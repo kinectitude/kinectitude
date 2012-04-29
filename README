@@ -1,0 +1,7 @@
+Kinectitude
+
+Build/          Target directory for builds
+Libraries/      Contains third-party dependencies
+Source/         All projects and source code, organized by namespace
+
+Building Kinectitude requires the Kinect for Windows SDK, and the SlimDX SDK.
