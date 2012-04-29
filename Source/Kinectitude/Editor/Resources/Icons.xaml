@@ -1,0 +1,34 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <!-- Toolbar and Menu Icons -->
+    
+    <ImageSource x:Key="icoNew">..\Icons\page_white.png</ImageSource>
+    <ImageSource x:Key="icoOpen">..\Icons\folder.png</ImageSource>
+    <ImageSource x:Key="icoSave">..\Icons\disk.png</ImageSource>
+    <ImageSource x:Key="icoCut">..\Icons\cut.png</ImageSource>
+    <ImageSource x:Key="icoCopy">..\Icons\page_copy.png</ImageSource>
+    <ImageSource x:Key="icoPaste">..\Icons\page_paste.png</ImageSource>
+    <ImageSource x:Key="icoUndo">..\Icons\arrow_undo.png</ImageSource>
+    <ImageSource x:Key="icoRedo">..\Icons\arrow_redo.png</ImageSource>
+    
+    <!-- Library Icons -->
+    
+    <ImageSource x:Key="icoGame">..\Icons\monitor.png</ImageSource>
+    <ImageSource x:Key="icoFolder">..\Icons\folder.png</ImageSource>
+    <ImageSource x:Key="icoScene">..\Icons\film.png</ImageSource>
+    <ImageSource x:Key="icoEntity">..\Icons\status_offline.png</ImageSource>
+    <ImageSource x:Key="icoAsset">..\Icons\picture.png</ImageSource>
+    
+    <!-- Library Commands -->
+    
+    <ImageSource x:Key="icoDelete">..\Icons\delete.png</ImageSource>
+    <ImageSource x:Key="icoNewScene">..\Icons\film_add.png</ImageSource>
+    
+    <!-- Plugins -->
+    
+    <ImageSource x:Key="icoComponent">..\Icons\cog.png</ImageSource>
+    <ImageSource x:Key="icoEvent">..\Icons\clock.png</ImageSource>
+    <ImageSource x:Key="icoAction">..\Icons\lightning.png</ImageSource>
+    
+</ResourceDictionary>

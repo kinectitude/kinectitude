@@ -1,0 +1,261 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Game Name="Pong" Width="800" Height="600" FirstScene="Main Menu">
+
+  <Plugin Path="Kinect.dll">
+    <Alias Name="KinectComponent" Class="Kinectitude.Kinect.KinectComponent" />
+    <Alias Name="KinectFollowComponent" Class="Kinectitude.Kinect.KinectFollowComponent" />
+    <Alias Name="KinectManager" Class="Kinectitude.Kinect.KinectManager" />
+  </Plugin>
+  
+  <Plugin Path="Physics.dll">
+    <Alias Name="PhysicsComponent" Class="Kinectitude.Physics.PhysicsComponent" />
+    <Alias Name="PhysicsManager" Class="Kinectitude.Physics.PhysicsManager" />
+    <Alias Name="CrossesLineEvent" Class="Kinectitude.Physics.CrossesLineEvent" />
+    <Alias Name="ExitsLeftEvent" Class="Kinectitude.Physics.ExitsLeftEvent" />
+    <Alias Name="ExitsRightEvent" Class="Kinectitude.Physics.ExitsRightEvent" />
+    <Alias Name="SetPositionAction" Class="Kinectitude.Physics.SetPositionAction" />
+  </Plugin>
+  
+  <Plugin Path="Render.dll">
+    <Alias Name="RenderComponent" Class="Kinectitude.Render.RenderComponent" />
+    <Alias Name="RenderManager" Class="Kinectitude.Render.RenderManager" />
+    <Alias Name="TextRenderComponent" Class="Kinectitude.Render.TextRenderComponent" />
+    <Alias Name="SetTextAction" Class="Kinectitude.Render.SetTextAction" />
+  </Plugin>
+    
+  <Asset File="icon.png" />
+  
+  <Entity Name="Paddle">
+    
+    <Attribute Key="width" Value="24" />
+    <Attribute Key="height" Value="128" />
+    <Attribute Key="score" Value="0" />
+    
+    <Component Type="KinectFollowComponent" Direction="Y" />
+    <Component Type="RenderComponent" Fillcolor="LimeGreen" />
+    <Component Type="PhysicsComponent" Dx="0" Dy="0" />
+  </Entity>
+
+  <Entity Name="PlayerOnePaddle" Prototype="Paddle">
+    <Component Type="KinectFollowComponent" Player="P1" Joint="HandLeft" />
+  </Entity>
+  
+  <Entity Name="PlayerTwoPaddle" Prototype="Paddle">
+    <Component Type="KinectFollowComponent" Player="P1" Joint="HandRight" />
+  </Entity>
+  
+  <Entity Name="Score">
+    <Component Type="TextRenderComponent" Fontcolor="White" />
+  </Entity>
+  
+  <Entity Name="Bar">
+    
+    <Attribute Key="width" Value="800" />
+    <Attribute Key="height" Value="10" />    
+    
+    <Component Type="RenderComponent" Fillcolor="LimeGreen" />
+  </Entity>
+
+  <Scene Name="Main Menu">
+
+    <Attribute Key="numReady" Value="0" />
+    
+    <Entity>
+      
+      <Attribute Key="x" Value="250" />
+      <Attribute Key="y" Value="24" />
+      
+      <Component Type="TextRenderComponent" Value="Kinect Wimbledon Deluxe" Fontcolor="Yellow" />
+    </Entity>
+
+    <Entity>
+      
+      <Attribute Key="x" Value="220" />
+      <Attribute Key="y" Value="80" />
+      
+      <Component Type="TextRenderComponent" Value="Move below the line to start" Fontcolor="White" />
+    </Entity>
+
+    <Entity>
+      
+      <Attribute Key="x" Value="25" />
+      <Attribute Key="y" Value="125" />
+      
+      <Component Type="TextRenderComponent" Value="Player 1 not ready!" Fontcolor="White" />
+      
+      <!--Event Type="TriggerOccursEvent" Name="Player1Ready">
+        <Action Type="SetTextAction" Value="Player 1 is ready!" />
+      </Event-->
+    </Entity>
+
+    <Entity>
+      
+      <Attribute Key="x" Value="425" />
+      <Attribute Key="y" Value="125" />
+      
+      <Component Type="TextRenderComponent" Value="Player 2 Not Ready!" Fontcolor="White" />
+      
+      <!--Event Type="TriggerOccursEvent" Name="Player2Ready">
+        <Action Type="SetTextAction" Value="Player 2 is ready!" />
+      </Event-->
+    </Entity>
+
+    <Entity Prototype="PlayerOnePaddle">
+      
+      <Attribute Key="x" Value="5" />
+      <Attribute Key="y" Value="250" />
+      
+      <Event Type="CrossesLineEvent" Line="Y" Location="450" Direction="Positive">
+        <!--Action Type="FireTriggerAction" Name="Player1Ready" /-->
+        <Action Type="IncrementAction" Key="scene.numReady" />
+      </Event>
+    </Entity>
+
+    <Entity Prototype="PlayerTwoPaddle">
+      
+      <Attribute Key="x" Value="770" />
+      <Attribute Key="y" Value="250" />
+      
+      <Event Type="CrossesLineEvent" Line="Y" Location="450" Direction="Positive">
+        <!--Action Type="FireTriggerAction" Name="Player2Ready" /-->
+        <Action Type="IncrementAction" Key="scene.numReady" />
+      </Event>
+    </Entity>
+
+    <Entity Prototype="Bar">
+      <Attribute Key="x" Value="0" />
+      <Attribute Key="y" Value="450" />
+    </Entity>
+    
+    <Event Type="AttributeEqualsEvent" Key="scene.numReady" Value="2">
+      <Action Type="ChangeSceneAction" Target="Game" />
+    </Event>
+    
+  </Scene>
+  
+  <Scene Name="Game">
+    
+    <Entity Prototype="PlayerOnePaddle" Name="paddle1">
+      
+      <Attribute Key="x" Value="5" />
+      <Attribute Key="y" Value="250" />
+      
+      <!--Event Type="TriggerOccursEvent" Name="Player1Scores">
+        <Action Type="IncrementAction" Key="score" />
+      </Event-->
+    </Entity>
+
+    <Entity Prototype="PlayerTwoPaddle" Name="paddle2">
+      
+      <Attribute Key="x" Value="770" />
+      <Attribute Key="y" Value="250" />
+      
+      <!--Event Type="TriggerOccursEvent" Name="Player2Scores">
+        <Action Type="IncrementAction" Key="score" />
+      </Event-->
+    </Entity>
+
+    <Entity>
+      
+      <Attribute Key="x" Value="400" />
+      <Attribute Key="y" Value="300" />
+      <Attribute Key="width" Value="48" />
+      <Attribute Key="height" Value="48" />
+      
+      <Component Type="RenderComponent" Fillcolor="LimeGreen" Shape="Ellipse" />
+      <Component Type="PhysicsComponent" Dx="6" Dy="6" />
+      
+      <Event Type="ExitsLeftEvent">
+        <Action Type="SetPositionAction" X="400" Y="300" />
+        <!--Action Type="FireTriggerAction" Name="Player2Scores" /-->
+      </Event>
+      <Event Type="ExitsRightEvent">
+        <Action Type="SetPositionAction" X="400" Y="300" />
+        <!--Action Type="FireTriggerAction" Name="Player1Scores" /-->
+      </Event>
+    </Entity>
+
+	<Entity Prototype="Score">
+
+      <Attribute Key="x" Value="56" />
+      <Attribute Key="y" Value="24" />
+      
+      <Component Type="TextRenderComponent" Value="{paddle1.score}" />
+    </Entity>
+	
+	<Entity Prototype="Score">
+
+      <Attribute Key="x" Value="724" />
+      <Attribute Key="y" Value="24" />
+    
+      <Component Type="TextRenderComponent" Value="{paddle2.score}" />
+	</Entity>
+	
+    <Event Type="AttributeEqualsEvent" Key="paddle1.score" Value="7">
+      <!--Action Type="SetAttributeAction" Key="game.winner" Value="1" /-->
+      <Action Type="ChangeSceneAction" Target="Game Over" />
+    </Event>
+    
+    <Event Type="AttributeEqualsEvent" Key="paddle2.score" Value="7">
+      <!--Action Type="SetAttributeAction" Key="game.winner" Value="2" /-->
+      <Action Type="ChangeSceneAction" Target="Game Over" />
+    </Event>
+    
+  </Scene>
+
+  <Scene Name="Game Over">
+    
+    <Entity>
+
+      <Attribute Key="x" Value="300" />
+      <Attribute Key="y" Value="20" />
+      
+      <Component Type="TextRenderComponent" Value="Player {game.winner} Wins!" Fontcolor="White" />
+    </Entity>
+
+    <Entity>
+
+      <Attribute Key="x" Value="100" />
+      <Attribute Key="y" Value="100" />
+
+      <Component Type="TextRenderComponent" Value="Top line for menu, bottom to quit." Fontcolor="White" />
+    </Entity>
+
+    <Entity Prototype="PlayerOnePaddle">
+
+      <Attribute Key="x" Value="5" />
+      <Attribute Key="y" Value="250" />
+      
+      <Event Type="CrossesLineEvent" Line="Y" Location="500" Direction="Positive">
+        <Action Type="PopSceneAction" />
+      </Event>
+      <Event Type="CrossesLineEvent" Line="Y" Location="150" Direction="Negative">
+        <Action Type="ChangeSceneAction" Target="Main Menu" />
+      </Event>
+    </Entity>
+
+    <Entity Prototype="PlayerTwoPaddle">
+
+      <Attribute Key="x" Value="770" />
+      <Attribute Key="y" Value="250" />
+
+      <Event Type="CrossesLineEvent" Line="Y" Location="500" Direction="Positive">
+        <Action Type="PopSceneAction" />
+      </Event>
+      <Event Type="CrossesLineEvent" Line="Y" Location="150" Direction="Negative">
+        <Action Type="ChangeSceneAction" Target="Main Menu" />
+      </Event>
+    </Entity>
+
+    <Entity Prototype="Bar">
+      <Attribute Key="x" Value="0" />
+      <Attribute Key="y" Value="500" />
+    </Entity>
+
+    <Entity Prototype="Bar">
+      <Attribute Key="x" Value="0" />
+      <Attribute Key="y" Value="150" />
+    </Entity>
+    
+  </Scene>
+</Game>

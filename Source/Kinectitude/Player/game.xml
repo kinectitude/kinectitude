@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<game name="pong" width="800" height="600">
+
+  <define part="KinectComponent" fullName="Kinectitude.Kinect.KinectComponent" file="Kinectitude.Kinect.dll" />
+  <define part="KinectFollowComponent" fullName="Kinectitude.Kinect.KinectFollowComponent" file="Kinectitude.Kinect.dll" />
+  <define part="KinectManager" fullName="Kinectitude.Kinect.KinectManager" file="Kinectitude.Kinect.dll" />
+
+  <define part="PhysicsComponent" fullName="Kinectitude.Physics.PhysicsComponent" file="Kinectitude.Physics.dll" />
+  <define part="PhysicsManager" fullName="Kinectitude.Physics.PhysicsManager" file="Kinectitude.Physics.dll" />
+  <define part="CrossesLineEvent" fullName="Kinectitude.Physics.CrossesLineEvent" file="Kinectitude.Physics.dll" />
+  <define part="ExitsLeftEvent" fullName="Kinectitude.Physics.ExitsLeftEvent" file="Kinectitude.Physics.dll" />
+  <define part="ExitsRightEvent" fullName="Kinectitude.Physics.ExitsRightEvent" file="Kinectitude.Physics.dll" />
+  <define part="SetPositionAction" fullName="Kinectitude.Physics.SetPositionAction" file="Kinectitude.Physics.dll" />
+
+  <define part="RenderComponent" fullName="Kinectitude.Render.RenderComponent" file="Kinectitude.Render.dll" />
+  <define part="RenderManager" fullName="Kinectitude.Render.RenderManager" file="Kinectitude.Render.dll" />
+  <define part="TextRenderComponent" fullName="Kinectitude.Render.TextRenderComponent" file="Kinectitude.Render.dll" />
+  <define part="SetTextAction" fullName="Kinectitude.Render.SetTextAction" file="Kinectitude.Render.dll" />
+
+  <prototype name="paddle" width="24" height="128">
+    <component type= "KinectFollowComponent" Direction ="Y" player="P1" joint ="HandLeft"  />
+    <component type= "RenderComponent" fillcolor ="LimeGreen" />
+    <component type="PhysicsComponent" dx="0" dy="0" />
+  </prototype>
+
+  <prototype name="score">
+    <component type="TextRenderComponent" value="0" fontcolor="White" />
+  </prototype>
+
+  <prototype name="bar" width="800" height="10" x="0" y="450">
+    <component type= "RenderComponent" fillcolor ="LimeGreen" />
+  </prototype>
+
+  <!-- tests that it will inherit from paddle-->
+  <prototype name="endPaddle" prototype="paddle">
+    <event type="CrossesLineEvent" Line="Y" Location="500"  Direction="Positive">
+      <action type="PopSceneAction"/>
+    </event>
+    <event type="CrossesLineEvent" Line="Y" Location="150"  Direction="Negative">
+      <action type="ChangeSceneAction" target="main"/>
+    </event>
+  </prototype>
+
+  <!--this is to test that muti-inheritance works and in the correct order it is stupid to actually do for this-->
+  <prototype name="highY" y="150"/>
+
+  <scene name ="main" numReady="0" ready1="" ready2 ="">
+
+    <entity name="topText" x="250" y="24">
+      <component type="TextRenderComponent" value="Kinect Wimbledon Delux" fontcolor="Yellow" />
+    </entity>
+
+    <entity name="instructions" x="220" y="80">
+      <component type="TextRenderComponent" value="Move below the line to start" fontcolor="White" />
+    </entity>
+
+    <entity name="ready1" x="25" y="125">
+      <component type="TextRenderComponent" value="Player 1 Not Ready!" fontcolor="White" />
+      <event type="AttributeChangesEvent" target="scene.ready1">
+        <action type="SetTextAction" value="scene.ready1" />
+      </event>
+    </entity>
+
+    <entity name="ready2" x="425" y="125">
+      <component type="TextRenderComponent" value="Player 2 Not Ready!" fontcolor="White" />
+      <event type="AttributeChangesEvent" target="scene.ready2">
+        <action type="SetTextAction" value="scene.ready2" />
+      </event>
+    </entity>
+
+    <entity name ="player1" prototype="paddle" x="5" y="250">
+      <event type="CrossesLineEvent" Line="Y" Location="450"  Direction="Positive">
+        <action type="SetAttributeAction" target="scene.ready1" value="player 1 is ready!"/>
+        <!-- <condition if="scene.ready2"> -->
+        <!-- TODO replace with line above this complicated epressions for ifs, checked in debug to see that it parsed it right-->
+        <condition if="scene.ready2 and scene.ready1 or scene.ready1 and scene.ready2">
+          <action type="ChangeSceneAction" target="game"/>
+        </condition>
+      </event>
+    </entity>
+
+    <entity name ="player2" prototype="paddle" x="770" y="250">
+      <!--this is testing to see that I can ovrride things in a prototype-->
+      <component type="KinectFollowComponent" player="P1" joint="HandRight" />
+      <event type="CrossesLineEvent" Line="Y" Location="450"  Direction="Positive">
+        <action type="SetAttributeAction" target="scene.ready2" value="player 2 is ready!"/>
+        <condition if="scene.ready1">
+          <action type="ChangeSceneAction" target="game"/>
+        </condition>
+      </event>
+    </entity>
+
+    <entity name="readybar" prototype="bar"/>
+  </scene>
+
+  <scene name="game" player1Score="0" player2Score="0">
+
+    <entity name="player1" prototype="paddle" x="5" y="250"/>
+
+    <entity name="player2" prototype="paddle" x="770" y="250">
+      <component type="KinectFollowComponent" player="P1" joint="HandRight" />
+    </entity>
+
+    <entity name="ball" x="400" y="300" radius="24">
+      <component type="RenderComponent" fillcolor="LimeGreen" />
+      <component type ="PhysicsComponent" dx="6" dy="6" />
+      <event type="ExitsLeftEvent">
+        <action type="SetPositionAction" x="400" y="300" />
+        <action type="IncrementAction" target ="scene.player2Score" />
+      </event>
+      <!-- this is done differently then the other one to test both methods-->
+      <event type="ExitsRightEvent">
+        <action type="SetPositionAction" x="400" y="300" />
+        <action type="IncrementAction" target="scene.player1Score" />
+        <action type="FireTriggerAction" name="player1Scores"/>
+      </event>
+    </entity>
+
+    <entity prototype="score" x="56" y="24">
+      <event type="TriggerOccursEvent" trigger="player1Scores">
+        <action type="SetTextAction" value="scene.player1Score" />
+      </event>
+      <event type="AttributeEqualsEvent" target="scene.player1Score" value ="7">
+        <action type="SetAttributeAction" target="game.winner" value="player 1 wins"/>
+        <action type="ChangeSceneAction" target="gameOver"/>
+      </event>
+    </entity>
+
+    <entity prototype="score" x="724" y="24">
+      <event type="AttributeChangesEvent" target="scene.player2Score">
+        <action type="SetTextAction" value="scene.player2Score" />
+      </event>
+      <event type="AttributeEqualsEvent" target="scene.player2Score" value ="7">
+        <action type="SetAttributeAction" target="game.winner" value="player 2 wins"/>
+        <action type="ChangeSceneAction" target="gameOver"/>
+      </event>
+    </entity>
+
+  </scene>
+
+  <scene name="gameOver">
+    <entity name="gameOver" x="300" y="20">
+      <!-- we should make this work later so it can have at least an inital value of what it is
+      <component type="TextRenderComponent" value="={game.winner}" fontcolor="White" />-->
+      <!--This can simply have value = game.winner, since it won't change, but I needed somewhere to test Scene StartEvent-->
+      <component type="TextRenderComponent" value="" fontcolor="White" />
+      <event type="SceneStartsEvent">
+        <action type="SetTextAction" value="game.winner" />
+      </event>
+    </entity>
+
+    <entity name="instructions" x="100" y="100">
+      <component type="TextRenderComponent" value="Top line to for menu bottom to quit" fontcolor="White" />
+    </entity>
+
+    <entity name="player1" prototype="endPaddle" x="5" y="250"/>
+
+    <entity name="player2" prototype="endPaddle" x="770" y="250">
+      <component type="KinectFollowComponent" joint="HandRight" />
+    </entity>
+
+    <entity name="bottomBar" prototype="bar" y="500"/>
+
+    <entity name="topBar" prototype="highY bar"/>
+
+  </scene>
+</game>
