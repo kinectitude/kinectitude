@@ -84,8 +84,13 @@
     <Compile Include="Commands\Scene\SelectMultipleEntitiesCommand.cs" />
     <Compile Include="Commands\Base\UndoCommand.cs" />
     <Compile Include="Base\ModelCollection.cs" />
-    <Compile Include="Models\Attributes\BaseAttribute.cs" />
+    <Compile Include="Models\Alias.cs" />
+    <Compile Include="Models\Attribute.cs" />
+    <Compile Include="Models\Condition.cs" />
+    <Compile Include="Models\Expressions\BooleanExpression.cs" />
+    <Compile Include="Models\IActionContainer.cs" />
     <Compile Include="Models\IEntityContainer.cs" />
+    <Compile Include="Models\IAction.cs" />
     <Compile Include="Models\IEventContainer.cs" />
     <Compile Include="Models\Plugins\Action.cs" />
     <Compile Include="Models\AttributeContainer.cs" />
@@ -96,21 +101,20 @@
     <Compile Include="Models\Properties\RealProperty.cs" />
     <Compile Include="Models\Properties\TextProperty.cs" />
     <Compile Include="Models\Properties\PropertyDescriptor.cs" />
-    <Compile Include="Models\Attributes\BooleanAttribute.cs" />
     <Compile Include="Models\Plugins\Component.cs" />
     <Compile Include="Models\Entity.cs" />
     <Compile Include="Models\Plugins\Event.cs" />
-    <Compile Include="Models\Attributes\IntegerAttribute.cs" />
+    <Compile Include="Models\Using.cs" />
     <Compile Include="Storage\IPluginFactory.cs" />
     <Compile Include="Models\Plugins\Plugin.cs" />
     <Compile Include="Models\Plugins\PluginDescriptor.cs" />
     <Compile Include="Models\Properties\BaseProperty.cs" />
-    <Compile Include="Models\Attributes\RealAttribute.cs" />
-    <Compile Include="Models\Attributes\TextAttribute.cs" />
+    <Compile Include="Storage\IPluginNamespace.cs" />
     <Compile Include="Storage\XmlGameStorage.cs" />
     <Compile Include="Storage\IGameStorage.cs" />
     <Compile Include="ViewModels\AttributeViewModel.cs" />
     <Compile Include="ViewModels\BasePropertyViewModel.cs" />
+    <Compile Include="Views\DetailsConverter.cs" />
     <Compile Include="Views\FolderConverter.cs" />
     <Compile Include="ViewModels\ComponentViewModel.cs" />
     <Compile Include="ViewModels\EntityViewModel.cs" />
@@ -207,12 +211,14 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="App.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="schema.xsd">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\disk.png" />
@@ -232,6 +238,7 @@
     <Resource Include="Icons\film_add.png" />
     <Resource Include="Icons\clock.png" />
     <Resource Include="Icons\cog.png" />
+    <Resource Include="Icons\lock.png" />
     <Content Include="Samples\Pong\Assets\icon.png" />
     <Content Include="Samples\Pong\game.xml">
       <SubType>Designer</SubType>

@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Kinectitude.Editor.Models.Properties;
 
-namespace Editor.ViewModels
+namespace Kinectitude.Editor.ViewModels
 {
     public class BasePropertyViewModel
     {
@@ -33,7 +34,7 @@ namespace Editor.ViewModels
 
         public string Key
         {
-            get { return property.Descriptor.Key; }
+            get { return property.Descriptor.DisplayName; }
         }
 
         private BasePropertyViewModel(BaseProperty property)

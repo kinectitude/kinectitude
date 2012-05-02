@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Editor.Base;
+using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models.Plugins;
 
-namespace Editor.ViewModels
+namespace Kinectitude.Editor.ViewModels
 {
     public class PluginViewModel : BaseModel
     {
@@ -17,7 +18,7 @@ namespace Editor.ViewModels
 
         public string Name
         {
-            get { return descriptor.Name; }
+            get { return descriptor.DisplayName; }
         }
 
         public string Type

@@ -5,7 +5,7 @@ using System.Text;
 using System.Reflection;
 using Kinectitude.Attributes;
 
-namespace Editor
+namespace Kinectitude.Editor.Models.Properties
 {
     public class PropertyDescriptor
     {
@@ -20,20 +20,20 @@ namespace Editor
             Asset
         }
 
-        private readonly string propertyName;
-        private readonly string key;
+        private readonly string name;
+        private readonly string displayName;
         private readonly string description;
         private readonly PropertyType type;
         private readonly string[] enumeration;
 
-        public string PropertyName
+        public string Name
         {
-            get { return propertyName; }
+            get { return name; }
         }
 
-        public string Key
+        public string DisplayName
         {
-            get { return key; }
+            get { return displayName; }
         }
 
         public string Description
@@ -53,18 +53,18 @@ namespace Editor
 
         public PropertyDescriptor(PropertyInfo propertyInfo)
         {
-            propertyName = propertyInfo.Name;
+            name = propertyInfo.Name;
 
-            PluginAttribute pluginPropertyAttribute = Attribute.GetCustomAttribute(propertyInfo, typeof(PluginAttribute)) as PluginAttribute;
+            PluginAttribute pluginPropertyAttribute = System.Attribute.GetCustomAttribute(propertyInfo, typeof(PluginAttribute)) as PluginAttribute;
 
             if (null != pluginPropertyAttribute)
             {
-                key = pluginPropertyAttribute.Name;
+                displayName = pluginPropertyAttribute.Name;
                 description = pluginPropertyAttribute.Description;
             }
             else
             {
-                key = propertyInfo.Name;
+                displayName = propertyInfo.Name;
             }
 
             Type propertyType = propertyInfo.PropertyType;

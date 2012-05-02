@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Input;
-using Editor.Base;
+using Kinectitude.Editor.Base;
 
-namespace Editor.Commands.Base
+namespace Kinectitude.Editor.Commands.Base
 {
     public class CommandHistory : BaseModel, ICommandHistory
     {

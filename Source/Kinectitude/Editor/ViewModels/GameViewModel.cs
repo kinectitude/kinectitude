@@ -2,14 +2,15 @@
 using System.Linq;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using Editor.Base;
-using Editor.Views;
-using Editor.Storage;
+using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Views;
+using Kinectitude.Editor.Storage;
 using System.Collections.Generic;
-using Editor.Commands.Base;
-using Editor.Commands.Game;
+using Kinectitude.Editor.Commands.Base;
+using Kinectitude.Editor.Commands.Game;
+using Kinectitude.Editor.Models;
 
-namespace Editor.ViewModels
+namespace Kinectitude.Editor.ViewModels
 {
     public class GameViewModel : BaseModel
     {
@@ -198,7 +199,7 @@ namespace Editor.ViewModels
             _attributes = new ObservableCollection<AttributeViewModel>(attributeViewModels);
             attributes = new ModelCollection<AttributeViewModel>(_attributes);
 
-            var prototypeViewModels = from entity in game.Prototypes select EntityViewModel.Create(entity);
+            var prototypeViewModels = from entity in game.Entities select EntityViewModel.Create(entity);
             _prototypes = new ObservableCollection<EntityViewModel>(prototypeViewModels);
             prototypes = new ModelCollection<EntityViewModel>(_prototypes);
 

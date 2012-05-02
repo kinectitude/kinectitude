@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Kinectitude.Editor.Commands.Scene
+namespace Kinectitude.Editor.Models.Expressions
 {
-    class SelectMultipleEntitiesCommand
+    public class BooleanExpression
     {
     }
 }

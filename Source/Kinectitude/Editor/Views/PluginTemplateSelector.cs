@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Windows.Controls;
 using System.Windows;
-using Editor.ViewModels;
+using Kinectitude.Editor.ViewModels;
 
-namespace Editor.Views
+namespace Kinectitude.Editor.Views
 {
     public class PluginTemplateSelector : DataTemplateSelector
     {

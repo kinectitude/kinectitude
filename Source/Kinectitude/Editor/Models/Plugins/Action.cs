@@ -3,23 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Editor
+namespace Kinectitude.Editor.Models.Plugins
 {
-    public class Action : Plugin
+    public class Action : Plugin, IAction
     {
-        private Event parent;
+        private IActionContainer parent;
 
-        public Event Parent
+        public IActionContainer Parent
         {
             get { return parent; }
             set { parent = value; }
         }
 
         public Action(PluginDescriptor descriptor) : base(descriptor) { }
-
-        public override string ToString()
-        {
-            return string.Format("Type: {0}", Descriptor.Name);
-        }
     }
 }

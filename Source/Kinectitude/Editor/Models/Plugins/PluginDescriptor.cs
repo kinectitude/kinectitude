@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using Kinectitude.Attributes;
+using Kinectitude.Editor.Models.Properties;
 
-namespace Editor
+namespace Kinectitude.Editor.Models.Plugins
 {
     public class PluginDescriptor
     {
@@ -16,21 +17,26 @@ namespace Editor
             Action
         }
 
-        private readonly string className;
         private readonly string name;
+        private readonly string file;
+        private readonly string displayName;
         private readonly PluginType type;
         private readonly string description;
-        //private readonly Uri image;
         private readonly List<PropertyDescriptor> propertyDescriptors;
-
-        public string Class
-        {
-            get { return className; }
-        }
 
         public string Name
         {
             get { return name; }
+        }
+
+        public string File
+        {
+            get { return file; }
+        }
+
+        public string DisplayName
+        {
+            get { return displayName; }
         }
 
         public PluginType Type
@@ -43,11 +49,6 @@ namespace Editor
             get { return description; }
         }
 
-        /*public Uri Image
-        {
-            get { return image; }
-        }*/
-
         public IEnumerable<PropertyDescriptor> PropertyDescriptors
         {
             get { return propertyDescriptors; }
@@ -55,22 +56,19 @@ namespace Editor
 
         public PluginDescriptor(Type pluginType)
         {
-            className = pluginType.Name;
-
+            name = pluginType.FullName;
+            file = pluginType.Module.Name;
+            displayName = pluginType.Name;
+            
             PropertyInfo[] propertyInfo = pluginType.GetProperties();
             propertyDescriptors = new List<PropertyDescriptor>();
 
-            PluginAttribute pluginAttribute = Attribute.GetCustomAttribute(pluginType, typeof(PluginAttribute)) as PluginAttribute;
+            PluginAttribute pluginAttribute = System.Attribute.GetCustomAttribute(pluginType, typeof(PluginAttribute)) as PluginAttribute;
 
             if (null != pluginAttribute)
             {
-                name = pluginAttribute.Name;
+                displayName = pluginAttribute.Name;
                 description = pluginAttribute.Description;
-                //image = new Uri(pluginAttribute.Icon);
-            }
-            else
-            {
-                name = pluginType.Name;
             }
             
             if (typeof(Kinectitude.Core.Component).IsAssignableFrom(pluginType))
@@ -88,12 +86,17 @@ namespace Editor
 
             foreach (PropertyInfo property in propertyInfo)
             {
-                if (Attribute.IsDefined(property, typeof(PluginAttribute)))
+                if (System.Attribute.IsDefined(property, typeof(PluginAttribute)))
                 {
                     PropertyDescriptor descriptor = new PropertyDescriptor(property);
                     propertyDescriptors.Add(descriptor);
                 }
             }
+        }
+
+        public PropertyDescriptor GetPropertyDescriptor(string name)
+        {
+            return propertyDescriptors.FirstOrDefault(x => x.Name == name);
         }
     }
 }

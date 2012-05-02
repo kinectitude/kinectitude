@@ -2,25 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Editor.Base;
+using Kinectitude.Editor.Base;
+using Attribute = Kinectitude.Editor.Models.Attribute;
 
-namespace Editor.ViewModels
+namespace Kinectitude.Editor.ViewModels
 {
     public class AttributeViewModel : BaseModel
     {
-        private readonly BaseAttribute attribute;
+        private readonly Attribute attribute;
 
         public string Key
         {
             get { return attribute.Key; }
         }
 
-        public string Value
+        public dynamic Value
         {
-            get { return attribute.StringValue; }
+            get { return attribute.Value; }
         }
 
-        public AttributeViewModel(BaseAttribute attribute)
+        public AttributeViewModel(Attribute attribute)
         {
             this.attribute = attribute;
         }

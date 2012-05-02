@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Editor
+namespace Kinectitude.Editor.Models.Properties
 {
     public abstract class Property<T> : BaseProperty
     {
@@ -20,6 +20,11 @@ namespace Editor
         }
 
         protected Property(PropertyDescriptor descriptor) : base(descriptor) { }
+
+        public override string ToString()
+        {
+            return value.ToString();
+        }
     }
 
     public abstract class BaseProperty
@@ -28,25 +33,28 @@ namespace Editor
         {
             BaseProperty property = null;
 
-            if (descriptor.Type == PropertyDescriptor.PropertyType.Text)
+            if (null != descriptor)
             {
-                property = new TextProperty(descriptor);
-            }
-            else if (descriptor.Type == PropertyDescriptor.PropertyType.Integer)
-            {
-                property = new IntegerProperty(descriptor);
-            }
-            else if (descriptor.Type == PropertyDescriptor.PropertyType.Real)
-            {
-                property = new RealProperty(descriptor);
-            }
-            else if (descriptor.Type == PropertyDescriptor.PropertyType.Boolean)
-            {
-                property = new BooleanProperty(descriptor);
-            }
-            else if (descriptor.Type == PropertyDescriptor.PropertyType.Enumeration)
-            {
-                property = new EnumerationProperty(descriptor);
+                if (descriptor.Type == PropertyDescriptor.PropertyType.Text)
+                {
+                    property = new TextProperty(descriptor);
+                }
+                else if (descriptor.Type == PropertyDescriptor.PropertyType.Integer)
+                {
+                    property = new IntegerProperty(descriptor);
+                }
+                else if (descriptor.Type == PropertyDescriptor.PropertyType.Real)
+                {
+                    property = new RealProperty(descriptor);
+                }
+                else if (descriptor.Type == PropertyDescriptor.PropertyType.Boolean)
+                {
+                    property = new BooleanProperty(descriptor);
+                }
+                else if (descriptor.Type == PropertyDescriptor.PropertyType.Enumeration)
+                {
+                    property = new EnumerationProperty(descriptor);
+                }
             }
             return property;
         }
@@ -65,8 +73,6 @@ namespace Editor
             set { inherited = value; }
         }
 
-        public abstract string StringValue { get; }
-
         protected BaseProperty(PropertyDescriptor descriptor)
         {
             this.descriptor = descriptor;
@@ -74,5 +80,7 @@ namespace Editor
         }
 
         public abstract bool TryParse(string input);
+
+        public abstract override string ToString();
     }
 }

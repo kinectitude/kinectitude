@@ -3,24 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
-using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Models;
+using Action = Kinectitude.Editor.Models.Plugins.Action;
+using Kinectitude.Editor.Models.Expressions;
+using Kinectitude.Editor.Models.Plugins;
 
-namespace Kinectitude.Editor.Models.Plugins
+namespace Kinectitude.Editor.Models
 {
-    public class Event : Plugin, IActionContainer
+    public class Condition : IAction, IActionContainer
     {
-        private IEventContainer parent;
-
-        //private readonly List<IAction> _actions;
-        //private readonly ReadOnlyCollection<IAction> actions;
-
+        private IActionContainer parent;
+        private BooleanExpression when;
         private readonly List<IAction> actions;
 
-        public IEventContainer Parent
+        public IActionContainer Parent
         {
             get { return parent; }
             set { parent = value; }
+        }
+
+        public BooleanExpression When
+        {
+            get { return when; }
+            set { when = value; }
         }
 
         public IEnumerable<IAction> Actions
@@ -28,11 +32,8 @@ namespace Kinectitude.Editor.Models.Plugins
             get { return actions; }
         }
 
-        public Event(PluginDescriptor descriptor) : base(descriptor)
+        public Condition()
         {
-            //_actions = new List<IAction>();
-            //actions = new ReadOnlyCollection<IAction>(_actions);
-
             actions = new List<IAction>();
         }
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Input;
 
-namespace Editor.Commands.Base
+namespace Kinectitude.Editor.Commands.Base
 {
     public class UndoCommand : ICommand
     {

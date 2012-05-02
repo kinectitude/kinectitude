@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Kinectitude.Editor.Models.Properties;
 
-namespace Editor
+namespace Kinectitude.Editor.Models.Plugins
 {
     public class Plugin
     {
         private readonly PluginDescriptor descriptor;
-        private readonly BaseProperty[] properties;
+        private readonly SortedDictionary<string, BaseProperty> properties;
         
         public PluginDescriptor Descriptor
         {
@@ -17,30 +18,36 @@ namespace Editor
 
         public IEnumerable<BaseProperty> Properties
         {
-            get { return properties; }
+            get { return properties.Values; }
         }
 
         protected Plugin(PluginDescriptor descriptor)
         {
             this.descriptor = descriptor;
-            PropertyDescriptor[] propertyDescriptors = descriptor.PropertyDescriptors.ToArray();
-            properties = new BaseProperty[propertyDescriptors.Length];
-
-            int i = 0;
-            foreach (PropertyDescriptor propertyDescriptor in propertyDescriptors)
-            {
-                BaseProperty property = BaseProperty.CreateProperty(propertyDescriptor);
-
-                if (null != property)
-                {
-                    properties[i++] = property;
-                }
-            }
+            properties = new SortedDictionary<string, BaseProperty>();
         }
 
-        public BaseProperty GetProperty(string key)
+        public virtual T GetProperty<T>(string name) where T : BaseProperty
         {
-            return properties.FirstOrDefault(x => x.Descriptor.Key == key);
+            return properties.ContainsKey(name) ? properties[name] as T : null;
+        }
+
+        public void SetProperty(string name, string value)
+        {
+            if (!properties.ContainsKey(name))
+            {
+                BaseProperty property = BaseProperty.CreateProperty(descriptor.GetPropertyDescriptor(name));
+                if (null != property)
+                {
+                    properties[name] = property;
+                }
+            }
+
+            if (properties.ContainsKey(name))
+            {
+                BaseProperty property = properties[name];
+                property.TryParse(value);
+            }
         }
     }
 }

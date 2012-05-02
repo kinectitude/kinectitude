@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Collections.ObjectModel;
+using System;
+using Kinectitude.Editor.Storage;
+using Kinectitude.Editor.Models.Plugins;
 
-namespace Editor
+namespace Kinectitude.Editor.Models
 {
     public class Game : AttributeContainer, IEntityContainer
     {
@@ -12,11 +15,10 @@ namespace Editor
         private int height;
         private bool fullScreen;
         private Scene firstScene;
-
-        private readonly List<Scene> _scenes;
-        private readonly List<Entity> _prototypes;
-        private readonly ReadOnlyCollection<Scene> scenes;
-        private readonly ReadOnlyCollection<Entity> prototypes;
+        private readonly IPluginNamespace pluginNamespace;
+        private readonly SortedDictionary<string, Using> usings;
+        private readonly SortedDictionary<string, Entity> prototypes;
+        private readonly SortedDictionary<string, Scene> scenes;
 
         public string Name
         {
@@ -54,57 +56,114 @@ namespace Editor
             set { firstScene = value; }
         }
 
-        public ReadOnlyCollection<Scene> Scenes
+        public IEnumerable<Using> Usings
         {
-            get { return scenes; }
+            get { return usings.Values; }
         }
 
-        public ReadOnlyCollection<Entity> Prototypes
+        public IEnumerable<Scene> Scenes
         {
-            get { return prototypes; }
+            get { return scenes.Values; }
         }
 
-        public Game()
+        public IEnumerable<Entity> Entities
         {
+            get { return prototypes.Values; }
+        }
+
+        public Game(IPluginNamespace pluginNamespace)
+        {
+            /*_usings = new List<Using>();
+            usings = new ReadOnlyCollection<Using>(_usings);
+
             _scenes = new List<Scene>();
             scenes = new ReadOnlyCollection<Scene>(_scenes);
 
             _prototypes = new List<Entity>();
-            prototypes = new ReadOnlyCollection<Entity>(_prototypes);
+            prototypes = new ReadOnlyCollection<Entity>(_prototypes);*/
+
+            this.pluginNamespace = pluginNamespace;
+            usings = new SortedDictionary<string, Using>();
+            prototypes = new SortedDictionary<string, Entity>();
+            scenes = new SortedDictionary<string, Scene>();
         }
 
         public void AddScene(Scene scene)
         {
             scene.Parent = this;
-            _scenes.Add(scene);
+            scenes.Add(scene.Name, scene);
         }
 
         public void RemoveScene(Scene scene)
         {
             scene.Parent = null;
-            _scenes.Remove(scene);
+            scenes.Remove(scene.Name);
         }
 
-        public Entity GetPrototypeEntityByName(string name)
+        public Entity GetPrototype(string name)
         {
-            return _prototypes.FirstOrDefault(x => x.Name == name);
+            Entity ret = null;
+            prototypes.TryGetValue(name, out ret);
+            return ret;
         }
 
         public void AddEntity(Entity entity)
         {
             entity.Parent = this;
-            _prototypes.Add(entity);
+            prototypes.Add(entity.Name, entity);
         }
 
         public void RemoveEntity(Entity entity)
         {
             entity.Parent = null;
-            _prototypes.Remove(entity);
+            prototypes.Remove(entity.Name);
         }
 
-        public override string ToString()
+        /*public void AddAlias(string name, string fullName)
         {
-            return string.Format("Name: '{0}', Width: {1}, Height: {2}", Name, Width, Height);
+            string uniqueName = name;
+            if (aliases.ContainsKey(name))
+            {
+                int i = 1;
+                do
+                {
+                    uniqueName = string.Format("{0}{1}", name, i++);
+                }
+                while(aliases.ContainsKey(uniqueName));
+
+                aliases[uniqueName] = fullName;
+            }
+        }*/
+
+        public void AddUsing(Using use)
+        {
+            usings.Add(use.Path, use);
+        }
+
+        public void RemoveUsing(Using use)
+        {
+            usings.Remove(use.Path);
+        }
+
+        public Scene GetScene(string name)
+        {
+            Scene ret = null;
+            scenes.TryGetValue(name, out ret);
+            return ret;
+        }
+
+        public PluginDescriptor GetPluginDescriptor(string name)
+        {
+            foreach (Using use in Usings)
+            {
+                Alias alias = use.GetAlias(name);
+                if (null != alias)
+                {
+                    name = alias.Class;
+                    break;
+                }
+            }
+            return pluginNamespace.GetPluginDescriptor(name);
         }
     }
 }

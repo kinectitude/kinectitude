@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Editor.Base;
+using Kinectitude.Editor.Base;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using Editor.Commands;
-using Editor.Commands.Base;
+using Kinectitude.Editor.Commands;
+using Kinectitude.Editor.Commands.Base;
+using Kinectitude.Editor.Models;
+using Kinectitude.Editor.Commands.Scene;
 
-namespace Editor.ViewModels
+namespace Kinectitude.Editor.ViewModels
 {
     public class SceneViewModel : BaseModel
     {
@@ -103,15 +105,15 @@ namespace Editor.ViewModels
 
             var attributeViewModels = from attribute in scene.Attributes select new AttributeViewModel(attribute);
             var entityViewModels = from entity in scene.Entities select EntityViewModel.Create(entity);
-            var eventViewModels = from evt in scene.Events select new EventViewModel(evt);
+            //var eventViewModels = from evt in scene.Events select new EventViewModel(evt);
 
             _attributes = new ObservableCollection<AttributeViewModel>(attributeViewModels);
             _entities = new ObservableCollection<EntityViewModel>(entityViewModels);
-            _events = new ObservableCollection<EventViewModel>(eventViewModels);
+            //_events = new ObservableCollection<EventViewModel>(eventViewModels);
 
             attributes = new ModelCollection<AttributeViewModel>(_attributes);
             entities = new ModelCollection<EntityViewModel>(_entities);
-            events = new ModelCollection<EventViewModel>(_events);
+            //events = new ModelCollection<EventViewModel>(_events);
 
             commandHistory = new CommandHistory();
         }

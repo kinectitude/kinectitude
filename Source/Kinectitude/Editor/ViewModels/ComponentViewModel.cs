@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
+using Kinectitude.Editor.Models.Plugins;
 
-namespace Editor.ViewModels
+namespace Kinectitude.Editor.ViewModels
 {
     public class ComponentViewModel
     {
@@ -19,7 +20,7 @@ namespace Editor.ViewModels
 
         public string Name
         {
-            get { return component.Descriptor.Name; }
+            get { return component.Descriptor.DisplayName; }
         }
 
         public IEnumerable<BasePropertyViewModel> Properties

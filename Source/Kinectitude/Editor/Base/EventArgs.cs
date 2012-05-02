@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Editor.Base
+namespace Kinectitude.Editor.Base
 {
     public class EventArgs<T> : EventArgs
     {

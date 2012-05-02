@@ -1,9 +1,9 @@
-﻿<Window x:Class="Editor.Views.WorkspaceWindow"
+﻿<Window x:Class="Kinectitude.Editor.Views.WorkspaceWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:v="clr-namespace:Editor.Views"
-        xmlns:vm="clr-namespace:Editor.ViewModels"
-        xmlns:m="clr-namespace:Editor"
+        xmlns:v="clr-namespace:Kinectitude.Editor.Views"
+        xmlns:vm="clr-namespace:Kinectitude.Editor.ViewModels"
+        xmlns:m="clr-namespace:Kinectitude.Editor.Models"
         Title="Kinectitude Editor v1.0 Beta"
         Name="window"
         WindowState="Maximized"
@@ -87,7 +87,7 @@
                     </ContentPresenter.Resources>
                 </ContentPresenter-->
 
-                <TabControl ItemsSource="{Binding ActiveItems}" Name="tabItems" SelectedItem="{Binding CurrentItem, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}">
+                <TabControl ItemsSource="{Binding ActiveItems}" Name="tabItems" SelectedItem="{Binding CurrentItem}">
                     <TabControl.ItemTemplate>
                         <DataTemplate>
                             <DockPanel MinWidth="64">
@@ -110,9 +110,7 @@
                                     </DataTemplate>
 
                                     <DataTemplate DataType="{x:Type vm:EntityViewModel}">
-                                        <ScrollViewer Background="Gray" HorizontalScrollBarVisibility="Visible">
-                                            <v:EntityView />
-                                        </ScrollViewer>
+                                        <v:EntityView />
                                     </DataTemplate>
 
                                 </ContentPresenter.Resources>
@@ -173,7 +171,7 @@
                                         <TextBlock Text="{Binding Name}" Padding="3" />
                                     </StackPanel>
                                 </HierarchicalDataTemplate>
-                                <HierarchicalDataTemplate DataType="{x:Type vm:Folder}" ItemsSource="{Binding Children}">
+                                <HierarchicalDataTemplate DataType="{x:Type v:Folder}" ItemsSource="{Binding Children}">
                                     <StackPanel Orientation="Horizontal">
                                         <Image Source="{StaticResource icoFolder}" />
                                         <TextBlock Text="{Binding Name}" Padding="3" />
@@ -210,7 +208,7 @@
                 <GridSplitter Height="4" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
 
                 <ScrollViewer VerticalScrollBarVisibility="Visible" Grid.Row="2">
-                    <ListBox ItemsSource="{Binding Plugins}">
+                    <!--ListBox ItemsSource="{Binding Plugins}">
                         <ListBox.Resources>
                             
                             <DataTemplate DataType="{x:Type vm:PluginViewModel}">
@@ -248,7 +246,7 @@
                             </DataTemplate>
 
                         </ListBox.Resources>
-                    </ListBox>
+                    </ListBox-->
 
                     <!--DataGrid ItemsSource="{Binding CurrentItem.Attributes}" AutoGenerateColumns="False">
                         <DataGrid.Columns>
@@ -256,6 +254,31 @@
                             <DataGridTextColumn Header="Value" Binding="{Binding Value}" />
                         </DataGrid.Columns>
                     </DataGrid-->
+                    
+                    <ListBox DataContext="{Binding CurrentItem}">
+                        <ListBox.ItemsSource>
+                            <MultiBinding Converter="{StaticResource detailsConverter}">
+                                <Binding Path="Attributes" />
+                                <Binding Path="Components" />
+                            </MultiBinding>
+                        </ListBox.ItemsSource>
+                        <ListBox.Resources>
+                            <DataTemplate DataType="{x:Type v:Details}">
+                                <Expander Header="{Binding Header}" IsExpanded="True">
+                                    <ListBox ItemsSource="{Binding Items}">
+                                        <ListBox.Resources>
+                                            <DataTemplate DataType="{x:Type v:Detail}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Name}" />
+                                                    <TextBlock Text="{Binding Value}" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.Resources>
+                                    </ListBox>
+                                </Expander>
+                            </DataTemplate>
+                        </ListBox.Resources>
+                    </ListBox>
 
                 </ScrollViewer>
             </Grid>

@@ -1,29 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Game Name="Pong" Width="800" Height="600" FirstScene="Main Menu">
+<Game Name="Pong" Width="800" Height="600" FirstScene="Main Menu" IsFullScreen="false">
 
-  <Plugin Path="Kinect.dll">
+  <Using Path="Kinect.dll">
     <Alias Name="KinectComponent" Class="Kinectitude.Kinect.KinectComponent" />
     <Alias Name="KinectFollowComponent" Class="Kinectitude.Kinect.KinectFollowComponent" />
     <Alias Name="KinectManager" Class="Kinectitude.Kinect.KinectManager" />
-  </Plugin>
+  </Using>
   
-  <Plugin Path="Physics.dll">
+  <Using Path="Physics.dll">
     <Alias Name="PhysicsComponent" Class="Kinectitude.Physics.PhysicsComponent" />
     <Alias Name="PhysicsManager" Class="Kinectitude.Physics.PhysicsManager" />
     <Alias Name="CrossesLineEvent" Class="Kinectitude.Physics.CrossesLineEvent" />
     <Alias Name="ExitsLeftEvent" Class="Kinectitude.Physics.ExitsLeftEvent" />
     <Alias Name="ExitsRightEvent" Class="Kinectitude.Physics.ExitsRightEvent" />
     <Alias Name="SetPositionAction" Class="Kinectitude.Physics.SetPositionAction" />
-  </Plugin>
+  </Using>
   
-  <Plugin Path="Render.dll">
+  <Using Path="Render.dll">
     <Alias Name="RenderComponent" Class="Kinectitude.Render.RenderComponent" />
     <Alias Name="RenderManager" Class="Kinectitude.Render.RenderManager" />
     <Alias Name="TextRenderComponent" Class="Kinectitude.Render.TextRenderComponent" />
     <Alias Name="SetTextAction" Class="Kinectitude.Render.SetTextAction" />
-  </Plugin>
-    
-  <Asset File="icon.png" />
+  </Using>
   
   <Entity Name="Paddle">
     
@@ -83,9 +81,9 @@
       
       <Component Type="TextRenderComponent" Value="Player 1 not ready!" Fontcolor="White" />
       
-      <!--Event Type="TriggerOccursEvent" Name="Player1Ready">
+      <Event Type="TriggerOccursEvent" Name="Player1Ready">
         <Action Type="SetTextAction" Value="Player 1 is ready!" />
-      </Event-->
+      </Event>
     </Entity>
 
     <Entity>
@@ -95,9 +93,9 @@
       
       <Component Type="TextRenderComponent" Value="Player 2 Not Ready!" Fontcolor="White" />
       
-      <!--Event Type="TriggerOccursEvent" Name="Player2Ready">
+      <Event Type="TriggerOccursEvent" Name="Player2Ready">
         <Action Type="SetTextAction" Value="Player 2 is ready!" />
-      </Event-->
+      </Event>
     </Entity>
 
     <Entity Prototype="PlayerOnePaddle">
@@ -106,7 +104,7 @@
       <Attribute Key="y" Value="250" />
       
       <Event Type="CrossesLineEvent" Line="Y" Location="450" Direction="Positive">
-        <!--Action Type="FireTriggerAction" Name="Player1Ready" /-->
+        <Action Type="FireTriggerAction" Name="Player1Ready" />
         <Action Type="IncrementAction" Key="scene.numReady" />
       </Event>
     </Entity>
@@ -117,8 +115,10 @@
       <Attribute Key="y" Value="250" />
       
       <Event Type="CrossesLineEvent" Line="Y" Location="450" Direction="Positive">
-        <!--Action Type="FireTriggerAction" Name="Player2Ready" /-->
-        <Action Type="IncrementAction" Key="scene.numReady" />
+        <Condition If="scene.numReady &lt; 2">
+          <Action Type="FireTriggerAction" Name="Player2Ready" />
+          <Action Type="IncrementAction" Key="scene.numReady" />
+        </Condition>
       </Event>
     </Entity>
 
@@ -140,9 +140,9 @@
       <Attribute Key="x" Value="5" />
       <Attribute Key="y" Value="250" />
       
-      <!--Event Type="TriggerOccursEvent" Name="Player1Scores">
+      <Event Type="TriggerOccursEvent" Name="Player1Scores">
         <Action Type="IncrementAction" Key="score" />
-      </Event-->
+      </Event>
     </Entity>
 
     <Entity Prototype="PlayerTwoPaddle" Name="paddle2">
@@ -150,9 +150,9 @@
       <Attribute Key="x" Value="770" />
       <Attribute Key="y" Value="250" />
       
-      <!--Event Type="TriggerOccursEvent" Name="Player2Scores">
+      <Event Type="TriggerOccursEvent" Name="Player2Scores">
         <Action Type="IncrementAction" Key="score" />
-      </Event-->
+      </Event>
     </Entity>
 
     <Entity>
@@ -167,11 +167,11 @@
       
       <Event Type="ExitsLeftEvent">
         <Action Type="SetPositionAction" X="400" Y="300" />
-        <!--Action Type="FireTriggerAction" Name="Player2Scores" /-->
+        <Action Type="FireTriggerAction" Name="Player2Scores" />
       </Event>
       <Event Type="ExitsRightEvent">
         <Action Type="SetPositionAction" X="400" Y="300" />
-        <!--Action Type="FireTriggerAction" Name="Player1Scores" /-->
+        <Action Type="FireTriggerAction" Name="Player1Scores" />
       </Event>
     </Entity>
 
@@ -192,12 +192,12 @@
 	</Entity>
 	
     <Event Type="AttributeEqualsEvent" Key="paddle1.score" Value="7">
-      <!--Action Type="SetAttributeAction" Key="game.winner" Value="1" /-->
+      <Action Type="SetAttributeAction" Key="game.winner" Value="1" />
       <Action Type="ChangeSceneAction" Target="Game Over" />
     </Event>
     
     <Event Type="AttributeEqualsEvent" Key="paddle2.score" Value="7">
-      <!--Action Type="SetAttributeAction" Key="game.winner" Value="2" /-->
+      <Action Type="SetAttributeAction" Key="game.winner" Value="2" />
       <Action Type="ChangeSceneAction" Target="Game Over" />
     </Event>
     

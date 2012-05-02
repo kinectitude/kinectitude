@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Editor.Views
+namespace Kinectitude.Editor.Views
 {
     /// <summary>
     /// Interaction logic for GameView.xaml

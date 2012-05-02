@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Editor
+namespace Kinectitude.Editor.Models
 {
     public class PluginNotLoadedException : Exception
     {
-        private string type;
+        private readonly string type;
 
         public PluginNotLoadedException(string type)
         {

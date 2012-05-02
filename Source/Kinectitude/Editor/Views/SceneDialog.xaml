@@ -1,4 +1,4 @@
-﻿<Window x:Class="Editor.Views.SceneDialog"
+﻿<Window x:Class="Kinectitude.Editor.Views.SceneDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Scene"

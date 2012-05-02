@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Editor.Base;
+using Kinectitude.Editor.Base;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Windows.Data;
 using System.Collections;
 
-namespace Editor.ViewModels
+namespace Kinectitude.Editor.Views
 {
     public class Folder
     {

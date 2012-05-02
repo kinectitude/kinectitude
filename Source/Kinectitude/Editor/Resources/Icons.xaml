@@ -31,4 +31,8 @@
     <ImageSource x:Key="icoEvent">..\Icons\clock.png</ImageSource>
     <ImageSource x:Key="icoAction">..\Icons\lightning.png</ImageSource>
     
+    <!-- Details Viewer -->
+    
+    <ImageSource x:Key="icoLocked">..\Icons\lock.png</ImageSource>
+    
 </ResourceDictionary>

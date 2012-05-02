@@ -4,21 +4,28 @@ using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using Editor.Base;
+using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models.Plugins;
+using Kinectitude.Editor.Models.Properties;
+using Attribute = Kinectitude.Editor.Models.Attribute;
 
-namespace Editor
+namespace Kinectitude.Editor.Models
 {
     public class Entity : AttributeContainer, IEventContainer
     {
         private IEntityContainer parent;
         private string name;
 
-        private readonly List<Entity> _prototypes;
+        /*private readonly List<Entity> _prototypes;
         private readonly List<Component> _components;
         private readonly List<Event> _events;
         private readonly ReadOnlyCollection<Entity> prototypes;
         private readonly ReadOnlyCollection<Component> components;
-        private readonly ReadOnlyCollection<Event> events;
+        private readonly ReadOnlyCollection<Event> events;*/
+
+        private readonly SortedDictionary<string, Entity> prototypes;
+        private readonly SortedDictionary<string, Component> components;
+        private readonly List<Event> events;
 
         public IEntityContainer Parent
         {
@@ -32,92 +39,100 @@ namespace Editor
             set { name = value; }
         }
 
-        public ReadOnlyCollection<Entity> Prototypes
+        public IEnumerable<Entity> Prototypes
         {
-            get { return prototypes; }
+            get { return prototypes.Values; }
         }
 
-        public ReadOnlyCollection<Component> Components
+        public IEnumerable<Component> Components
         {
-            get { return components; }
+            get { return components.Values; }
         }
 
-        public ReadOnlyCollection<Event> Events
+        public IEnumerable<Event> Events
         {
             get { return events; }
         }
 
         public Entity()
         {
-            _prototypes = new List<Entity>();
-            _components = new List<Component>();
-            _events = new List<Event>();
+            //_prototypes = new List<Entity>();
+            //_components = new List<Component>();
+            //_events = new List<Event>();
 
-            prototypes = new ReadOnlyCollection<Entity>(_prototypes);
-            components = new ReadOnlyCollection<Component>(_components);
-            events = new ReadOnlyCollection<Event>(_events);
+            //prototypes = new ReadOnlyCollection<Entity>(_prototypes);
+            //components = new ReadOnlyCollection<Component>(_components);
+            //events = new ReadOnlyCollection<Event>(_events);
+
+            prototypes = new SortedDictionary<string, Entity>();
+            components = new SortedDictionary<string, Component>();
+            events = new List<Event>();
         }
 
         public void AddPrototype(Entity entity)
         {
-            _prototypes.Add(entity);
+            prototypes.Add(entity.Name, entity);
         }
 
         public void RemovePrototype(Entity entity)
         {
-            _prototypes.Remove(entity);
+            prototypes.Remove(entity.Name);
         }
 
         public void AddComponent(Component component)
         {
             component.Parent = this;
-            _components.Add(component);
+            components.Add(component.Descriptor.Name, component);
         }
 
         public void RemoveComponent(Component component)
         {
             component.Parent = null;
-            _components.Remove(component);
+            components.Remove(component.Descriptor.Name);
         }
 
         public void AddEvent(Event evt)
         {
             evt.Parent = this;
-            _events.Add(evt);
+            events.Add(evt);
         }
 
         public void RemoveEvent(Event evt)
         {
             evt.Parent = null;
-            _events.Remove(evt);
+            events.Remove(evt);
         }
 
-        public override T GetAttribute<T>(string key)
+        public override Attribute GetAttribute(string key)
         {
-            BaseAttribute attribute = base.GetAttribute<T>(key);
+            Attribute attribute = base.GetAttribute(key);
             if (null == attribute)
             {
                 foreach (Entity prototype in Prototypes)
                 {
-                    attribute = prototype.GetAttribute<T>(key);
+                    attribute = prototype.GetAttribute(key);
                     if (null != attribute)
                     {
                         break;
                     }
                 }
             }
-            return attribute as T;
+            return attribute;
         }
 
-        public bool HasComponent(string name)
+        /*public bool HasComponent(string name)
         {
             return null != GetComponent(name);
-        }
+        }*/
 
         public Component GetComponent(string name)
         {
-            Component component = Components.FirstOrDefault(x => x.Descriptor.Name == name);
-            if (null == component)
+            Component component = null;
+            if (components.ContainsKey(name))
+            {
+                component = components[name];
+            }
+            else
             {
                 foreach (Entity prototype in Prototypes)
                 {
@@ -131,7 +146,7 @@ namespace Editor
             return component;
         }
 
-        public T GetPropertyForComponent<T>(string componentName, string key) where T : BaseProperty
+        /*public T GetPropertyForComponent<T>(string componentName, string key) where T : BaseProperty
         {
             BaseProperty property = null;
             Component component = GetComponent(componentName);
@@ -155,11 +170,6 @@ namespace Editor
                 }
             }
             return property as T;
-        }
-
-        public override string ToString()
-        {
-            return string.Format("Name: {0}, Prototype: {1}", Name != null ? Name : string.Empty, Prototypes[0] != null ? Prototypes[0].Name : string.Empty);
-        }
+        }*/
     }
 }

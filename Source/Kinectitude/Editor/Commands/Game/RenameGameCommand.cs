@@ -1,7 +1,7 @@
-﻿using Editor.ViewModels;
-using Editor.Commands.Base;
+﻿using Kinectitude.Editor.Commands.Base;
+using Kinectitude.Editor.ViewModels;
 
-namespace Editor.Commands.Game
+namespace Kinectitude.Editor.Commands.Game
 {
     public class RenameGameCommand : IUndoableCommand
     {

@@ -1,7 +1,7 @@
-﻿using Editor.ViewModels;
-using Editor.Commands.Base;
+﻿using Kinectitude.Editor.Commands.Base;
+using Kinectitude.Editor.ViewModels;
 
-namespace Editor.Commands
+namespace Kinectitude.Editor.Commands.Scene
 {
     public class RenameSceneCommand : IUndoableCommand
     {

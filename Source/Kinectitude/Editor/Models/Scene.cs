@@ -2,21 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Editor.Base;
+using Kinectitude.Editor.Base;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using Kinectitude.Editor.Models.Plugins;
 
-namespace Editor
+namespace Kinectitude.Editor.Models
 {
-    public class Scene : AttributeContainer, IEntityContainer, IEventContainer
+    public class Scene : AttributeContainer, IEntityContainer
     {
         private Game parent;
         private string name;
 
-        private readonly List<Entity> _entities;
-        private readonly List<Event> _events;
-        private readonly ReadOnlyCollection<Entity> entities;
-        private readonly ReadOnlyCollection<Event> events;
+        //private readonly List<Entity> _entities;
+        //private readonly List<Event> _events;
+        //private readonly ReadOnlyCollection<Entity> entities;
+        //private readonly ReadOnlyCollection<Event> events;
+
+        private readonly List<Entity> entities;
 
         public Game Parent
         {
@@ -30,48 +33,50 @@ namespace Editor
             set { name = value; }
         }
 
-        public ReadOnlyCollection<Entity> Entities
+        public IEnumerable<Entity> Entities
         {
             get { return entities; }
         }
 
-        public ReadOnlyCollection<Event> Events
+        /*public ReadOnlyCollection<Event> Events
         {
             get { return events; }
-        }
+        }*/
 
         public Scene()
         {
-            _entities = new List<Entity>();
-            entities = new ReadOnlyCollection<Entity>(_entities);
+            //_entities = new List<Entity>();
+            //entities = new ReadOnlyCollection<Entity>(_entities);
 
-            _events = new List<Event>();
-            events = new ReadOnlyCollection<Event>(_events);
+            //_events = new List<Event>();
+            //events = new ReadOnlyCollection<Event>(_events);
+
+            entities = new List<Entity>();
         }
 
-        public Entity GetPrototypeEntityByName(string name)
+        /*public Entity GetPrototypeEntityByName(string name)
         {
             Entity prototype = null;
             if (null != Parent)
             {
-                prototype = Parent.GetPrototypeEntityByName(name);
+                prototype = Parent.GetPrototype(name);
             }
             return prototype;
-        }
+        }*/
 
         public void AddEntity(Entity entity)
         {
             entity.Parent = this;
-            _entities.Add(entity);
+            entities.Add(entity);
         }
 
         public void RemoveEntity(Entity entity)
         {
             entity.Parent = null;
-            _entities.Remove(entity);
+            entities.Remove(entity);
         }
 
-        public void AddEvent(Event evt)
+        /*public void AddEvent(Event evt)
         {
             evt.Parent = this;
             _events.Add(evt);
@@ -81,11 +86,6 @@ namespace Editor
         {
             evt.Parent = null;
             _events.Remove(evt);
-        }
-
-        public override string ToString()
-        {
-            return string.Format("Name: {0}", Name);
-        }
+        }*/
     }
 }

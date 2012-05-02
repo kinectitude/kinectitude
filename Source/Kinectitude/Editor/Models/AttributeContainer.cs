@@ -4,53 +4,59 @@ using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using Editor.Base;
+using Kinectitude.Editor.Base;
+using Attribute = Kinectitude.Editor.Models.Attribute;
 
-namespace Editor
+namespace Kinectitude.Editor.Models
 {
     public class AttributeContainer
     {
-        private readonly List<BaseAttribute> _attributes;
-        private readonly ReadOnlyCollection<BaseAttribute> attributes;
+        private readonly SortedDictionary<string, Attribute> attributes;
 
-        public ReadOnlyCollection<BaseAttribute> Attributes
+        public IEnumerable<Attribute> Attributes
         {
-            get { return attributes; }
+            get { return attributes.Values; }
         }
 
         protected AttributeContainer()
         {
-            _attributes = new List<BaseAttribute>();
-            attributes = new ReadOnlyCollection<BaseAttribute>(_attributes);
+            attributes = new SortedDictionary<string, Attribute>();
         }
 
-        public void AddAttribute(BaseAttribute attribute)
+        public void AddAttribute(Attribute attribute)
         {
-            if (!_attributes.Contains(attribute))
+            if (attributes.ContainsKey(attribute.Key))
             {
-                BaseAttribute found = _attributes.FirstOrDefault(x => x.Key == attribute.Key);
-                if (null != found)
-                {
-                    RemoveAttribute(found);
-                }
-                attribute.Parent = this;
-                _attributes.Add(attribute);
+                RemoveAttribute(attributes[attribute.Key]);
             }
+            attributes.Add(attribute.Key, attribute);
         }
 
-        public void RemoveAttribute(BaseAttribute attribute)
+        public void RemoveAttribute(Attribute attribute)
         {
-            if (!attribute.IsLocked)
+            attributes.Remove(attribute.Key);
+        }
+
+        public virtual Attribute GetAttribute(string key)
+        {
+            Attribute ret = null;
+            if (attributes.ContainsKey(key))
             {
-                attribute.Parent = null;
-                _attributes.Remove(attribute);
+                ret = attributes[key];
             }
+            return ret;
         }
 
-        public virtual T GetAttribute<T>(string key) where T : BaseAttribute
+        public void SetAttribute(string key, dynamic value)
         {
-            BaseAttribute attribute = _attributes.FirstOrDefault(x => x.Key == key);
-            return attribute as T;
+            if (!attributes.ContainsKey(key))
+            {
+                attributes[key] = new Attribute(key, value);
+            }
+            else
+            {
+                attributes[key].Value = value;
+            }
         }
     }
 }

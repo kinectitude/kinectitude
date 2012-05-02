@@ -1,20 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Editor.Base;
-using Editor.Storage;
+using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Storage;
 using System.Windows.Input;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
 using System.IO;
-using Editor.Views;
+using Kinectitude.Editor.Views;
 using System.Windows;
 using Kinectitude.Attributes;
+using Kinectitude.Editor.Models.Plugins;
+using Kinectitude.Editor.Models;
+using Action = Kinectitude.Editor.Models.Plugins.Action;
+using Component = Kinectitude.Editor.Models.Plugins.Component;
 
-namespace Editor.ViewModels
+namespace Kinectitude.Editor.ViewModels
 {
-    public class Workspace : IPluginFactory, INotifyPropertyChanged
+    public sealed class Workspace : IPluginFactory, INotifyPropertyChanged
     {
         public const string PluginDirectory = "Plugins";
 
@@ -76,7 +80,7 @@ namespace Editor.ViewModels
                 if (game != value)
                 {
                     game = value;
-                    RaisePropertyChanged("Game");
+                    raisePropertyChanged("Game");
                 }
             }
         }
@@ -94,7 +98,7 @@ namespace Editor.ViewModels
                 if (currentItem != value)
                 {
                     currentItem = value;
-                    RaisePropertyChanged("CurrentItem");
+                    raisePropertyChanged("CurrentItem");
                 }
             }
         }
@@ -114,20 +118,13 @@ namespace Editor.ViewModels
             plugins = new List<PluginViewModel>();
 
             Assembly core = typeof(Kinectitude.Core.Component).Assembly;
-            registerTypesFromAssembly(core);
+            registerTypesFromAssembly(core, true);
 
             string[] files = Directory.GetFiles(Path.Combine(Environment.CurrentDirectory, PluginDirectory), "*.dll");
             foreach (string file in files)
             {
-                try
-                {
-                    Assembly asm = Assembly.LoadFrom(file);
-                    registerTypesFromAssembly(asm);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                Assembly asm = Assembly.LoadFrom(file);
+                registerTypesFromAssembly(asm);
             }
             NewGame(null);
 
@@ -142,7 +139,7 @@ namespace Editor.ViewModels
             };
         }
 
-        private void registerTypesFromAssembly(Assembly assembly)
+        private void registerTypesFromAssembly(Assembly assembly, bool includeInternalTypes = false)
         {
             IEnumerable<Type> types = from type in assembly.GetTypes()
                                       where
@@ -160,7 +157,7 @@ namespace Editor.ViewModels
                                               typeof(Kinectitude.Core.Action).IsAssignableFrom(type)
                                           )
                                       ) &&
-                                      Attribute.IsDefined(type, typeof(PluginAttribute))
+                                      System.Attribute.IsDefined(type, typeof(PluginAttribute))
                                       select type;
 
             foreach (Type type in types)
@@ -170,17 +167,38 @@ namespace Editor.ViewModels
             }
         }
 
-        private PluginDescriptor getDescriptor(string type)
+        public PluginDescriptor GetPluginDescriptor(string name)
         {
-            PluginViewModel viewModel = plugins.FirstOrDefault(x => x.Descriptor.Class == type);
+            var descriptors = from viewModel in plugins select viewModel.Descriptor;
+
+            PluginDescriptor ret = null;
+            foreach (PluginDescriptor descriptor in descriptors)
+            {
+                if (descriptor.Name == name)
+                {
+                    ret = descriptor;
+                    break;
+                }
+
+                if (descriptor.File == "Kinectitude.Core.dll")
+                {
+                    string shortName = descriptor.Name.Substring(descriptor.Name.LastIndexOf('.') + 1);
+                    if (shortName == name)
+                    {
+                        ret = descriptor;
+                        break;
+                    }
+                }
+            }
+            /*PluginViewModel viewModel = plugins.FirstOrDefault(x => x.Descriptor.Name == name);
             if (null == viewModel)
             {
-                throw new PluginNotLoadedException(type);
-            }
-            return viewModel.Descriptor;
+                throw new PluginNotLoadedException(name);
+            }*/
+            return ret;
         }
 
-        public Component CreateComponent(string name)
+        /*public Component CreateComponent(string name)
         {
             PluginDescriptor descriptor = getDescriptor(name);
             return new Component(descriptor);
@@ -196,16 +214,16 @@ namespace Editor.ViewModels
         {
             PluginDescriptor descriptor = getDescriptor(name);
             return new Action(descriptor);
-        }
+        }*/
 
-        protected void NewGame(object parameter)
+        public void NewGame(object parameter)
         {
-            Game game = new Game();
+            Game game = new Game(this);
             GameViewModel viewModel = GameViewModel.Create(game, this);
             Game = viewModel;
         }
 
-        protected void LoadGame(object parameter)
+        public void LoadGame(object parameter)
         {
             Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
             dialog.FileName = string.Empty;
@@ -220,31 +238,32 @@ namespace Editor.ViewModels
             }
         }
 
-        protected void SaveGame(object parameter)
+        public void SaveGame(object parameter)
         {
 
         }
 
-        protected void SaveGameAs(object parameter)
+        public void SaveGameAs(object parameter)
         {
 
         }
 
-        protected void RevertGame(object parameter)
+        public void RevertGame(object parameter)
         {
             loadGameFromFile(Game.FileName);
         }
 
-        protected void OpenItem(object parameter)
+        public void OpenItem(object parameter)
         {
             BaseModel baseModel = parameter as BaseModel;
             if (null != baseModel && !_activeItems.Contains(baseModel))
             {
                 _activeItems.Add(baseModel);
             }
+            CurrentItem = baseModel;
         }
 
-        protected void CloseItem(object parameter)
+        public void CloseItem(object parameter)
         {
             BaseModel baseModel = parameter as BaseModel;
             if (null != baseModel)
@@ -253,7 +272,7 @@ namespace Editor.ViewModels
             }
         }
 
-        protected void Exit(object parameter)
+        public void Exit(object parameter)
         {
             Application.Current.Shutdown();
         }
@@ -276,7 +295,7 @@ namespace Editor.ViewModels
             }
         }
 
-        protected void RaisePropertyChanged(string propertyName)
+        private void raisePropertyChanged(string propertyName)
         {
             if (null != PropertyChanged)
             {

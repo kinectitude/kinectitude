@@ -4,8 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using System.IO;
+using Kinectitude.Editor.Models;
+using Kinectitude.Editor.Models.Plugins;
+using Kinectitude.Editor.Models.Properties;
+using Action = Kinectitude.Editor.Models.Plugins.Action;
+using Attribute = Kinectitude.Editor.Models.Attribute;
 
-namespace Editor.Storage
+namespace Kinectitude.Editor.Storage
 {
     public class XmlGameStorage : IGameStorage
     {
@@ -27,18 +32,21 @@ namespace Editor.Storage
             public const string Key = "Key";
             public const string Value = "Value";
             public const string Root = "Root";
+            public const string Using = "Using";
+            public const string Path = "Path";
+            public const string Alias = "Alias";
+            public const string Class = "Class";
         }
 
+        private Game game;
         private readonly string fileName;
         private readonly IPluginFactory factory;
-        private readonly Dictionary<string, Entity> prototypes;
         private readonly Queue<Tuple<XElement, Entity>> entities;
 
         public XmlGameStorage(string fileName, IPluginFactory factory)
         {
             this.fileName = fileName;
             this.factory = factory;
-            prototypes = new Dictionary<string, Entity>();
             entities = new Queue<Tuple<XElement,Entity>>();
         }
 
@@ -52,23 +60,28 @@ namespace Editor.Storage
             // First Pass
             // Create the Game object top-down, including properties, attributes, and parent relationships.
 
-            Game game = new Game
+            game = new Game(factory)
             {
                 Name = (string)document.Attribute(Constants.Name),
                 Width = (int)document.Attribute(Constants.Width),
                 Height = (int)document.Attribute(Constants.Height)
             };
 
+            foreach (XElement usingElement in document.Elements(Constants.Using))
+            {
+                Using use = createUsing(usingElement);
+                game.AddUsing(use);
+            }
+
             foreach (XElement attributeElement in document.Elements(Constants.Attribute))
             {
-                BaseAttribute attribute = createAttribute(attributeElement);
+                Attribute attribute = createAttribute(attributeElement);
                 game.AddAttribute(attribute);
             }
 
             foreach (XElement prototypeElement in document.Elements(Constants.Entity))
             {
                 Entity entity = createEntity(prototypeElement);
-                prototypes.Add(entity.Name, entity);
                 entities.Enqueue(new Tuple<XElement, Entity>(prototypeElement, entity));
                 game.AddEntity(entity);
             }
@@ -82,7 +95,7 @@ namespace Editor.Storage
             // Second Pass
             // Run through the XML again, to resolve references such as the game's first scene, or an entity's prototype
 
-            game.FirstScene = game.Scenes.FirstOrDefault(x => x.Name == (string)document.Attribute(Constants.FirstScene));
+            game.FirstScene = game.GetScene((string)document.Attribute(Constants.FirstScene));
 
             while (entities.Count > 0)
             {
@@ -96,14 +109,42 @@ namespace Editor.Storage
                     string[] tokens = prototypeNames.Split(' ');
                     foreach (string token in tokens)
                     {
-                        if (prototypes.ContainsKey(token))
+                        Entity prototype = game.GetPrototype(token);
+                        if (null != prototype)
                         {
-                            entity.AddPrototype(prototypes[token]);
+                            entity.AddPrototype(prototype);
                         }
                     }
                 }
             }
             return game;
+        }
+
+        private Using createUsing(XElement element)
+        {
+            Using use = new Using
+            {
+                Path = (string)element.Attribute(Constants.Path)
+            };
+
+            foreach (XElement aliasElement in element.Elements(Constants.Alias))
+            {
+                Alias alias = createAlias(aliasElement);
+                use.AddAlias(alias);
+            }
+
+            return use;
+        }
+
+        private Alias createAlias(XElement element)
+        {
+            Alias alias = new Alias
+            {
+                Name = (string)element.Attribute(Constants.Name),
+                Class = (string)element.Attribute(Constants.Class)
+            };
+
+            return alias;
         }
 
         private Scene createScene(XElement element)
@@ -115,7 +156,7 @@ namespace Editor.Storage
 
             foreach (XElement attributeElement in element.Elements(Constants.Attribute))
             {
-                BaseAttribute attribute = createAttribute(attributeElement);
+                Attribute attribute = createAttribute(attributeElement);
                 scene.AddAttribute(attribute);
             }
 
@@ -126,11 +167,11 @@ namespace Editor.Storage
                 scene.AddEntity(entity);
             }
 
-            foreach (XElement eventElement in element.Elements(Constants.Event))
+            /*foreach (XElement eventElement in element.Elements(Constants.Event))
             {
                 Event evt = createEvent(eventElement);
                 scene.AddEvent(evt);
-            }
+            }*/
             return scene;
         }
 
@@ -143,7 +184,7 @@ namespace Editor.Storage
 
             foreach (XElement attributeElement in element.Elements(Constants.Attribute))
             {
-                BaseAttribute attribute = createAttribute(attributeElement);
+                Attribute attribute = createAttribute(attributeElement);
                 entity.AddAttribute(attribute);
             }
 
@@ -163,32 +204,25 @@ namespace Editor.Storage
 
         private Component createComponent(XElement element)
         {
-            string type = (string)element.Attribute(Constants.Type);
-            Component component = factory.CreateComponent(type);
+            //string type = game.GetPluginClass((string)element.Attribute(Constants.Type));
+            PluginDescriptor descriptor = game.GetPluginDescriptor((string)element.Attribute(Constants.Type));
+            Component component = new Component(descriptor);
 
-            foreach (XAttribute attribute in element.Attributes())
+            foreach (XAttribute attribute in element.Attributes().Except(element.Attributes(Constants.Type)))
             {
-                BaseProperty property = component.GetProperty(attribute.Name.LocalName);
-                if (null != property)
-                {
-                    property.TryParse((string)attribute);
-                }
+                component.SetProperty(attribute.Name.LocalName, (string)attribute);
             }
             return component;
         }
 
         private Event createEvent(XElement element)
         {
-            string type = (string)element.Attribute(Constants.Type);
-            Event evt = factory.CreateEvent(type);
+            PluginDescriptor descriptor = game.GetPluginDescriptor((string)element.Attribute(Constants.Type));
+            Event evt = new Event(descriptor);
 
-            foreach (XAttribute attribute in element.Attributes())
+            foreach (XAttribute attribute in element.Attributes().Except(element.Attributes(Constants.Type)))
             {
-                BaseProperty property = evt.GetProperty(attribute.Name.LocalName);
-                if (null != property)
-                {
-                    property.TryParse((string)attribute);
-                }
+                evt.SetProperty(attribute.Name.LocalName, (string)attribute);
             }
 
             foreach (XElement actionElement in element.Elements(Constants.Action))
@@ -201,25 +235,21 @@ namespace Editor.Storage
 
         private Action createAction(XElement element)
         {
-            string type = (string)element.Attribute(Constants.Type);
-            Action action = factory.CreateAction(type);
+            PluginDescriptor descriptor = game.GetPluginDescriptor((string)element.Attribute(Constants.Type));
+            Action action = new Action(descriptor);
 
-            foreach (XAttribute attribute in element.Attributes())
+            foreach (XAttribute attribute in element.Attributes().Except(element.Attributes(Constants.Type)))
             {
-                BaseProperty property = action.GetProperty(attribute.Name.LocalName);
-                if (null != property)
-                {
-                    property.TryParse((string)attribute);
-                }
+                action.SetProperty(attribute.Name.LocalName, (string)attribute);
             }
             return action;
         }
 
-        private BaseAttribute createAttribute(XElement element)
+        private Attribute createAttribute(XElement element)
         {
             string key = (string)element.Attribute(Constants.Key);
             string value = (string)element.Attribute(Constants.Value);
-            BaseAttribute attribute = BaseAttribute.CreateAttribute(key, value);
+            Attribute attribute = new Attribute(key, value);
             return attribute;
         }
 
@@ -234,13 +264,13 @@ namespace Editor.Storage
                 new XAttribute(Constants.FirstScene, game.FirstScene.Name)
             );
 
-            foreach (BaseAttribute attribute in game.Attributes)
+            foreach (Attribute attribute in game.Attributes)
             {
                 XElement element = serializeAttribute(attribute);
                 document.Add(element);
             }
 
-            foreach (Entity entity in game.Prototypes)
+            foreach (Entity entity in game.Entities)
             {
                 XElement element = serializeEntity(entity);
                 document.Add(element);
@@ -263,7 +293,7 @@ namespace Editor.Storage
                 new XAttribute(Constants.Name, scene.Name)
             );
 
-            foreach (BaseAttribute attribute in scene.Attributes)
+            foreach (Attribute attribute in scene.Attributes)
             {
                 XElement attributeElement = serializeAttribute(attribute);
                 element.Add(attributeElement);
@@ -275,11 +305,11 @@ namespace Editor.Storage
                 element.Add(entityElement);
             }
 
-            foreach (Event evt in scene.Events)
+            /*foreach (Event evt in scene.Events)
             {
                 XElement eventElement = serializeEvent(evt);
                 element.Add(eventElement);
-            }
+            }*/
             return element;
         }
 
@@ -293,14 +323,14 @@ namespace Editor.Storage
                 element.Add(name);
             }
 
-            if (entity.Prototypes.Count > 0)
+            if (entity.Prototypes.Count() > 0)
             {
                 var prototypeNames = from prototypeEntity in entity.Prototypes select prototypeEntity.Name;
                 XAttribute prototype = new XAttribute(Constants.Prototype, string.Join(" ", prototypeNames));
                 element.Add(prototype);
             }
 
-            foreach (BaseAttribute attribute in entity.Attributes)
+            foreach (Attribute attribute in entity.Attributes)
             {
                 XElement attributeElement = serializeAttribute(attribute);
                 element.Add(attributeElement);
@@ -320,13 +350,13 @@ namespace Editor.Storage
             return element;
         }
 
-        private XElement serializeAttribute(BaseAttribute attribute)
+        private XElement serializeAttribute(Attribute attribute)
         {
             XElement element = new XElement
             (
                 Constants.Attribute,
                 new XAttribute(Constants.Key, attribute.Key),
-                new XAttribute(Constants.Value, attribute.StringValue)
+                new XAttribute(Constants.Value, attribute.Value.ToString())
             );
             return element;
         }
@@ -335,12 +365,12 @@ namespace Editor.Storage
         {
             XElement element = new XElement(
                 Constants.Component,
-                new XAttribute(Constants.Type, component.Descriptor.Name)
+                new XAttribute(Constants.Type, component.Descriptor.DisplayName)
             );
 
             foreach (BaseProperty property in component.Properties)
             {
-                XAttribute propertyAttribute = new XAttribute(property.Descriptor.Key, property.StringValue);
+                XAttribute propertyAttribute = new XAttribute(property.Descriptor.DisplayName, property.ToString());
                 element.Add(propertyAttribute);
             }
             return element;
@@ -351,12 +381,12 @@ namespace Editor.Storage
             XElement element = new XElement
             (
                 Constants.Event,
-                new XAttribute(Constants.Type, evt.Descriptor.Name)
+                new XAttribute(Constants.Type, evt.Descriptor.DisplayName)
             );
 
             foreach (BaseProperty property in evt.Properties)
             {
-                XAttribute propertyAttribute = new XAttribute(property.Descriptor.Key, property.StringValue);
+                XAttribute propertyAttribute = new XAttribute(property.Descriptor.DisplayName, property.ToString());
                 element.Add(propertyAttribute);
             }
 
@@ -373,12 +403,12 @@ namespace Editor.Storage
             XElement element = new XElement
             (
                 Constants.Action,
-                new XAttribute(Constants.Type, action.Descriptor.Name)
+                new XAttribute(Constants.Type, action.Descriptor.DisplayName)
             );
 
             foreach (BaseProperty property in action.Properties)
             {
-                XAttribute propertyAttribute = new XAttribute(property.Descriptor.Key, property.StringValue);
+                XAttribute propertyAttribute = new XAttribute(property.Descriptor.DisplayName, property.ToString());
                 element.Add(propertyAttribute);
             }
             return element;

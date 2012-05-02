@@ -2,15 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Editor.Base;
+using Kinectitude.Editor.Base;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Windows.Input;
+using Kinectitude.Editor.Models;
+using Attribute = Kinectitude.Editor.Models.Attribute;
+using Kinectitude.Editor.Models.Properties;
+using Kinectitude.Editor.Models.Plugins;
 
-namespace Editor.ViewModels
+namespace Kinectitude.Editor.ViewModels
 {
     public class EntityViewModel : BaseModel
     {
+        private const string RenderComponent = "Kinectitude.Render.RenderComponent";
+        private const string Shape = "Shape";
+        private const string Ellipse = "Ellipse";
+
         private static readonly Dictionary<Entity, EntityViewModel> viewModels;
 
         static EntityViewModel()
@@ -60,13 +68,12 @@ namespace Editor.ViewModels
         {
             get
             {
-                IntegerAttribute x = entity.GetAttribute<IntegerAttribute>("x");
-                return null != x ? x.Value : 0;
+                Attribute attribute = entity.GetAttribute("x");
+                return null != attribute ? entity.GetAttribute("x").Value : 0;
             }
             set
             {
-                IntegerAttribute x = entity.GetAttribute<IntegerAttribute>("x");
-                x.Value = value;
+                entity.SetAttribute("x", value);
                 RaisePropertyChanged("X");
             }
         }
@@ -75,13 +82,12 @@ namespace Editor.ViewModels
         {
             get
             {
-                IntegerAttribute y = entity.GetAttribute<IntegerAttribute>("y");
-                return null != y ? y.Value : 0;
+                Attribute attribute = entity.GetAttribute("y");
+                return null != attribute ? entity.GetAttribute("y").Value : 0;
             }
             set
             {
-                IntegerAttribute y = entity.GetAttribute<IntegerAttribute>("y");
-                y.Value = value;
+                entity.SetAttribute("y", value);
                 RaisePropertyChanged("Y");
             }
         }
@@ -90,13 +96,12 @@ namespace Editor.ViewModels
         {
             get
             {
-                IntegerAttribute width = entity.GetAttribute<IntegerAttribute>("width");
-                return null != width ? width.Value : 24;
+                Attribute attribute = entity.GetAttribute("width");
+                return null != attribute ? entity.GetAttribute("width").Value : 0;
             }
             set
             {
-                IntegerAttribute width = entity.GetAttribute<IntegerAttribute>("width");
-                width.Value = value;
+                entity.SetAttribute("width", value);
                 RaisePropertyChanged("Width");
             }
         }
@@ -105,13 +110,12 @@ namespace Editor.ViewModels
         {
             get
             {
-                IntegerAttribute height = entity.GetAttribute<IntegerAttribute>("height");
-                return null != height ? height.Value : 24;
+                Attribute attribute = entity.GetAttribute("height");
+                return null != attribute ? entity.GetAttribute("height").Value : 0;
             }
             set
             {
-                IntegerAttribute height = entity.GetAttribute<IntegerAttribute>("height");
-                height.Value = value;
+                entity.GetAttribute("height").Value = value;
                 RaisePropertyChanged("Height");
             }
         }
@@ -144,14 +148,24 @@ namespace Editor.ViewModels
             get
             {
                 bool ret = true;
-                if (entity.HasComponent("RenderComponent"))
+                Component component = entity.GetComponent("Kinectitude.Render.RenderComponent");
+                if (null != component)
+                {
+                    TextProperty property = component.GetProperty<TextProperty>("Shape");
+                    if (null != property && property.Value == "Ellipse")
+                    {
+                        ret = false;
+                    }
+                }
+
+                /*if (entity.HasComponent("RenderComponent"))
                 {
                     TextProperty property = entity.GetPropertyForComponent<TextProperty>("RenderComponent", "Shape");
                     if (null != property && property.Value == "Ellipse")
                     {
                         ret = false;
                     }
-                }
+                }*/
                 return !HasText && ret;
             }
         }
@@ -166,14 +180,24 @@ namespace Editor.ViewModels
             get
             {
                 string text = string.Empty;
-                if (entity.HasComponent("TextRenderComponent"))
+                Component component = entity.GetComponent("Kinectitude.Render.TextRenderComponent");
+                if (null != component)
+                {
+                    TextProperty property = component.GetProperty<TextProperty>("Value");
+                    if (null != property)
+                    {
+                        text = property.Value;
+                    }
+                }
+
+                /*if (entity.HasComponent("TextRenderComponent"))
                 {
                     TextProperty property = entity.GetPropertyForComponent<TextProperty>("TextRenderComponent", "Value");
                     if (null != property)
                     {
                         text = property.Value;
                     }
-                }
+                }*/
                 return text;
             }
         }
@@ -188,7 +212,23 @@ namespace Editor.ViewModels
             get
             {
                 string color = string.Empty;
-                if (entity.HasComponent("RenderComponent"))
+                Component component = entity.GetComponent("Kinectitude.Render.RenderComponent");
+                if (null != component)
+                {
+                    TextProperty property = component.GetProperty<TextProperty>("Fillcolor");
+                    color = property.Value ?? color;
+                }
+                if (color == string.Empty)
+                {
+                    component = entity.GetComponent("Kinectitude.Render.TextRenderComponent");
+                    if (null != component)
+                    {
+                        TextProperty property = component.GetProperty<TextProperty>("Fontcolor");
+                        color = property.Value ?? color;
+                    }
+                }
+
+                /*if (entity.HasComponent("RenderComponent"))
                 {
                     TextProperty property = entity.GetPropertyForComponent<TextProperty>("RenderComponent", "Fillcolor");
                     if (null != property)
@@ -203,7 +243,7 @@ namespace Editor.ViewModels
                     {
                         color = property.Value;
                     }
-                }
+                }*/
                 return color;
             }
         }

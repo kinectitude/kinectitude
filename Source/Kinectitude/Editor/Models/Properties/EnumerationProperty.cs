@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Editor
+namespace Kinectitude.Editor.Models.Properties
 {
     public class EnumerationProperty : Property<string>
     {
@@ -20,11 +20,6 @@ namespace Editor
             }
         }
 
-        public override string StringValue
-        {
-            get { return null != Value ? Value : string.Empty; }
-        }
-
         public EnumerationProperty(PropertyDescriptor descriptor) : base(descriptor) { }
 
         public override bool TryParse(string input)
@@ -37,11 +32,6 @@ namespace Editor
                 ret = true;
             }
             return ret;
-        }
-
-        public override string ToString()
-        {
-            return string.Format("Key: {0}, Type: Enumeration, Value: {1}", Descriptor.Key, Value);
         }
     }
 }

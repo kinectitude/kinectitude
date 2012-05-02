@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Kinectitude.Editor.Models;
 
-namespace Editor.Storage
+namespace Kinectitude.Editor.Storage
 {
     public interface IGameStorage
     {
