@@ -2,11 +2,13 @@
 using Kinectitude.Core;
 using System.Xml;
 using Kinectitude.Attributes;
+using Kinectitude.Core.Base;
+using Action = Kinectitude.Core.Base.Action;
 
 namespace Kinectitude.Physics
 {
     [Plugin("Set position", "")]
-    public class SetPositionAction : Kinectitude.Core.Action
+    public class SetPositionAction : Action
     {
         [Plugin("X", "")]
         public double X { get; set; }

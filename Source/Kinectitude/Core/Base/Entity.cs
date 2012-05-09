@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Kinectitude.Core
+namespace Kinectitude.Core.Base
 {
     public class Entity : DataContainer
     {

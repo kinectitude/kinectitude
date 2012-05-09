@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml;
-using Kinectitude.Attributes;
+﻿using Kinectitude.Attributes;
+using Action = Kinectitude.Core.Base.Action;
 
-namespace Kinectitude.Core
+namespace Kinectitude.Core.Actions
 {
     [Plugin("Change the scene", "")]
     internal sealed class ChangeSceneAction : Action

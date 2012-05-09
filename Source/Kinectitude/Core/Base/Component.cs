@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Kinectitude.Core
+namespace Kinectitude.Core.Base
 {
     public abstract class Component : IUpdateable
     {

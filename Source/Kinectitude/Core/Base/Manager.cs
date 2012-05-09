@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Kinectitude.Core
+namespace Kinectitude.Core.Base
 {
     public interface IManager : IUpdateable
     {

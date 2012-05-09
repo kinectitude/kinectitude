@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Kinectitude.Core.Loaders;
+using Kinectitude.Core.Conditions;
+using Kinectitude.Core.Data;
 
-namespace Kinectitude.Core
+namespace Kinectitude.Core.Base
 {
     internal abstract class Condition : Action
     {

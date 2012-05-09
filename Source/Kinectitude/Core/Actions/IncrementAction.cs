@@ -1,8 +1,8 @@
-﻿using System.Xml;
-using System;
-using Kinectitude.Attributes;
+﻿using Kinectitude.Attributes;
+using Action = Kinectitude.Core.Base.Action;
+using Kinectitude.Core.Data;
 
-namespace Kinectitude.Core
+namespace Kinectitude.Core.Actions
 {
     [Plugin("Increment an attribute", "")]
     public sealed class IncrementAction : Action

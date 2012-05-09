@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
+using Kinectitude.Core.Base;
 
-namespace Kinectitude.Core
+namespace Kinectitude.Core.Conditions
 {
-    internal class AndCondition:Condition
+    internal class AndCondition : Condition
     {
         private readonly List<Condition> conditions;
         

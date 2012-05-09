@@ -3,6 +3,8 @@ using System.Linq;
 using Kinectitude.Core;
 using System.Xml;
 using Kinectitude.Attributes;
+using Kinectitude.Core.Base;
+using Kinectitude.Core.Data;
 
 namespace Kinectitude.Render
 {

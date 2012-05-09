@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Kinectitude.Core
+﻿
+namespace Kinectitude.Core.Data
 {
     public class SpecificWriter
     {

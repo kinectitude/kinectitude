@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
-using System.Reflection;
 using System.Xml.Linq;
 using System.Linq;
 
-namespace Kinectitude.Core
+namespace Kinectitude.Core.Loaders
 {
     internal class XMLGameLoader : GameLoader
     {

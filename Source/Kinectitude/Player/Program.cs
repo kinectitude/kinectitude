@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using SlimDX.Windows;
 
-namespace SlimDxRunner
+namespace Kinectitude.Player
 {
     static class Program
     {

@@ -1,4 +1,5 @@
 ﻿using Kinectitude.Core;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Physics
 {

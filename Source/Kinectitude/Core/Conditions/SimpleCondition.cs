@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Kinectitude.Core.Base;
+using Kinectitude.Core.Data;
 
-namespace Kinectitude.Core
+namespace Kinectitude.Core.Conditions
 {
     internal class SimpleCondition : Condition
     {

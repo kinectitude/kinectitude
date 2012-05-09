@@ -7,8 +7,10 @@ using SlimDX;
 using SlimDX.DirectWrite;
 using FontStyle = SlimDX.DirectWrite.FontStyle;
 using Kinectitude.Core;
+using Kinectitude.Core.Base;
+using Kinectitude.Core.Loaders;
 
-namespace SlimDxRunner
+namespace Kinectitude.Player
 {
     internal sealed class Application : IDisposable
     {

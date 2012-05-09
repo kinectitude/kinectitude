@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Xml;
-using System.Reflection;
+﻿using System.Collections.Generic;
+using Kinectitude.Core.Data;
 
-namespace Kinectitude.Core
+namespace Kinectitude.Core.Base
 {
     public abstract class Event
     {

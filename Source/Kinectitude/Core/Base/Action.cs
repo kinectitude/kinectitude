@@ -1,8 +1,5 @@
-﻿using System;
-using System.Xml;
-using System.Reflection;
-
-namespace Kinectitude.Core
+﻿
+namespace Kinectitude.Core.Base
 {
     public abstract class Action
     {

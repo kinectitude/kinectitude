@@ -3,6 +3,7 @@ using System.Xml;
 using Kinectitude.Core;
 using System;
 using Kinectitude.Attributes;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Kinect
 {

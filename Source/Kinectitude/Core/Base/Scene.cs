@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml;
 using System.Reflection;
-using System.Windows;
+using Kinectitude.Core.Events;
+using Kinectitude.Core.Loaders;
 
-namespace Kinectitude.Core
+namespace Kinectitude.Core.Base
 {    
     public class Scene : DataContainer
     {

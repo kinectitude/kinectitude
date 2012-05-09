@@ -1,10 +1,8 @@
-﻿using System.Xml;
-using System;
-using System.Linq;
-using System.Collections.Generic;
+﻿using System.Linq;
 using Kinectitude.Attributes;
+using Kinectitude.Core.Base;
 
-namespace Kinectitude.Core
+namespace Kinectitude.Core.Events
 {
     // Use this as a base class for any attribute change.  It will always fire
 

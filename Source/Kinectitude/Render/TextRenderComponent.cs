@@ -6,6 +6,7 @@ using SlimDX;
 using SlimDX.DirectWrite;
 using System.Drawing;
 using FontStyle = SlimDX.DirectWrite.FontStyle;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Render
 {

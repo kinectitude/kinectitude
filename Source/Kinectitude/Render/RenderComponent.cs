@@ -5,6 +5,7 @@ using SlimDX;
 using SlimDX.Direct2D;
 using System.Drawing;
 using ColorConverter = System.Windows.Media.ColorConverter;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Render
 {

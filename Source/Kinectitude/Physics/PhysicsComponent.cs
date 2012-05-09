@@ -4,6 +4,7 @@ using System.Windows;
 using System.Xml;
 using Kinectitude.Core;
 using Kinectitude.Attributes;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Physics
 {

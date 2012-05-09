@@ -1,4 +1,5 @@
-﻿namespace Kinectitude.Core
+﻿
+namespace Kinectitude.Core.Base
 {    
     public interface IUpdateable
     {

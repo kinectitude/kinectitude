@@ -2,6 +2,7 @@
 using Kinectitude.Core;
 using Microsoft.Kinect;
 using Coding4Fun.Kinect.Wpf;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Kinect
 {

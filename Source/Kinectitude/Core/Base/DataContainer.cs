@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Xml;
+﻿using System.Collections.Generic;
+using Kinectitude.Core.Events;
 
-namespace Kinectitude.Core
+namespace Kinectitude.Core.Base
 {
     public class DataContainer
     {

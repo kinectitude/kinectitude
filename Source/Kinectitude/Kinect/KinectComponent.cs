@@ -1,5 +1,6 @@
 ﻿using System;
 using Kinectitude.Core;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Kinect
 {

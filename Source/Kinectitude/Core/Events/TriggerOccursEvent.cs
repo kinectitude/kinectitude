@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Kinectitude.Attributes;
+﻿using Kinectitude.Attributes;
+using Kinectitude.Core.Base;
 
-namespace Kinectitude.Core
+namespace Kinectitude.Core.Events
 {
     // Trigger can just be an event that does nothing special on its own, but can be treated special
 

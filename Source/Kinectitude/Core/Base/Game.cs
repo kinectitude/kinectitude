@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Xml;
-using System.Threading;
 using System.Windows;
 using System.Reflection;
-using System.IO;
 using System.Linq;
 using SlimDX.Direct2D;
+using Kinectitude.Core.Loaders;
+using Kinectitude.Core.Data;
 
-namespace Kinectitude.Core
+namespace Kinectitude.Core.Base
 {
     public delegate void RenderDelegate(RenderTarget renderTarget);
 
