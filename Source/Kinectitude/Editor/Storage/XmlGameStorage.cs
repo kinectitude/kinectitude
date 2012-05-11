@@ -60,7 +60,7 @@ namespace Kinectitude.Editor.Storage
         public Game LoadGame()
         {
             XmlSchemaSet schemas = new XmlSchemaSet();
-            schemas.Add(null, new XmlTextReader("schema.xsd"));
+            schemas.Add(null, new XmlTextReader(Path.Combine("Storage", "schema.xsd")));
 
             XElement project = XElement.Load(fileName);
             XElement root = project.Element(Constants.Root);

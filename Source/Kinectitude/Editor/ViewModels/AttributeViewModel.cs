@@ -54,8 +54,6 @@ namespace Kinectitude.Editor.ViewModels
         private readonly Entity entity;
         private Attribute attribute;
         private AttributeViewModel inheritedViewModel;
-        private bool canInherit;
-        private bool inherited;
 
         public Attribute Attribute
         {
@@ -67,9 +65,10 @@ namespace Kinectitude.Editor.ViewModels
             get { return attribute.Key; }
             set
             {
-                if (!inherited)
+                if (!IsInherited)
                 {
                     attribute.Key = value; // TODO: Propagation and command
+                    FindInheritedAttribute(value);
                     RaisePropertyChanged("Key");
                 }
             }
@@ -80,8 +79,11 @@ namespace Kinectitude.Editor.ViewModels
             get { return attribute.Value; }
             set
             {
-                attribute.Value = value; // TODO: Propagation and command
-                RaisePropertyChanged("Value");
+                if (!IsInherited)
+                {
+                    attribute.Value = value; // TODO: Propagation and command
+                    RaisePropertyChanged("Value");
+                }
             }
         }
 
@@ -90,10 +92,18 @@ namespace Kinectitude.Editor.ViewModels
             get { return inheritedViewModel; }
             set
             {
-                if (inheritedViewModel != value)
+                if (null != inheritedViewModel)
                 {
-                    
+                    inheritedViewModel.PropertyChanged -= OnPropertyChanged;
                 }
+
+                inheritedViewModel = value;
+                
+                if (null != inheritedViewModel)
+                {
+                    inheritedViewModel.PropertyChanged += OnPropertyChanged;
+                }
+                RaisePropertyChanged("CanInherit");
             }
         }
 
@@ -102,109 +112,83 @@ namespace Kinectitude.Editor.ViewModels
             get { return null != inheritedViewModel; }
         }
 
+        public bool IsLocal
+        {
+            get { return !IsInherited; }
+        }
+
         public bool IsInherited
         {
-            get { return inherited; }
+            get { return CanInherit && attribute == InheritedAttribute.Attribute; }
             set
             {
-                inherited = value;
-
-                if (!inherited)
+                if (IsInherited != value)
                 {
-                    attribute = new Attribute(inheritedViewModel.Key, inheritedViewModel.Value);
-                    inheritedViewModel.PropertyChanged -= onPropertyChanged;
-                    entity.AddAttribute(attribute);
-                    inheritedViewModel = null;
-                }
-                else
-                {
-                    entity.RemoveAttribute(attribute);
-
-                    foreach (Entity prototype in entity.Prototypes)
+                    if (!value)
                     {
-                        EntityViewModel prototypeViewModel = EntityViewModel.GetViewModel(prototype);
-
-                        foreach (AttributeViewModel viewModel in prototypeViewModel.Attributes)
-                        {
-                            if (viewModel.Key == attribute.Key)
-                            {
-                                inheritedViewModel = viewModel;
-                                inheritedViewModel.PropertyChanged += onPropertyChanged;
-                                attribute = viewModel.Attribute;
-                                inherited = true;
-                            }
-                        }
+                        attribute = new Attribute(inheritedViewModel.Key, inheritedViewModel.Value);
+                        entity.AddAttribute(attribute);
                     }
+                    else
+                    {
+                        if (null != attribute)
+                        {
+                            entity.RemoveAttribute(attribute);
+                        }
+                        attribute = InheritedAttribute.Attribute;
+                    }
+                    RaisePropertyChanged("IsInherited");
+                    RaisePropertyChanged("IsLocal");
                 }
-                RaisePropertyChanged("IsInherited");
             }
         }
 
         private AttributeViewModel(Entity entity, string key)
         {
             this.entity = entity;
-
             attribute = entity.GetAttribute(key);
-            inherited = false;
-
+            FindInheritedAttribute(key);
             if (null == attribute)
             {
-                foreach (Entity prototype in entity.Prototypes)
-                {
-                    EntityViewModel prototypeViewModel = EntityViewModel.GetViewModel(prototype);
-
-                    foreach (AttributeViewModel viewModel in prototypeViewModel.Attributes)
-                    {
-                        if (viewModel.Key == key)
-                        {
-                            inheritedViewModel = viewModel;
-                            inheritedViewModel.PropertyChanged += onPropertyChanged;
-                            attribute = viewModel.Attribute;
-                            inherited = true;
-                        }
-                    }
-                }
-
-                if (null == inheritedViewModel)
-                {
-
-                }
+                IsInherited = true;
             }
         }
 
         private AttributeViewModel(Attribute attribute)
         {
             this.attribute = attribute;
-            this.inherited = false;
         }
 
-        private void onAttributesChanged(object sender, NotifyCollectionChangedEventArgs args)
+        private void FindInheritedAttribute(string key)
         {
-            if (args.Action == NotifyCollectionChangedAction.Add)
+            foreach (Entity prototype in entity.Prototypes)
             {
-                foreach (AttributeViewModel viewModel in args.NewItems)
-                {
+                EntityViewModel prototypeViewModel = EntityViewModel.GetViewModel(prototype);
 
+                foreach (AttributeViewModel viewModel in prototypeViewModel.Attributes)
+                {
+                    if (viewModel.Key == key)
+                    {
+                        InheritedAttribute = viewModel;
+                        return;
+                    }
                 }
             }
-            else if (args.Action == NotifyCollectionChangedAction.Remove)
-            {
-
-            }
+            InheritedAttribute = null;
         }
 
-        private void onPropertyChanged(object sender, PropertyChangedEventArgs args)
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
             AttributeViewModel sourceAttribute = sender as AttributeViewModel;
             if (null != sourceAttribute)
             {
                 if (args.PropertyName == "Key")
                 {
-                    Key = sourceAttribute.Key;
+                    RaisePropertyChanged("Key");
                 }
                 else if (args.PropertyName == "Value")
                 {
-                    Value = sourceAttribute.Value;
+                    RaisePropertyChanged("Value");
                 }
             }
         }

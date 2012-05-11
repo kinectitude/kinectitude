@@ -137,7 +137,6 @@
     <Compile Include="Views\GameView.xaml.cs">
       <DependentUpon>GameView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\PluginTemplateSelector.cs" />
     <Compile Include="Views\SceneDialog.xaml.cs">
       <DependentUpon>SceneDialog.xaml</DependentUpon>
     </Compile>
@@ -224,7 +223,7 @@
       <SubType>Designer</SubType>
     </Resource>
     <Resource Include="Samples\Breakout.xml" />
-    <Content Include="schema.xsd">
+    <Content Include="Storage\schema.xsd">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
