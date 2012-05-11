@@ -5,9 +5,9 @@ using System.Text;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using Kinectitude.Editor.Base;
-using Attribute = Kinectitude.Editor.Models.Attribute;
+using Attribute = Kinectitude.Editor.Models.Base.Attribute;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Base
 {
     public class AttributeContainer
     {
@@ -40,10 +40,7 @@ namespace Kinectitude.Editor.Models
         public virtual Attribute GetAttribute(string key)
         {
             Attribute ret = null;
-            if (attributes.ContainsKey(key))
-            {
-                ret = attributes[key];
-            }
+            attributes.TryGetValue(key, out ret);
             return ret;
         }
 

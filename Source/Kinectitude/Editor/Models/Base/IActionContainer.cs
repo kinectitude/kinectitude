@@ -5,7 +5,7 @@ using System.Text;
 using System.Collections.ObjectModel;
 using Action = Kinectitude.Editor.Models.Plugins.Action;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Base
 {
     public interface IActionContainer
     {

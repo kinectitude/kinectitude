@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using Kinectitude.Editor.Models.Plugins;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Base
 {
     public class Scene : AttributeContainer, IEntityContainer
     {

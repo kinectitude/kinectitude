@@ -4,13 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Base
 {
     public class Using
     {
         private string path;
-        //private readonly List<Alias> _aliases;
-        //private readonly ReadOnlyCollection<Alias> aliases;
         private readonly SortedDictionary<string, Alias> aliases;
 
         public string Path
@@ -26,8 +24,6 @@ namespace Kinectitude.Editor.Models
 
         public Using()
         {
-            //_aliases = new List<Alias>();
-            //aliases = new ReadOnlyCollection<Alias>(_aliases);
             aliases = new SortedDictionary<string, Alias>();
         }
 

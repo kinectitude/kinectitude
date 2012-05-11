@@ -5,7 +5,7 @@ using System;
 using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.Models.Plugins;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Base
 {
     public class Game : AttributeContainer, IEntityContainer
     {
@@ -73,15 +73,6 @@ namespace Kinectitude.Editor.Models
 
         public Game(IPluginNamespace pluginNamespace)
         {
-            /*_usings = new List<Using>();
-            usings = new ReadOnlyCollection<Using>(_usings);
-
-            _scenes = new List<Scene>();
-            scenes = new ReadOnlyCollection<Scene>(_scenes);
-
-            _prototypes = new List<Entity>();
-            prototypes = new ReadOnlyCollection<Entity>(_prototypes);*/
-
             this.pluginNamespace = pluginNamespace;
             usings = new SortedDictionary<string, Using>();
             prototypes = new SortedDictionary<string, Entity>();
@@ -118,22 +109,6 @@ namespace Kinectitude.Editor.Models
             entity.Parent = null;
             prototypes.Remove(entity.Name);
         }
-
-        /*public void AddAlias(string name, string fullName)
-        {
-            string uniqueName = name;
-            if (aliases.ContainsKey(name))
-            {
-                int i = 1;
-                do
-                {
-                    uniqueName = string.Format("{0}{1}", name, i++);
-                }
-                while(aliases.ContainsKey(uniqueName));
-
-                aliases[uniqueName] = fullName;
-            }
-        }*/
 
         public void AddUsing(Using use)
         {

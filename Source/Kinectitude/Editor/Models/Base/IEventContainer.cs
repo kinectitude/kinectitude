@@ -5,7 +5,7 @@ using System.Text;
 using System.Collections.ObjectModel;
 using Kinectitude.Editor.Models.Plugins;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Base
 {
     public interface IEventContainer
     {

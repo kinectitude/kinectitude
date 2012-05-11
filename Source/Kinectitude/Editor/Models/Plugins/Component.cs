@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 using Kinectitude.Editor.Models.Properties;
+using Kinectitude.Editor.Models.Base;
 
 namespace Kinectitude.Editor.Models.Plugins
 {
@@ -21,7 +22,7 @@ namespace Kinectitude.Editor.Models.Plugins
 
         public override T GetProperty<T>(string name)
         {
-            BaseProperty property = base.GetProperty<T>(name);
+            Property property = base.GetProperty<T>(name);
 
             if (null == property)
             {

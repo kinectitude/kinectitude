@@ -8,26 +8,24 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
 using System.IO;
-using Kinectitude.Editor.Views;
 using System.Windows;
 using Kinectitude.Attributes;
 using Kinectitude.Editor.Models.Plugins;
 using Kinectitude.Editor.Models;
-using Action = Kinectitude.Editor.Models.Plugins.Action;
-using Component = Kinectitude.Editor.Models.Plugins.Component;
+using Kinectitude.Editor.Models.Base;
+using Kinectitude.Editor.Commands.Base;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    public sealed class Workspace : IPluginFactory, INotifyPropertyChanged
+    public sealed class Workspace : BaseModel, IPluginNamespace
     {
         public const string PluginDirectory = "Plugins";
-
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         private readonly List<PluginViewModel> plugins;
         private readonly ObservableCollection<BaseModel> _activeItems;
         private readonly ModelCollection<BaseModel> activeItems;
         private readonly ResolutionPreset[] resolutionPresets;
+        private readonly ICommandHistory commandHistory;
 
         private GameViewModel game;
         private BaseModel currentItem;
@@ -80,7 +78,7 @@ namespace Kinectitude.Editor.ViewModels
                 if (game != value)
                 {
                     game = value;
-                    raisePropertyChanged("Game");
+                    RaisePropertyChanged("Game");
                 }
             }
         }
@@ -98,7 +96,7 @@ namespace Kinectitude.Editor.ViewModels
                 if (currentItem != value)
                 {
                     currentItem = value;
-                    raisePropertyChanged("CurrentItem");
+                    RaisePropertyChanged("CurrentItem");
                 }
             }
         }
@@ -113,11 +111,17 @@ namespace Kinectitude.Editor.ViewModels
             get { return resolutionPresets; }
         }
 
+        public ICommandHistory CommandHistory
+        {
+            get { return commandHistory; }
+        }
+
         public Workspace()
         {
             plugins = new List<PluginViewModel>();
+            commandHistory = new CommandHistory();
 
-            Assembly core = typeof(Kinectitude.Core.Component).Assembly;
+            Assembly core = typeof(Kinectitude.Core.Base.Component).Assembly;
             registerTypesFromAssembly(core, true);
 
             string[] files = Directory.GetFiles(Path.Combine(Environment.CurrentDirectory, PluginDirectory), "*.dll");
@@ -145,16 +149,16 @@ namespace Kinectitude.Editor.ViewModels
                                       where
                                       (
                                           (
-                                              typeof(Kinectitude.Core.Component) != type &&
-                                              typeof(Kinectitude.Core.Component).IsAssignableFrom(type)
+                                              typeof(Kinectitude.Core.Base.Component) != type &&
+                                              typeof(Kinectitude.Core.Base.Component).IsAssignableFrom(type)
                                           ) ||
                                           (
-                                              typeof(Kinectitude.Core.Event) != type &&
-                                              typeof(Kinectitude.Core.Event).IsAssignableFrom(type)
+                                              typeof(Kinectitude.Core.Base.Event) != type &&
+                                              typeof(Kinectitude.Core.Base.Event).IsAssignableFrom(type)
                                           ) ||
                                           (
-                                              typeof(Kinectitude.Core.Action) != type &&
-                                              typeof(Kinectitude.Core.Action).IsAssignableFrom(type)
+                                              typeof(Kinectitude.Core.Base.Action) != type &&
+                                              typeof(Kinectitude.Core.Base.Action).IsAssignableFrom(type)
                                           )
                                       ) &&
                                       System.Attribute.IsDefined(type, typeof(PluginAttribute))
@@ -190,36 +194,19 @@ namespace Kinectitude.Editor.ViewModels
                     }
                 }
             }
-            /*PluginViewModel viewModel = plugins.FirstOrDefault(x => x.Descriptor.Name == name);
-            if (null == viewModel)
+            
+            if (null == ret)
             {
                 throw new PluginNotLoadedException(name);
-            }*/
+            }
+
             return ret;
         }
-
-        /*public Component CreateComponent(string name)
-        {
-            PluginDescriptor descriptor = getDescriptor(name);
-            return new Component(descriptor);
-        }
-
-        public Event CreateEvent(string name)
-        {
-            PluginDescriptor descriptor = getDescriptor(name);
-            return new Event(descriptor);
-        }
-
-        public Action CreateAction(string name)
-        {
-            PluginDescriptor descriptor = getDescriptor(name);
-            return new Action(descriptor);
-        }*/
 
         public void NewGame(object parameter)
         {
             Game game = new Game(this);
-            GameViewModel viewModel = GameViewModel.Create(game, this);
+            GameViewModel viewModel = new GameViewModel(game, this, commandHistory);
             Game = viewModel;
         }
 
@@ -285,21 +272,13 @@ namespace Kinectitude.Editor.ViewModels
             {
                 Game game = storage.LoadGame();
 
-                GameViewModel gameViewModel = GameViewModel.Create(game, this);
+                GameViewModel gameViewModel = new GameViewModel(game, this, commandHistory);
                 gameViewModel.FileName = fileName;
                 Game = gameViewModel;
             }
             catch (PluginNotLoadedException e)
             {
                 System.Windows.MessageBox.Show(e.Message);
-            }
-        }
-
-        private void raisePropertyChanged(string propertyName)
-        {
-            if (null != PropertyChanged)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
     }

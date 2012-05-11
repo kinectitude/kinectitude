@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:v="clr-namespace:Kinectitude.Editor.Views"
         xmlns:vm="clr-namespace:Kinectitude.Editor.ViewModels"
-        xmlns:m="clr-namespace:Kinectitude.Editor.Models"
         Title="Kinectitude Editor v1.0 Beta"
         Name="window"
         WindowState="Maximized"
@@ -11,9 +10,8 @@
         UseLayoutRounding="True">
 
     <Window.InputBindings>
-        
-        <KeyBinding Gesture="CTRL+Z" Command="{Binding ElementName=treGame, Path=SelectedItem.CommandHistory.UndoCommand, Mode=OneWay}" />
-        <KeyBinding Gesture="CTRL+Y" Command="{Binding ElementName=treGame, Path=SelectedItem.CommandHistory.RedoCommand, Mode=OneWay}" />
+        <KeyBinding Gesture="CTRL+Z" Command="{Binding CommandHistory.UndoCommand, Mode=OneWay}" />
+        <KeyBinding Gesture="CTRL+Y" Command="{Binding CommandHistory.RedoCommand, Mode=OneWay}" />
     </Window.InputBindings>
     
     <DockPanel>
@@ -28,7 +26,7 @@
                 <Separator />
                 <MenuItem Header="_Exit" Command="{Binding ExitCommand, Mode=OneWay}" InputGestureText="Alt+F4" />
             </MenuItem>
-            <MenuItem DataContext="{Binding ElementName=treGame, Path=SelectedItem}" Header="_Edit">
+            <MenuItem Header="_Edit">
                 <MenuItem Command="{Binding CommandHistory.UndoCommand, Mode=OneWay}" InputGestureText="Ctrl+Z">
                     <MenuItem.Header>
                         <TextBlock Text="{Binding CommandHistory.LastUndoableCommandName, StringFormat=Undo {0}}" />
@@ -207,7 +205,7 @@
 
                 <GridSplitter Height="4" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
 
-                <ScrollViewer VerticalScrollBarVisibility="Visible" Grid.Row="2">
+                <ScrollViewer VerticalScrollBarVisibility="Visible" Grid.Row="2" HorizontalScrollBarVisibility="Disabled">
                     <!--ListBox ItemsSource="{Binding Plugins}">
                         <ListBox.Resources>
                             
@@ -255,8 +253,32 @@
                         </DataGrid.Columns>
                     </DataGrid-->
                     
-                    <ListBox DataContext="{Binding CurrentItem}">
-                        <ListBox.ItemsSource>
+                    <ListBox DataContext="{Binding CurrentItem}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        
+                        <Expander Header="Attributes" IsExpanded="True" FontWeight="Bold">
+                            <ListView ItemsSource="{Binding Attributes}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridView.ColumnHeaderContainerStyle>
+                                            <Style TargetType="{x:Type GridViewColumnHeader}">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </Style>
+                                        </GridView.ColumnHeaderContainerStyle>
+                                        <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Key}" />
+                                        <GridViewColumn Width="Auto">
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <CheckBox IsChecked="{Binding IsInherited}" IsEnabled="{Binding CanInherit}" />
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                        <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Value}" />
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </Expander>
+                        
+                        <!--ListBox.ItemsSource>
                             <MultiBinding Converter="{StaticResource detailsConverter}">
                                 <Binding Path="Attributes" />
                                 <Binding Path="Components" />
@@ -264,20 +286,24 @@
                         </ListBox.ItemsSource>
                         <ListBox.Resources>
                             <DataTemplate DataType="{x:Type v:Details}">
-                                <Expander Header="{Binding Header}" IsExpanded="True">
-                                    <ListBox ItemsSource="{Binding Items}">
-                                        <ListBox.Resources>
-                                            <DataTemplate DataType="{x:Type v:Detail}">
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="{Binding Name}" />
-                                                    <TextBlock Text="{Binding Value}" />
-                                                </StackPanel>
+                                <Expander Header="{Binding Header}" IsExpanded="True" FontWeight="Bold">
+                                    <ListView ItemsSource="{Binding Items}" Grid.IsSharedSizeScope="True">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="Key" />
+                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="Value" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Label Content="{Binding Name}" />
+                                                    <TextBox Text="{Binding Value}" />
+                                                </Grid>
                                             </DataTemplate>
-                                        </ListBox.Resources>
-                                    </ListBox>
+                                        </ItemsControl.ItemTemplate>
+                                    </ListView>
                                 </Expander>
                             </DataTemplate>
-                        </ListBox.Resources>
+                        </ListBox.Resources-->
                     </ListBox>
 
                 </ScrollViewer>

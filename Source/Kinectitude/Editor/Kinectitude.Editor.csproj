@@ -19,7 +19,7 @@
     <ExpressionBlendVersion>4.0.20525.0</ExpressionBlendVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -29,7 +29,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>$(ProjectDir)..\..\..\Build\$(Configuration)\</OutputPath>
@@ -66,7 +66,10 @@
     <Compile Include="Base\BaseModel.cs" />
     <Compile Include="Base\DelegateCommand.cs" />
     <Compile Include="Base\EventArgs.cs" />
+    <Compile Include="Commands\Attribute\RenameAttributeCommand.cs" />
     <Compile Include="Commands\Base\CommandHistory.cs" />
+    <Compile Include="Commands\Entity\AddPrototypeCommand.cs" />
+    <Compile Include="Commands\Entity\RemovePrototypeCommand.cs" />
     <Compile Include="Commands\Game\CreatePrototypeCommand.cs" />
     <Compile Include="Commands\Game\CreateSceneCommand.cs" />
     <Compile Include="Commands\Game\DeletePrototypeCommand.cs" />
@@ -84,17 +87,17 @@
     <Compile Include="Commands\Scene\SelectMultipleEntitiesCommand.cs" />
     <Compile Include="Commands\Base\UndoCommand.cs" />
     <Compile Include="Base\ModelCollection.cs" />
-    <Compile Include="Models\Alias.cs" />
-    <Compile Include="Models\Attribute.cs" />
-    <Compile Include="Models\Condition.cs" />
+    <Compile Include="Models\Base\Alias.cs" />
+    <Compile Include="Models\Base\Attribute.cs" />
+    <Compile Include="Models\Base\Condition.cs" />
     <Compile Include="Models\Expressions\BooleanExpression.cs" />
-    <Compile Include="Models\IActionContainer.cs" />
-    <Compile Include="Models\IEntityContainer.cs" />
-    <Compile Include="Models\IAction.cs" />
-    <Compile Include="Models\IEventContainer.cs" />
+    <Compile Include="Models\Base\IActionContainer.cs" />
+    <Compile Include="Models\Base\IEntityContainer.cs" />
+    <Compile Include="Models\Base\IAction.cs" />
+    <Compile Include="Models\Base\IEventContainer.cs" />
     <Compile Include="Models\Plugins\Action.cs" />
-    <Compile Include="Models\AttributeContainer.cs" />
-    <Compile Include="Models\PluginNotLoadedException.cs" />
+    <Compile Include="Models\Base\AttributeContainer.cs" />
+    <Compile Include="Models\Base\PluginNotLoadedException.cs" />
     <Compile Include="Models\Properties\BooleanProperty.cs" />
     <Compile Include="Models\Properties\EnumerationProperty.cs" />
     <Compile Include="Models\Properties\IntegerProperty.cs" />
@@ -102,13 +105,12 @@
     <Compile Include="Models\Properties\TextProperty.cs" />
     <Compile Include="Models\Properties\PropertyDescriptor.cs" />
     <Compile Include="Models\Plugins\Component.cs" />
-    <Compile Include="Models\Entity.cs" />
+    <Compile Include="Models\Base\Entity.cs" />
     <Compile Include="Models\Plugins\Event.cs" />
-    <Compile Include="Models\Using.cs" />
-    <Compile Include="Storage\IPluginFactory.cs" />
+    <Compile Include="Models\Base\Using.cs" />
     <Compile Include="Models\Plugins\Plugin.cs" />
     <Compile Include="Models\Plugins\PluginDescriptor.cs" />
-    <Compile Include="Models\Properties\BaseProperty.cs" />
+    <Compile Include="Models\Properties\Property.cs" />
     <Compile Include="Storage\IPluginNamespace.cs" />
     <Compile Include="Storage\XmlGameStorage.cs" />
     <Compile Include="Storage\IGameStorage.cs" />
@@ -130,7 +132,7 @@
       <DependentUpon>EntityView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\GameViewModel.cs" />
-    <Compile Include="Models\Scene.cs" />
+    <Compile Include="Models\Base\Scene.cs" />
     <Compile Include="Views\GameView.xaml.cs">
       <DependentUpon>GameView.xaml</DependentUpon>
     </Compile>
@@ -171,7 +173,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Models\Game.cs" />
+    <Compile Include="Models\Base\Game.cs" />
     <Page Include="Views\GameView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -217,9 +219,14 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <None Include="schema.xsd">
+    <Resource Include="Samples\Breakout\game.xml">
       <SubType>Designer</SubType>
-    </None>
+    </Resource>
+    <Resource Include="Samples\Breakout.xml" />
+    <Content Include="schema.xsd">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\disk.png" />
@@ -254,9 +261,7 @@
     <Resource Include="Icons\page_copy.png" />
     <Resource Include="Icons\page_paste.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Commands\Entity\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Attributes\Kinectitude.Attributes.csproj">
       <Project>{52A964EE-E3ED-4AC5-843F-9FAA26055B39}</Project>

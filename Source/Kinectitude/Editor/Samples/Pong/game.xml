@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Game Name="Pong" Width="800" Height="600" FirstScene="Main Menu" IsFullScreen="false">
+<Game xmlns="http://www.kinectitude.com" Name="Pong" Width="800" Height="600" FirstScene="Main Menu" IsFullScreen="false">
 
   <Using Path="Kinect.dll">
     <Alias Name="KinectComponent" Class="Kinectitude.Kinect.KinectComponent" />
@@ -126,11 +126,13 @@
       <Attribute Key="x" Value="0" />
       <Attribute Key="y" Value="450" />
     </Entity>
-    
-    <Event Type="AttributeEqualsEvent" Key="scene.numReady" Value="2">
-      <Action Type="ChangeSceneAction" Target="Game" />
-    </Event>
-    
+
+    <Entity>
+      <Event Type="AttributeEqualsEvent" Key="scene.numReady" Value="2">
+        <Action Type="ChangeSceneAction" Target="Game" />
+      </Event>
+    </Entity>
+
   </Scene>
   
   <Scene Name="Game">
@@ -175,7 +177,7 @@
       </Event>
     </Entity>
 
-	<Entity Prototype="Score">
+	  <Entity Prototype="Score">
 
       <Attribute Key="x" Value="56" />
       <Attribute Key="y" Value="24" />
@@ -183,23 +185,25 @@
       <Component Type="TextRenderComponent" Value="{paddle1.score}" />
     </Entity>
 	
-	<Entity Prototype="Score">
+	  <Entity Prototype="Score">
 
       <Attribute Key="x" Value="724" />
       <Attribute Key="y" Value="24" />
     
       <Component Type="TextRenderComponent" Value="{paddle2.score}" />
-	</Entity>
-	
-    <Event Type="AttributeEqualsEvent" Key="paddle1.score" Value="7">
-      <Action Type="SetAttributeAction" Key="game.winner" Value="1" />
-      <Action Type="ChangeSceneAction" Target="Game Over" />
-    </Event>
-    
-    <Event Type="AttributeEqualsEvent" Key="paddle2.score" Value="7">
-      <Action Type="SetAttributeAction" Key="game.winner" Value="2" />
-      <Action Type="ChangeSceneAction" Target="Game Over" />
-    </Event>
+	  </Entity>
+
+    <Entity>
+      <Event Type="AttributeEqualsEvent" Key="paddle1.score" Value="7">
+        <Action Type="SetAttributeAction" Key="game.winner" Value="1" />
+        <Action Type="ChangeSceneAction" Target="Game Over" />
+      </Event>
+
+      <Event Type="AttributeEqualsEvent" Key="paddle2.score" Value="7">
+        <Action Type="SetAttributeAction" Key="game.winner" Value="2" />
+        <Action Type="ChangeSceneAction" Target="Game Over" />
+      </Event>
+    </Entity>
     
   </Scene>
 

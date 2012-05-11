@@ -9,14 +9,14 @@ namespace Kinectitude.Editor.Models.Plugins
     public class Plugin
     {
         private readonly PluginDescriptor descriptor;
-        private readonly SortedDictionary<string, BaseProperty> properties;
+        private readonly SortedDictionary<string, Property> properties;
         
         public PluginDescriptor Descriptor
         {
             get { return descriptor; }
         }
 
-        public IEnumerable<BaseProperty> Properties
+        public IEnumerable<Property> Properties
         {
             get { return properties.Values; }
         }
@@ -24,10 +24,10 @@ namespace Kinectitude.Editor.Models.Plugins
         protected Plugin(PluginDescriptor descriptor)
         {
             this.descriptor = descriptor;
-            properties = new SortedDictionary<string, BaseProperty>();
+            properties = new SortedDictionary<string, Property>();
         }
 
-        public virtual T GetProperty<T>(string name) where T : BaseProperty
+        public virtual T GetProperty<T>(string name) where T : Property
         {
             return properties.ContainsKey(name) ? properties[name] as T : null;
         }
@@ -36,7 +36,7 @@ namespace Kinectitude.Editor.Models.Plugins
         {
             if (!properties.ContainsKey(name))
             {
-                BaseProperty property = BaseProperty.CreateProperty(descriptor.GetPropertyDescriptor(name));
+                Property property = Property.CreateProperty(descriptor.GetPropertyDescriptor(name));
                 if (null != property)
                 {
                     properties[name] = property;
@@ -45,7 +45,7 @@ namespace Kinectitude.Editor.Models.Plugins
 
             if (properties.ContainsKey(name))
             {
-                BaseProperty property = properties[name];
+                Property property = properties[name];
                 property.TryParse(value);
             }
         }

@@ -7,7 +7,7 @@ using Action = Kinectitude.Editor.Models.Plugins.Action;
 using Kinectitude.Editor.Models.Expressions;
 using Kinectitude.Editor.Models.Plugins;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Base
 {
     public class Condition : IAction, IActionContainer
     {

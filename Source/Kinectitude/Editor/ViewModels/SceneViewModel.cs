@@ -9,38 +9,19 @@ using Kinectitude.Editor.Commands;
 using Kinectitude.Editor.Commands.Base;
 using Kinectitude.Editor.Models;
 using Kinectitude.Editor.Commands.Scene;
+using Kinectitude.Editor.Models.Base;
 
 namespace Kinectitude.Editor.ViewModels
 {
     public class SceneViewModel : BaseModel
     {
-        private static readonly Dictionary<Scene, SceneViewModel> viewModels;
-
-        static SceneViewModel()
-        {
-            viewModels = new Dictionary<Scene, SceneViewModel>();
-        }
-
-        public static SceneViewModel Create(Game game, Scene scene)
-        {
-            if (!viewModels.ContainsKey(scene))
-            {
-                SceneViewModel viewModel = new SceneViewModel(game, scene);
-                viewModels[scene] = viewModel;
-            }
-            return viewModels[scene];
-        }
-        
         private EntityViewModel currentEntity;
 
-        private readonly Game game;
         private readonly Scene scene;
         private readonly ObservableCollection<AttributeViewModel> _attributes;
         private readonly ObservableCollection<EntityViewModel> _entities;
-        private readonly ObservableCollection<EventViewModel> _events;
         private readonly ModelCollection<AttributeViewModel> attributes;
         private readonly ModelCollection<EntityViewModel> entities;
-        private readonly ModelCollection<EventViewModel> events;
         private readonly ICommandHistory commandHistory;
 
         public Scene Scene
@@ -78,44 +59,20 @@ namespace Kinectitude.Editor.ViewModels
             get { return entities; }
         }
 
-        public ModelCollection<EventViewModel> Events
+        public SceneViewModel(Scene scene, ICommandHistory commandHistory)
         {
-            get { return events; }
-        }
-
-        public int Width
-        {
-            get { return game.Width; }
-        }
-
-        public int Height
-        {
-            get { return game.Height; }
-        }
-
-        public ICommandHistory CommandHistory
-        {
-            get { return commandHistory; }
-        }
-
-        private SceneViewModel(Game game, Scene scene)
-        {
-            this.game = game;
             this.scene = scene;
 
-            var attributeViewModels = from attribute in scene.Attributes select new AttributeViewModel(attribute);
-            var entityViewModels = from entity in scene.Entities select EntityViewModel.Create(entity);
-            //var eventViewModels = from evt in scene.Events select new EventViewModel(evt);
+            var attributeViewModels = from attribute in scene.Attributes select AttributeViewModel.GetViewModel(attribute);
+            var entityViewModels = from entity in scene.Entities select EntityViewModel.GetViewModel(entity);
 
             _attributes = new ObservableCollection<AttributeViewModel>(attributeViewModels);
             _entities = new ObservableCollection<EntityViewModel>(entityViewModels);
-            //_events = new ObservableCollection<EventViewModel>(eventViewModels);
 
             attributes = new ModelCollection<AttributeViewModel>(_attributes);
             entities = new ModelCollection<EntityViewModel>(_entities);
-            //events = new ModelCollection<EventViewModel>(_events);
 
-            commandHistory = new CommandHistory();
+            this.commandHistory = commandHistory;
         }
     }
 }

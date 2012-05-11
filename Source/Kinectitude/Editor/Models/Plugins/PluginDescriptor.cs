@@ -71,15 +71,15 @@ namespace Kinectitude.Editor.Models.Plugins
                 description = pluginAttribute.Description;
             }
             
-            if (typeof(Kinectitude.Core.Component).IsAssignableFrom(pluginType))
+            if (typeof(Kinectitude.Core.Base.Component).IsAssignableFrom(pluginType))
             {
                 type = PluginType.Component;
             }
-            else if (typeof(Kinectitude.Core.Event).IsAssignableFrom(pluginType))
+            else if (typeof(Kinectitude.Core.Base.Event).IsAssignableFrom(pluginType))
             {
                 type = PluginType.Event;
             }
-            else if (typeof(Kinectitude.Core.Action).IsAssignableFrom(pluginType))
+            else if (typeof(Kinectitude.Core.Base.Action).IsAssignableFrom(pluginType))
             {
                 type = PluginType.Action;
             }

@@ -7,9 +7,9 @@ using System.Collections.Specialized;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Plugins;
 using Kinectitude.Editor.Models.Properties;
-using Attribute = Kinectitude.Editor.Models.Attribute;
+using Attribute = Kinectitude.Editor.Models.Base.Attribute;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Base
 {
     public class Entity : AttributeContainer, IEventContainer
     {
@@ -103,7 +103,7 @@ namespace Kinectitude.Editor.Models
             events.Remove(evt);
         }
 
-        public override Attribute GetAttribute(string key)
+        /*public override Attribute GetAttribute(string key)
         {
             Attribute attribute = base.GetAttribute(key);
             if (null == attribute)
@@ -117,8 +117,10 @@ namespace Kinectitude.Editor.Models
                     }
                 }
             }
+            Attribute attribute = null;
+
             return attribute;
-        }
+        }*/
 
         /*public bool HasComponent(string name)
         {

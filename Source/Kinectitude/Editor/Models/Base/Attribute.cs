@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Base
 {
     public class Attribute
     {
@@ -27,6 +27,12 @@ namespace Kinectitude.Editor.Models
         {
             get { return value; }
             set { this.value = value; }
+        }
+
+        public Attribute(string key, dynamic value)
+        {
+            this.key = key;
+            this.value = value;
         }
 
         public Attribute(string key, string value)

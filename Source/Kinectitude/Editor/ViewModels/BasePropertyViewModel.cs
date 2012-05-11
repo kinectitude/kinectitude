@@ -8,26 +8,9 @@ namespace Kinectitude.Editor.ViewModels
 {
     public class BasePropertyViewModel
     {
-        private static readonly Dictionary<BaseProperty, BasePropertyViewModel> viewModels;
+        private readonly Property property;
 
-        static BasePropertyViewModel()
-        {
-            viewModels = new Dictionary<BaseProperty, BasePropertyViewModel>();
-        }
-
-        public static BasePropertyViewModel Create(BaseProperty property)
-        {
-            if (!viewModels.ContainsKey(property))
-            {
-                BasePropertyViewModel viewModel = new BasePropertyViewModel(property);
-                viewModels[property] = viewModel;
-            }
-            return viewModels[property];
-        }
-
-        private readonly BaseProperty property;
-
-        public BaseProperty Property
+        public Property Property
         {
             get { return property; }
         }
@@ -37,7 +20,7 @@ namespace Kinectitude.Editor.ViewModels
             get { return property.Descriptor.DisplayName; }
         }
 
-        private BasePropertyViewModel(BaseProperty property)
+        private BasePropertyViewModel(Property property)
         {
             this.property = property;
         }

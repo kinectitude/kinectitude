@@ -8,7 +8,10 @@ using Kinectitude.Editor.Models;
 using Kinectitude.Editor.Models.Plugins;
 using Kinectitude.Editor.Models.Properties;
 using Action = Kinectitude.Editor.Models.Plugins.Action;
-using Attribute = Kinectitude.Editor.Models.Attribute;
+using Attribute = Kinectitude.Editor.Models.Base.Attribute;
+using System.Xml.Schema;
+using System.Xml;
+using Kinectitude.Editor.Models.Base;
 
 namespace Kinectitude.Editor.Storage
 {
@@ -16,77 +19,88 @@ namespace Kinectitude.Editor.Storage
     {
         private static class Constants
         {
-            public const string Scene = "Scene";
-            public const string Name = "Name";
-            public const string Width = "Width";
-            public const string Height = "Height";
-            public const string FirstScene = "FirstScene";
-            public const string Game = "Game";
-            public const string Entity = "Entity";
-            public const string Prototype = "Prototype";
-            public const string Component = "Component";
-            public const string Event = "Event";
-            public const string Action = "Action";
-            public const string Type = "Type";
-            public const string Attribute = "Attribute";
-            public const string Key = "Key";
-            public const string Value = "Value";
-            public const string Root = "Root";
-            public const string Using = "Using";
-            public const string Path = "Path";
-            public const string Alias = "Alias";
-            public const string Class = "Class";
+            private static readonly XNamespace Namespace  = "http://www.kinectitude.com";
+
+            public static readonly XName Game = Namespace + "Game";
+            public static readonly XName Using = Namespace + "Using";
+            public static readonly XName Alias = Namespace + "Alias";
+            public static readonly XName Scene = Namespace + "Scene";
+            public static readonly XName Entity = Namespace + "Entity";
+            public static readonly XName Attribute = Namespace + "Attribute";
+            public static readonly XName Component = Namespace + "Component";
+            public static readonly XName Event = Namespace + "Event";
+            public static readonly XName Condition = Namespace + "Condition";
+            public static readonly XName Action = Namespace + "Action";
+
+            public static readonly XName Name = "Name";
+            public static readonly XName Width = "Width";
+            public static readonly XName Height = "Height";
+            public static readonly XName FirstScene = "FirstScene";
+            public static readonly XName Prototype = "Prototype";
+            public static readonly XName Type = "Type";
+            public static readonly XName Key = "Key";
+            public static readonly XName Value = "Value";
+            public static readonly XName Path = "Path";
+            public static readonly XName Class = "Class";
+            public static readonly XName Root = "Root";
         }
 
         private Game game;
         private readonly string fileName;
-        private readonly IPluginFactory factory;
+        private readonly IPluginNamespace pluginNamespace;
         private readonly Queue<Tuple<XElement, Entity>> entities;
 
-        public XmlGameStorage(string fileName, IPluginFactory factory)
+        public XmlGameStorage(string fileName, IPluginNamespace pluginNamespace)
         {
             this.fileName = fileName;
-            this.factory = factory;
+            this.pluginNamespace = pluginNamespace;
             entities = new Queue<Tuple<XElement,Entity>>();
         }
 
         public Game LoadGame()
         {
+            XmlSchemaSet schemas = new XmlSchemaSet();
+            schemas.Add(null, new XmlTextReader("schema.xsd"));
+
             XElement project = XElement.Load(fileName);
             XElement root = project.Element(Constants.Root);
             string gameFileName = Path.Combine(Path.GetDirectoryName(fileName), root.Value, "game.xml");
-            XElement document = XElement.Load(gameFileName);
+
+            XDocument document = XDocument.Load(gameFileName);
+            XElement gameElement = document.Root;
+
+            document.Validate(schemas, (o, e) => { throw new ArgumentException("Invalid Kinectitude XML file."); });
 
             // First Pass
             // Create the Game object top-down, including properties, attributes, and parent relationships.
 
-            game = new Game(factory)
+            game = new Game(pluginNamespace)
             {
-                Name = (string)document.Attribute(Constants.Name),
-                Width = (int)document.Attribute(Constants.Width),
-                Height = (int)document.Attribute(Constants.Height)
+                Name = (string)gameElement.Attribute(Constants.Name),
+                Width = (int)gameElement.Attribute(Constants.Width),
+                Height = (int)gameElement.Attribute(Constants.Height)
             };
 
-            foreach (XElement usingElement in document.Elements(Constants.Using))
+            foreach (XElement usingElement in gameElement.Elements(Constants.Using))
             {
                 Using use = createUsing(usingElement);
                 game.AddUsing(use);
             }
 
-            foreach (XElement attributeElement in document.Elements(Constants.Attribute))
+            foreach (XElement attributeElement in gameElement.Elements(Constants.Attribute))
             {
                 Attribute attribute = createAttribute(attributeElement);
                 game.AddAttribute(attribute);
             }
 
-            foreach (XElement prototypeElement in document.Elements(Constants.Entity))
+            foreach (XElement prototypeElement in gameElement.Elements(Constants.Entity))
             {
                 Entity entity = createEntity(prototypeElement);
                 entities.Enqueue(new Tuple<XElement, Entity>(prototypeElement, entity));
                 game.AddEntity(entity);
             }
 
-            foreach (XElement sceneElement in document.Elements(Constants.Scene))
+            foreach (XElement sceneElement in gameElement.Elements(Constants.Scene))
             {
                 Scene scene = createScene(sceneElement);
                 game.AddScene(scene);
@@ -95,7 +109,7 @@ namespace Kinectitude.Editor.Storage
             // Second Pass
             // Run through the XML again, to resolve references such as the game's first scene, or an entity's prototype
 
-            game.FirstScene = game.GetScene((string)document.Attribute(Constants.FirstScene));
+            game.FirstScene = game.GetScene((string)gameElement.Attribute(Constants.FirstScene));
 
             while (entities.Count > 0)
             {
@@ -167,11 +181,6 @@ namespace Kinectitude.Editor.Storage
                 scene.AddEntity(entity);
             }
 
-            /*foreach (XElement eventElement in element.Elements(Constants.Event))
-            {
-                Event evt = createEvent(eventElement);
-                scene.AddEvent(evt);
-            }*/
             return scene;
         }
 
@@ -204,7 +213,6 @@ namespace Kinectitude.Editor.Storage
 
         private Component createComponent(XElement element)
         {
-            //string type = game.GetPluginClass((string)element.Attribute(Constants.Type));
             PluginDescriptor descriptor = game.GetPluginDescriptor((string)element.Attribute(Constants.Type));
             Component component = new Component(descriptor);
 
@@ -305,11 +313,6 @@ namespace Kinectitude.Editor.Storage
                 element.Add(entityElement);
             }
 
-            /*foreach (Event evt in scene.Events)
-            {
-                XElement eventElement = serializeEvent(evt);
-                element.Add(eventElement);
-            }*/
             return element;
         }
 
@@ -368,7 +371,7 @@ namespace Kinectitude.Editor.Storage
                 new XAttribute(Constants.Type, component.Descriptor.DisplayName)
             );
 
-            foreach (BaseProperty property in component.Properties)
+            foreach (Property property in component.Properties)
             {
                 XAttribute propertyAttribute = new XAttribute(property.Descriptor.DisplayName, property.ToString());
                 element.Add(propertyAttribute);
@@ -384,7 +387,7 @@ namespace Kinectitude.Editor.Storage
                 new XAttribute(Constants.Type, evt.Descriptor.DisplayName)
             );
 
-            foreach (BaseProperty property in evt.Properties)
+            foreach (Property property in evt.Properties)
             {
                 XAttribute propertyAttribute = new XAttribute(property.Descriptor.DisplayName, property.ToString());
                 element.Add(propertyAttribute);
@@ -406,7 +409,7 @@ namespace Kinectitude.Editor.Storage
                 new XAttribute(Constants.Type, action.Descriptor.DisplayName)
             );
 
-            foreach (BaseProperty property in action.Properties)
+            foreach (Property property in action.Properties)
             {
                 XAttribute propertyAttribute = new XAttribute(property.Descriptor.DisplayName, property.ToString());
                 element.Add(propertyAttribute);

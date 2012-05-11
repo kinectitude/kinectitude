@@ -39,7 +39,7 @@
         <xs:element ref="Attribute" minOccurs="0" maxOccurs="unbounded" />
         <xs:element ref="Entity" minOccurs="0" maxOccurs="unbounded" />
       </xs:sequence>
-      <xs:attribute name="Name" type="xs:string" />
+      <xs:attribute name="Name" type="xs:string" use="required" />
     </xs:complexType>
   </xs:element>
 
@@ -65,7 +65,7 @@
   <xs:element name="Component">
     <xs:complexType>
       <xs:attribute name="Type" type="xs:string" use="required" />
-      <xs:anyAttribute />
+      <xs:anyAttribute processContents="lax" />
     </xs:complexType>
   </xs:element>
     
@@ -76,7 +76,7 @@
         <xs:element ref="Action" />
       </xs:choice>
       <xs:attribute name="Type" type="xs:string" use="required" />
-      <xs:anyAttribute />
+      <xs:anyAttribute processContents="lax" />
     </xs:complexType>
   </xs:element>
 
@@ -93,7 +93,7 @@
   <xs:element name="Action">
     <xs:complexType>
       <xs:attribute name="Type" type="xs:string" use="required" />
-      <xs:anyAttribute />
+      <xs:anyAttribute processContents="lax" />
     </xs:complexType>
   </xs:element>
 </xs:schema>

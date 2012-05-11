@@ -9,35 +9,15 @@ using System.Collections.Generic;
 using Kinectitude.Editor.Commands.Base;
 using Kinectitude.Editor.Commands.Game;
 using Kinectitude.Editor.Models;
+using Kinectitude.Editor.Models.Base;
 
 namespace Kinectitude.Editor.ViewModels
 {
     public class GameViewModel : BaseModel
     {
-        private static readonly Dictionary<Game, GameViewModel> viewModels;
-
-        static GameViewModel()
-        {
-            viewModels = new Dictionary<Game, GameViewModel>();
-        }
-
-        public static GameViewModel Create(Game game, IPluginFactory pluginFactory)
-        {
-            if (!viewModels.ContainsKey(game))
-            {
-                GameViewModel viewModel = new GameViewModel(game, pluginFactory);
-                viewModels[game] = viewModel;
-            }
-            return viewModels[game];
-        }
-
-        public static class Constants
-        {
-            public const string DefaultName = "Untitled Game";
-        }
+        public const string DefaultName = "Untitled Game";
 
         private string fileName;
-
         private readonly Game game;
         private readonly ObservableCollection<AttributeViewModel> _attributes;
         private readonly ObservableCollection<EntityViewModel> _prototypes;
@@ -45,11 +25,8 @@ namespace Kinectitude.Editor.ViewModels
         private readonly ModelCollection<AttributeViewModel> attributes;
         private readonly ModelCollection<EntityViewModel> prototypes;
         private readonly ModelCollection<SceneViewModel> scenes;
-        private readonly IPluginFactory pluginFactory;
+        private readonly IPluginNamespace pluginNamespace;
         private readonly ICommandHistory commandHistory;
-        
-        public event EventHandler UndoCountChanged = delegate { };
-        public event EventHandler RedoCountChanged = delegate { };
 
         public Game Game
         {
@@ -73,7 +50,7 @@ namespace Kinectitude.Editor.ViewModels
         {
             get
             {
-                return null != game.Name ? game.Name : Constants.DefaultName;
+                return null != game.Name ? game.Name : DefaultName;
             }
             set
             {
@@ -165,11 +142,6 @@ namespace Kinectitude.Editor.ViewModels
             get { return scenes; }
         }
 
-        public ICommandHistory CommandHistory
-        {
-            get { return commandHistory; }
-        }
-
         public ICommand CreateSceneCommand
         {
             get { return new DelegateCommand(null, ExecuteCreateSceneCommand); }
@@ -180,34 +152,28 @@ namespace Kinectitude.Editor.ViewModels
             get { return new DelegateCommand(null, ExecuteCreatePrototypeCommand); }
         }
 
-        public ICommand RenameSceneCommand
-        {
-            get { return new DelegateCommand(null, ExecuteRenameSceneCommand); }
-        }
-
         public ICommand DeleteItemCommand
         {
             get { return new DelegateCommand(null, ExecuteDeleteItemCommand); }
         }
 
-        private GameViewModel(Game game, IPluginFactory pluginFactory)
+        public GameViewModel(Game game, IPluginNamespace pluginNamespace, ICommandHistory commandHistory)
         {
             this.game = game;
-            this.pluginFactory = pluginFactory;
+            this.pluginNamespace = pluginNamespace;
+            this.commandHistory = commandHistory;
 
-            var attributeViewModels = from attribute in game.Attributes select new AttributeViewModel(attribute);
+            var attributeViewModels = from attribute in game.Attributes select AttributeViewModel.GetViewModel(attribute);
+            var prototypeViewModels = from entity in game.Entities select EntityViewModel.GetViewModel(entity);  // TODO: Make these available to Scenes
+            var sceneViewModels = from scene in game.Scenes select new SceneViewModel(scene, commandHistory);
+
             _attributes = new ObservableCollection<AttributeViewModel>(attributeViewModels);
-            attributes = new ModelCollection<AttributeViewModel>(_attributes);
-
-            var prototypeViewModels = from entity in game.Entities select EntityViewModel.Create(entity);
             _prototypes = new ObservableCollection<EntityViewModel>(prototypeViewModels);
-            prototypes = new ModelCollection<EntityViewModel>(_prototypes);
-
-            var sceneViewModels = from scene in game.Scenes select SceneViewModel.Create(game, scene);
             _scenes = new ObservableCollection<SceneViewModel>(sceneViewModels);
-            scenes = new ModelCollection<SceneViewModel>(_scenes);
 
-            commandHistory = new CommandHistory();
+            attributes = new ModelCollection<AttributeViewModel>(_attributes);
+            prototypes = new ModelCollection<EntityViewModel>(_prototypes);
+            scenes = new ModelCollection<SceneViewModel>(_scenes);
         }
 
         public void SaveGame()
@@ -218,7 +184,7 @@ namespace Kinectitude.Editor.ViewModels
             }
             else
             {
-                IGameStorage storage = new XmlGameStorage(FileName, pluginFactory);
+                IGameStorage storage = new XmlGameStorage(FileName, pluginNamespace);
                 storage.SaveGame(game);
             }
         }
@@ -235,7 +201,7 @@ namespace Kinectitude.Editor.ViewModels
             if (result == true)
             {
                 FileName = dialog.FileName;
-                IGameStorage storage = new XmlGameStorage(FileName, pluginFactory);
+                IGameStorage storage = new XmlGameStorage(FileName, pluginNamespace);
                 storage.SaveGame(game);
             }
         }
@@ -243,7 +209,7 @@ namespace Kinectitude.Editor.ViewModels
         public void ExecuteCreateSceneCommand(object parameter)
         {
             Scene scene = new Scene();
-            SceneViewModel viewModel = SceneViewModel.Create(game, scene);
+            SceneViewModel viewModel = new SceneViewModel(scene, commandHistory);
 
             SceneDialog dialog = new SceneDialog();
             dialog.DataContext = viewModel;
@@ -259,7 +225,7 @@ namespace Kinectitude.Editor.ViewModels
         public void ExecuteCreatePrototypeCommand(object parameter)
         {
             Entity entity = new Entity();
-            EntityViewModel viewModel = EntityViewModel.Create(entity);
+            EntityViewModel viewModel = EntityViewModel.GetViewModel(entity);
 
             EntityDialog dialog = new EntityDialog();
             dialog.DataContext = viewModel;
@@ -270,26 +236,6 @@ namespace Kinectitude.Editor.ViewModels
                 CreatePrototypeCommand command = new CreatePrototypeCommand(commandHistory, this, viewModel);
                 command.Execute();
             }
-        }
-
-        public void ExecuteRenameSceneCommand(object parameter)
-        {
-            // This should really be in the property setter for SceneViewModel::Name
-
-            /*SceneViewModel viewModel = parameter as SceneViewModel;
-            if (null != viewModel)
-            {
-                string oldName = viewModel.Name;
-                SceneDialog dialog = new SceneDialog();
-                dialog.DataContext = viewModel;
-                dialog.ShowDialog();
-
-                if (dialog.DialogResult == true)
-                {
-                    RenameSceneCommand command = new RenameSceneCommand(this, viewModel, oldName);
-                    command.Execute();
-                }
-            }*/
         }
 
         public void ExecuteDeleteItemCommand(object parameter)
@@ -321,6 +267,11 @@ namespace Kinectitude.Editor.ViewModels
         {
             _prototypes.Remove(prototype);
             game.RemoveEntity(prototype.Entity);
+        }
+
+        public EntityViewModel GetPrototype(Entity prototype)
+        {
+            return prototypes.FirstOrDefault(x => x.Entity == prototype);
         }
 
         public void AddScene(SceneViewModel scene)

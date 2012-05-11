@@ -5,15 +5,13 @@ using System.Text;
 using System.Collections.ObjectModel;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models;
+using Kinectitude.Editor.Models.Base;
 
 namespace Kinectitude.Editor.Models.Plugins
 {
     public class Event : Plugin, IActionContainer
     {
         private IEventContainer parent;
-
-        //private readonly List<IAction> _actions;
-        //private readonly ReadOnlyCollection<IAction> actions;
 
         private readonly List<IAction> actions;
 

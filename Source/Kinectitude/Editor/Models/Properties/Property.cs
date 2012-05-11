@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Kinectitude.Editor.Models.Properties
 {
-    public abstract class Property<T> : BaseProperty
+    public abstract class Property<T> : Property
     {
         private T value;
 
@@ -27,11 +27,11 @@ namespace Kinectitude.Editor.Models.Properties
         }
     }
 
-    public abstract class BaseProperty
+    public abstract class Property
     {
-        public static BaseProperty CreateProperty(PropertyDescriptor descriptor)
+        public static Property CreateProperty(PropertyDescriptor descriptor)
         {
-            BaseProperty property = null;
+            Property property = null;
 
             if (null != descriptor)
             {
@@ -73,7 +73,7 @@ namespace Kinectitude.Editor.Models.Properties
             set { inherited = value; }
         }
 
-        protected BaseProperty(PropertyDescriptor descriptor)
+        protected Property(PropertyDescriptor descriptor)
         {
             this.descriptor = descriptor;
             inherited = true;

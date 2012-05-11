@@ -32,9 +32,11 @@ namespace Kinectitude.Editor.ViewModels
         {
             this.component = component;
 
-            var propertyViewModels = from property in component.Properties select BasePropertyViewModel.Create(property);
+            /*var propertyViewModels = from property in component.Properties select BasePropertyViewModel.Create(property);
             _properties = new List<BasePropertyViewModel>(propertyViewModels);
-            properties = new ReadOnlyCollection<BasePropertyViewModel>(_properties);
+            properties = new ReadOnlyCollection<BasePropertyViewModel>(_properties);*/
+
+            // TODO: Property inheritance and all that
         }
     }
 }
