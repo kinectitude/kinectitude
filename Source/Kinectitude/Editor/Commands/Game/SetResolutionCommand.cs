@@ -9,7 +9,6 @@ namespace Kinectitude.Editor.Commands.Game
 {
     public class SetResolutionCommand : IUndoableCommand
     {
-        private readonly ICommandHistory history;
         private readonly GameViewModel game;
         private readonly int oldWidth;
         private readonly int oldHeight;
@@ -21,9 +20,8 @@ namespace Kinectitude.Editor.Commands.Game
             get { return "Change Game Resolution"; }
         }
 
-        public SetResolutionCommand(ICommandHistory history, GameViewModel game, int newWidth, int newHeight)
+        public SetResolutionCommand(GameViewModel game, int newWidth, int newHeight)
         {
-            this.history = history;
             this.game = game;
             this.newWidth = newWidth;
             this.newHeight = newHeight;
@@ -37,7 +35,7 @@ namespace Kinectitude.Editor.Commands.Game
             game.Game.Height = newHeight;
             game.RaisePropertyChanged("Width");
             game.RaisePropertyChanged("Height");
-            history.PushUndo(this);
+            CommandHistory.Instance.PushUndo(this);
         }
 
         public void Unexecute()
@@ -46,7 +44,7 @@ namespace Kinectitude.Editor.Commands.Game
             game.Game.Height = oldHeight;
             game.RaisePropertyChanged("Width");
             game.RaisePropertyChanged("Height");
-            history.PushRedo(this);
+            CommandHistory.Instance.PushRedo(this);
         }
     }
 }

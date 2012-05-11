@@ -9,7 +9,6 @@ namespace Kinectitude.Editor.Commands.Game
 {
     public class SetFirstSceneCommand : IUndoableCommand
     {
-        private readonly ICommandHistory history;
         private readonly GameViewModel game;
         private readonly SceneViewModel newScene;
         private readonly SceneViewModel oldScene;
@@ -19,9 +18,8 @@ namespace Kinectitude.Editor.Commands.Game
             get { return "Set First Scene"; }
         }
 
-        public SetFirstSceneCommand(ICommandHistory history, GameViewModel game, SceneViewModel newScene)
+        public SetFirstSceneCommand(GameViewModel game, SceneViewModel newScene)
         {
-            this.history = history;
             this.game = game;
             this.newScene = newScene;
             oldScene = game.FirstScene;
@@ -31,14 +29,14 @@ namespace Kinectitude.Editor.Commands.Game
         {
             game.Game.FirstScene = newScene.Scene;
             game.RaisePropertyChanged("FirstScene");
-            history.PushUndo(this);
+            CommandHistory.Instance.PushUndo(this);
         }
 
         public void Unexecute()
         {
             game.Game.FirstScene = oldScene.Scene;
             game.RaisePropertyChanged("FirstScene");
-            history.PushRedo(this);
+            CommandHistory.Instance.PushRedo(this);
         }
     }
 }

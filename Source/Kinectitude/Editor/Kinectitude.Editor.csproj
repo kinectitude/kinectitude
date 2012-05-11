@@ -70,6 +70,7 @@
     <Compile Include="Commands\Base\CommandHistory.cs" />
     <Compile Include="Commands\Entity\AddPrototypeCommand.cs" />
     <Compile Include="Commands\Entity\RemovePrototypeCommand.cs" />
+    <Compile Include="Commands\Entity\RenameEntityCommand.cs" />
     <Compile Include="Commands\Game\CreatePrototypeCommand.cs" />
     <Compile Include="Commands\Game\CreateSceneCommand.cs" />
     <Compile Include="Commands\Game\DeletePrototypeCommand.cs" />

@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Kinectitude.Editor.Base;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Windows.Input;
-using Kinectitude.Editor.Models;
-using Attribute = Kinectitude.Editor.Models.Base.Attribute;
-using Kinectitude.Editor.Models.Properties;
-using Kinectitude.Editor.Models.Plugins;
 using Kinectitude.Editor.Models.Base;
+using Kinectitude.Editor.Commands.Entity;
+using Kinectitude.Editor.Commands.Base;
 
 namespace Kinectitude.Editor.ViewModels
 {
@@ -40,6 +36,7 @@ namespace Kinectitude.Editor.ViewModels
         }
 
         private readonly Entity entity;
+        private readonly ICommandHistory commandHistory;
         private readonly ObservableCollection<EntityViewModel> _prototypes;
         private readonly ObservableCollection<AttributeViewModel> _attributes;
         private readonly ObservableCollection<ComponentViewModel> _components;
@@ -61,8 +58,8 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (entity.Name != value)
                 {
-                    entity.Name = value;
-                    RaisePropertyChanged("Name");
+                    RenameEntityCommand command = new RenameEntityCommand(commandHistory, this, value);
+                    command.Execute();
                 }
             }
         }
@@ -437,6 +434,16 @@ namespace Kinectitude.Editor.ViewModels
             }
 
             // TODO components and events
+
+            foreach (ComponentViewModel inheritedComponent in entityViewModel.Components)
+            {
+
+            }
+
+            foreach (EventViewModel inheritedEvent in entityViewModel.Events)
+            {
+
+            }
 
             _prototypes.Add(entityViewModel);
         }

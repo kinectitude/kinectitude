@@ -85,9 +85,21 @@ namespace Kinectitude.Editor.ViewModels
             }
         }
 
+        public AttributeViewModel InheritedAttribute
+        {
+            get { return inheritedViewModel; }
+            set
+            {
+                if (inheritedViewModel != value)
+                {
+                    
+                }
+            }
+        }
+
         public bool CanInherit
         {
-            get { return canInherit; }
+            get { return null != inheritedViewModel; }
         }
 
         public bool IsInherited

@@ -9,7 +9,6 @@ namespace Kinectitude.Editor.Commands.Game
 {
     public class DeletePrototypeCommand : IUndoableCommand
     {
-        private readonly ICommandHistory history;
         private readonly GameViewModel game;
         private readonly EntityViewModel prototype;
 
@@ -18,9 +17,8 @@ namespace Kinectitude.Editor.Commands.Game
             get { return string.Format("Delete Prototype '{0}'", prototype.Name); }
         }
 
-        public DeletePrototypeCommand(ICommandHistory history, GameViewModel game, EntityViewModel prototype)
+        public DeletePrototypeCommand(GameViewModel game, EntityViewModel prototype)
         {
-            this.history = history;
             this.game = game;
             this.prototype = prototype;
         }
@@ -30,7 +28,7 @@ namespace Kinectitude.Editor.Commands.Game
             if (null != prototype)
             {
                 game.RemovePrototype(prototype);
-                history.PushUndo(this);
+                CommandHistory.Instance.PushUndo(this);
             }
         }
 
@@ -39,7 +37,7 @@ namespace Kinectitude.Editor.Commands.Game
             if (null != prototype)
             {
                 game.AddPrototype(prototype);
-                history.PushRedo(this);
+                CommandHistory.Instance.PushRedo(this);
             }
         }
     }

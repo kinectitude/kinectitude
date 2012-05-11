@@ -26,7 +26,6 @@ namespace Kinectitude.Editor.ViewModels
         private readonly ModelCollection<EntityViewModel> prototypes;
         private readonly ModelCollection<SceneViewModel> scenes;
         private readonly IPluginNamespace pluginNamespace;
-        private readonly ICommandHistory commandHistory;
 
         public Game Game
         {
@@ -56,7 +55,7 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (game.Name != value)
                 {
-                    RenameGameCommand command = new RenameGameCommand(commandHistory, this, value);
+                    RenameGameCommand command = new RenameGameCommand(this, value);
                     command.Execute();
                 }
             }
@@ -69,7 +68,7 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (game.Description != value)
                 {
-                    SetDescriptionCommand command = new SetDescriptionCommand(commandHistory, this, value);
+                    SetDescriptionCommand command = new SetDescriptionCommand(this, value);
                     command.Execute();
                 }
             }
@@ -82,7 +81,7 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (game.Width != value)
                 {
-                    SetResolutionCommand command = new SetResolutionCommand(commandHistory, this, value, Height);
+                    SetResolutionCommand command = new SetResolutionCommand(this, value, Height);
                     command.Execute();
                 }
             }
@@ -95,7 +94,7 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (game.Height != value)
                 {
-                    SetResolutionCommand command = new SetResolutionCommand(commandHistory, this, Width, value);
+                    SetResolutionCommand command = new SetResolutionCommand(this, Width, value);
                     command.Execute();
                 }
             }
@@ -108,7 +107,7 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (game.IsFullScreen != value)
                 {
-                    SetFullScreenCommand command = new SetFullScreenCommand(commandHistory, this, value);
+                    SetFullScreenCommand command = new SetFullScreenCommand(this, value);
                     command.Execute();
                 }
             }
@@ -121,7 +120,7 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (null != value)
                 {
-                    SetFirstSceneCommand command = new SetFirstSceneCommand(commandHistory, this, value);
+                    SetFirstSceneCommand command = new SetFirstSceneCommand(this, value);
                     command.Execute();
                 }
             }
@@ -157,15 +156,14 @@ namespace Kinectitude.Editor.ViewModels
             get { return new DelegateCommand(null, ExecuteDeleteItemCommand); }
         }
 
-        public GameViewModel(Game game, IPluginNamespace pluginNamespace, ICommandHistory commandHistory)
+        public GameViewModel(Game game, IPluginNamespace pluginNamespace)
         {
             this.game = game;
             this.pluginNamespace = pluginNamespace;
-            this.commandHistory = commandHistory;
 
             var attributeViewModels = from attribute in game.Attributes select AttributeViewModel.GetViewModel(attribute);
-            var prototypeViewModels = from entity in game.Entities select EntityViewModel.GetViewModel(entity);  // TODO: Make these available to Scenes
-            var sceneViewModels = from scene in game.Scenes select new SceneViewModel(scene, commandHistory);
+            var prototypeViewModels = from entity in game.Entities select EntityViewModel.GetViewModel(entity);
+            var sceneViewModels = from scene in game.Scenes select SceneViewModel.GetViewModel(scene);
 
             _attributes = new ObservableCollection<AttributeViewModel>(attributeViewModels);
             _prototypes = new ObservableCollection<EntityViewModel>(prototypeViewModels);
@@ -209,7 +207,7 @@ namespace Kinectitude.Editor.ViewModels
         public void ExecuteCreateSceneCommand(object parameter)
         {
             Scene scene = new Scene();
-            SceneViewModel viewModel = new SceneViewModel(scene, commandHistory);
+            SceneViewModel viewModel = SceneViewModel.GetViewModel(scene);
 
             SceneDialog dialog = new SceneDialog();
             dialog.DataContext = viewModel;
@@ -217,7 +215,7 @@ namespace Kinectitude.Editor.ViewModels
 
             if (dialog.DialogResult == true)
             {
-                CreateSceneCommand command = new CreateSceneCommand(commandHistory, this, viewModel);
+                CreateSceneCommand command = new CreateSceneCommand(this, viewModel);
                 command.Execute();
             }
         }
@@ -233,7 +231,7 @@ namespace Kinectitude.Editor.ViewModels
 
             if (dialog.DialogResult == true)
             {
-                CreatePrototypeCommand command = new CreatePrototypeCommand(commandHistory, this, viewModel);
+                CreatePrototypeCommand command = new CreatePrototypeCommand(this, viewModel);
                 command.Execute();
             }
         }
@@ -243,7 +241,7 @@ namespace Kinectitude.Editor.ViewModels
             SceneViewModel scene = parameter as SceneViewModel;
             if (null != scene)
             {
-                DeleteSceneCommand command = new DeleteSceneCommand(commandHistory, this, scene);
+                DeleteSceneCommand command = new DeleteSceneCommand(this, scene);
                 command.Execute();
             }
             else
@@ -251,7 +249,7 @@ namespace Kinectitude.Editor.ViewModels
                 EntityViewModel entity = parameter as EntityViewModel;
                 if (null != entity)
                 {
-                    DeletePrototypeCommand command = new DeletePrototypeCommand(commandHistory, this, entity);
+                    DeletePrototypeCommand command = new DeletePrototypeCommand(this, entity);
                     command.Execute();
                 }
             }

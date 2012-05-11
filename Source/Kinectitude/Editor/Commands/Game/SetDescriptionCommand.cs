@@ -9,7 +9,6 @@ namespace Kinectitude.Editor.Commands.Game
 {
     public class SetDescriptionCommand : IUndoableCommand
     {
-        private readonly ICommandHistory history;
         private readonly GameViewModel game;
         private readonly string newDescription;
         private readonly string oldDescription;
@@ -19,9 +18,8 @@ namespace Kinectitude.Editor.Commands.Game
             get { return "Change Game Description"; }
         }
 
-        public SetDescriptionCommand(ICommandHistory history, GameViewModel game, string newDescription)
+        public SetDescriptionCommand(GameViewModel game, string newDescription)
         {
-            this.history = history;
             this.game = game;
             this.newDescription = newDescription;
             oldDescription = game.Description;
@@ -31,14 +29,14 @@ namespace Kinectitude.Editor.Commands.Game
         {
             game.Game.Description = newDescription;
             game.RaisePropertyChanged("Description");
-            history.PushUndo(this);
+            CommandHistory.Instance.PushUndo(this);
         }
 
         public void Unexecute()
         {
             game.Game.Description = oldDescription;
             game.RaisePropertyChanged("Description");
-            history.PushRedo(this);
+            CommandHistory.Instance.PushRedo(this);
         }
     }
 }

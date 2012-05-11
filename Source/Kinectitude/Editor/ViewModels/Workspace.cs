@@ -25,7 +25,6 @@ namespace Kinectitude.Editor.ViewModels
         private readonly ObservableCollection<BaseModel> _activeItems;
         private readonly ModelCollection<BaseModel> activeItems;
         private readonly ResolutionPreset[] resolutionPresets;
-        private readonly ICommandHistory commandHistory;
 
         private GameViewModel game;
         private BaseModel currentItem;
@@ -113,13 +112,12 @@ namespace Kinectitude.Editor.ViewModels
 
         public ICommandHistory CommandHistory
         {
-            get { return commandHistory; }
+            get { return Kinectitude.Editor.Commands.Base.CommandHistory.Instance; }
         }
 
         public Workspace()
         {
             plugins = new List<PluginViewModel>();
-            commandHistory = new CommandHistory();
 
             Assembly core = typeof(Kinectitude.Core.Base.Component).Assembly;
             registerTypesFromAssembly(core, true);
@@ -206,7 +204,7 @@ namespace Kinectitude.Editor.ViewModels
         public void NewGame(object parameter)
         {
             Game game = new Game(this);
-            GameViewModel viewModel = new GameViewModel(game, this, commandHistory);
+            GameViewModel viewModel = new GameViewModel(game, this);
             Game = viewModel;
         }
 
@@ -272,7 +270,7 @@ namespace Kinectitude.Editor.ViewModels
             {
                 Game game = storage.LoadGame();
 
-                GameViewModel gameViewModel = new GameViewModel(game, this, commandHistory);
+                GameViewModel gameViewModel = new GameViewModel(game, this);
                 gameViewModel.FileName = fileName;
                 Game = gameViewModel;
             }

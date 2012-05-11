@@ -9,7 +9,6 @@ namespace Kinectitude.Editor.Commands.Scene
 {
     public class SelectEntityCommand : IUndoableCommand
     {
-        private readonly ICommandHistory history;
         private readonly SceneViewModel scene;
         private readonly EntityViewModel entity;
 
@@ -18,9 +17,8 @@ namespace Kinectitude.Editor.Commands.Scene
             get { return "Select Entity"; }
         }
 
-        public SelectEntityCommand(ICommandHistory history, SceneViewModel scene, EntityViewModel entity)
+        public SelectEntityCommand(SceneViewModel scene, EntityViewModel entity)
         {
-            this.history = history;
             this.scene = scene;
             this.entity = entity;
         }

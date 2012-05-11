@@ -5,7 +5,6 @@ namespace Kinectitude.Editor.Commands.Game
 {
     public class RenameGameCommand : IUndoableCommand
     {
-        private readonly ICommandHistory history;
         private readonly GameViewModel game;
         private readonly string newName;
         private readonly string oldName;
@@ -15,9 +14,8 @@ namespace Kinectitude.Editor.Commands.Game
             get { return "Rename Game"; }
         }
 
-        public RenameGameCommand(ICommandHistory history, GameViewModel game, string newName)
+        public RenameGameCommand(GameViewModel game, string newName)
         {
-            this.history = history;
             this.game = game;
             this.newName = newName;
             oldName = game.Name;
@@ -29,7 +27,7 @@ namespace Kinectitude.Editor.Commands.Game
             {
                 game.Game.Name = newName;
                 game.RaisePropertyChanged("Name");
-                history.PushUndo(this);
+                CommandHistory.Instance.PushUndo(this);
             }
         }
 
@@ -37,7 +35,7 @@ namespace Kinectitude.Editor.Commands.Game
         {
             game.Game.Name = oldName;
             game.RaisePropertyChanged("Name");
-            history.PushRedo(this);
+            CommandHistory.Instance.PushRedo(this);
         }
     }
 }

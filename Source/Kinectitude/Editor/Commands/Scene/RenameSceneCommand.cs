@@ -5,7 +5,6 @@ namespace Kinectitude.Editor.Commands.Scene
 {
     public class RenameSceneCommand : IUndoableCommand
     {
-        private readonly ICommandHistory history;
         private readonly SceneViewModel scene;
         private readonly string newName;
         private readonly string oldName;
@@ -15,9 +14,8 @@ namespace Kinectitude.Editor.Commands.Scene
             get { return "Rename Scene"; }
         }
 
-        public RenameSceneCommand(ICommandHistory history, SceneViewModel scene, string newName)
+        public RenameSceneCommand(SceneViewModel scene, string newName)
         {
-            this.history = history;
             this.scene = scene;
             this.newName = newName;
             oldName = scene.Name;
@@ -29,7 +27,7 @@ namespace Kinectitude.Editor.Commands.Scene
             {
                 scene.Scene.Name = newName;
                 scene.RaisePropertyChanged("Name");
-                history.PushUndo(this);
+                CommandHistory.Instance.PushUndo(this);
             }
         }
 
@@ -37,7 +35,7 @@ namespace Kinectitude.Editor.Commands.Scene
         {
             scene.Scene.Name = oldName;
             scene.RaisePropertyChanged("Name");
-            history.PushRedo(this);
+            CommandHistory.Instance.PushRedo(this);
         }
     }
 }

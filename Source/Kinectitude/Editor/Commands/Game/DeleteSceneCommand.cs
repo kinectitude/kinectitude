@@ -9,7 +9,6 @@ namespace Kinectitude.Editor.Commands.Game
 {
     public class DeleteSceneCommand : IUndoableCommand
     {
-        private readonly ICommandHistory history;
         private readonly GameViewModel game;
         private readonly SceneViewModel scene;
 
@@ -18,9 +17,8 @@ namespace Kinectitude.Editor.Commands.Game
             get { return string.Format("Delete Scene '{0}'", scene.Name); }
         }
 
-        public DeleteSceneCommand(ICommandHistory history, GameViewModel game, SceneViewModel scene)
+        public DeleteSceneCommand(GameViewModel game, SceneViewModel scene)
         {
-            this.history = history;
             this.game = game;
             this.scene = scene;
         }
@@ -30,7 +28,7 @@ namespace Kinectitude.Editor.Commands.Game
             if (null != scene)
             {
                 game.AddScene(scene);
-                history.PushRedo(this);
+                CommandHistory.Instance.PushRedo(this);
             }
         }
 
@@ -39,7 +37,7 @@ namespace Kinectitude.Editor.Commands.Game
             if (null != scene)
             {
                 game.RemoveScene(scene);
-                history.PushUndo(this);
+                CommandHistory.Instance.PushUndo(this);
             }
         }
     }

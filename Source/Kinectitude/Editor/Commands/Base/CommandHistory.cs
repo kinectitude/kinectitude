@@ -9,6 +9,18 @@ namespace Kinectitude.Editor.Commands.Base
 {
     public class CommandHistory : BaseModel, ICommandHistory
     {
+        private static readonly CommandHistory instance;
+
+        static CommandHistory()
+        {
+            instance = new CommandHistory();
+        }
+
+        public static CommandHistory Instance
+        {
+            get { return instance; }
+        }
+
         public event EventHandler UndoCountChanged = delegate { };
         public event EventHandler RedoCountChanged = delegate { };
 
@@ -45,7 +57,7 @@ namespace Kinectitude.Editor.Commands.Base
             get { return redo.Count > 0 ? redo.Peek().Name : null; }
         }
 
-        public CommandHistory()
+        private CommandHistory()
         {
             undo = new Stack<IUndoableCommand>();
             redo = new Stack<IUndoableCommand>();
@@ -54,13 +66,13 @@ namespace Kinectitude.Editor.Commands.Base
         public void PushUndo(IUndoableCommand command)
         {
             undo.Push(command);
-            raiseUndoChange();
+            RaiseUndoChange();
         }
 
         public void PushRedo(IUndoableCommand command)
         {
             redo.Push(command);
-            raiseRedoChange();
+            RaiseRedoChange();
         }
 
         public IUndoableCommand PopUndo()
@@ -69,7 +81,7 @@ namespace Kinectitude.Editor.Commands.Base
             if (undo.Count > 0)
             {
                 command = undo.Pop();
-                raiseUndoChange();
+                RaiseUndoChange();
             }
             return command;
         }
@@ -80,18 +92,18 @@ namespace Kinectitude.Editor.Commands.Base
             if (redo.Count > 0)
             {
                 command = redo.Pop();
-                raiseRedoChange();
+                RaiseRedoChange();
             }
             return command;
         }
 
-        private void raiseUndoChange()
+        private void RaiseUndoChange()
         {
             RaisePropertyChanged("LastUndoableCommandName");
             UndoCountChanged(this, EventArgs.Empty);
         }
 
-        private void raiseRedoChange()
+        private void RaiseRedoChange()
         {
             RaisePropertyChanged("LastRedoableCommandName");
             RedoCountChanged(this, EventArgs.Empty);
