@@ -7,6 +7,32 @@ namespace Kinectitude.Editor.Models.Base
 {
     public class Attribute
     {
+        public static dynamic TryParse(string value)
+        {
+            int parsedInteger = 0;
+            bool successfullyParsed = int.TryParse(value, out parsedInteger);
+            if (successfullyParsed)
+            {
+                return parsedInteger;
+            }
+            
+            double parsedDouble = 0;
+            successfullyParsed = double.TryParse(value, out parsedDouble);
+            if (successfullyParsed)
+            {
+                return parsedDouble;
+            }
+            
+            bool parsedBoolean = false;
+            successfullyParsed = bool.TryParse(value, out parsedBoolean);
+            if (successfullyParsed)
+            {
+                return parsedBoolean;
+            }
+            
+            return value;
+        }
+
         private AttributeContainer parent;
         private string key;
         private dynamic value;
@@ -38,35 +64,7 @@ namespace Kinectitude.Editor.Models.Base
         public Attribute(string key, string value)
         {
             this.key = key;
-
-            int parsedInteger = 0;
-            bool successfullyParsed = int.TryParse(value, out parsedInteger);
-            if (successfullyParsed)
-            {
-                this.value = parsedInteger;
-            }
-            else
-            {
-                double parsedDouble = 0;
-                successfullyParsed = double.TryParse(value, out parsedDouble);
-                if (successfullyParsed)
-                {
-                    this.value = parsedDouble;
-                }
-                else
-                {
-                    bool parsedBoolean = false;
-                    successfullyParsed = bool.TryParse(value, out parsedBoolean);
-                    if (successfullyParsed)
-                    {
-                        this.value = parsedBoolean;
-                    }
-                    else
-                    {
-                        this.value = value;
-                    }
-                }
-            }
+            this.value = Attribute.TryParse(value);
         }
     }
 }

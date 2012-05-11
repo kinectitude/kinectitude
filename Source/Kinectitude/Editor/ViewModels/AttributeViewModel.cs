@@ -4,6 +4,7 @@ using Attribute = Kinectitude.Editor.Models.Base.Attribute;
 using System.ComponentModel;
 using Kinectitude.Editor.Models.Base;
 using System.Collections.Specialized;
+using Kinectitude.Editor.Commands.Attribute;
 
 namespace Kinectitude.Editor.ViewModels
 {
@@ -67,22 +68,21 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (!IsInherited)
                 {
-                    attribute.Key = value; // TODO: Propagation and command
-                    FindInheritedAttribute(value);
-                    RaisePropertyChanged("Key");
+                    RenameAttributeCommand command = new RenameAttributeCommand(this, value);
+                    command.Execute();
                 }
             }
         }
 
-        public dynamic Value
+        public string Value
         {
-            get { return attribute.Value; }
+            get { return attribute.Value.ToString(); }
             set
             {
                 if (!IsInherited)
                 {
-                    attribute.Value = value; // TODO: Propagation and command
-                    RaisePropertyChanged("Value");
+                    SetAttributeValueCommand command = new SetAttributeValueCommand(this, value);
+                    command.Execute();
                 }
             }
         }
@@ -159,7 +159,7 @@ namespace Kinectitude.Editor.ViewModels
             this.attribute = attribute;
         }
 
-        private void FindInheritedAttribute(string key)
+        public void FindInheritedAttribute(string key)
         {
             foreach (Entity prototype in entity.Prototypes)
             {

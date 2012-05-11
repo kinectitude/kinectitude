@@ -15,7 +15,7 @@ namespace Kinectitude.Editor.Commands.Attribute
 
         public string Name
         {
-            get { return string.Format("Rename local attribute to '{0}'", newKey); }
+            get { return string.Format("Rename Attribute to '{0}'", newKey); }
         }
 
         public RenameAttributeCommand(AttributeViewModel attribute, string newKey)
@@ -30,14 +30,18 @@ namespace Kinectitude.Editor.Commands.Attribute
             if (newKey != oldKey)
             {
                 attribute.Attribute.Key = newKey;
-                attribute.RaisePropertyChanged("Name");
+                attribute.FindInheritedAttribute(newKey);
+                attribute.RaisePropertyChanged("Key");
                 CommandHistory.Instance.PushUndo(this);
             }
         }
 
         public void Unexecute()
         {
-            throw new NotImplementedException();
+            attribute.Attribute.Key = oldKey;
+            attribute.FindInheritedAttribute(oldKey);
+            attribute.RaisePropertyChanged("Key");
+            CommandHistory.Instance.PushRedo(this);
         }
     }
 }
