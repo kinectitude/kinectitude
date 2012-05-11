@@ -8,15 +8,12 @@ namespace Kinectitude.Editor.Commands.Base
 {
     public class RedoCommand : ICommand
     {
-        private readonly ICommandHistory history;
-
         private bool canExecute;
 
-        public RedoCommand(ICommandHistory history)
+        public RedoCommand()
         {
-            this.history = history;
-            this.history.RedoCountChanged += onRedoCountChanged;
-            canExecute = (history.RedoCount > 0);
+            CommandHistory.Instance.RedoCountChanged += OnRedoCountChanged;
+            canExecute = CommandHistory.Instance.RedoCount > 0;
         }
 
         public bool CanExecute(object parameter)
@@ -28,17 +25,17 @@ namespace Kinectitude.Editor.Commands.Base
 
         public void Execute(object parameter)
         {
-            if (history.RedoCount > 0)
+            if (CommandHistory.Instance.RedoCount > 0)
             {
-                IUndoableCommand command = history.PopRedo();
+                IUndoableCommand command = CommandHistory.Instance.PopRedo();
                 command.Execute();
             }
         }
 
-        private void onRedoCountChanged(object sender, EventArgs args)
+        private void OnRedoCountChanged(object sender, EventArgs args)
         {
             bool oldCanExecuteValue = canExecute;
-            canExecute = (history.RedoCount > 0);
+            canExecute = (CommandHistory.Instance.RedoCount > 0);
             if (null != CanExecuteChanged && oldCanExecuteValue != canExecute)
             {
                 CanExecuteChanged(this, EventArgs.Empty);

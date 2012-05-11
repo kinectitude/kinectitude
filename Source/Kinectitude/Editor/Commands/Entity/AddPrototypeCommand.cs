@@ -9,7 +9,6 @@ namespace Kinectitude.Editor.Commands.Entity
 {
     public class AddPrototypeCommand : IUndoableCommand
     {
-        private readonly ICommandHistory history;
         private readonly EntityViewModel entity;
         private readonly EntityViewModel prototype;
 
@@ -18,9 +17,8 @@ namespace Kinectitude.Editor.Commands.Entity
             get { return string.Format("Add Prototype '{0}'", prototype.Name); }
         }
 
-        public AddPrototypeCommand(ICommandHistory history, EntityViewModel entity, EntityViewModel prototype)
+        public AddPrototypeCommand(EntityViewModel entity, EntityViewModel prototype)
         {
-            this.history = history;
             this.entity = entity;
             this.prototype = prototype;
         }
@@ -28,13 +26,13 @@ namespace Kinectitude.Editor.Commands.Entity
         public void Execute()
         {
             entity.AddPrototype(prototype);
-            history.PushUndo(this);
+            CommandHistory.Instance.PushUndo(this);
         }
 
         public void Unexecute()
         {
             entity.RemovePrototype(prototype);
-            history.PushRedo(this);
+            CommandHistory.Instance.PushRedo(this);
         }
     }
 }

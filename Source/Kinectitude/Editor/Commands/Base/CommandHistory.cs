@@ -29,12 +29,12 @@ namespace Kinectitude.Editor.Commands.Base
 
         public ICommand UndoCommand
         {
-            get { return new UndoCommand(this); }
+            get { return new UndoCommand(); }
         }
 
         public ICommand RedoCommand
         {
-            get { return new RedoCommand(this); }
+            get { return new RedoCommand(); }
         }
 
         public int UndoCount

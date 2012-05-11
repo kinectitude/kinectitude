@@ -9,7 +9,6 @@ namespace Kinectitude.Editor.Commands.Entity
 {
     public class RenameEntityCommand : IUndoableCommand
     {
-        private readonly ICommandHistory history;
         private readonly EntityViewModel entity;
         private readonly string newName;
         private readonly string oldName;
@@ -19,9 +18,8 @@ namespace Kinectitude.Editor.Commands.Entity
             get { return "Rename Entity"; }
         }
 
-        public RenameEntityCommand(ICommandHistory history, EntityViewModel entity, string newName)
+        public RenameEntityCommand(EntityViewModel entity, string newName)
         {
-            this.history = history;
             this.entity = entity;
             this.newName = newName;
             oldName = entity.Name;
@@ -33,7 +31,7 @@ namespace Kinectitude.Editor.Commands.Entity
             {
                 entity.Entity.Name = newName;
                 entity.RaisePropertyChanged("Name");
-                history.PushUndo(this);
+                CommandHistory.Instance.PushUndo(this);
             }
         }
 
@@ -41,7 +39,7 @@ namespace Kinectitude.Editor.Commands.Entity
         {
             entity.Entity.Name = oldName;
             entity.RaisePropertyChanged("Name");
-            history.PushRedo(this);
+            CommandHistory.Instance.PushRedo(this);
         }
     }
 }

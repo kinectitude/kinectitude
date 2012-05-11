@@ -9,7 +9,6 @@ namespace Kinectitude.Editor.Commands.Attribute
 {
     public class RenameAttributeCommand : IUndoableCommand
     {
-        private readonly ICommandHistory history;
         private readonly AttributeViewModel attribute;
         private readonly string newKey;
         private readonly string oldKey;
@@ -19,9 +18,8 @@ namespace Kinectitude.Editor.Commands.Attribute
             get { return string.Format("Rename local attribute to '{0}'", newKey); }
         }
 
-        public RenameAttributeCommand(ICommandHistory history, AttributeViewModel attribute, string newKey)
+        public RenameAttributeCommand(AttributeViewModel attribute, string newKey)
         {
-            this.history = history;
             this.attribute = attribute;
             this.newKey = newKey;
             oldKey = attribute.Key;
@@ -33,7 +31,7 @@ namespace Kinectitude.Editor.Commands.Attribute
             {
                 attribute.Attribute.Key = newKey;
                 attribute.RaisePropertyChanged("Name");
-                history.PushUndo(this);
+                CommandHistory.Instance.PushUndo(this);
             }
         }
 

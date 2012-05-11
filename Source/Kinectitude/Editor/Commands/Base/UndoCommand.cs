@@ -8,15 +8,12 @@ namespace Kinectitude.Editor.Commands.Base
 {
     public class UndoCommand : ICommand
     {
-        private readonly ICommandHistory history;
-
         private bool canExecute;
 
-        public UndoCommand(ICommandHistory history)
+        public UndoCommand()
         {
-            this.history = history;
-            this.history.UndoCountChanged += onUndoCountChanged;
-            canExecute = (history.UndoCount > 0);
+            CommandHistory.Instance.UndoCountChanged += OnUndoCountChanged;
+            canExecute = CommandHistory.Instance.UndoCount > 0;
         }
 
         public bool CanExecute(object parameter)
@@ -28,17 +25,17 @@ namespace Kinectitude.Editor.Commands.Base
 
         public void Execute(object parameter)
         {
-            if (history.UndoCount > 0)
+            if (CommandHistory.Instance.UndoCount > 0)
             {
-                IUndoableCommand command = history.PopUndo();
+                IUndoableCommand command = CommandHistory.Instance.PopUndo();
                 command.Unexecute();
             }
         }
 
-        private void onUndoCountChanged(object sender, EventArgs args)
+        private void OnUndoCountChanged(object sender, EventArgs args)
         {
             bool oldCanExecuteValue = canExecute;
-            canExecute = (history.UndoCount > 0);
+            canExecute = (CommandHistory.Instance.UndoCount > 0);
             if (null != CanExecuteChanged && oldCanExecuteValue != canExecute)
             {
                 CanExecuteChanged(this, EventArgs.Empty);

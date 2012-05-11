@@ -36,7 +36,6 @@ namespace Kinectitude.Editor.ViewModels
         }
 
         private readonly Entity entity;
-        private readonly ICommandHistory commandHistory;
         private readonly ObservableCollection<EntityViewModel> _prototypes;
         private readonly ObservableCollection<AttributeViewModel> _attributes;
         private readonly ObservableCollection<ComponentViewModel> _components;
@@ -58,7 +57,7 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (entity.Name != value)
                 {
-                    RenameEntityCommand command = new RenameEntityCommand(commandHistory, this, value);
+                    RenameEntityCommand command = new RenameEntityCommand(this, value);
                     command.Execute();
                 }
             }
