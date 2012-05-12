@@ -68,6 +68,7 @@
     <Compile Include="Base\EventArgs.cs" />
     <Compile Include="Commands\Attribute\RenameAttributeCommand.cs" />
     <Compile Include="Commands\Attribute\SetAttributeValueCommand.cs" />
+    <Compile Include="Commands\Attribute\SetAttributeInheritedCommand.cs" />
     <Compile Include="Commands\Base\CommandHistory.cs" />
     <Compile Include="Commands\Entity\AddPrototypeCommand.cs" />
     <Compile Include="Commands\Entity\RemovePrototypeCommand.cs" />

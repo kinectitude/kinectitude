@@ -256,38 +256,43 @@
                     <ListBox DataContext="{Binding CurrentItem}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                         
                         <Expander Header="Attributes" IsExpanded="True" FontWeight="Bold">
-                            <ListView ItemsSource="{Binding Attributes}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                                <ListView.View>
-                                    <GridView>
-                                        <GridView.ColumnHeaderContainerStyle>
-                                            <Style TargetType="{x:Type GridViewColumnHeader}">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                            </Style>
-                                        </GridView.ColumnHeaderContainerStyle>
-                                        <GridViewColumn Width="Auto">
-                                            <GridViewColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <TextBox IsEnabled="{Binding IsLocal}" Text="{Binding Key}" />
-                                                </DataTemplate>
-                                            </GridViewColumn.CellTemplate>
-                                        </GridViewColumn>
-                                        <GridViewColumn Width="Auto">
-                                            <GridViewColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <CheckBox IsChecked="{Binding IsInherited}" IsEnabled="{Binding CanInherit}" />
-                                                </DataTemplate>
-                                            </GridViewColumn.CellTemplate>
-                                        </GridViewColumn>
-                                        <GridViewColumn Width="Auto">
-                                            <GridViewColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <TextBox IsEnabled="{Binding IsLocal}" Text="{Binding Value}" />
-                                                </DataTemplate>
-                                            </GridViewColumn.CellTemplate>
-                                        </GridViewColumn>
-                                    </GridView>
-                                </ListView.View>
-                            </ListView>
+                            <StackPanel Orientation="Vertical">
+                                <ListView FontWeight="Normal" Name="lstAttributes" ItemsSource="{Binding Attributes}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridView.ColumnHeaderContainerStyle>
+                                                <Style TargetType="{x:Type GridViewColumnHeader}">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </Style>
+                                            </GridView.ColumnHeaderContainerStyle>
+                                            <GridViewColumn Width="Auto">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBox IsEnabled="{Binding IsLocal}" Text="{Binding Key}" Width="60" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Width="Auto">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <CheckBox IsChecked="{Binding IsInherited}" IsEnabled="{Binding CanInherit}" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Width="Auto">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBox IsEnabled="{Binding IsLocal}" Text="{Binding Value}" Width="60" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                <Button Command="{Binding AddAttributeCommand}">Add Attribute</Button>
+                                <Button Command="{Binding RemoveAttributeCommand}" CommandParameter="{Binding ElementName=lstAttributes, Path=SelectedItem}">Delete Attribute</Button>
+                            </StackPanel>
+                            
                         </Expander>
                         
                         <!--ListBox.ItemsSource>

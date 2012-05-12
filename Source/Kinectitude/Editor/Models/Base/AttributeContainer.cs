@@ -29,11 +29,13 @@ namespace Kinectitude.Editor.Models.Base
             {
                 RemoveAttribute(attributes[attribute.Key]);
             }
+            attribute.Parent = this;
             attributes.Add(attribute.Key, attribute);
         }
 
         public void RemoveAttribute(Attribute attribute)
         {
+            attribute.Parent = null;
             attributes.Remove(attribute.Key);
         }
 

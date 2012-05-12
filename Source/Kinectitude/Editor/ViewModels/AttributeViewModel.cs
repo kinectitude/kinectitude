@@ -59,6 +59,12 @@ namespace Kinectitude.Editor.ViewModels
         public Attribute Attribute
         {
             get { return attribute; }
+            set { attribute = value; }
+        }
+
+        public Entity Entity
+        {
+            get { return entity; }
         }
 
         public string Key
@@ -122,24 +128,8 @@ namespace Kinectitude.Editor.ViewModels
             get { return CanInherit && attribute == InheritedAttribute.Attribute; }
             set
             {
-                if (IsInherited != value)
-                {
-                    if (!value)
-                    {
-                        attribute = new Attribute(inheritedViewModel.Key, inheritedViewModel.Value);
-                        entity.AddAttribute(attribute);
-                    }
-                    else
-                    {
-                        if (null != attribute)
-                        {
-                            entity.RemoveAttribute(attribute);
-                        }
-                        attribute = InheritedAttribute.Attribute;
-                    }
-                    RaisePropertyChanged("IsInherited");
-                    RaisePropertyChanged("IsLocal");
-                }
+                SetAttributeInheritedCommand command = new SetAttributeInheritedCommand(this, value);
+                command.Execute();
             }
         }
 
@@ -150,7 +140,7 @@ namespace Kinectitude.Editor.ViewModels
             FindInheritedAttribute(key);
             if (null == attribute)
             {
-                IsInherited = true;
+                attribute = InheritedAttribute.Attribute;
             }
         }
 

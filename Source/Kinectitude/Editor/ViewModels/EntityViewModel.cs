@@ -12,9 +12,9 @@ namespace Kinectitude.Editor.ViewModels
 {
     public class EntityViewModel : BaseModel
     {
-        private const string RenderComponent = "Kinectitude.Render.RenderComponent";
-        private const string Shape = "Shape";
-        private const string Ellipse = "Ellipse";
+        //private const string RenderComponent = "Kinectitude.Render.RenderComponent";
+        //private const string Shape = "Shape";
+        //private const string Ellipse = "Ellipse";
 
         private static readonly Dictionary<Entity, EntityViewModel> entities;
 
@@ -225,9 +225,9 @@ namespace Kinectitude.Editor.ViewModels
             get { return new DelegateCommand(null, ExecuteAddAttributeCommand); }
         }
 
-        public ICommand DeleteAttributeCommand
+        public ICommand RemoveAttributeCommand
         {
-            get { return new DelegateCommand(null, ExecuteDeleteAttributeCommand); }
+            get { return new DelegateCommand(null, ExecuteRemoveAttributeCommand); }
         }
 
         public ICommand AddComponentCommand
@@ -349,9 +349,13 @@ namespace Kinectitude.Editor.ViewModels
             
         }
 
-        public void ExecuteDeleteAttributeCommand(object parameter)
+        public void ExecuteRemoveAttributeCommand(object parameter)
         {
-
+            AttributeViewModel viewModel = parameter as AttributeViewModel;
+            if (null != viewModel)
+            {
+                RemoveAttribute(viewModel);
+            }
         }
 
         public void ExecuteAddComponentCommand(object parameter)
@@ -401,6 +405,11 @@ namespace Kinectitude.Editor.ViewModels
         {
             entity.AddAttribute(attribute.Attribute);
             _attributes.Add(attribute);
+        }
+
+        public void RemoveAttribute(AttributeViewModel attribute)
+        {
+            //en
         }
 
         public void AddPrototype(EntityViewModel entityViewModel)
