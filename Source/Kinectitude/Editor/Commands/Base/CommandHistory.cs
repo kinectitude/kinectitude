@@ -7,45 +7,54 @@ using Kinectitude.Editor.Base;
 
 namespace Kinectitude.Editor.Commands.Base
 {
-    public class CommandHistory : BaseModel, ICommandHistory
+    public class CommandHistory : BaseModel
     {
         private static readonly CommandHistory instance;
-
-        static CommandHistory()
-        {
-            instance = new CommandHistory();
-        }
 
         public static CommandHistory Instance
         {
             get { return instance; }
         }
 
-        public event EventHandler UndoCountChanged = delegate { };
-        public event EventHandler RedoCountChanged = delegate { };
+        static CommandHistory()
+        {
+            instance = new CommandHistory();
+        }
 
         private readonly Stack<IUndoableCommand> undo;
         private readonly Stack<IUndoableCommand> redo;
+        //private static event EventHandler undoCountChanged;
+        //private static event EventHandler redoCountChanged;
+        private bool replay;
+
+        private CommandHistory()
+        {
+            undo = new Stack<IUndoableCommand>();
+            redo = new Stack<IUndoableCommand>();
+            //undoCountChanged = delegate { };
+            //redoCountChanged = delegate { };
+            replay = false;
+        }
 
         public ICommand UndoCommand
         {
-            get { return new UndoCommand(); }
+            get { return new DelegateCommand(CanUndo, Undo); }
         }
 
         public ICommand RedoCommand
         {
-            get { return new RedoCommand(); }
+            get { return new DelegateCommand(CanRedo, Redo); }
         }
 
-        public int UndoCount
+        /*public static int UndoCount
         {
             get { return undo.Count; }
         }
 
-        public int RedoCount
+        public static int RedoCount
         {
             get { return redo.Count; }
-        }
+        }*/
 
         public string LastUndoableCommandName
         {
@@ -57,25 +66,81 @@ namespace Kinectitude.Editor.Commands.Base
             get { return redo.Count > 0 ? redo.Peek().Name : null; }
         }
 
-        private CommandHistory()
+        /*public static event EventHandler UndoCountChanged
         {
-            undo = new Stack<IUndoableCommand>();
-            redo = new Stack<IUndoableCommand>();
+            add { undoCountChanged += value; }
+            remove { undoCountChanged -= value; }
         }
 
-        public void PushUndo(IUndoableCommand command)
+        public static event EventHandler RedoCountChanged
         {
-            undo.Push(command);
-            RaiseUndoChange();
+            add { redoCountChanged += value; }
+            remove { redoCountChanged -= value; }
+        }*/
+
+        public void LogCommand(IUndoableCommand command)
+        {
+            if (!replay)
+            {
+                undo.Push(command);
+                redo.Clear();
+                RaisePropertyChanges();
+            }
         }
 
-        public void PushRedo(IUndoableCommand command)
+        public bool CanUndo(object parameter)
+        {
+            return undo.Count > 0;
+        }
+
+        public bool CanRedo(object parameter)
+        {
+            return redo.Count > 0;
+        }
+
+        public void Undo(object parameter)
+        {
+            replay = true;
+
+            if (undo.Count > 0)
+            {
+                IUndoableCommand command = undo.Pop();
+                command.Unexecute();
+                redo.Push(command);
+                RaisePropertyChanges();
+            }
+
+            replay = false;
+        }
+
+        public void Redo(object parameter)
+        {
+            replay = true;
+
+            if (redo.Count > 0)
+            {
+                IUndoableCommand command = redo.Pop();
+                command.Execute();
+                undo.Push(command);
+                RaisePropertyChanges();
+            }
+
+            replay = false;
+        }
+
+        private void RaisePropertyChanges()
+        {
+            RaisePropertyChanged("LastUndoableCommandName");
+            RaisePropertyChanged("LastRedoableCommandName");
+        }
+
+        /*public static void PushRedo(IUndoableCommand command)
         {
             redo.Push(command);
             RaiseRedoChange();
-        }
+        }*/
 
-        public IUndoableCommand PopUndo()
+        /*public IUndoableCommand PopUndo()
         {
             IUndoableCommand command = null;
             if (undo.Count > 0)
@@ -95,18 +160,18 @@ namespace Kinectitude.Editor.Commands.Base
                 RaiseRedoChange();
             }
             return command;
-        }
+        }*/
 
-        private void RaiseUndoChange()
+        /*private static void RaiseUndoChange()
         {
             RaisePropertyChanged("LastUndoableCommandName");
             UndoCountChanged(this, EventArgs.Empty);
         }
 
-        private void RaiseRedoChange()
+        private static void RaiseRedoChange()
         {
             RaisePropertyChanged("LastRedoableCommandName");
             RedoCountChanged(this, EventArgs.Empty);
-        }
+        }*/
     }
 }

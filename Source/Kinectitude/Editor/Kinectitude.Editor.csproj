@@ -77,9 +77,7 @@
     <Compile Include="Commands\Game\CreateSceneCommand.cs" />
     <Compile Include="Commands\Game\DeletePrototypeCommand.cs" />
     <Compile Include="Commands\Game\DeleteSceneCommand.cs" />
-    <Compile Include="Commands\Base\ICommandHistory.cs" />
     <Compile Include="Commands\Base\IUndoableCommand.cs" />
-    <Compile Include="Commands\Base\RedoCommand.cs" />
     <Compile Include="Commands\Game\RenameGameCommand.cs" />
     <Compile Include="Commands\Game\SetDescriptionCommand.cs" />
     <Compile Include="Commands\Game\SetFirstSceneCommand.cs" />
@@ -88,7 +86,6 @@
     <Compile Include="Commands\Scene\RenameSceneCommand.cs" />
     <Compile Include="Commands\Scene\SelectEntityCommand.cs" />
     <Compile Include="Commands\Scene\SelectMultipleEntitiesCommand.cs" />
-    <Compile Include="Commands\Base\UndoCommand.cs" />
     <Compile Include="Base\ModelCollection.cs" />
     <Compile Include="Models\Base\Alias.cs" />
     <Compile Include="Models\Base\Attribute.cs" />
@@ -119,6 +116,7 @@
     <Compile Include="Storage\IGameStorage.cs" />
     <Compile Include="ViewModels\AttributeViewModel.cs" />
     <Compile Include="ViewModels\BasePropertyViewModel.cs" />
+    <Compile Include="ViewModels\ViewModel.cs" />
     <Compile Include="Views\DetailsConverter.cs" />
     <Compile Include="Views\FolderConverter.cs" />
     <Compile Include="ViewModels\ComponentViewModel.cs" />

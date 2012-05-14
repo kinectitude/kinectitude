@@ -28,15 +28,11 @@ namespace Kinectitude.Editor.Commands.Game
         public void Execute()
         {
             game.Game.IsFullScreen = newValue;
-            game.RaisePropertyChanged("IsFullScreen");
-            CommandHistory.Instance.PushUndo(this);
         }
 
         public void Unexecute()
         {
             game.Game.IsFullScreen = oldValue;
-            game.RaisePropertyChanged("IsFullScreen");
-            CommandHistory.Instance.PushRedo(this);
         }
     }
 }

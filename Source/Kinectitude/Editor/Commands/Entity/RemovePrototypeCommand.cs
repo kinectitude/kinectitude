@@ -26,13 +26,11 @@ namespace Kinectitude.Editor.Commands.Entity
         public void Execute()
         {
             entity.RemovePrototype(prototype);
-            CommandHistory.Instance.PushUndo(this);
         }
 
         public void Unexecute()
         {
             entity.AddPrototype(prototype);
-            CommandHistory.Instance.PushRedo(this);
         }
     }
 }

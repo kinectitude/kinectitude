@@ -15,23 +15,23 @@ namespace Kinectitude.Editor.ViewModels
 {
     public class SceneViewModel : BaseModel
     {
-        private static readonly Dictionary<Scene, SceneViewModel> viewModels;
+        private static readonly Dictionary<Scene, SceneViewModel> sceneViewModels;
 
         static SceneViewModel()
         {
-            viewModels = new Dictionary<Scene, SceneViewModel>();
+            sceneViewModels = new Dictionary<Scene, SceneViewModel>();
         }
 
         public static SceneViewModel GetViewModel(Scene scene)
         {
-            SceneViewModel viewModel = null;
-            viewModels.TryGetValue(scene, out viewModel);
-            if (null == viewModel)
+            SceneViewModel sceneViewModel = null;
+            sceneViewModels.TryGetValue(scene, out sceneViewModel);
+            if (null == sceneViewModel)
             {
-                viewModel = new SceneViewModel(scene);
-                viewModels[scene] = viewModel;
+                sceneViewModel = new SceneViewModel(scene);
+                sceneViewModels[scene] = sceneViewModel;
             }
-            return viewModel;
+            return sceneViewModel;
         }
 
         private EntityViewModel currentEntity;
@@ -52,8 +52,9 @@ namespace Kinectitude.Editor.ViewModels
             get { return scene.Name; }
             set
             {
-                RenameSceneCommand command = new RenameSceneCommand(this, value);
-                command.Execute();
+                CommandHistory.Instance.LogCommand(new RenameSceneCommand(this, value));
+                scene.Name = value;
+                RaisePropertyChanged("Name");
             }
         }
 
@@ -62,8 +63,8 @@ namespace Kinectitude.Editor.ViewModels
             get { return currentEntity; }
             set
             {
-                SelectEntityCommand command = new SelectEntityCommand(this, value);
-                command.Execute();
+                //SelectEntityCommand command = new SelectEntityCommand(this, value);
+                //command.Execute();
             }
         }
 
@@ -77,7 +78,7 @@ namespace Kinectitude.Editor.ViewModels
             get { return entities; }
         }
 
-        private SceneViewModel(Scene scene)
+        public SceneViewModel(Scene scene)
         {
             this.scene = scene;
 

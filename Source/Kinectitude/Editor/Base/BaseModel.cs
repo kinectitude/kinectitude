@@ -8,7 +8,7 @@ namespace Kinectitude.Editor.Base
 
         public BaseModel() { }
 
-        public virtual void RaisePropertyChanged(string propertyName)
+        protected virtual void RaisePropertyChanged(string propertyName)
         {
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }

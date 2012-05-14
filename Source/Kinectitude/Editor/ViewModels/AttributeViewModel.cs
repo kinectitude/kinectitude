@@ -5,6 +5,7 @@ using System.ComponentModel;
 using Kinectitude.Editor.Models.Base;
 using System.Collections.Specialized;
 using Kinectitude.Editor.Commands.Attribute;
+using Kinectitude.Editor.Commands.Base;
 
 namespace Kinectitude.Editor.ViewModels
 {
@@ -53,18 +54,13 @@ namespace Kinectitude.Editor.ViewModels
         }
 
         private readonly Entity entity;
+        private bool inherited;
         private Attribute attribute;
         private AttributeViewModel inheritedViewModel;
 
         public Attribute Attribute
         {
             get { return attribute; }
-            set { attribute = value; }
-        }
-
-        public Entity Entity
-        {
-            get { return entity; }
         }
 
         public string Key
@@ -74,8 +70,10 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (!IsInherited)
                 {
-                    RenameAttributeCommand command = new RenameAttributeCommand(this, value);
-                    command.Execute();
+                    CommandHistory.Instance.LogCommand(new RenameAttributeCommand(this, value));
+                    attribute.Key = value;
+                    FindInheritedAttribute(value);
+                    RaisePropertyChanged("Key");
                 }
             }
         }
@@ -87,29 +85,10 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (!IsInherited)
                 {
-                    SetAttributeValueCommand command = new SetAttributeValueCommand(this, value);
-                    command.Execute();
+                    CommandHistory.Instance.LogCommand(new SetAttributeValueCommand(this, value));
+                    attribute.Value = Attribute.TryParse(value);
+                    RaisePropertyChanged("Value");
                 }
-            }
-        }
-
-        public AttributeViewModel InheritedAttribute
-        {
-            get { return inheritedViewModel; }
-            set
-            {
-                if (null != inheritedViewModel)
-                {
-                    inheritedViewModel.PropertyChanged -= OnPropertyChanged;
-                }
-
-                inheritedViewModel = value;
-                
-                if (null != inheritedViewModel)
-                {
-                    inheritedViewModel.PropertyChanged += OnPropertyChanged;
-                }
-                RaisePropertyChanged("CanInherit");
             }
         }
 
@@ -125,11 +104,33 @@ namespace Kinectitude.Editor.ViewModels
 
         public bool IsInherited
         {
-            get { return CanInherit && attribute == InheritedAttribute.Attribute; }
+            get { return inherited; }
             set
             {
-                SetAttributeInheritedCommand command = new SetAttributeInheritedCommand(this, value);
-                command.Execute();
+                CommandHistory.Instance.LogCommand(new SetAttributeInheritedCommand(this, value));
+                if (CanInherit)
+                {
+                    if (!value)
+                    {
+                        attribute = new Attribute(inheritedViewModel.Key, inheritedViewModel.Value);
+                        entity.AddAttribute(attribute);
+                    }
+                    else
+                    {
+                        if (null != attribute)
+                        {
+                            entity.RemoveAttribute(attribute);
+                        }
+                        attribute = inheritedViewModel.Attribute;
+                    }
+
+                    inherited = value;
+
+                    RaisePropertyChanged("Key");
+                    RaisePropertyChanged("Value");
+                    RaisePropertyChanged("IsInherited");
+                    RaisePropertyChanged("IsLocal");
+                }
             }
         }
 
@@ -140,7 +141,8 @@ namespace Kinectitude.Editor.ViewModels
             FindInheritedAttribute(key);
             if (null == attribute)
             {
-                attribute = InheritedAttribute.Attribute;
+                inherited = true;
+                attribute = inheritedViewModel.Attribute;
             }
         }
 
@@ -151,6 +153,11 @@ namespace Kinectitude.Editor.ViewModels
 
         public void FindInheritedAttribute(string key)
         {
+            if (null != inheritedViewModel)
+            {
+                inheritedViewModel.PropertyChanged -= OnPropertyChanged;
+            }
+
             foreach (Entity prototype in entity.Prototypes)
             {
                 EntityViewModel prototypeViewModel = EntityViewModel.GetViewModel(prototype);
@@ -159,12 +166,22 @@ namespace Kinectitude.Editor.ViewModels
                 {
                     if (viewModel.Key == key)
                     {
-                        InheritedAttribute = viewModel;
+                        inheritedViewModel = viewModel;
+                        inheritedViewModel.PropertyChanged += OnPropertyChanged;
+
+                        if (IsInherited)
+                        {
+                            attribute = inheritedViewModel.Attribute;
+                        }
+
+                        RaisePropertyChanged("CanInherit");
                         return;
                     }
                 }
             }
-            InheritedAttribute = null;
+
+            RaisePropertyChanged("CanInherit");
+            inheritedViewModel = null;
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -178,6 +195,14 @@ namespace Kinectitude.Editor.ViewModels
                 }
                 else if (args.PropertyName == "Value")
                 {
+                    RaisePropertyChanged("Value");
+                }
+                else if (args.PropertyName == "IsInherited")
+                {
+                    FindInheritedAttribute(attribute.Key);
+                    RaisePropertyChanged("IsInherited");
+                    RaisePropertyChanged("CanInherit");
+                    RaisePropertyChanged("Key");
                     RaisePropertyChanged("Value");
                 }
             }

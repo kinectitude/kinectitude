@@ -31,20 +31,14 @@ namespace Kinectitude.Editor.Commands.Game
 
         public void Execute()
         {
-            game.Game.Width = newWidth;
-            game.Game.Height = newHeight;
-            game.RaisePropertyChanged("Width");
-            game.RaisePropertyChanged("Height");
-            CommandHistory.Instance.PushUndo(this);
+            game.Width = newWidth;
+            game.Height = newHeight;
         }
 
         public void Unexecute()
         {
-            game.Game.Width = oldWidth;
-            game.Game.Height = oldHeight;
-            game.RaisePropertyChanged("Width");
-            game.RaisePropertyChanged("Height");
-            CommandHistory.Instance.PushRedo(this);
+            game.Width = oldWidth;
+            game.Height = oldHeight;
         }
     }
 }

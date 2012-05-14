@@ -27,16 +27,12 @@ namespace Kinectitude.Editor.Commands.Game
 
         public void Execute()
         {
-            game.Game.Description = newDescription;
-            game.RaisePropertyChanged("Description");
-            CommandHistory.Instance.PushUndo(this);
+            game.Description = newDescription;
         }
 
         public void Unexecute()
         {
-            game.Game.Description = oldDescription;
-            game.RaisePropertyChanged("Description");
-            CommandHistory.Instance.PushRedo(this);
+            game.Description = oldDescription;
         }
     }
 }

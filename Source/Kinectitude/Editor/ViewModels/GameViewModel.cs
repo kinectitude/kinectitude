@@ -55,8 +55,9 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (game.Name != value)
                 {
-                    RenameGameCommand command = new RenameGameCommand(this, value);
-                    command.Execute();
+                    CommandHistory.Instance.LogCommand(new RenameGameCommand(this, value));
+                    game.Name = value;
+                    RaisePropertyChanged("Name");
                 }
             }
         }
@@ -68,8 +69,9 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (game.Description != value)
                 {
-                    SetDescriptionCommand command = new SetDescriptionCommand(this, value);
-                    command.Execute();
+                    CommandHistory.Instance.LogCommand(new SetDescriptionCommand(this, value));
+                    game.Description = value;
+                    RaisePropertyChanged("Description");
                 }
             }
         }
@@ -81,8 +83,9 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (game.Width != value)
                 {
-                    SetResolutionCommand command = new SetResolutionCommand(this, value, Height);
-                    command.Execute();
+                    CommandHistory.Instance.LogCommand(new SetResolutionCommand(this, value, Height));
+                    game.Width = value;
+                    RaisePropertyChanged("Width");
                 }
             }
         }
@@ -94,8 +97,9 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (game.Height != value)
                 {
-                    SetResolutionCommand command = new SetResolutionCommand(this, Width, value);
-                    command.Execute();
+                    CommandHistory.Instance.LogCommand(new SetResolutionCommand(this, Width, value));
+                    game.Height = value;
+                    RaisePropertyChanged("Height");
                 }
             }
         }
@@ -107,8 +111,9 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (game.IsFullScreen != value)
                 {
-                    SetFullScreenCommand command = new SetFullScreenCommand(this, value);
-                    command.Execute();
+                    CommandHistory.Instance.LogCommand(new SetFullScreenCommand(this, value));
+                    game.IsFullScreen = value;
+                    RaisePropertyChanged("IsFullScreen");
                 }
             }
         }
@@ -120,8 +125,9 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (null != value)
                 {
-                    SetFirstSceneCommand command = new SetFirstSceneCommand(this, value);
-                    command.Execute();
+                    CommandHistory.Instance.LogCommand(new SetFirstSceneCommand(this, value));
+                    game.FirstScene = value.Scene;
+                    RaisePropertyChanged("FirstScene");
                 }
             }
         }
@@ -215,8 +221,7 @@ namespace Kinectitude.Editor.ViewModels
 
             if (dialog.DialogResult == true)
             {
-                CreateSceneCommand command = new CreateSceneCommand(this, viewModel);
-                command.Execute();
+                AddScene(viewModel);
             }
         }
 
@@ -231,8 +236,7 @@ namespace Kinectitude.Editor.ViewModels
 
             if (dialog.DialogResult == true)
             {
-                CreatePrototypeCommand command = new CreatePrototypeCommand(this, viewModel);
-                command.Execute();
+                AddPrototype(viewModel);
             }
         }
 
@@ -241,45 +245,42 @@ namespace Kinectitude.Editor.ViewModels
             SceneViewModel scene = parameter as SceneViewModel;
             if (null != scene)
             {
-                DeleteSceneCommand command = new DeleteSceneCommand(this, scene);
-                command.Execute();
+                RemoveScene(scene);
             }
             else
             {
                 EntityViewModel entity = parameter as EntityViewModel;
                 if (null != entity)
                 {
-                    DeletePrototypeCommand command = new DeletePrototypeCommand(this, entity);
-                    command.Execute();
+                    RemovePrototype(entity);
                 }
             }
         }
 
         public void AddPrototype(EntityViewModel prototype)
         {
+            CommandHistory.Instance.LogCommand(new CreatePrototypeCommand(this, prototype));
             game.AddEntity(prototype.Entity);
             _prototypes.Add(prototype);
         }
 
         public void RemovePrototype(EntityViewModel prototype)
         {
+            CommandHistory.Instance.LogCommand(new DeletePrototypeCommand(this, prototype));
             _prototypes.Remove(prototype);
             game.RemoveEntity(prototype.Entity);
         }
 
-        public EntityViewModel GetPrototype(Entity prototype)
-        {
-            return prototypes.FirstOrDefault(x => x.Entity == prototype);
-        }
-
         public void AddScene(SceneViewModel scene)
         {
+            CommandHistory.Instance.LogCommand(new CreateSceneCommand(this, scene));
             game.AddScene(scene.Scene);
             _scenes.Add(scene);
         }
 
         public void RemoveScene(SceneViewModel scene)
         {
+            CommandHistory.Instance.LogCommand(new DeleteSceneCommand(this, scene));
             _scenes.Remove(scene);
             game.RemoveScene(scene.Scene);
         }

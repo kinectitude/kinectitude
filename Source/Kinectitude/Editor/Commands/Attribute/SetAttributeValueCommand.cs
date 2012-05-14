@@ -10,8 +10,8 @@ namespace Kinectitude.Editor.Commands.Attribute
     public class SetAttributeValueCommand : IUndoableCommand
     {
         private readonly AttributeViewModel attribute;
-        private readonly dynamic newValue;
-        private readonly dynamic oldValue;
+        private readonly string newValue;
+        private readonly string oldValue;
 
         public string Name
         {
@@ -21,22 +21,18 @@ namespace Kinectitude.Editor.Commands.Attribute
         public SetAttributeValueCommand(AttributeViewModel attribute, string newValue)
         {
             this.attribute = attribute;
-            this.newValue = Kinectitude.Editor.Models.Base.Attribute.TryParse(newValue);
-            oldValue = attribute.Value;
+            this.newValue = newValue;
+            oldValue = attribute.Value.ToString();
         }
 
         public void Execute()
         {
-            attribute.Attribute.Value = newValue;
-            attribute.RaisePropertyChanged("Value");
-            CommandHistory.Instance.PushUndo(this);
+            attribute.Value = newValue;
         }
 
         public void Unexecute()
         {
-            attribute.Attribute.Value = oldValue;
-            attribute.RaisePropertyChanged("Value");
-            CommandHistory.Instance.PushRedo(this);
+            attribute.Value = oldValue;
         }
     }
 }

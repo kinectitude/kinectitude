@@ -28,7 +28,6 @@ namespace Kinectitude.Editor.Commands.Game
             if (null != scene)
             {
                 game.AddScene(scene);
-                CommandHistory.Instance.PushRedo(this);
             }
         }
 
@@ -37,7 +36,6 @@ namespace Kinectitude.Editor.Commands.Game
             if (null != scene)
             {
                 game.RemoveScene(scene);
-                CommandHistory.Instance.PushUndo(this);
             }
         }
     }

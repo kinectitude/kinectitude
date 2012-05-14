@@ -27,21 +27,12 @@ namespace Kinectitude.Editor.Commands.Attribute
 
         public void Execute()
         {
-            if (newKey != oldKey)
-            {
-                attribute.Attribute.Key = newKey;
-                attribute.FindInheritedAttribute(newKey);
-                attribute.RaisePropertyChanged("Key");
-                CommandHistory.Instance.PushUndo(this);
-            }
+            attribute.Key = newKey;
         }
 
         public void Unexecute()
         {
-            attribute.Attribute.Key = oldKey;
-            attribute.FindInheritedAttribute(oldKey);
-            attribute.RaisePropertyChanged("Key");
-            CommandHistory.Instance.PushRedo(this);
+            attribute.Key = oldKey;
         }
     }
 }

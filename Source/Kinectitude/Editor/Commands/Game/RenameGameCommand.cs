@@ -23,19 +23,12 @@ namespace Kinectitude.Editor.Commands.Game
 
         public void Execute()
         {
-            if (newName != oldName)
-            {
-                game.Game.Name = newName;
-                game.RaisePropertyChanged("Name");
-                CommandHistory.Instance.PushUndo(this);
-            }
+            game.Name = newName;
         }
 
         public void Unexecute()
         {
-            game.Game.Name = oldName;
-            game.RaisePropertyChanged("Name");
-            CommandHistory.Instance.PushRedo(this);
+            game.Name = oldName;
         }
     }
 }

@@ -23,19 +23,12 @@ namespace Kinectitude.Editor.Commands.Scene
 
         public void Execute()
         {
-            if (newName != oldName)
-            {
-                scene.Scene.Name = newName;
-                scene.RaisePropertyChanged("Name");
-                CommandHistory.Instance.PushUndo(this);
-            }
+            scene.Name = newName;
         }
 
         public void Unexecute()
         {
-            scene.Scene.Name = oldName;
-            scene.RaisePropertyChanged("Name");
-            CommandHistory.Instance.PushRedo(this);
+            scene.Name = oldName;
         }
     }
 }

@@ -10,7 +10,6 @@ namespace Kinectitude.Editor.Commands.Attribute
     public class SetAttributeInheritedCommand : IUndoableCommand
     {
         private readonly AttributeViewModel attribute;
-        private readonly Kinectitude.Editor.Models.Base.Attribute localAttribute;
         private readonly bool shouldInherit;
         private readonly bool wasInherited;
 
@@ -24,41 +23,16 @@ namespace Kinectitude.Editor.Commands.Attribute
             this.attribute = attribute;
             this.shouldInherit = shouldInherit;
             wasInherited = attribute.IsInherited;
-            localAttribute = attribute.Attribute;
-
-            if (wasInherited)
-            {
-                localAttribute = new Kinectitude.Editor.Models.Base.Attribute(attribute.InheritedAttribute.Key, attribute.InheritedAttribute.Value);
-            }
         }
 
         public void Execute()
         {
-            if (wasInherited != shouldInherit)
-            {
-                if (!shouldInherit)
-                {
-                    attribute.Attribute = localAttribute;
-                    attribute.Entity.AddAttribute(localAttribute);
-                }
-                else
-                {
-                    if (null != attribute.Attribute)
-                    {
-                        attribute.Entity.RemoveAttribute(attribute.Attribute);
-                    }
-                    attribute.Attribute = attribute.InheritedAttribute.Attribute;
-                }
-                attribute.RaisePropertyChanged("Key");
-                attribute.RaisePropertyChanged("Value");
-                attribute.RaisePropertyChanged("IsInherited");
-                attribute.RaisePropertyChanged("IsLocal");
-            }
+            attribute.IsInherited = shouldInherit;
         }
 
         public void Unexecute()
         {
-            
+            attribute.IsInherited = wasInherited;
         }
     }
 }

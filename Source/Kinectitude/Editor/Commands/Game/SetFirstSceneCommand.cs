@@ -27,16 +27,12 @@ namespace Kinectitude.Editor.Commands.Game
 
         public void Execute()
         {
-            game.Game.FirstScene = newScene.Scene;
-            game.RaisePropertyChanged("FirstScene");
-            CommandHistory.Instance.PushUndo(this);
+            game.FirstScene = newScene;
         }
 
         public void Unexecute()
         {
-            game.Game.FirstScene = oldScene.Scene;
-            game.RaisePropertyChanged("FirstScene");
-            CommandHistory.Instance.PushRedo(this);
+            game.FirstScene = oldScene;
         }
     }
 }

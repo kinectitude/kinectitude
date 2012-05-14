@@ -28,7 +28,6 @@ namespace Kinectitude.Editor.Commands.Game
             if (null != prototype)
             {
                 game.RemovePrototype(prototype);
-                CommandHistory.Instance.PushUndo(this);
             }
         }
 
@@ -37,7 +36,6 @@ namespace Kinectitude.Editor.Commands.Game
             if (null != prototype)
             {
                 game.AddPrototype(prototype);
-                CommandHistory.Instance.PushRedo(this);
             }
         }
     }

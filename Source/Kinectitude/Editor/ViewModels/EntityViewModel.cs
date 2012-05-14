@@ -57,8 +57,9 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (entity.Name != value)
                 {
-                    RenameEntityCommand command = new RenameEntityCommand(this, value);
-                    command.Execute();
+                    CommandHistory.Instance.LogCommand(new RenameEntityCommand(this, value));
+                    entity.Name = value;
+                    RaisePropertyChanged("Name");
                 }
             }
         }
@@ -403,8 +404,8 @@ namespace Kinectitude.Editor.ViewModels
 
         public void AddAttribute(AttributeViewModel attribute)
         {
-            entity.AddAttribute(attribute.Attribute);
-            _attributes.Add(attribute);
+            //entity.AddAttribute(attribute.Attribute);
+            //_attributes.Add(attribute);
         }
 
         public void RemoveAttribute(AttributeViewModel attribute)
@@ -414,12 +415,14 @@ namespace Kinectitude.Editor.ViewModels
 
         public void AddPrototype(EntityViewModel entityViewModel)
         {
+            CommandHistory.Instance.LogCommand(new AddPrototypeCommand(this, entityViewModel));
             entity.AddPrototype(entityViewModel.Entity);
             PrivateAddPrototype(entityViewModel);
         }
 
         public void RemovePrototype(EntityViewModel entityViewModel)
         {
+            CommandHistory.Instance.LogCommand(new RemovePrototypeCommand(this, entityViewModel));
             entity.RemovePrototype(entityViewModel.Entity);
             PrivateRemovePrototype(entityViewModel);
         }

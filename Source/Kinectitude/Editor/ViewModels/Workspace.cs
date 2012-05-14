@@ -110,7 +110,7 @@ namespace Kinectitude.Editor.ViewModels
             get { return resolutionPresets; }
         }
 
-        public ICommandHistory CommandHistory
+        public CommandHistory CommandHistory
         {
             get { return Kinectitude.Editor.Commands.Base.CommandHistory.Instance; }
         }

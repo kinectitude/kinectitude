@@ -27,19 +27,12 @@ namespace Kinectitude.Editor.Commands.Entity
 
         public void Execute()
         {
-            if (newName != oldName)
-            {
-                entity.Entity.Name = newName;
-                entity.RaisePropertyChanged("Name");
-                CommandHistory.Instance.PushUndo(this);
-            }
+            entity.Name = newName;
         }
 
         public void Unexecute()
         {
-            entity.Entity.Name = oldName;
-            entity.RaisePropertyChanged("Name");
-            CommandHistory.Instance.PushRedo(this);
+            entity.Name = oldName;
         }
     }
 }
