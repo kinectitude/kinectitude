@@ -9,26 +9,31 @@ using FontStyle = SlimDX.DirectWrite.FontStyle;
 using Kinectitude.Core;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Loaders;
+using System.Diagnostics;
 
 namespace Kinectitude.Player
 {
     internal sealed class Application : IDisposable
     {
+        private const float TimeStep = 1.0f / 60.0f;
+
         private readonly Game game;
         private readonly RenderForm form;
         private readonly WindowRenderTarget renderTarget;
         private readonly SlimDX.Direct2D.Factory drawFactory;
         private readonly SlimDX.DirectWrite.Factory writeFactory;
+        private readonly SolidColorBrush textBrush;
         private readonly TextFormat textFormat;
-        private readonly Clock clock;
         private readonly Color4 clearColor;
+        private readonly Clock clock;
 
         private float frameDelta;
         private float frameAccumulator;
         private float framesPerSecond;
         private int frameCount;
+        private float accumulator;
 
-        internal Application()
+        public Application()
         {
             drawFactory = new SlimDX.Direct2D.Factory();
             SizeF dpi = drawFactory.DesktopDpi;
@@ -49,15 +54,16 @@ namespace Kinectitude.Player
             });
             
             writeFactory = new SlimDX.DirectWrite.Factory(SlimDX.DirectWrite.FactoryType.Shared);
-            textFormat = writeFactory.CreateTextFormat("Arial", FontWeight.Regular, FontStyle.Normal, FontStretch.Normal, 36.0f, "en-us");
+            textFormat = writeFactory.CreateTextFormat("Consolas", FontWeight.Regular, FontStyle.Normal, FontStretch.Normal, 18.0f, "en-us");
             textFormat.TextAlignment = TextAlignment.Center;
             textFormat.ParagraphAlignment = ParagraphAlignment.Center;
+            textBrush = new SolidColorBrush(renderTarget, new Color4(1.0f, 1.0f, 1.0f));
+            clearColor = new Color4(0.30f, 0.30f, 0.80f);
 
             gameLoader.RegisterService(typeof(SlimDX.DirectWrite.Factory), writeFactory);
 
             clock = new Clock();
-
-            clearColor = new Color4(0.30f, 0.30f, 0.80f);
+            accumulator = 0.0f;
         }
 
         public void Dispose()
@@ -75,15 +81,22 @@ namespace Kinectitude.Player
 
             MessagePump.Run(form, () =>
                 {
-                    Update();
+                    frameDelta = clock.Update();
+                    accumulator += frameDelta;
+
+                    while (accumulator > TimeStep)
+                    {
+                        Update(TimeStep);
+                        accumulator -= TimeStep;
+                    }
+
                     Render();
                 }
             );
         }
 
-        private void Update()
+        private void Update(float frameDelta)
         {
-            frameDelta = clock.Update();
             game.OnUpdate(frameDelta);
         }
 
@@ -109,7 +122,7 @@ namespace Kinectitude.Player
             }
 
             RectangleF layoutRect = form.ClientRectangle;
-            renderTarget.DrawText(framesPerSecond.ToString(), textFormat, layoutRect, new SolidColorBrush(renderTarget, new Color4(1.0f, 1.0f, 1.0f)));
+            renderTarget.DrawText(framesPerSecond.ToString(), textFormat, layoutRect, textBrush);
 
             renderTarget.EndDraw();
         }

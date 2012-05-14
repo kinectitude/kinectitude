@@ -14,14 +14,6 @@ namespace Kinectitude.Player
         [STAThread]
         static void Main()
         {
-            //RenderForm form = new RenderForm("Kinectitude");
-            //MessagePump.Run(form, () => { });
-
-            /*using (KinectitudeSample sample = new KinectitudeSample())
-            {
-                sample.Run();
-            }*/
-
             using (Application app = new Application())
             {
                 app.Run();

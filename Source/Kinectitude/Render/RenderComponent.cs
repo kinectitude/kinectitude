@@ -41,9 +41,9 @@ namespace Kinectitude.Render
         {
             if (null != Entity["radius"])
             {
-                double radius = 2 * double.Parse(Entity["radius"]);
-                width = radius;
-                height = radius;
+                double radius = double.Parse(Entity["radius"]);
+                width = radius * 2;
+                height = radius * 2;
                 circular = true;
             }
             else
@@ -76,7 +76,7 @@ namespace Kinectitude.Render
             }
             else
             {
-                RectangleF rectangle = new RectangleF((float)X, (float)Y, (float)width, (float)height);
+                RectangleF rectangle = new RectangleF((float)X - (float)width / 2.0f, (float)Y - (float)height / 2.0f, (float)width, (float)height);
                 renderTarget.FillRectangle(brush, rectangle);
             }
         }

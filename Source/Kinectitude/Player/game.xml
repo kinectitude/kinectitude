@@ -44,7 +44,7 @@
   <!--this is to test that muti-inheritance works and in the correct order it is stupid to actually do for this-->
   <prototype name="highY" y="150"/>
 
-  <scene name ="main" numReady="0" ready1="" ready2 ="">
+  <scene name ="oldMain" numReady="0" ready1="" ready2 ="">
 
     <entity name="topText" x="250" y="24">
       <component type="TextRenderComponent" value="Kinect Wimbledon Delux" fontcolor="Yellow" />
@@ -93,47 +93,15 @@
     <entity name="readybar" prototype="bar"/>
   </scene>
 
-  <scene name="game" player1Score="0" player2Score="0">
+  <scene name="main" player1Score="0" player2Score="0">
 
-    <entity name="player1" prototype="paddle" x="5" y="250"/>
+    <entity name="player1" prototype="paddle" x="17" y="314"/>
 
-    <entity name="player2" prototype="paddle" x="770" y="250">
-      <component type="KinectFollowComponent" player="P1" joint="HandRight" />
-    </entity>
+    <entity name="player2" prototype="paddle" x="782" y="314"/>
 
     <entity name="ball" x="400" y="300" radius="24">
       <component type="RenderComponent" fillcolor="LimeGreen" />
-      <component type ="PhysicsComponent" dx="6" dy="6" />
-      <event type="ExitsLeftEvent">
-        <action type="SetPositionAction" x="400" y="300" />
-        <action type="IncrementAction" target ="scene.player2Score" />
-      </event>
-      <!-- this is done differently then the other one to test both methods-->
-      <event type="ExitsRightEvent">
-        <action type="SetPositionAction" x="400" y="300" />
-        <action type="IncrementAction" target="scene.player1Score" />
-        <action type="FireTriggerAction" name="player1Scores"/>
-      </event>
-    </entity>
-
-    <entity prototype="score" x="56" y="24">
-      <event type="TriggerOccursEvent" trigger="player1Scores">
-        <action type="SetTextAction" value="scene.player1Score" />
-      </event>
-      <event type="AttributeEqualsEvent" target="scene.player1Score" value ="7">
-        <action type="SetAttributeAction" target="game.winner" value="player 1 wins"/>
-        <action type="ChangeSceneAction" target="gameOver"/>
-      </event>
-    </entity>
-
-    <entity prototype="score" x="724" y="24">
-      <event type="AttributeChangesEvent" target="scene.player2Score">
-        <action type="SetTextAction" value="scene.player2Score" />
-      </event>
-      <event type="AttributeEqualsEvent" target="scene.player2Score" value ="7">
-        <action type="SetAttributeAction" target="game.winner" value="player 2 wins"/>
-        <action type="ChangeSceneAction" target="gameOver"/>
-      </event>
+      <component type ="PhysicsComponent" dx="6" dy="0" />
     </entity>
 
   </scene>
