@@ -30,6 +30,9 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FarseerPhysics">
+      <HintPath>..\..\..\Libraries\FarseerPhysics.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -45,11 +48,9 @@
     <Compile Include="CrossesLineEvent.cs" />
     <Compile Include="ExitsRightEvent.cs" />
     <Compile Include="ExitsLeftEvent.cs" />
-    <Compile Include="IPhysics.cs" />
     <Compile Include="PhysicsComponent.cs" />
     <Compile Include="PhysicsManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SetPositionAction.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Attributes\Kinectitude.Attributes.csproj">

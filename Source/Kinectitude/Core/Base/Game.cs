@@ -46,7 +46,7 @@ namespace Kinectitude.Core.Base
             main.Running = true;
         }
 
-        public void OnUpdate(double frameDelta)
+        public void OnUpdate(float frameDelta)
         {
             Scene currentScene = currentScenes.Peek();
             if (currentScene.Running)
@@ -77,15 +77,19 @@ namespace Kinectitude.Core.Base
         internal object CreateFromReflection(string name, Type[] constructors, object[] argVals)
         {
             Type componentType = GetType(name);
-            ConstructorInfo ci = componentType.GetConstructor(constructors);
+            return CreateFromReflection(componentType, constructors, argVals);
+        }
+
+        internal object CreateFromReflection(Type create,  Type[] constructors, object[] argVals)
+        {
+            ConstructorInfo ci = create.GetConstructor(constructors);
             object created = ci.Invoke(argVals);
             return created;
         }
+
         internal bool SetParam(object obj, string val, string param, Event e = null, SceneLoader s = null)
         {
             Type componentType = obj.GetType();
-            //fast to lower with uppercase first letter
-            param = param[0].ToString().ToUpper() + param.Substring(1).ToLower();
             MethodInfo mi;
             Type toType;
             if (gameLoader.MemberSetters.ContainsKey(componentType.Name + " " + param))
@@ -112,7 +116,6 @@ namespace Kinectitude.Core.Base
             }
             else if (toType == typeof(float))
             {
-                //odd Float is not a thing?
                 float tmp = float.Parse(val);
                 mi.Invoke(obj, new object[] { tmp });
             }

@@ -5,6 +5,8 @@ using System.Text;
 using Kinectitude.Core;
 using Kinectitude.Attributes;
 using Kinectitude.Core.Base;
+using Kinectitude.Core.Exceptions;
+using Kinectitude.Core.Interfaces;
 
 namespace Kinectitude.Physics
 {
@@ -93,7 +95,13 @@ namespace Kinectitude.Physics
 
         public override void OnInitialize()
         {
-            PhysicsComponent pc = Entity.GetComponent(typeof(PhysicsComponent)) as PhysicsComponent;
+            PhysicsComponent pc = Entity.GetComponent(typeof(IPhysicsComponent)) as PhysicsComponent;
+            if (null == pc)
+            {
+                List<Type> missing = new List<Type>();
+                missing.Add(typeof(PhysicsComponent));
+                throw new MissingRequirementsException(this, missing);
+            }
             pc.AddCrossLineEvent(this);
         }
     }

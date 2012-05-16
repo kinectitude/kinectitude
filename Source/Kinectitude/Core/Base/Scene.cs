@@ -96,7 +96,7 @@ namespace Kinectitude.Core.Base
             return managersDictionary[typeof(T)] as T;  // TODO: This might be a good place to move the manager construction code
         }
 
-        internal void OnUpdate(double frameDelta)
+        internal void OnUpdate(float frameDelta)
         {
             //should not be updated if not running
             foreach (IManager m in managers)
@@ -123,7 +123,7 @@ namespace Kinectitude.Core.Base
                 {
                     constructors = new Type[] { typeof(Game) };
                     argVals = new object[] { Game };
-                    parent = (IManager)Game.CreateFromReflection(manager.Name, constructors, argVals);
+                    parent = (IManager)Game.CreateFromReflection(manager, constructors, argVals);
                     managers.Add(parent);
                     managersDictionary.Add(manager, parent);
                 }
@@ -140,7 +140,6 @@ namespace Kinectitude.Core.Base
                 object[] argVal = { created };
                 mi.Invoke(parent, argVal);
             }
-            created.Ready();
         }
 
         internal void FireTrigger(string triggerName)

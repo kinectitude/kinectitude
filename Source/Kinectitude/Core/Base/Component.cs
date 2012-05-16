@@ -2,6 +2,7 @@
 
 namespace Kinectitude.Core.Base
 {
+
     public abstract class Component : IUpdateable
     {
         public Entity Entity { get; private set; }
@@ -13,8 +14,13 @@ namespace Kinectitude.Core.Base
 
         public abstract Type ManagerType();
 
-        public virtual void OnUpdate(double frameDelta) { }
+        public virtual void OnUpdate(float frameDelta) { }
 
         public virtual void Ready() { }
+
+        public virtual Type ImplementationType()
+        {
+            return this.GetType();
+        }
     }
 }

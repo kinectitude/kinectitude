@@ -5,25 +5,37 @@ namespace Kinectitude.Core.Base
 {
     public class Entity : DataContainer
     {
-        private readonly Dictionary<Type, Component> components;
+        //used to get a specific component
+        private readonly Dictionary<Type, Component> componentDictionary;
+        //used so that all components can be ready when the entity is ready
+        private readonly List<Component> componentList = new List<Component>();
 
         public Entity(int id) : base(id)
         {
-            components = new Dictionary<Type, Component>();
+            componentDictionary = new Dictionary<Type, Component>();
         }
 
         public void AddComponent(Component component)
         {
-            components[component.GetType()] = component;
+            componentDictionary[component.ImplementationType()] = component;
+            componentList.Add(component);
         }
 
         public Component GetComponent(Type type)
         {
-            if (!components.ContainsKey(type))
+            if (!componentDictionary.ContainsKey(type))
             {
                 return null;
             }
-            return components[type];
+            return componentDictionary[type];
+        }
+
+        internal void Ready()
+        {
+            foreach (Component component in componentList)
+            {
+                component.Ready();
+            }
         }
     }
 }

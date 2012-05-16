@@ -5,6 +5,7 @@ using System.IO;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Actions;
 using Kinectitude.Core.Events;
+using Kinectitude.Core.Components;
 
 namespace Kinectitude.Core.Loaders
 {
@@ -44,9 +45,11 @@ namespace Kinectitude.Core.Loaders
             TypesDict["PushSceneAction"] = typeof(PushSceneAction);
             TypesDict["PopSceneAction"] = typeof(PopSceneAction);
             TypesDict["ChangeSceneAction"] = typeof(ChangeSceneAction);
-            TypesDict["SceneStartEvent"] = typeof(SceneStartsEvent);
+            TypesDict["SceneStartsEvent"] = typeof(SceneStartsEvent);
             TypesDict["FireTriggerAction"] = typeof(FireTriggerAction);
             TypesDict["TriggerOccursEvent"] = typeof(TriggerOccursEvent);
+            TypesDict["TransformComponent"] = typeof(TransformComponent);
+            TypesDict["SetPositionAction"] = typeof(SetPositionAction);
             Game = new Game(this);
         }
 

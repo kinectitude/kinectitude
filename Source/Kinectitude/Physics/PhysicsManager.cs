@@ -1,42 +1,35 @@
 ﻿using Kinectitude.Core;
 using Kinectitude.Core.Base;
+using Kinectitude.Core.Interfaces;
+using FarseerPhysics.Dynamics;
+using Microsoft.Xna.Framework;
+using System;
 
 namespace Kinectitude.Physics
 {
-    public class PhysicsManager : Manager<IPhysics>
+    public class PhysicsManager : Manager<PhysicsComponent>
     {
-        public PhysicsManager(Game g) : base(g) { }
 
-        public override void OnUpdate(double t)
+        public World PhysicsWorld { get; private set; }
+
+        public PhysicsManager(Game g) : base(g)
         {
-            for (int i = 0; i < children.Count; i++)
-            {
-                for (int j = i + 1; j < children.Count; j++)
-                {
-                    IPhysics pc = children[i];
-                    IPhysics pc2 = children[j];
+            PhysicsWorld = new World(Vector2.Zero);
+            PhysicsWorld.ClearForces();
+        }
 
-                    if (pc.HitTest(pc2, t))
-                    {
-                        if ((pc2.Dx - pc.Dx > 0 && pc2.X < pc.X) || (pc2.Dx - pc.Dx < 0 && pc2.X > pc.X)) // If the objects are heading towards each other
-                        {
-                            pc.Dx = -pc.Dx;
-                            pc2.Dx = -pc2.Dx;
-                        }
-
-                        if (pc.Above(pc2) || pc2.Above(pc))
-                        {
-                            pc.Dy = -pc.Dy;
-                            pc2.Dy = -pc2.Dy;
-                        }
-                    }
-                }
-            }
-
+        public override void OnUpdate(float t)
+        {
+            PhysicsWorld.Step(t);
             foreach (PhysicsComponent pc in children)
             {
                 pc.OnUpdate(t);
             }
+        }
+
+        protected override void OnAdd(PhysicsComponent item)
+        {
+            item.Initialize(this);
         }
     }
 }

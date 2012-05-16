@@ -4,6 +4,10 @@ using Kinectitude.Core;
 using System;
 using Kinectitude.Attributes;
 using Kinectitude.Core.Base;
+using Kinectitude.Core.Interfaces;
+using Kinectitude.Core.Components;
+using Kinectitude.Core.Exceptions;
+using System.Collections.Generic;
 
 namespace Kinectitude.Kinect
 {
@@ -17,8 +21,11 @@ namespace Kinectitude.Kinect
         public JointType followJoint;
         private FollowType followType;
 
-        private double nextDx = 0;
-        private double nextDy = 0;
+        private float nextDx = 0;
+        private float nextDy = 0;
+
+        private TransformComponent transform;
+        private IPhysicsComponent physics = null;
 
         [Plugin("Joint", "")]
         public string Joint
@@ -141,43 +148,60 @@ namespace Kinectitude.Kinect
 
         public void UpdatePosition(float x, float y)
         {
-            if (FollowType.Both == followType)
+            float prevx = transform.X;
+            nextDx = x - prevx;
+            float prevy = transform.Y;
+            nextDy = y - prevy;
+        }
+
+        public override void OnUpdate(float t)
+        {
+            //if they are following with physics, we will set a velocity
+            if (null != physics)
             {
-                double prevx = double.Parse(Entity["x"]);
-                double prevy = double.Parse(Entity["y"]);
-                nextDx = x - prevx;
-                nextDy = y - prevy;
-            }
-            else if (FollowType.X == followType)
-            {
-                double prevx = double.Parse(Entity["x"]);
-                nextDx = x - prevx;
+                switch (followType)
+                {
+                    case FollowType.X:
+                        physics.XVelocity = nextDx;
+                        break;
+                    case FollowType.Y:
+                        physics.YVelocity = nextDy;
+                        break;
+                    case FollowType.Both:
+                        physics.XVelocity = nextDx;
+                        physics.YVelocity = nextDy;
+                        break;
+                }
             }
             else
             {
-                double prevy = double.Parse(Entity["y"]);
-                nextDy = y - prevy;
+                switch (followType)
+                {
+                    case FollowType.X:
+                        transform.X += nextDx;
+                        break;
+                    case FollowType.Y:
+                        transform.Y += nextDy;
+                        break;
+                    case FollowType.Both:
+                        transform.X += nextDx;
+                        transform.Y += nextDy;
+                        break;
+                }
             }
         }
 
-        public override void OnUpdate(double t)
+        public override void Ready()
         {
-            if (FollowType.Both == followType)
+            transform = Entity.GetComponent(typeof(TransformComponent)) as TransformComponent;
+            if (null == transform)
             {
-                Entity["Dx"] = nextDx.ToString();
-                Entity["Dy"] = nextDy.ToString();
-                nextDx = nextDy = 0;
+                List<Type> missing = new List<Type>();
+                missing.Add(typeof(TransformComponent));
+                throw new MissingRequirementsException(this, missing);
             }
-            else if (FollowType.X == followType)
-            {
-                Entity["Dx"] = nextDy.ToString();
-                nextDx = 0;
-            }
-            else
-            {
-                Entity["Dy"] = nextDy.ToString();
-                nextDy = 0;
-            }
+            physics = Entity.GetComponent(typeof(IPhysicsComponent)) as IPhysicsComponent;
         }
+
     }
 }

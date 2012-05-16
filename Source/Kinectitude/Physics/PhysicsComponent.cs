@@ -3,93 +3,89 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Xml;
 using Kinectitude.Core;
+using Kinectitude.Core.Interfaces;
+using Kinectitude.Core.Components;
 using Kinectitude.Attributes;
 using Kinectitude.Core.Base;
+using FarseerPhysics.Dynamics;
+using FarseerPhysics.Factories;
+using Microsoft.Xna.Framework;
+using FarseerPhysics.Common;
+using Kinectitude.Core.Exceptions;
 
 namespace Kinectitude.Physics
 {
     [Plugin("Physics Component", "")]
-    public class PhysicsComponent : Component, IPhysics
+    public class PhysicsComponent : Component, IPhysicsComponent
     {
+        private const float sizeRatio = 1f / 100f;
+        private const float speedRatio = 1f / 10f;
         private List<CrossesLineEvent> crossesLineEvents = new List<CrossesLineEvent>();
+        private Body body;
+        private PhysicsManager pm;
+        private TransformComponent tc;
 
+        [Plugin("Shape", "")]
+        public string Shape { get; set; }
+
+        private float xVelocity;
         [Plugin("Horizontal Velocity", "")]
-        public double Dx
+        public float XVelocity
         {
-            get { return double.Parse(Entity["Dx"]); }
-            set { Entity["Dx"] = value.ToString(); }
+            get { return xVelocity; }
+            set 
+            {
+                if (null != body)
+                {
+                    body.LinearVelocity = new Vector2(value * speedRatio, YVelocity * speedRatio);
+                }
+                xVelocity = value;
+            }
         }
 
+        private float yVelocity;
         [Plugin("Vertical Velocity", "")]
-        public double Dy
+        public float YVelocity
         {
-            get { return double.Parse(Entity["Dy"]); }
-            set { Entity["Dy"] = value.ToString(); }
+            get { return yVelocity; }
+            set
+            {
+                if (null != body)
+                {
+                    body.LinearVelocity = new Vector2(xVelocity * speedRatio, value * speedRatio);
+                }
+                yVelocity = value; 
+            }
         }
 
-        public double Width { get; private set; }
-        public double Height { get; private set; }
-        public double X
-        {
-            get { return double.Parse(Entity["x"]); }
-            set { Entity["x"] = value.ToString(); }
-        }
-        public double Y
-        {
-            get { return double.Parse(Entity["y"]); }
-            set { Entity["y"] = value.ToString(); }
-        }
+        [Plugin("Angular Velocity", "")]
+        public float AngularVelocity { get; set; }
 
         override public Type ManagerType(){return typeof(PhysicsManager);}
 
-        public PhysicsComponent(Entity entity) : base(entity)
+        public PhysicsComponent(Entity entity) : base(entity) { }
+
+        public override void OnUpdate(float t)
         {
-            if (null != Entity["radius"])
+            float prevX = tc.X;
+            float prevY = tc.Y;
+            float x = body.Position.X / sizeRatio;
+            float y = body.Position.Y / sizeRatio;
+
+            tc.setX(this, x);
+            tc.setY(this, y);
+
+            //TODO this is a hack
+            int Height = tc.Height;
+            if (y < 0 || y > 600 - Height)
             {
-                double radius = double.Parse(Entity["radius"]);
-                Width = radius * 2;
-                Height = Width;
-            }
-            else
-            {
-                Width = double.Parse(Entity["width"]);
-                Height = double.Parse(Entity["height"]);
-            }
-        }
-
-        public bool Above(IPhysics other)
-        {
-            return other.Y >= Y + Height;
-        }
-
-        public bool HitTest(IPhysics other, double predTimestep)
-        {
-            double futureX = X + Dx * predTimestep;
-            double futureY = Y + Dy * predTimestep;
-            
-            Rect r1 = new Rect(futureX, futureY, Width, Height);
-            Rect r2 = new Rect(other.X + other.Dx * predTimestep, other.Y + other.Dy * predTimestep, other.Width, other.Height);
-
-            bool res = r1.IntersectsWith(r2);
-            return res;
-        }
-
-        public override void OnUpdate(double t)
-        {
-            //Since it can be updated while in the update, keep it the same until we are done.
-            double delX = Dx;
-            double delY = Dy;
-            double prevX = X;
-            double prevY = Y;
-            X += delX;
-            Y += delY;
-
-            if (Y < 0 || Y > 600 - Height)
-            {
-                Dy = -Dy;
+                body.LinearVelocity = new Vector2(body.LinearVelocity.X, -body.LinearVelocity.Y);
             }
 
-            // If we need to check for exited right events
+            xVelocity = body.LinearVelocity.X / speedRatio;
+            yVelocity = body.LinearVelocity.Y / speedRatio;
+
+            //TODO make this done in farseer somehow
             if (crossesLineEvents.Count != 0)
             {
                 foreach (CrossesLineEvent evt in crossesLineEvents)
@@ -107,23 +103,23 @@ namespace Kinectitude.Physics
                         neg = false;
                     }
 
-                    double compareTo;
+                    double prev;
                     double next;
                     if (CrossesLineEvent.LineType.X == evt.Cross)
                     {
-                        compareTo = prevX;
-                        next = delX;
+                        prev = prevX;
+                        next = x;
                     }
                     else
                     {
-                        compareTo = prevY;
-                        next = delY;
+                        prev = prevY;
+                        next = y;
                     }
-                    if (pos && 0 < next  && cross < next + compareTo && cross >= compareTo)
+                    if (pos && 0 < next - prev  && cross < next  && cross >= prev)
                     {
                         evt.DoActions();
                     }
-                    else if (neg && 0 > next && cross > next + compareTo && cross <= compareTo)
+                    else if (neg && 0 > next - prev && cross > next && cross <= prev)
                     {
                         evt.DoActions();
                     }
@@ -136,10 +132,61 @@ namespace Kinectitude.Physics
             crossesLineEvents.Add(evt);
         }
 
-        public void OnSetPositionAction(SetPositionAction action)
+        public void setPosition()
         {
-            X = action.X;
-            Y = action.Y;
+            body.Position = new Vector2(tc.X * sizeRatio, tc.Y * sizeRatio);
+        }
+
+        public void setSize()
+        {
+            throw new NotImplementedException("THE PHYSICS COMPONENT WON'T SET THE SIZE CURRENTLY");
+        }
+
+        public void Initialize(PhysicsManager pm)
+        {   
+            this.pm = pm;
+        }
+
+        public override Type ImplementationType()
+        {
+            return typeof(IPhysicsComponent);
+        }
+
+        public override void Ready()
+        {
+            List<Type> missing = new List<Type>();
+            tc = Entity.GetComponent(typeof(TransformComponent)) as TransformComponent;
+            if (null == tc)
+            {
+                missing.Add(typeof(TransformComponent));
+                throw new MissingRequirementsException(this, missing);
+            }
+            tc.SubscribeToX(this, setPosition);
+            tc.SubscribeToY(this, setPosition);
+            tc.SubscribeToHeight(this, setSize);
+            tc.SubscribeToWidht(this, setSize);
+            //TODO this is temporary
+            if ("circle" == Shape)
+            {
+                body = BodyFactory.CreateCircle(pm.PhysicsWorld, tc.Width * sizeRatio, 1f);
+                //TODO this is a hack
+                body.Restitution = 1f;
+                body.BodyType = BodyType.Dynamic;
+            }
+            else
+            {
+                float width = tc.Width * sizeRatio;
+                float height = tc.Height * sizeRatio;
+                body = BodyFactory.CreateRectangle(pm.PhysicsWorld, width, height, 1f);
+                //TODO this is a hack
+                body.Restitution = 0f;
+                body.BodyType = BodyType.Kinematic;
+            }
+            body.Mass = 1f;
+            body.Friction = 0f;
+            body.LinearDamping = 0f;
+            setPosition();
+            body.LinearVelocity = new Vector2(xVelocity * speedRatio, yVelocity * speedRatio);
         }
     }
 }

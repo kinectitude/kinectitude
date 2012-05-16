@@ -6,19 +6,25 @@ using SlimDX.Direct2D;
 using System.Drawing;
 using ColorConverter = System.Windows.Media.ColorConverter;
 using Kinectitude.Core.Base;
+using Kinectitude.Core.Components;
+using Kinectitude.Core.Exceptions;
+using System.Collections.Generic;
 
 namespace Kinectitude.Render
 {
     [Plugin("Render Component", "")]
     public class RenderComponent : Component, IRender
     {
-        private readonly double width;
-        private readonly double height;
-        private readonly bool circular;
+        private bool circular;
         private Color4 renderColor;
 
+        private TransformComponent tc;
+
+        [Plugin("Shape", "")]
+        public string Shape { get; set; }
+
         [Plugin("Fill Color", "")]
-        public string Fillcolor
+        public string FillColor
         {
             set 
             {
@@ -27,32 +33,7 @@ namespace Kinectitude.Render
             } 
         }
 
-        private double X
-        {
-            get { return double.Parse(Entity["x"]); }
-        }
-
-        private double Y
-        {
-            get { return double.Parse(Entity["y"]); }
-        }
-
-        public RenderComponent(Entity entity) : base(entity)
-        {
-            if (null != Entity["radius"])
-            {
-                double radius = double.Parse(Entity["radius"]);
-                width = radius * 2;
-                height = radius * 2;
-                circular = true;
-            }
-            else
-            {
-                width = double.Parse(Entity["width"]);
-                height = double.Parse(Entity["height"]);
-                circular = false;
-            }
-        }
+        public RenderComponent(Entity entity) : base(entity) { }
 
         public override Type ManagerType()
         {
@@ -68,17 +49,30 @@ namespace Kinectitude.Render
             {
                 Ellipse ellipse = new Ellipse()
                 {
-                    Center = new System.Drawing.PointF((float)X, (float)Y),
-                    RadiusX = (float)width / 2.0f,
-                    RadiusY = (float)height / 2.0f
+                    Center = new System.Drawing.PointF(tc.X, tc.Y),
+                    RadiusX = tc.Width,
+                    RadiusY = tc.Height
                 };
                 renderTarget.FillEllipse(brush, ellipse);
             }
             else
             {
-                RectangleF rectangle = new RectangleF((float)X - (float)width / 2.0f, (float)Y - (float)height / 2.0f, (float)width, (float)height);
+                RectangleF rectangle =
+                    new RectangleF(tc.X - tc.Width / 2.0f, tc.Y - tc.Height / 2.0f, tc.Width, tc.Height);
                 renderTarget.FillRectangle(brush, rectangle);
             }
+        }
+
+        public override void Ready()
+        {
+            List<Type> missing = new List<Type>();
+            tc = Entity.GetComponent(typeof(TransformComponent)) as TransformComponent;
+            if (null == tc)
+            {
+                missing.Add(typeof(TransformComponent));
+                throw new MissingRequirementsException(this, missing);
+            }
+            circular = "circle" == Shape;
         }
     }
 }

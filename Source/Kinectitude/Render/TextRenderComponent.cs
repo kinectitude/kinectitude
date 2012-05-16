@@ -7,6 +7,9 @@ using SlimDX.DirectWrite;
 using System.Drawing;
 using FontStyle = SlimDX.DirectWrite.FontStyle;
 using Kinectitude.Core.Base;
+using Kinectitude.Core.Components;
+using System.Collections.Generic;
+using Kinectitude.Core.Exceptions;
 
 namespace Kinectitude.Render
 {
@@ -15,6 +18,7 @@ namespace Kinectitude.Render
     {
         private Color4 renderColor;
         private TextFormat textFormat;
+        private TransformComponent tc;
 
         [Plugin("Value", "")]
         public string Value
@@ -24,23 +28,13 @@ namespace Kinectitude.Render
         }
 
         [Plugin("Font Color", "")]
-        public string Fontcolor
+        public string FontColor
         {
             set
             {
                 System.Windows.Media.Color color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(value);
                 renderColor = new Color4((float)color.R / 255.0f, (float)color.G / 255.0f, (float)color.B / 255.0f);
             }
-        }
-
-        private double X
-        {
-            get { return double.Parse(Entity["x"]); }
-        }
-
-        private double Y
-        {
-            get { return double.Parse(Entity["y"]); }
         }
 
         public TextRenderComponent(Entity entity) : base(entity) { }
@@ -62,7 +56,19 @@ namespace Kinectitude.Render
 
         public void Render(SlimDX.Direct2D.RenderTarget renderTarget)
         {
-            renderTarget.DrawText(Value, textFormat, new RectangleF((float)X, (float)Y, 0.0f, 0.0f), new SlimDX.Direct2D.SolidColorBrush(renderTarget, renderColor));
+            renderTarget.DrawText(Value, textFormat, new RectangleF(tc.X, tc.Y, 0.0f, 0.0f), 
+                new SlimDX.Direct2D.SolidColorBrush(renderTarget, renderColor));
+        }
+
+        public override void Ready()
+        {
+            tc = Entity.GetComponent(typeof(TransformComponent)) as TransformComponent;
+            if (null == tc)
+            {
+                List<Type> missing = new List<Type>();
+                missing.Add(typeof(TransformComponent));
+                throw new MissingRequirementsException(this, missing);
+            }
         }
     }
 }

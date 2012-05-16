@@ -12,7 +12,6 @@ namespace Kinectitude.Kinect
         private const int scount = 6;
         private static Skeleton[] allSkeletons = new Skeleton[scount];
 
-
         public KinectManager(Game g) : base(g) 
         {
             enable();
@@ -34,13 +33,6 @@ namespace Kinectitude.Kinect
                 kinectDriver.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
                 kinectDriver.AllFramesReady += sensorReady;
                 kinectDriver.Start();
-            }
-        }
-        ~KinectManager()
-        {
-            if (null != kinectDriver)
-            {
-                kinectDriver.Stop();
             }
         }
 
@@ -93,7 +85,7 @@ namespace Kinectitude.Kinect
             }
         }
 
-        public override void OnUpdate(double t)
+        public override void OnUpdate(float t)
         {
             if (null == kinectDriver && 0 != KinectSensor.KinectSensors.Count)
             {
@@ -104,6 +96,5 @@ namespace Kinectitude.Kinect
                 kc.OnUpdate(t);
             }
         }
-
     }
 }

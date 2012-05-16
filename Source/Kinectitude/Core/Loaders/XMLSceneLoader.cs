@@ -105,6 +105,7 @@ namespace Kinectitude.Core.Loaders
                         }
                     }
                     entityParse(parsedNode, entity);
+                    entity.Ready();
                 }
             }            
         }

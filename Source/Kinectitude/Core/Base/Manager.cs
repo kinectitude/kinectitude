@@ -35,7 +35,7 @@ namespace Kinectitude.Core.Base
             children = new List<T>();
         }
 
-        public virtual void OnUpdate(double frameDelta) { }
+        public virtual void OnUpdate(float frameDelta) { }
 
         public void Stop()
         {
