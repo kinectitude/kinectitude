@@ -30,7 +30,8 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FarseerPhysics">
+    <Reference Include="FarseerPhysics, Version=3.3.4512.25344, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Libraries\FarseerPhysics.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
