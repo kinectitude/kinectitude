@@ -11,7 +11,7 @@ namespace Kinectitude.Core.Base
     public class Manager<T> : IManager where T : IUpdateable
     {
         protected readonly List<T> children;
-        protected readonly Game game;
+        protected Game Game { get;  private set; }
         protected bool running;
 
         public void Add(T item)
@@ -31,7 +31,7 @@ namespace Kinectitude.Core.Base
 
         public Manager(Game game)
         {
-            this.game = game;
+            Game = game;
             children = new List<T>();
         }
 
@@ -53,8 +53,7 @@ namespace Kinectitude.Core.Base
                 OnStart();
             }
         }
-
-        public virtual void OnStart() { }
-        public virtual void OnStop() { }
+        protected virtual void OnStart() { }
+        protected virtual void OnStop() { }
     }
 }

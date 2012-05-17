@@ -33,7 +33,7 @@ namespace Kinectitude.Render
             } 
         }
 
-        public RenderComponent(Entity entity) : base(entity) { }
+        public RenderComponent() : base() { }
 
         public override Type ManagerType()
         {
@@ -70,7 +70,7 @@ namespace Kinectitude.Render
             if (null == tc)
             {
                 missing.Add(typeof(TransformComponent));
-                throw new MissingRequirementsException(this, missing);
+                throw MissingRequirementsException.MissingRequirement(this, missing);
             }
             circular = "circle" == Shape;
         }

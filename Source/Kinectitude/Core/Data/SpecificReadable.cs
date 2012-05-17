@@ -7,7 +7,7 @@ namespace Kinectitude.Core.Data
 {
     public abstract class SpecificReadable
     {
-        internal static SpecificReadable CreateSpecificReadable(string value, Event evt, SceneLoader sceneLoader)
+        internal static SpecificReadable CreateSpecificReadable(string value, Event evt, Scene scene)
         {
             double d;
             if (!value.Contains('.') || double.TryParse(value, out d))
@@ -21,10 +21,10 @@ namespace Kinectitude.Core.Data
                 {
                     throw new ArgumentException("Can't parse " + value);
                 }
-                return new SpecificContainerReadable(vals[1], ReadableData.CreateReadableData(value, evt, sceneLoader));
+                return new SpecificContainerReadable(vals[1], ReadableData.CreateReadableData(value, evt, scene));
             }
             Entity entity = evt.Entity;
-            return new SpecificContainerReadable(vals[1], ReadableData.CreateReadableData(vals[0], evt, sceneLoader));
+            return new SpecificContainerReadable(vals[1], ReadableData.CreateReadableData(vals[0], evt, scene));
         }
 
         public abstract string GetValue();

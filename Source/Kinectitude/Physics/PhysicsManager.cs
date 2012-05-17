@@ -12,7 +12,7 @@ namespace Kinectitude.Physics
 
         public World PhysicsWorld { get; private set; }
 
-        public PhysicsManager(Game g) : base(g)
+        public PhysicsManager(Game game) : base(game)
         {
             PhysicsWorld = new World(Vector2.Zero);
             PhysicsWorld.ClearForces();

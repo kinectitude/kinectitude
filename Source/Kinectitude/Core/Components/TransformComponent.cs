@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Managers;
+using Kinectitude.Attributes;
 
 public delegate void ChangeDelegate();
 
 namespace Kinectitude.Core.Components
 {
+    [Plugin("Transform Component", "")]
     public class TransformComponent:Component
     {
         private List<ChangeDelegate> notifyXUpdate = new List<ChangeDelegate>();
@@ -19,6 +21,7 @@ namespace Kinectitude.Core.Components
         private Dictionary<ChangeDelegate, Component> creators = new Dictionary<ChangeDelegate, Component>();
 
         private float x;
+        [Plugin("X Position", "")]
         public float X
         {
             get
@@ -47,6 +50,7 @@ namespace Kinectitude.Core.Components
         }
 
         private float y;
+        [Plugin("Y Position", "")]
         public float Y
         {
             get
@@ -75,6 +79,7 @@ namespace Kinectitude.Core.Components
         }
 
         private int width;
+        [Plugin("Width", "")]
         public int Width
         {
             get
@@ -103,6 +108,7 @@ namespace Kinectitude.Core.Components
         }
 
         private int height;
+        [Plugin("Height", "")]
         public int Height
         {
             get
@@ -130,7 +136,7 @@ namespace Kinectitude.Core.Components
             }
         }
 
-        public TransformComponent(Entity entity) : base(entity) { }
+        public TransformComponent() : base() { }
 
         public override Type ManagerType()
         {

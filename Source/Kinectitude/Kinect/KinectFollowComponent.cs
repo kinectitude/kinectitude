@@ -144,7 +144,7 @@ namespace Kinectitude.Kinect
             }
         }
 
-        public KinectFollowComponent(Entity entity) : base(entity) { }
+        public KinectFollowComponent() : base() { }
 
         public void UpdatePosition(float x, float y)
         {
@@ -198,7 +198,7 @@ namespace Kinectitude.Kinect
             {
                 List<Type> missing = new List<Type>();
                 missing.Add(typeof(TransformComponent));
-                throw new MissingRequirementsException(this, missing);
+                throw MissingRequirementsException.MissingRequirement(this, missing);
             }
             physics = Entity.GetComponent(typeof(IPhysicsComponent)) as IPhysicsComponent;
         }

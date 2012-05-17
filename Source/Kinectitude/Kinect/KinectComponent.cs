@@ -6,7 +6,7 @@ namespace Kinectitude.Kinect
 {
     public abstract class KinectComponent : Component
     {
-        protected KinectComponent(Entity entity) : base(entity) { }
+        protected KinectComponent() : base() { }
         override public Type ManagerType() { return typeof(KinectManager); }
     }
 }

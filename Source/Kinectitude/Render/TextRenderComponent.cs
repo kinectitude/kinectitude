@@ -37,7 +37,7 @@ namespace Kinectitude.Render
             }
         }
 
-        public TextRenderComponent(Entity entity) : base(entity) { }
+        public TextRenderComponent() : base() { }
 
         public void OnSetTextAction(SetTextAction action)
         {
@@ -67,7 +67,7 @@ namespace Kinectitude.Render
             {
                 List<Type> missing = new List<Type>();
                 missing.Add(typeof(TransformComponent));
-                throw new MissingRequirementsException(this, missing);
+                throw MissingRequirementsException.MissingRequirement(this, missing);
             }
         }
     }

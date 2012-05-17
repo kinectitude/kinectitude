@@ -8,9 +8,8 @@ namespace Kinectitude.Core.Exceptions
 {
     public class MissingRequirementsException : Exception
     {
-        public string errorMessage;
 
-        private void creationHelper(string name, Entity entity, List<Type> missingTypes)
+        private static string creationHelper(string name, Entity entity, List<Type> missingTypes)
         {
             string identity = null != entity.Name ? entity.Name : "Entity " + entity.Id.ToString();
             StringBuilder sb = new StringBuilder();
@@ -20,17 +19,21 @@ namespace Kinectitude.Core.Exceptions
                 sb.Append(missingType.FullName).Append("\n");
             }
             sb.Append("required by ").Append(name);
-            errorMessage = sb.ToString();
+            return sb.ToString();
         }
 
-        public MissingRequirementsException(Component component, List<Type> missingTypes)
+        private MissingRequirementsException(string message) : base(message) { }
+
+        public static MissingRequirementsException MissingRequirement(Component component, List<Type> missingTypes)
         {
-            creationHelper(component.GetType().FullName, component.Entity, missingTypes);
+            return new MissingRequirementsException(
+                creationHelper(component.GetType().FullName, component.Entity, missingTypes));
         }
 
-        public MissingRequirementsException(Event Event, List<Type> missingTypes)
+        public static MissingRequirementsException MissingRequirement(Event Event, List<Type> missingTypes)
         {
-            creationHelper(Event.GetType().FullName, Event.Entity, missingTypes);
+            return new MissingRequirementsException(
+                creationHelper(Event.GetType().FullName, Event.Entity, missingTypes));
         }
     }
 }

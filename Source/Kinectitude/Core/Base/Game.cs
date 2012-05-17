@@ -55,15 +55,6 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        internal Type GetType(string plugin)
-        {
-            if (!gameLoader.TypesDict.ContainsKey(plugin))
-            {
-                MessageBox.Show(plugin + " was not loaded!");
-            }
-            return gameLoader.TypesDict[plugin];
-        }
-
         public void AddService(object obj)
         {
             gameLoader.Services[obj.GetType()] = obj;
@@ -74,20 +65,7 @@ namespace Kinectitude.Core.Base
             return gameLoader.Services[typeof(T)] as T;
         }
 
-        internal object CreateFromReflection(string name, Type[] constructors, object[] argVals)
-        {
-            Type componentType = GetType(name);
-            return CreateFromReflection(componentType, constructors, argVals);
-        }
-
-        internal object CreateFromReflection(Type create,  Type[] constructors, object[] argVals)
-        {
-            ConstructorInfo ci = create.GetConstructor(constructors);
-            object created = ci.Invoke(argVals);
-            return created;
-        }
-
-        internal bool SetParam(object obj, string val, string param, Event e = null, SceneLoader s = null)
+        /*internal bool SetParam(object obj, string val, string param, Event e = null, Scene s = null)
         {
             Type componentType = obj.GetType();
             MethodInfo mi;
@@ -172,7 +150,7 @@ namespace Kinectitude.Core.Base
                 return false;
             }
             return true;
-        }
+        }*/
 
         internal void RunScene(string name)
         {

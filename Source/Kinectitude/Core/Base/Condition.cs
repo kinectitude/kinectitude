@@ -8,7 +8,7 @@ namespace Kinectitude.Core.Base
 {
     internal abstract class Condition : Action
     {
-        private static List<Condition> conditionBuilder(string[] conditionStrings, Event e, SceneLoader s)
+        private static List<Condition> conditionBuilder(string[] conditionStrings, Event e, Scene s)
         {
             List<Condition> conditions = new List<Condition>();
             foreach (string condition in conditionStrings)
@@ -18,30 +18,30 @@ namespace Kinectitude.Core.Base
             return conditions;
         }
 
-        internal static Condition CreateCondition(string value, Event evt, SceneLoader sceneLoader)
+        internal static Condition CreateCondition(string value, Event evt, Scene scene)
         {
             value = value.Trim();
             //always and before or, this is like C/C++/C#/Java
             if (value.Contains(" and ") && value.Contains(" or "))
             {
                 int orLoc = value.LastIndexOf(" or ");
-                Condition firstPart = Condition.CreateCondition(value.Substring(0, orLoc), evt, sceneLoader);
-                Condition secondPart = Condition.CreateCondition(value.Substring(orLoc + 4), evt, sceneLoader);
+                Condition firstPart = Condition.CreateCondition(value.Substring(0, orLoc), evt, scene);
+                Condition secondPart = Condition.CreateCondition(value.Substring(orLoc + 4), evt, scene);
                 return new OrCondition(new List<Condition> { firstPart, secondPart }, evt);
             }
             else if (value.Contains(" and "))
             {
                 string[] conditionStrs = Regex.Split(value, " and ");
-                return new AndCondition(conditionBuilder(conditionStrs, evt, sceneLoader), evt);
+                return new AndCondition(conditionBuilder(conditionStrs, evt, scene), evt);
             }
             else if (value.Contains(" or "))
             {
                 string[] conditionStrs = Regex.Split(value, " or ");
-                return new OrCondition(conditionBuilder(conditionStrs, evt, sceneLoader), evt);
+                return new OrCondition(conditionBuilder(conditionStrs, evt, scene), evt);
             }
             else
             {
-                return new SimpleCondition(SpecificReadable.CreateSpecificReadable(value, evt, sceneLoader), evt);
+                return new SimpleCondition(SpecificReadable.CreateSpecificReadable(value, evt, scene), evt);
             }
         }
         

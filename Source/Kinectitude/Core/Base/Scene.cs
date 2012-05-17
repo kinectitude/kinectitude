@@ -107,38 +107,47 @@ namespace Kinectitude.Core.Base
 
         internal void CreateComponent(Entity entity, string stringType, List<Tuple<string, string>> values)
         {
-            Type componentType = Game.GetType(stringType);
-            Component created = entity.GetComponent(componentType);
-
-            if (null == created)
+            Component created = ClassFactory.Create<Component>(stringType);
+            created.Entity = entity;
+            entity.AddComponent(created);
+            Type manager = created.ManagerType();
+            IManager parent = null;
+            if (!managersDictionary.ContainsKey(manager))
             {
+                parent = ClassFactory.Create<IManager>(manager, Game);
+                managers.Add(parent);
+                managersDictionary.Add(manager, parent);
+            }
+            else
+            {
+                parent = managersDictionary[manager];
+            }
+                
+            foreach (Tuple<string, string> tuple in values)
+            {
+                ClassFactory.SetParam(created, tuple.Item1, tuple.Item2, this, null, entity);
+            }
+            //TODO make this better?
+            MethodInfo mi = manager.GetMethod("Add");
+            object[] argVal = { created };
+            mi.Invoke(parent, argVal);
+        }
 
-                Type[] constructors = { typeof(Entity) };
-                object[] argVals = { entity };
-                created = (Component)Game.CreateFromReflection(stringType, constructors, argVals);
-                entity.AddComponent(created);
-                Type manager = created.ManagerType();
-                IManager parent = null;
-                if (!managersDictionary.ContainsKey(manager))
-                {
-                    constructors = new Type[] { typeof(Game) };
-                    argVals = new object[] { Game };
-                    parent = (IManager)Game.CreateFromReflection(manager, constructors, argVals);
-                    managers.Add(parent);
-                    managersDictionary.Add(manager, parent);
-                }
-                else
-                {
-                    parent = managersDictionary[manager];
-                }
-
-                foreach (Tuple<string, string> tuple in values)
-                {
-                    Game.SetParam(created, tuple.Item1, tuple.Item2);
-                }
-                MethodInfo mi = manager.GetMethod("Add");
-                object[] argVal = { created };
-                mi.Invoke(parent, argVal);
+        internal void CreateAction(Event evt, string type, List<Tuple<string, string>> attribs, Condition cond = null)
+        {
+            Action action = ClassFactory.Create<Action>(type);
+            action.Event = evt;
+            foreach (Tuple<string, string> attrib in attribs)
+            {
+                ClassFactory.SetParam(action, attrib.Item1, attrib.Item2, this, evt, evt.Entity);
+            }
+            if (null == cond)
+            {
+                evt.AddAction(action);
+            }
+            else
+            {
+                cond.AddAction(action);
             }
         }
 

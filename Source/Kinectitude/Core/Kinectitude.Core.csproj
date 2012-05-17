@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Actions\SetPositionAction.cs" />
     <Compile Include="Base\Action.cs" />
+    <Compile Include="Base\ClassFactory.cs" />
     <Compile Include="Components\TransformComponent.cs" />
     <Compile Include="Conditions\AndCondition.cs" />
     <Compile Include="Events\AttributeChangesEvent.cs" />
@@ -61,6 +62,7 @@
     <Compile Include="Actions\FireTriggerAction.cs" />
     <Compile Include="Base\Game.cs" />
     <Compile Include="Events\SceneStartsEvent.cs" />
+    <Compile Include="Exceptions\InvalidAttributeException.cs" />
     <Compile Include="Exceptions\MissingRequirementsException.cs" />
     <Compile Include="Interfaces\IPhysicsComponent.cs" />
     <Compile Include="Loaders\GameLoader.cs" />

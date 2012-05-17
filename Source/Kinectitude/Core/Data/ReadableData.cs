@@ -7,7 +7,7 @@ namespace Kinectitude.Core.Data
 {
     public abstract class ReadableData
     {
-        internal static ReadableData CreateReadableData(string value, Event evt, SceneLoader sceneLoader)
+        internal static ReadableData CreateReadableData(string value, Event evt, Scene scene)
         {
             if (value.Contains(','))
             {
@@ -15,7 +15,7 @@ namespace Kinectitude.Core.Data
                 string[] readables = value.Split(',');
                 foreach (string readable in readables)
                 {
-                    readableList.Add(CreateReadableData(readable, evt, sceneLoader));
+                    readableList.Add(CreateReadableData(readable, evt, scene));
                 }
                 return new MultiReader(readableList);
             }
@@ -28,20 +28,20 @@ namespace Kinectitude.Core.Data
             if ('$' == value[0])
             {
                 value = value.Substring(1);
-                return new PrototypeReader(sceneLoader.IsType[value]);
+                return new PrototypeReader(scene.IsType[value]);
             }
             if ('#' == value[0])
             {
                 value = value.Substring(1);
-                return new PrototypeReader(sceneLoader.IsExactType[value]);
+                return new PrototypeReader(scene.IsExactType[value]);
             }
             if ("game" == value)
             {
-                return new ConstantReadableData(sceneLoader.Game);
+                return new ConstantReadableData(scene.Game);
             }
             if ("scene" == value)
             {
-                return new ConstantReadableData(sceneLoader.Scene);
+                return new ConstantReadableData(scene);
             }
             if ("this" == value)
             {

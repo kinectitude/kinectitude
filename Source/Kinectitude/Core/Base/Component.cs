@@ -5,12 +5,9 @@ namespace Kinectitude.Core.Base
 
     public abstract class Component : IUpdateable
     {
-        public Entity Entity { get; private set; }
+        public Entity Entity { get; internal set; }
 
-        public Component(Entity entity)
-        {
-            Entity = entity;
-        }
+        public Component() { }
 
         public abstract Type ManagerType();
 

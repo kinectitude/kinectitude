@@ -7,16 +7,16 @@ namespace Kinectitude.Render
 {    
     public class RenderManager : Manager<IRender>
     {
-        private readonly TextFormat textFormat;
+        private TextFormat textFormat;
 
         public TextFormat TextFormat
         {
             get { return textFormat; }
         }
-        
-        public RenderManager(Game game) : base(game)
+
+        public RenderManager(Game game): base(game)
         {
-            SlimDX.DirectWrite.Factory factory = game.GetService<SlimDX.DirectWrite.Factory>();
+            SlimDX.DirectWrite.Factory factory = Game.GetService<SlimDX.DirectWrite.Factory>();
             textFormat = factory.CreateTextFormat("Arial", FontWeight.Regular, FontStyle.Normal, FontStretch.Normal, 36.0f, "en-us");
             textFormat.FlowDirection = FlowDirection.TopToBottom;
             textFormat.IncrementalTabStop = textFormat.FontSize * 4.0f;
@@ -39,14 +39,14 @@ namespace Kinectitude.Render
             }
         }
 
-        public override void OnStart()
+        protected override void OnStart()
         {
-            game.OnRender = new RenderDelegate(OnRender);
+            Game.OnRender = new RenderDelegate(OnRender);
         }
 
-        public override void OnStop()
+        protected override void OnStop()
         {
-            game.OnRender = null;
+            Game.OnRender = null;
         }
     }
 }

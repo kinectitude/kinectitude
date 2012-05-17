@@ -100,7 +100,7 @@ namespace Kinectitude.Physics
             {
                 List<Type> missing = new List<Type>();
                 missing.Add(typeof(PhysicsComponent));
-                throw new MissingRequirementsException(this, missing);
+                throw MissingRequirementsException.MissingRequirement(this, missing);
             }
             pc.AddCrossLineEvent(this);
         }

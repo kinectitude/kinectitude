@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <game name="pong" Width="800" Height="600">
 
-  <define part="KinectComponent" fullName="Kinectitude.Kinect.KinectComponent" file="Kinectitude.Kinect.dll" />
   <define part="KinectFollowComponent" fullName="Kinectitude.Kinect.KinectFollowComponent" file="Kinectitude.Kinect.dll" />
 
   <define part="PhysicsComponent" fullName="Kinectitude.Physics.PhysicsComponent" file="Kinectitude.Physics.dll" />

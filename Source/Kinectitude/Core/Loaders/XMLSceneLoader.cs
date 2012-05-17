@@ -135,7 +135,7 @@ namespace Kinectitude.Core.Loaders
                             }
                             string value = attrib.Value;
                             string param = attrib.Name.ToString();
-                            Tuple<string, string> t = new Tuple<string,string>(value, param);
+                            Tuple<string, string> t = new Tuple<string,string>(param, value);
                             values.Add(t);
                         }
                         Scene.CreateComponent(entity, stringType, values);
@@ -153,28 +153,18 @@ namespace Kinectitude.Core.Loaders
             {
                 if (action.Name == "action")
                 {
-                    Action actionObj =
-                        (Action)game.CreateFromReflection(action.Attribute("type").Value, 
-                        new Type[] { },new object[] { });
-                    actionObj.Event = evt;
-                    if (null == cond)
-                    {
-                        evt.AddAction(actionObj);
-                    }
-                    else
-                    {
-                        cond.AddAction(actionObj);
-                    }
+
+                    List<Tuple<string, string>> values = new List<Tuple<string,string>>();
+
                     foreach (XAttribute attrib in action.Attributes())
                     {
                         if ("type" == attrib.Name.ToString())
                         {
                             continue;
                         }
-                        string value = attrib.Value;
-                        string param = attrib.Name.ToString();
-                        game.SetParam(actionObj, value, param, evt, this);
+                        values.Add(new Tuple<string, string>(attrib.Name.ToString(), attrib.Value));
                     }
+                    Scene.CreateAction(evt, action.Attribute("type").Value, values, cond);
                 }
                 else if (action.Name == "condition")
                 {
@@ -183,11 +173,9 @@ namespace Kinectitude.Core.Loaders
             }
         }
 
-        //merges src and dst with results in dst.  dst is returned
         private Event createEvent(Game game, XElement node)
         {
-            Event evt = (Event)game.CreateFromReflection((string)node.Attribute("type"),
-                new Type[] { }, new object[] { });
+            Event evt = ClassFactory.Create<Event>((string)node.Attribute("type"));
 
             foreach (XAttribute attrib in node.Attributes())
             {
@@ -197,7 +185,7 @@ namespace Kinectitude.Core.Loaders
                 }
                 string value = attrib.Value;
                 string param = attrib.Name.ToString();
-                game.SetParam(evt, value, param);
+                ClassFactory.SetParam(evt, param, value, Scene, evt, evt.Entity);
             }
             addActions(game, node, evt);
             return evt;
@@ -205,7 +193,7 @@ namespace Kinectitude.Core.Loaders
 
         private Condition createCondition(Game game, Event e, XElement node)
         {
-            Condition c = Condition.CreateCondition((string)node.Attribute("if"), e, this);
+            Condition c = Condition.CreateCondition((string)node.Attribute("if"), e, Scene);
             addActions(game, node, e, c);
             return c;
         }

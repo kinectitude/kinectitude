@@ -63,7 +63,7 @@ namespace Kinectitude.Physics
 
         override public Type ManagerType(){return typeof(PhysicsManager);}
 
-        public PhysicsComponent(Entity entity) : base(entity) { }
+        public PhysicsComponent() : base() { }
 
         public override void OnUpdate(float t)
         {
@@ -159,7 +159,7 @@ namespace Kinectitude.Physics
             if (null == tc)
             {
                 missing.Add(typeof(TransformComponent));
-                throw new MissingRequirementsException(this, missing);
+                throw MissingRequirementsException.MissingRequirement(this, missing);
             }
             tc.SubscribeToX(this, setPosition);
             tc.SubscribeToY(this, setPosition);

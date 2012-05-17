@@ -12,7 +12,7 @@ namespace Kinectitude.Kinect
         private const int scount = 6;
         private static Skeleton[] allSkeletons = new Skeleton[scount];
 
-        public KinectManager(Game g) : base(g) 
+        public KinectManager(Game game) : base(game) 
         {
             enable();
         }

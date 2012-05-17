@@ -16,7 +16,6 @@ namespace Kinectitude.Core.Loaders
         internal Dictionary<string, MethodInfo> MemberSetters { get; private set; }
         internal Dictionary<Type, object> Services { get; private set; }
         internal Dictionary<string, Type> MemberType { get; private set; }
-        internal Dictionary<string, Type> TypesDict { get; private set; }
         public Game Game { get; protected set; }
 
         /**
@@ -34,22 +33,9 @@ namespace Kinectitude.Core.Loaders
 
         protected GameLoader()
         {
-            TypesDict = new Dictionary<string, Type>();
             MemberType = new Dictionary<string, Type>();
             Services = new Dictionary<Type, object>();
             MemberSetters = new Dictionary<string, MethodInfo>();
-            TypesDict["IncrementAction"] = typeof(IncrementAction);
-            TypesDict["AttributeChangesEvent"] = typeof(AttributeChangesEvent);
-            TypesDict["AttributeEqualsEvent"] = typeof(AttributeEqualsEvent);
-            TypesDict["SetAttributeAction"] = typeof(SetAttributeAction);
-            TypesDict["PushSceneAction"] = typeof(PushSceneAction);
-            TypesDict["PopSceneAction"] = typeof(PopSceneAction);
-            TypesDict["ChangeSceneAction"] = typeof(ChangeSceneAction);
-            TypesDict["SceneStartsEvent"] = typeof(SceneStartsEvent);
-            TypesDict["FireTriggerAction"] = typeof(FireTriggerAction);
-            TypesDict["TriggerOccursEvent"] = typeof(TriggerOccursEvent);
-            TypesDict["TransformComponent"] = typeof(TransformComponent);
-            TypesDict["SetPositionAction"] = typeof(SetPositionAction);
             Game = new Game(this);
         }
 
@@ -72,8 +58,7 @@ namespace Kinectitude.Core.Loaders
             {
                 assembly = loadedFiles[file];
             }
-            TypesDict[named] =
-                assembly.GetType(fullName);
+            ClassFactory.RegisterType(named, assembly.GetType(fullName));
         }
     }
 }
