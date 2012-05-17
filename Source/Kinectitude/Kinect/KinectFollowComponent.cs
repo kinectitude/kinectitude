@@ -1,13 +1,11 @@
-﻿using Microsoft.Kinect;
-using System.Xml;
-using Kinectitude.Core;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using Kinectitude.Attributes;
 using Kinectitude.Core.Base;
-using Kinectitude.Core.Interfaces;
 using Kinectitude.Core.Components;
 using Kinectitude.Core.Exceptions;
-using System.Collections.Generic;
+using Kinectitude.Core.Interfaces;
+using Microsoft.Kinect;
 
 namespace Kinectitude.Kinect
 {

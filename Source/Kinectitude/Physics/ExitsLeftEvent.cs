@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using Kinectitude.Core;
-using System.Xml;
-using Kinectitude.Attributes;
+﻿using Kinectitude.Attributes;
 
 namespace Kinectitude.Physics
 {

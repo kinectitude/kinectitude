@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Kinectitude.Attributes;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Managers;
-using Kinectitude.Attributes;
 
 public delegate void ChangeDelegate();
 

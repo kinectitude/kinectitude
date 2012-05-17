@@ -1,8 +1,7 @@
 ﻿using System.Linq;
-using Kinectitude.Core;
-using Microsoft.Kinect;
 using Coding4Fun.Kinect.Wpf;
 using Kinectitude.Core.Base;
+using Microsoft.Kinect;
 
 namespace Kinectitude.Kinect
 {

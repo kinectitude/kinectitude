@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows;
-using System.Xml;
-using Kinectitude.Core;
-using Kinectitude.Core.Interfaces;
-using Kinectitude.Core.Components;
-using Kinectitude.Attributes;
-using Kinectitude.Core.Base;
 using FarseerPhysics.Dynamics;
 using FarseerPhysics.Factories;
-using Microsoft.Xna.Framework;
-using FarseerPhysics.Common;
+using Kinectitude.Attributes;
+using Kinectitude.Core.Base;
+using Kinectitude.Core.Components;
 using Kinectitude.Core.Exceptions;
+using Kinectitude.Core.Interfaces;
+using Microsoft.Xna.Framework;
 
 namespace Kinectitude.Physics
 {

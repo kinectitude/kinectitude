@@ -1,12 +1,13 @@
-﻿using Kinectitude.Core;
+﻿using Kinectitude.Core.Base;
 using SlimDX.Direct2D;
 using SlimDX.DirectWrite;
-using Kinectitude.Core.Base;
+using System;
 
 namespace Kinectitude.Render
 {    
     public class RenderManager : Manager<IRender>
     {
+
         private TextFormat textFormat;
 
         public TextFormat TextFormat
@@ -41,12 +42,13 @@ namespace Kinectitude.Render
 
         protected override void OnStart()
         {
-            Game.OnRender = new RenderDelegate(OnRender);
+            Action<RenderTarget> onRender = OnRender;
+            Game.AddService(onRender);
         }
 
         protected override void OnStop()
         {
-            Game.OnRender = null;
+            Game.RemoveService(typeof(Action<RenderTarget>));
         }
     }
 }

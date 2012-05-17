@@ -1,9 +1,6 @@
-﻿using Kinectitude.Core;
+﻿using FarseerPhysics.Dynamics;
 using Kinectitude.Core.Base;
-using Kinectitude.Core.Interfaces;
-using FarseerPhysics.Dynamics;
 using Microsoft.Xna.Framework;
-using System;
 
 namespace Kinectitude.Physics
 {

@@ -1,7 +1,5 @@
-﻿using System.Windows;
-using System.Windows.Media;
+﻿using Kinectitude.Core.Base;
 using SlimDX.Direct2D;
-using Kinectitude.Core.Base;
 
 namespace Kinectitude.Render
 {

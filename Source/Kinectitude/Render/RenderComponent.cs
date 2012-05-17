@@ -1,14 +1,13 @@
 ﻿using System;
-using Kinectitude.Core;
-using Kinectitude.Attributes;
-using SlimDX;
-using SlimDX.Direct2D;
+using System.Collections.Generic;
 using System.Drawing;
-using ColorConverter = System.Windows.Media.ColorConverter;
+using Kinectitude.Attributes;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Components;
 using Kinectitude.Core.Exceptions;
-using System.Collections.Generic;
+using SlimDX;
+using SlimDX.Direct2D;
+using ColorConverter = System.Windows.Media.ColorConverter;
 
 namespace Kinectitude.Render
 {

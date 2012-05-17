@@ -1,15 +1,13 @@
 ﻿using System;
-using SlimDX.Windows;
 using System.Drawing;
 using System.Windows.Forms;
-using SlimDX.Direct2D;
-using SlimDX;
-using SlimDX.DirectWrite;
-using FontStyle = SlimDX.DirectWrite.FontStyle;
-using Kinectitude.Core;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Loaders;
-using System.Diagnostics;
+using SlimDX;
+using SlimDX.Direct2D;
+using SlimDX.DirectWrite;
+using SlimDX.Windows;
+using FontStyle = SlimDX.DirectWrite.FontStyle;
 
 namespace Kinectitude.Player
 {
@@ -116,9 +114,11 @@ namespace Kinectitude.Player
             renderTarget.Transform = Matrix3x2.Identity;
             renderTarget.Clear(clearColor);
 
-            if (null != game.OnRender)
+            Action<RenderTarget> onRender = game.GetService<Action<RenderTarget>>();
+
+            if (null != onRender)
             {
-                game.OnRender(renderTarget);
+                onRender(renderTarget);
             }
 
             RectangleF layoutRect = form.ClientRectangle;

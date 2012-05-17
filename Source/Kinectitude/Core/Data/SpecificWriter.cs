@@ -1,5 +1,5 @@
-﻿
-using Kinectitude.Core.Base;
+﻿using Kinectitude.Core.Base;
+
 namespace Kinectitude.Core.Data
 {
     public class SpecificWriter

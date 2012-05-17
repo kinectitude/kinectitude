@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using Kinectitude.Core.Base;
-using Action = Kinectitude.Core.Base.Action;
 
 namespace Kinectitude.Core.Loaders
 {

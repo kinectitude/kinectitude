@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.IO;
+using System.Reflection;
 using Kinectitude.Core.Base;
-using Kinectitude.Core.Actions;
-using Kinectitude.Core.Events;
-using Kinectitude.Core.Components;
 
 namespace Kinectitude.Core.Loaders
 {

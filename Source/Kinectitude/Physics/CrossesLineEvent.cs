@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Kinectitude.Core;
 using Kinectitude.Attributes;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Exceptions;

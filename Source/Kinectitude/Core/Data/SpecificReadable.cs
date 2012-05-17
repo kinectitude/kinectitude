@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Kinectitude.Core.Base;
-using Kinectitude.Core.Loaders;
 
 namespace Kinectitude.Core.Data
 {

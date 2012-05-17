@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Windows.Media;
-using Kinectitude.Core;
-using Kinectitude.Attributes;
-using SlimDX;
-using SlimDX.DirectWrite;
+using System.Collections.Generic;
 using System.Drawing;
-using FontStyle = SlimDX.DirectWrite.FontStyle;
+using Kinectitude.Attributes;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Components;
-using System.Collections.Generic;
 using Kinectitude.Core.Exceptions;
+using SlimDX;
+using SlimDX.DirectWrite;
 
 namespace Kinectitude.Render
 {

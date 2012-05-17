@@ -1,22 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows;
-using System.Reflection;
-using System.Linq;
-using SlimDX.Direct2D;
 using Kinectitude.Core.Loaders;
-using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Base
 {
-    public delegate void RenderDelegate(RenderTarget renderTarget);
 
     public class Game : DataContainer, IUpdateable
     {
         private readonly Stack<Scene> currentScenes;
         private readonly GameLoader gameLoader;
-
-        public RenderDelegate OnRender;
 
         public new string Name
         {
@@ -60,97 +52,18 @@ namespace Kinectitude.Core.Base
             gameLoader.Services[obj.GetType()] = obj;
         }
 
+        public void RemoveService(Type remove)
+        {
+            if (null != gameLoader.Services.ContainsKey(remove))
+            {
+                gameLoader.Services.Remove(remove);
+            }
+        }
+
         public T GetService<T>() where T : class
         {
             return gameLoader.Services[typeof(T)] as T;
         }
-
-        /*internal bool SetParam(object obj, string val, string param, Event e = null, Scene s = null)
-        {
-            Type componentType = obj.GetType();
-            MethodInfo mi;
-            Type toType;
-            if (gameLoader.MemberSetters.ContainsKey(componentType.Name + " " + param))
-            {
-                mi = gameLoader.MemberSetters[componentType.Name + " " + param];
-                toType = gameLoader.MemberType[componentType.Name + " " + param];
-            }
-            else
-            {
-                PropertyInfo pi = componentType.GetProperty(param);
-                mi = pi.GetSetMethod();
-                toType = pi.PropertyType;
-                gameLoader.MemberType[componentType.Name + " " + param] = toType;
-                gameLoader.MemberSetters[componentType.Name + " " + param] = mi;
-            }
-            if (toType == typeof(string))
-            {
-                mi.Invoke(obj, new object[] { val });
-            }
-            else if (toType == typeof(double))
-            {
-                double tmp = double.Parse(val);
-                mi.Invoke(obj, new object[] { tmp });
-            }
-            else if (toType == typeof(float))
-            {
-                float tmp = float.Parse(val);
-                mi.Invoke(obj, new object[] { tmp });
-            }
-            else if (toType == typeof(int))
-            {
-                int tmp = int.Parse(val);
-                mi.Invoke(obj, new object[] { tmp });
-            }
-            else if (toType == typeof(long))
-            {
-                long tmp = int.Parse(val);
-                mi.Invoke(obj, new object[] { tmp });
-            }
-            else if(toType == typeof(SpecificReadable))
-            {
-                SpecificReadable sr = SpecificReadable.CreateSpecificReadable(val, e, s);
-                mi.Invoke(obj, new object[] { sr });
-            }
-            else if(toType == typeof(ReadableData))
-            {
-                ReadableData rd = ReadableData.CreateReadableData(val, e, s);
-                mi.Invoke(obj, new object[] { rd });
-            }
-            else if (toType == typeof(SpecificWriter))
-            {
-                string set;
-                WriteableData wd;
-                string who;
-                if (val.Contains('.'))
-                {
-                    string[] split = val.Split('.');
-                    who = split[0];
-                    set = split[1];
-                }
-                else
-                {
-                    who = "this";
-                    set = val;
-                }
-                wd = WriteableData.CreateWriteableData(who, e.Entity, this, s.Scene);
-                SpecificWriter sw = 
-                    new SpecificWriter(wd, set);
-                mi.Invoke(obj, new object[] { sw });
-            }
-            else if (toType == typeof(WriteableData))
-            {
-                WriteableData wd = WriteableData.CreateWriteableData(val, e.Entity, this, s.Scene);
-                mi.Invoke(obj, new object[] { wd });
-            }
-            //TODO enum
-            else
-            {
-                MessageBox.Show("Error type " + toType + " is not supported");
-                return false;
-            }
-            return true;
-        }*/
 
         internal void RunScene(string name)
         {

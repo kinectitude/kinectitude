@@ -1,5 +1,4 @@
-﻿
-namespace Kinectitude.Core.Data
+﻿namespace Kinectitude.Core.Data
 {
     internal class ConstantReadable : SpecificReadable
     {
