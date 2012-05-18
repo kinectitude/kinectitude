@@ -16,7 +16,6 @@ namespace Kinectitude.Kinect
         public enum FollowType { X, Y, Both };
 
         public PlayerType followPlayer;
-        public JointType followJoint;
         private FollowType followType;
 
         private float nextDx = 0;
@@ -26,78 +25,7 @@ namespace Kinectitude.Kinect
         private IPhysicsComponent physics = null;
 
         [Plugin("Joint", "")]
-        public string Joint
-        {
-            set
-            {
-                switch (value.ToUpper())
-                {
-                    case ("HIPCENTER"):
-                        followJoint = JointType.HipCenter;
-                        break;
-                    case ("SPINE"):
-                        followJoint = JointType.Spine;
-                        break;
-                    case ("SHOULDERCENTER"):
-                        followJoint = JointType.ShoulderCenter;
-                        break;
-                    case ("HEAD"):
-                        followJoint = JointType.Head;
-                        break;
-                    case ("SHOULDERLEFT"):
-                        followJoint = JointType.ShoulderLeft;
-                        break;
-                    case ("FOOTRIGHT"):
-                        followJoint = JointType.FootRight;
-                        break;
-                    case ("ANKLERIGHT"):
-                        followJoint = JointType.AnkleRight;
-                        break;
-                    case ("KNEERIGHT"):
-                        followJoint = JointType.KneeRight;
-                        break;
-                    case ("HIPRIGHT"):
-                        followJoint = JointType.HipRight;
-                        break;
-                    case ("FOOTLEFT"):
-                        followJoint = JointType.FootLeft;
-                        break;
-                    case ("ANKLELEFT"):
-                        followJoint = JointType.AnkleLeft;
-                        break;
-                    case ("KNEELEFT"):
-                        followJoint = JointType.KneeLeft;
-                        break;
-                    case ("HIPLEFT"):
-                        followJoint = JointType.HipLeft;
-                        break;
-                    case ("HANDRIGHT"):
-                        followJoint = JointType.HandRight;
-                        break;
-                    case ("WRISTRIGHT"):
-                        followJoint = JointType.WristRight;
-                        break;
-                    case ("ELBORIGHT"):
-                        followJoint = JointType.ElbowRight;
-                        break;
-                    case ("SNOULDERRIGHT"):
-                        followJoint = JointType.ShoulderRight;
-                        break;
-                    case ("HANDLEFT"):
-                        followJoint = JointType.HandLeft;
-                        break;
-                    case ("WRISTLEFT"):
-                        followJoint = JointType.WristLeft;
-                        break;
-                    case ("ELBOWLEFT"):
-                        followJoint = JointType.ElbowLeft;
-                        break;
-                    default:
-                        break;
-                    //TODO
-                }
-            } 
-        }
+        public JointType Joint { get; set; }
 
         [Plugin("Player", "")]
         public string Player

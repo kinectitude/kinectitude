@@ -71,12 +71,12 @@ namespace Kinectitude.Kinect
                         KinectFollowComponent kfc = (KinectFollowComponent)kc;
                         if (KinectFollowComponent.PlayerType.P1 == kfc.followPlayer)
                         {
-                            Joint scaledJoint = SkeletalExtensions.ScaleTo(skeletons[0].Joints[kfc.followJoint], 800, 600 - 128, 0.4f, 0.4f);
+                            Joint scaledJoint = SkeletalExtensions.ScaleTo(skeletons[0].Joints[kfc.Joint], 800, 600 - 128, 0.4f, 0.4f);
                             kfc.UpdatePosition(scaledJoint.Position.X, scaledJoint.Position.Y);
                         }
                         else if (skeletons.Length > 1)
                         {
-                            Joint scaledJoint = SkeletalExtensions.ScaleTo(skeletons[1].Joints[kfc.followJoint], 800, 600 - 128, 0.4f, 0.4f);
+                            Joint scaledJoint = SkeletalExtensions.ScaleTo(skeletons[1].Joints[kfc.Joint], 800, 600 - 128, 0.4f, 0.4f);
                             kfc.UpdatePosition(scaledJoint.Position.X, scaledJoint.Position.Y);
                         }
                     }
