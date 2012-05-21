@@ -7,6 +7,7 @@ using System.Windows.Input;
 using Kinectitude.Editor.Models.Base;
 using Kinectitude.Editor.Commands.Entity;
 using Kinectitude.Editor.Commands.Base;
+using System;
 
 namespace Kinectitude.Editor.ViewModels
 {
@@ -37,13 +38,16 @@ namespace Kinectitude.Editor.ViewModels
 
         private readonly Entity entity;
         private readonly ObservableCollection<EntityViewModel> _prototypes;
-        private readonly ObservableCollection<AttributeViewModel> _attributes;
+        private readonly ObservableCollection<EntityAttributeViewModel> _attributes;
         private readonly ObservableCollection<ComponentViewModel> _components;
         private readonly ObservableCollection<EventViewModel> _events;
         private readonly ModelCollection<EntityViewModel> prototypes;
-        private readonly ModelCollection<AttributeViewModel> attributes;
+        private readonly ModelCollection<EntityAttributeViewModel> attributes;
         private readonly ModelCollection<ComponentViewModel> components;
         private readonly ModelCollection<EventViewModel> events;
+        private AttributeViewModel stagedAttribute;
+
+        public event EventHandler<EventArgs<string>> AttributeAvailable = delegate { };
 
         public Entity Entity
         {
@@ -57,14 +61,14 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (entity.Name != value)
                 {
-                    CommandHistory.Instance.LogCommand(new RenameEntityCommand(this, value));
+                    CommandHistory.LogCommand(new RenameEntityCommand(this, value));
                     entity.Name = value;
                     RaisePropertyChanged("Name");
                 }
             }
         }
 
-        public ModelCollection<AttributeViewModel> Attributes
+        public ModelCollection<EntityAttributeViewModel> Attributes
         {
             get { return attributes; }
         }
@@ -221,6 +225,11 @@ namespace Kinectitude.Editor.ViewModels
             get { return prototypes; }
         }
 
+        public AttributeViewModel StagedAttribute
+        {
+            get { return stagedAttribute; }
+        }
+
         public ICommand AddAttributeCommand
         {
             get { return new DelegateCommand(null, ExecuteAddAttributeCommand); }
@@ -271,12 +280,17 @@ namespace Kinectitude.Editor.ViewModels
             this.entity = entity;
 
             var prototypeViewModels = from prototype in entity.Prototypes select EntityViewModel.GetViewModel(prototype);
-            var attributeViewModels = from attribute in entity.Attributes select AttributeViewModel.GetViewModel(entity, attribute.Key);
+            var attributeViewModels = from attribute in entity.Attributes select new EntityAttributeViewModel(entity, attribute.Key);
             var componentViewModels = from component in entity.Components select new ComponentViewModel(component);
             var eventViewModels = from evt in entity.Events select new EventViewModel(evt);
 
+            /*foreach (EntityAttributeViewModel attributeViewModel in attributeViewModels)
+            {
+                AttributeAvailable += attributeViewModel.OnAttributeAvailable;
+            }*/
+
             _prototypes = new ObservableCollection<EntityViewModel>();
-            _attributes = new ObservableCollection<AttributeViewModel>(attributeViewModels);
+            _attributes = new ObservableCollection<EntityAttributeViewModel>(attributeViewModels);
             _components = new ObservableCollection<ComponentViewModel>(componentViewModels);
             _events = new ObservableCollection<EventViewModel>(eventViewModels);
 
@@ -286,77 +300,26 @@ namespace Kinectitude.Editor.ViewModels
             }
 
             prototypes = new ModelCollection<EntityViewModel>(_prototypes);
-            attributes = new ModelCollection<AttributeViewModel>(_attributes);
+            attributes = new ModelCollection<EntityAttributeViewModel>(_attributes);
             components = new ModelCollection<ComponentViewModel>(_components);
             events = new ModelCollection<EventViewModel>(_events);
         }
 
-        private void OnAttributesChanged(object sender, NotifyCollectionChangedEventArgs args)
-        {
-            /*if (args.Action == NotifyCollectionChangedAction.Add)
-            {
-                foreach (AttributeViewModel attribute in args.NewItems)
-                {
-                    AttributeViewModel localAttribute = AttributeViewModel.GetViewModel(attribute);
-                    _attributes.Add(localAttribute);
-
-                    // TODO Check all cases for key existing or not existing
-                }
-            }
-            else if (args.Action == NotifyCollectionChangedAction.Remove)
-            {
-                // TODO Check all cases for key existing or not existing
-            }*/
-        }
-
-        private void OnComponentsChanged(object sender, NotifyCollectionChangedEventArgs args)
-        {
-            if (args.Action == NotifyCollectionChangedAction.Add)
-            {
-                foreach (ComponentViewModel component in args.NewItems)
-                {
-
-                }
-            }
-            else if (args.Action == NotifyCollectionChangedAction.Remove)
-            {
-                foreach (ComponentViewModel component in args.OldItems)
-                {
-
-                }
-            }
-        }
-
-        private void OnEventsChanged(object sender, NotifyCollectionChangedEventArgs args)
-        {
-            if (args.Action == NotifyCollectionChangedAction.Add)
-            {
-                foreach (EventViewModel evt in args.NewItems)
-                {
-
-                }
-            }
-            else if (args.Action == NotifyCollectionChangedAction.Remove)
-            {
-                foreach (EventViewModel evt in args.OldItems)
-                {
-
-                }
-            }
-        }
-
         public void ExecuteAddAttributeCommand(object parameter)
         {
-            
+            //AddAttribute(stagedAttribute);
+
+            //stagedAttribute = null;
+            //RaisePropertyChanged("StagedAttribute");
         }
 
         public void ExecuteRemoveAttributeCommand(object parameter)
         {
-            AttributeViewModel viewModel = parameter as AttributeViewModel;
-            if (null != viewModel)
-            {
-                RemoveAttribute(viewModel);
-            }
+            //AttributeViewModel attribute = parameter as AttributeViewModel;
+            //if (null != attribute)
+            //{
+            //    RemoveAttribute(attribute);
+            //}
         }
 
         public void ExecuteAddComponentCommand(object parameter)
@@ -399,75 +362,188 @@ namespace Kinectitude.Editor.ViewModels
 
         public void ExecuteRemoveEventCommand(object parameter)
         {
-
+            
         }
 
-        public void AddAttribute(AttributeViewModel attribute)
+        public void AddAttribute(EntityAttributeViewModel attribute)
         {
-            //entity.AddAttribute(attribute.Attribute);
-            //_attributes.Add(attribute);
+            CommandHistory.LogCommand(new AddAttributeCommand(this, attribute));
+            attribute.AddAttribute();
+            //AttributeAvailable += attribute.OnAttributeAvailable;
+            _attributes.Add(attribute);
         }
 
-        public void RemoveAttribute(AttributeViewModel attribute)
+        public void RemoveAttribute(EntityAttributeViewModel attribute)
         {
-            //en
+            CommandHistory.LogCommand(new RemoveAttributeCommand(this, attribute));
+            attribute.RemoveAttribute();
+            //AttributeAvailable -= attribute.OnAttributeAvailable;
+            _attributes.Remove(attribute);
         }
 
         public void AddPrototype(EntityViewModel entityViewModel)
         {
-            CommandHistory.Instance.LogCommand(new AddPrototypeCommand(this, entityViewModel));
+            CommandHistory.LogCommand(new AddPrototypeCommand(this, entityViewModel));
             entity.AddPrototype(entityViewModel.Entity);
             PrivateAddPrototype(entityViewModel);
         }
 
         public void RemovePrototype(EntityViewModel entityViewModel)
         {
-            CommandHistory.Instance.LogCommand(new RemovePrototypeCommand(this, entityViewModel));
+            CommandHistory.LogCommand(new RemovePrototypeCommand(this, entityViewModel));
             entity.RemovePrototype(entityViewModel.Entity);
             PrivateRemovePrototype(entityViewModel);
         }
 
-        private void PrivateAddPrototype(EntityViewModel entityViewModel)
+        public EntityAttributeViewModel GetEntityAttributeViewModel(string key)
         {
-            entityViewModel.Attributes.CollectionChanged += OnAttributesChanged;
-            entityViewModel.Components.CollectionChanged += OnComponentsChanged;
-            entityViewModel.Events.CollectionChanged += OnEventsChanged;
+            return attributes.FirstOrDefault(x => x.Key == key);
+        }
 
-            foreach (AttributeViewModel inheritedAttribute in entityViewModel.Attributes)
+        private void PrivateAddPrototype(EntityViewModel prototype)
+        {
+            prototype.AttributeAvailable += OnAttributeAvailable;
+            prototype.Attributes.CollectionChanged += OnAttributesChanged;
+            prototype.Components.CollectionChanged += OnComponentsChanged;
+            prototype.Events.CollectionChanged += OnEventsChanged;
+
+            foreach (EntityAttributeViewModel inheritedAttribute in prototype.Attributes)
             {
                 // TODO handle case for local non-inheriting attribute which has same key as one of the new ones
 
-                AttributeViewModel localViewModel = _attributes.FirstOrDefault(x => x.Key == inheritedAttribute.Key);
-                if (null == localViewModel)
+                EntityAttributeViewModel localAttribute = _attributes.FirstOrDefault(x => x.Key == inheritedAttribute.Key);
+                if (null == localAttribute)
                 {
-                    _attributes.Add(AttributeViewModel.GetViewModel(entity, inheritedAttribute.Key));
+                    localAttribute = new EntityAttributeViewModel(entity, inheritedAttribute.Key);
+                    _attributes.Add(localAttribute);
                 }
+                localAttribute.FindInheritedViewModel();
             }
 
             // TODO components and events
 
-            foreach (ComponentViewModel inheritedComponent in entityViewModel.Components)
+            foreach (ComponentViewModel inheritedComponent in prototype.Components)
             {
 
             }
 
-            foreach (EventViewModel inheritedEvent in entityViewModel.Events)
+            foreach (EventViewModel inheritedEvent in prototype.Events)
             {
 
             }
 
-            _prototypes.Add(entityViewModel);
+            _prototypes.Add(prototype);
         }
 
-        private void PrivateRemovePrototype(EntityViewModel entityViewModel)
+        private void PrivateRemovePrototype(EntityViewModel prototype)
         {
-            entityViewModel.Attributes.CollectionChanged -= OnAttributesChanged;
-            entityViewModel.Components.CollectionChanged -= OnComponentsChanged;
-            entityViewModel.Events.CollectionChanged -= OnEventsChanged;
+            prototype.AttributeAvailable -= OnAttributeAvailable;
+            prototype.Attributes.CollectionChanged -= OnAttributesChanged;
+            prototype.Components.CollectionChanged -= OnComponentsChanged;
+            prototype.Events.CollectionChanged -= OnEventsChanged;
 
+            foreach (EntityAttributeViewModel inheritedAttribute in prototype.Attributes)
+            {
+                // TODO handle case for local non-inheriting attribute which has same key as one of the new ones
 
+                EntityAttributeViewModel localAttribute = _attributes.FirstOrDefault(x => x.Key == inheritedAttribute.Key);
+                if (null != localAttribute)
+                {
+                    localAttribute.FindInheritedViewModel();
+                }
+            }
 
-            _prototypes.Remove(entityViewModel);
+            _prototypes.Remove(prototype);
+        }
+
+        private void OnAttributesChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            if (args.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (EntityAttributeViewModel inheritedAttribute in args.NewItems)
+                {
+                    EntityAttributeViewModel localAttribute = _attributes.FirstOrDefault(x => x.Key == inheritedAttribute.Key);
+                    if (null == localAttribute)
+                    {
+                        _attributes.Add(new EntityAttributeViewModel(entity, inheritedAttribute.Key));
+                    }
+                    else
+                    {
+                        localAttribute.FindInheritedViewModel();
+                    }
+                }
+            }
+            else if (args.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (EntityAttributeViewModel inheritedAttribute in args.OldItems)
+                {
+                    EntityAttributeViewModel localAttribute = _attributes.FirstOrDefault(x => x.Key == inheritedAttribute.Key);
+                    if (null != localAttribute)
+                    {
+                        if (localAttribute.IsInherited)
+                        {
+                            _attributes.Remove(localAttribute);
+                        }
+                        else
+                        {
+                            localAttribute.FindInheritedViewModel();
+                        }
+                    }
+                }
+            }
+        }
+
+        private void OnComponentsChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            if (args.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (ComponentViewModel component in args.NewItems)
+                {
+
+                }
+            }
+            else if (args.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (ComponentViewModel component in args.OldItems)
+                {
+
+                }
+            }
+        }
+
+        private void OnEventsChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            if (args.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (EventViewModel evt in args.NewItems)
+                {
+
+                }
+            }
+            else if (args.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (EventViewModel evt in args.OldItems)
+                {
+
+                }
+            }
+        }
+
+        public void RaiseAttributeAvailable(string key)
+        {
+            AttributeAvailable(this, new EventArgs<string>(key));
+        }
+
+        private void OnAttributeAvailable(object sender, EventArgs<string> args)
+        {
+            EntityAttributeViewModel localAttribute = _attributes.FirstOrDefault(x => x.Key == args.Value);
+
+            if (null != localAttribute)
+            {
+                localAttribute.FindInheritedViewModel();
+            }
+
+            AttributeAvailable(sender, args);
         }
     }
 }

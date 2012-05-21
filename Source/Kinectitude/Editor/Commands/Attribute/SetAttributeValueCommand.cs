@@ -9,7 +9,7 @@ namespace Kinectitude.Editor.Commands.Attribute
 {
     public class SetAttributeValueCommand : IUndoableCommand
     {
-        private readonly AttributeViewModel attribute;
+        private readonly IAttributeViewModel attribute;
         private readonly string newValue;
         private readonly string oldValue;
 
@@ -18,7 +18,7 @@ namespace Kinectitude.Editor.Commands.Attribute
             get { return "Set Attribute Value"; }
         }
 
-        public SetAttributeValueCommand(AttributeViewModel attribute, string newValue)
+        public SetAttributeValueCommand(IAttributeViewModel attribute, string newValue)
         {
             this.attribute = attribute;
             this.newValue = newValue;

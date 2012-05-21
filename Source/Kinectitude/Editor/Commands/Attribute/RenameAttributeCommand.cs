@@ -9,7 +9,7 @@ namespace Kinectitude.Editor.Commands.Attribute
 {
     public class RenameAttributeCommand : IUndoableCommand
     {
-        private readonly AttributeViewModel attribute;
+        private readonly IAttributeViewModel attribute;
         private readonly string newKey;
         private readonly string oldKey;
 
@@ -18,7 +18,7 @@ namespace Kinectitude.Editor.Commands.Attribute
             get { return string.Format("Rename Attribute to '{0}'", newKey); }
         }
 
-        public RenameAttributeCommand(AttributeViewModel attribute, string newKey)
+        public RenameAttributeCommand(IAttributeViewModel attribute, string newKey)
         {
             this.attribute = attribute;
             this.newKey = newKey;

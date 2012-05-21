@@ -55,7 +55,7 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (game.Name != value)
                 {
-                    CommandHistory.Instance.LogCommand(new RenameGameCommand(this, value));
+                    CommandHistory.LogCommand(new RenameGameCommand(this, value));
                     game.Name = value;
                     RaisePropertyChanged("Name");
                 }
@@ -69,7 +69,7 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (game.Description != value)
                 {
-                    CommandHistory.Instance.LogCommand(new SetDescriptionCommand(this, value));
+                    CommandHistory.LogCommand(new SetDescriptionCommand(this, value));
                     game.Description = value;
                     RaisePropertyChanged("Description");
                 }
@@ -83,7 +83,7 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (game.Width != value)
                 {
-                    CommandHistory.Instance.LogCommand(new SetResolutionCommand(this, value, Height));
+                    CommandHistory.LogCommand(new SetResolutionCommand(this, value, Height));
                     game.Width = value;
                     RaisePropertyChanged("Width");
                 }
@@ -97,7 +97,7 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (game.Height != value)
                 {
-                    CommandHistory.Instance.LogCommand(new SetResolutionCommand(this, Width, value));
+                    CommandHistory.LogCommand(new SetResolutionCommand(this, Width, value));
                     game.Height = value;
                     RaisePropertyChanged("Height");
                 }
@@ -111,7 +111,7 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (game.IsFullScreen != value)
                 {
-                    CommandHistory.Instance.LogCommand(new SetFullScreenCommand(this, value));
+                    CommandHistory.LogCommand(new SetFullScreenCommand(this, value));
                     game.IsFullScreen = value;
                     RaisePropertyChanged("IsFullScreen");
                 }
@@ -125,7 +125,7 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (null != value)
                 {
-                    CommandHistory.Instance.LogCommand(new SetFirstSceneCommand(this, value));
+                    CommandHistory.LogCommand(new SetFirstSceneCommand(this, value));
                     game.FirstScene = value.Scene;
                     RaisePropertyChanged("FirstScene");
                 }
@@ -167,7 +167,7 @@ namespace Kinectitude.Editor.ViewModels
             this.game = game;
             this.pluginNamespace = pluginNamespace;
 
-            var attributeViewModels = from attribute in game.Attributes select AttributeViewModel.GetViewModel(attribute);
+            var attributeViewModels = from attribute in game.Attributes select AttributeViewModel.GetViewModel(game, attribute.Key);
             var prototypeViewModels = from entity in game.Entities select EntityViewModel.GetViewModel(entity);
             var sceneViewModels = from scene in game.Scenes select SceneViewModel.GetViewModel(scene);
 
@@ -259,28 +259,28 @@ namespace Kinectitude.Editor.ViewModels
 
         public void AddPrototype(EntityViewModel prototype)
         {
-            CommandHistory.Instance.LogCommand(new CreatePrototypeCommand(this, prototype));
+            CommandHistory.LogCommand(new CreatePrototypeCommand(this, prototype));
             game.AddEntity(prototype.Entity);
             _prototypes.Add(prototype);
         }
 
         public void RemovePrototype(EntityViewModel prototype)
         {
-            CommandHistory.Instance.LogCommand(new DeletePrototypeCommand(this, prototype));
+            CommandHistory.LogCommand(new DeletePrototypeCommand(this, prototype));
             _prototypes.Remove(prototype);
             game.RemoveEntity(prototype.Entity);
         }
 
         public void AddScene(SceneViewModel scene)
         {
-            CommandHistory.Instance.LogCommand(new CreateSceneCommand(this, scene));
+            CommandHistory.LogCommand(new CreateSceneCommand(this, scene));
             game.AddScene(scene.Scene);
             _scenes.Add(scene);
         }
 
         public void RemoveScene(SceneViewModel scene)
         {
-            CommandHistory.Instance.LogCommand(new DeleteSceneCommand(this, scene));
+            CommandHistory.LogCommand(new DeleteSceneCommand(this, scene));
             _scenes.Remove(scene);
             game.RemoveScene(scene.Scene);
         }

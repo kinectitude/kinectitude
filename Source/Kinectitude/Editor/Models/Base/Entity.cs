@@ -16,13 +16,6 @@ namespace Kinectitude.Editor.Models.Base
         private IEntityContainer parent;
         private string name;
 
-        /*private readonly List<Entity> _prototypes;
-        private readonly List<Component> _components;
-        private readonly List<Event> _events;
-        private readonly ReadOnlyCollection<Entity> prototypes;
-        private readonly ReadOnlyCollection<Component> components;
-        private readonly ReadOnlyCollection<Event> events;*/
-
         private readonly SortedDictionary<string, Entity> prototypes;
         private readonly SortedDictionary<string, Component> components;
         private readonly List<Event> events;
@@ -56,14 +49,6 @@ namespace Kinectitude.Editor.Models.Base
 
         public Entity()
         {
-            //_prototypes = new List<Entity>();
-            //_components = new List<Component>();
-            //_events = new List<Event>();
-
-            //prototypes = new ReadOnlyCollection<Entity>(_prototypes);
-            //components = new ReadOnlyCollection<Component>(_components);
-            //events = new ReadOnlyCollection<Event>(_events);
-
             prototypes = new SortedDictionary<string, Entity>();
             components = new SortedDictionary<string, Component>();
             events = new List<Event>();
@@ -103,30 +88,6 @@ namespace Kinectitude.Editor.Models.Base
             events.Remove(evt);
         }
 
-        /*public override Attribute GetAttribute(string key)
-        {
-            Attribute attribute = base.GetAttribute(key);
-            if (null == attribute)
-            {
-                foreach (Entity prototype in Prototypes)
-                {
-                    attribute = prototype.GetAttribute(key);
-                    if (null != attribute)
-                    {
-                        break;
-                    }
-                }
-            }
-            Attribute attribute = null;
-
-            return attribute;
-        }*/
-
-        /*public bool HasComponent(string name)
-        {
-            return null != GetComponent(name);
-        }*/
-
         public Component GetComponent(string name)
         {
             Component component = null;
@@ -147,31 +108,5 @@ namespace Kinectitude.Editor.Models.Base
             }
             return component;
         }
-
-        /*public T GetPropertyForComponent<T>(string componentName, string key) where T : BaseProperty
-        {
-            BaseProperty property = null;
-            Component component = GetComponent(componentName);
-            if (null != component)
-            {
-                property = component.GetProperty(key);
-            }
-            if (null == property || property.IsInherited)
-            {
-                foreach (Entity prototype in Prototypes)
-                {
-                    component = prototype.GetComponent(componentName);
-                    if (null != component)
-                    {
-                        property = component.GetProperty(key);
-                        if (null != property)
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
-            return property as T;
-        }*/
     }
 }

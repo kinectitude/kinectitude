@@ -209,6 +209,13 @@
 
                 <DockPanel Grid.Row="2" DataContext="{Binding CurrentItem}">
 
+                    <Border DockPanel.Dock="Top" Padding="0,4,4,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox Text="{Binding StagedAttribute.Key}" Width="80" />
+                            <TextBox Text="{Binding StagedAttribute.Value}" Width="80" />
+                        </StackPanel>
+                    </Border>
+                    
                     <Border DockPanel.Dock="Bottom" Padding="0,4,4,0">
                         <StackPanel Orientation="Horizontal">
                             <Button Command="{Binding AddAttributeCommand}">Add Attribute</Button>

@@ -9,7 +9,7 @@ namespace Kinectitude.Editor.Commands.Attribute
 {
     public class SetAttributeInheritedCommand : IUndoableCommand
     {
-        private readonly AttributeViewModel attribute;
+        private readonly IAttributeViewModel attribute;
         private readonly bool shouldInherit;
         private readonly bool wasInherited;
 
@@ -18,7 +18,7 @@ namespace Kinectitude.Editor.Commands.Attribute
             get { return "Change Attribute Inheritance"; }
         }
 
-        public SetAttributeInheritedCommand(AttributeViewModel attribute, bool shouldInherit)
+        public SetAttributeInheritedCommand(IAttributeViewModel attribute, bool shouldInherit)
         {
             this.attribute = attribute;
             this.shouldInherit = shouldInherit;

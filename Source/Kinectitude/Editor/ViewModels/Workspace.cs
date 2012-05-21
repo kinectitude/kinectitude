@@ -110,9 +110,24 @@ namespace Kinectitude.Editor.ViewModels
             get { return resolutionPresets; }
         }
 
-        public CommandHistory CommandHistory
+        public ICommand UndoCommand
         {
-            get { return Kinectitude.Editor.Commands.Base.CommandHistory.Instance; }
+            get { return CommandHistory.UndoCommand; }
+        }
+
+        public ICommand RedoCommand
+        {
+            get { return CommandHistory.RedoCommand; }
+        }
+
+        public ObservableStack<IUndoableCommand> UndoableCommands
+        {
+            get { return CommandHistory.UndoableCommands; }
+        }
+
+        public ObservableStack<IUndoableCommand> RedoableCommands
+        {
+            get { return CommandHistory.RedoableCommands; }
         }
 
         public Workspace()

@@ -13,7 +13,6 @@
     <Alias Name="CrossesLineEvent" Class="Kinectitude.Physics.CrossesLineEvent" />
     <Alias Name="ExitsLeftEvent" Class="Kinectitude.Physics.ExitsLeftEvent" />
     <Alias Name="ExitsRightEvent" Class="Kinectitude.Physics.ExitsRightEvent" />
-    <Alias Name="SetPositionAction" Class="Kinectitude.Physics.SetPositionAction" />
   </Using>
   
   <Using Path="Render.dll">
@@ -25,10 +24,9 @@
   
   <Entity Name="Paddle">
     
-    <Attribute Key="width" Value="24" />
-    <Attribute Key="height" Value="128" />
     <Attribute Key="score" Value="0" />
-    
+
+    <Component Type="TransformComponent" Width="24" Height="128" />
     <Component Type="KinectFollowComponent" Direction="Y" />
     <Component Type="RenderComponent" Fillcolor="LimeGreen" />
     <Component Type="PhysicsComponent" Dx="0" Dy="0" />
@@ -47,10 +45,7 @@
   </Entity>
   
   <Entity Name="Bar">
-    
-    <Attribute Key="width" Value="800" />
-    <Attribute Key="height" Value="10" />    
-    
+    <Component Type="TransformComponent" Width="800" Height="10" />
     <Component Type="RenderComponent" Fillcolor="LimeGreen" />
   </Entity>
 
@@ -59,26 +54,18 @@
     <Attribute Key="numReady" Value="0" />
     
     <Entity>
-      
-      <Attribute Key="x" Value="250" />
-      <Attribute Key="y" Value="24" />
-      
+      <Component Type="TransformComponent" X="250" Y="24" />
       <Component Type="TextRenderComponent" Value="Kinect Wimbledon Deluxe" Fontcolor="Yellow" />
     </Entity>
 
     <Entity>
-      
-      <Attribute Key="x" Value="220" />
-      <Attribute Key="y" Value="80" />
-      
+      <Component Type="TransformComponent" X="220" Y="80" />
       <Component Type="TextRenderComponent" Value="Move below the line to start" Fontcolor="White" />
     </Entity>
 
     <Entity>
-      
-      <Attribute Key="x" Value="25" />
-      <Attribute Key="y" Value="125" />
-      
+
+      <Component Type="TransformComponent" X="25" Y="125" />
       <Component Type="TextRenderComponent" Value="Player 1 not ready!" Fontcolor="White" />
       
       <Event Type="TriggerOccursEvent" Name="Player1Ready">
@@ -87,10 +74,8 @@
     </Entity>
 
     <Entity>
-      
-      <Attribute Key="x" Value="425" />
-      <Attribute Key="y" Value="125" />
-      
+
+      <Component Type="TransformComponent" X="425" Y="125" />
       <Component Type="TextRenderComponent" Value="Player 2 Not Ready!" Fontcolor="White" />
       
       <Event Type="TriggerOccursEvent" Name="Player2Ready">
@@ -99,9 +84,8 @@
     </Entity>
 
     <Entity Prototype="PlayerOnePaddle">
-      
-      <Attribute Key="x" Value="5" />
-      <Attribute Key="y" Value="250" />
+
+      <Component Type="TransformComponent" X="5" Y="250" />
       
       <Event Type="CrossesLineEvent" Line="Y" Location="450" Direction="Positive">
         <Action Type="FireTriggerAction" Name="Player1Ready" />
@@ -110,9 +94,8 @@
     </Entity>
 
     <Entity Prototype="PlayerTwoPaddle">
-      
-      <Attribute Key="x" Value="770" />
-      <Attribute Key="y" Value="250" />
+
+      <Component Type="TransformComponent" X="770" Y="250" />
       
       <Event Type="CrossesLineEvent" Line="Y" Location="450" Direction="Positive">
         <Condition If="scene.numReady &lt; 2">
@@ -123,8 +106,7 @@
     </Entity>
 
     <Entity Prototype="Bar">
-      <Attribute Key="x" Value="0" />
-      <Attribute Key="y" Value="450" />
+      <Component Type="TransformComponent" X="0" Y="450" />
     </Entity>
 
     <Entity>
@@ -138,9 +120,8 @@
   <Scene Name="Game">
     
     <Entity Prototype="PlayerOnePaddle" Name="paddle1">
-      
-      <Attribute Key="x" Value="5" />
-      <Attribute Key="y" Value="250" />
+
+      <Component Type="TransformComponent" X="5" Y="250" />
       
       <Event Type="TriggerOccursEvent" Name="Player1Scores">
         <Action Type="IncrementAction" Key="score" />
@@ -148,9 +129,8 @@
     </Entity>
 
     <Entity Prototype="PlayerTwoPaddle" Name="paddle2">
-      
-      <Attribute Key="x" Value="770" />
-      <Attribute Key="y" Value="250" />
+
+      <Component Type="TransformComponent" X="770" Y="250" />
       
       <Event Type="TriggerOccursEvent" Name="Player2Scores">
         <Action Type="IncrementAction" Key="score" />
@@ -158,12 +138,8 @@
     </Entity>
 
     <Entity>
-      
-      <Attribute Key="x" Value="400" />
-      <Attribute Key="y" Value="300" />
-      <Attribute Key="width" Value="48" />
-      <Attribute Key="height" Value="48" />
-      
+
+      <Component Type="TransformComponent" X="400" Y="300" Width="48" Height="48" />
       <Component Type="RenderComponent" Fillcolor="LimeGreen" Shape="Ellipse" />
       <Component Type="PhysicsComponent" Dx="6" Dy="6" />
       
@@ -178,18 +154,12 @@
     </Entity>
 
 	  <Entity Prototype="Score">
-
-      <Attribute Key="x" Value="56" />
-      <Attribute Key="y" Value="24" />
-      
+      <Component Type="TransformComponent" X="56" Y="24" />
       <Component Type="TextRenderComponent" Value="{paddle1.score}" />
     </Entity>
 	
 	  <Entity Prototype="Score">
-
-      <Attribute Key="x" Value="724" />
-      <Attribute Key="y" Value="24" />
-    
+      <Component Type="TransformComponent" X="724" Y="24" />
       <Component Type="TextRenderComponent" Value="{paddle2.score}" />
 	  </Entity>
 
@@ -210,25 +180,18 @@
   <Scene Name="Game Over">
     
     <Entity>
-
-      <Attribute Key="x" Value="300" />
-      <Attribute Key="y" Value="20" />
-      
+      <Component Type="TransformComponent" X="300" Y="20" />
       <Component Type="TextRenderComponent" Value="Player {game.winner} Wins!" Fontcolor="White" />
     </Entity>
 
     <Entity>
-
-      <Attribute Key="x" Value="100" />
-      <Attribute Key="y" Value="100" />
-
+      <Component Type="TransformComponent" X="100" Y="100" />
       <Component Type="TextRenderComponent" Value="Top line for menu, bottom to quit." Fontcolor="White" />
     </Entity>
 
     <Entity Prototype="PlayerOnePaddle">
 
-      <Attribute Key="x" Value="5" />
-      <Attribute Key="y" Value="250" />
+      <Component Type="TransformComponent" X="5" Y="250" />
       
       <Event Type="CrossesLineEvent" Line="Y" Location="500" Direction="Positive">
         <Action Type="PopSceneAction" />
@@ -240,8 +203,7 @@
 
     <Entity Prototype="PlayerTwoPaddle">
 
-      <Attribute Key="x" Value="770" />
-      <Attribute Key="y" Value="250" />
+      <Component Type="TransformComponent" X="770" Y="250" />
 
       <Event Type="CrossesLineEvent" Line="Y" Location="500" Direction="Positive">
         <Action Type="PopSceneAction" />
@@ -252,13 +214,11 @@
     </Entity>
 
     <Entity Prototype="Bar">
-      <Attribute Key="x" Value="0" />
-      <Attribute Key="y" Value="500" />
+      <Component Type="TransformComponent" X="0" Y="500" />
     </Entity>
 
     <Entity Prototype="Bar">
-      <Attribute Key="x" Value="0" />
-      <Attribute Key="y" Value="150" />
+      <Component Type="TransformComponent" X="0" Y="150" />
     </Entity>
     
   </Scene>

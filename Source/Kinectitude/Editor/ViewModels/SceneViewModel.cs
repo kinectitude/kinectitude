@@ -52,7 +52,7 @@ namespace Kinectitude.Editor.ViewModels
             get { return scene.Name; }
             set
             {
-                CommandHistory.Instance.LogCommand(new RenameSceneCommand(this, value));
+                CommandHistory.LogCommand(new RenameSceneCommand(this, value));
                 scene.Name = value;
                 RaisePropertyChanged("Name");
             }
@@ -82,7 +82,7 @@ namespace Kinectitude.Editor.ViewModels
         {
             this.scene = scene;
 
-            var attributeViewModels = from attribute in scene.Attributes select AttributeViewModel.GetViewModel(attribute);
+            var attributeViewModels = from attribute in scene.Attributes select AttributeViewModel.GetViewModel(scene, attribute.Key);
             var entityViewModels = from entity in scene.Entities select EntityViewModel.GetViewModel(entity);
 
             _attributes = new ObservableCollection<AttributeViewModel>(attributeViewModels);
