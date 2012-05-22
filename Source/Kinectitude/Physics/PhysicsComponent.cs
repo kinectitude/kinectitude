@@ -8,21 +8,70 @@ using Kinectitude.Core.Components;
 using Kinectitude.Core.Exceptions;
 using Kinectitude.Core.Interfaces;
 using Microsoft.Xna.Framework;
+using FarseerPhysics.Dynamics.Contacts;
 
 namespace Kinectitude.Physics
 {
+
     [Plugin("Physics Component", "")]
     public class PhysicsComponent : Component, IPhysicsComponent
     {
         private const float sizeRatio = 1f / 100f;
         private const float speedRatio = 1f / 10f;
         private List<CrossesLineEvent> crossesLineEvents = new List<CrossesLineEvent>();
+        private List<CollisionEvent> collisionEvents = new List<CollisionEvent>();
         private Body body;
         private PhysicsManager pm;
         private TransformComponent tc;
-
+ 
+        [Preset("Bouncy Ball", "circle")]
+        [Preset("Collision Event Line", "rectangle")]
+        [Preset("Wall", "rectangle")]
         [Plugin("Shape", "")]
         public string Shape { get; set; }
+
+        [Preset("Bouncy Ball", BodyType.Dynamic)]
+        [Preset("Collision Event Line", BodyType.Kinematic)]
+        [Preset("Wall", BodyType.Kinematic)]
+        [Plugin("Body Type", "")]
+        public BodyType Bodytype { get; set; }
+
+        [Preset("Bouncy Ball", 1.0)]
+        [Preset("Collision Event Line", 0.0)]
+        [Preset("Wall", 0.0)]
+        [Plugin("Restitution", "")]
+        public float Restitution { get; set; }
+
+        [Preset("Bouncy Ball", 1.0)]
+        [Preset("Collision Event Line", 1.0)]
+        [Preset("Wall", 1.0)]
+        [Plugin("Mass", "")]
+        public float Mass { get; set; }
+
+        [Preset("Bouncy Ball", 0.0)]
+        [Preset("Collision Event Line", 0.0)]
+        [Preset("Wall", 0.0)]
+        [Plugin("Friction", "")]
+        public float Friction { get; set; }
+
+        [Preset("Bouncy Ball", 0.0)]
+        [Preset("Collision Event Line", 0.0)]
+        [Preset("Wall", 0.0)]
+        [Plugin("Linear Damping", "")]
+        public float LinearDamping { get; set; }
+
+        private bool hasMaximum = false;
+        private float maximumVelocity = float.PositiveInfinity;
+        [Plugin("Maximum velocity", "")]
+        public float MaximumVelocity
+        {
+            get { return maximumVelocity; }
+            set
+            {
+                hasMaximum = true;
+                maximumVelocity = value;
+            }
+        }
 
         private float xVelocity;
         [Plugin("Horizontal Velocity", "")]
@@ -71,13 +120,6 @@ namespace Kinectitude.Physics
             tc.setX(this, x);
             tc.setY(this, y);
 
-            //TODO this is a hack
-            int Height = tc.Height;
-            if (y < 0 || y > 600 - Height)
-            {
-                body.LinearVelocity = new Vector2(body.LinearVelocity.X, -body.LinearVelocity.Y);
-            }
-
             xVelocity = body.LinearVelocity.X / speedRatio;
             yVelocity = body.LinearVelocity.Y / speedRatio;
 
@@ -111,7 +153,7 @@ namespace Kinectitude.Physics
                         prev = prevY;
                         next = y;
                     }
-                    if (pos && 0 < next - prev  && cross < next  && cross >= prev)
+                    if (pos && 0 < next - prev && cross < next && cross >= prev)
                     {
                         evt.DoActions();
                     }
@@ -128,12 +170,17 @@ namespace Kinectitude.Physics
             crossesLineEvents.Add(evt);
         }
 
-        public void setPosition()
+        public void AddCollisionEvent(CollisionEvent evt)
+        {
+            collisionEvents.Add(evt);
+        }
+
+        public void SetPosition()
         {
             body.Position = new Vector2(tc.X * sizeRatio, tc.Y * sizeRatio);
         }
 
-        public void setSize()
+        public void SetSize()
         {
             throw new NotImplementedException("THE PHYSICS COMPONENT WON'T SET THE SIZE CURRENTLY");
         }
@@ -157,32 +204,62 @@ namespace Kinectitude.Physics
                 missing.Add(typeof(TransformComponent));
                 throw MissingRequirementsException.MissingRequirement(this, missing);
             }
-            tc.SubscribeToX(this, setPosition);
-            tc.SubscribeToY(this, setPosition);
-            tc.SubscribeToHeight(this, setSize);
-            tc.SubscribeToWidht(this, setSize);
-            //TODO this is temporary
+
+            tc.SubscribeToX(this, SetPosition);
+            tc.SubscribeToY(this, SetPosition);
+            tc.SubscribeToHeight(this, SetSize);
+            tc.SubscribeToWidth(this, SetSize);
+
             if ("circle" == Shape)
             {
                 body = BodyFactory.CreateCircle(pm.PhysicsWorld, tc.Width * sizeRatio, 1f);
-                //TODO this is a hack
-                body.Restitution = 1f;
-                body.BodyType = BodyType.Dynamic;
             }
             else
             {
                 float width = tc.Width * sizeRatio;
                 float height = tc.Height * sizeRatio;
                 body = BodyFactory.CreateRectangle(pm.PhysicsWorld, width, height, 1f);
-                //TODO this is a hack
-                body.Restitution = 0f;
-                body.BodyType = BodyType.Kinematic;
             }
-            body.Mass = 1f;
-            body.Friction = 0f;
-            body.LinearDamping = 0f;
-            setPosition();
+
+            //Set fields on the body
+            body.UserData = Entity;
+            body.BodyType = Bodytype;
+            body.Restitution = Restitution;
+            body.Mass = Mass;
+            body.Friction = Friction;
+            body.LinearDamping = LinearDamping;
+            //TODO Add maximum velocity to body, if applicable
+
+            //Add a listener for collisions
+            body.OnCollision += OnCollision;
+
+            SetPosition();
             body.LinearVelocity = new Vector2(xVelocity * speedRatio, yVelocity * speedRatio);
+        }
+
+        private bool OnCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
+        {
+            if (crossesLineEvents.Count != 0)
+            {
+                Body bodyA = fixtureA.Body;
+                Body bodyB = fixtureB.Body;
+
+                Entity entityA = bodyA.UserData as Entity;
+                Entity entityB = bodyB.UserData as Entity;
+
+                Entity collidedWith = (entityA == Entity) ? entityB : entityA;
+
+                foreach (CollisionEvent ce in collisionEvents)
+                {
+                    if (ce.CollidesWith.MatchAndSet(collidedWith))
+                    {
+                        ce.DoActions();
+                    }
+                }
+            }
+
+            //Allow the collison to occur
+            return true;
         }
     }
 }

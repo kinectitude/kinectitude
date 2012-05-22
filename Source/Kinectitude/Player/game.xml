@@ -5,8 +5,7 @@
 
   <define part="PhysicsComponent" fullName="Kinectitude.Physics.PhysicsComponent" file="Kinectitude.Physics.dll" />
   <define part="CrossesLineEvent" fullName="Kinectitude.Physics.CrossesLineEvent" file="Kinectitude.Physics.dll" />
-  <define part="ExitsLeftEvent" fullName="Kinectitude.Physics.ExitsLeftEvent" file="Kinectitude.Physics.dll" />
-  <define part="ExitsRightEvent" fullName="Kinectitude.Physics.ExitsRightEvent" file="Kinectitude.Physics.dll" />
+  <define part="CollisionEvent" fullName="Kinectitude.Physics.CollisionEvent" file="Kinectitude.Physics.dll" />
 
   <define part="RenderComponent" fullName="Kinectitude.Render.RenderComponent" file="Kinectitude.Render.dll" />
   <define part="TextRenderComponent" fullName="Kinectitude.Render.TextRenderComponent" file="Kinectitude.Render.dll" />
@@ -15,7 +14,7 @@
   <prototype name="paddle">
     <component type="KinectFollowComponent" Direction="Y" Player="P1" Joint="HandLeft"/>
     <component type="RenderComponent" FillColor="LimeGreen" Shape="rectangle"/>
-    <component type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="rectangle"/>
+    <component type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" Bodytype="Kinematic"/>
     <component type="TransformComponent" Width="24" Height="128"/>
   </prototype>
 
@@ -109,16 +108,32 @@
       <component type="TransformComponent" X="782" Y="250"/>
     </entity>
 
+    <entity name="top_wall">
+      <component type="TransformComponent" X="0" Y="0" Width="2000" Height="5"/>
+      <component type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" Bodytype="Kinematic"/>
+    </entity>
+
+    <entity name="bottom_wall">
+      <component type="TransformComponent" X="0" Y="600" Width="2000" Height="5"/>
+      <component type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" Bodytype="Kinematic"/>
+    </entity>
+
+    <!--<entity name="left_wall">
+      <component type="TransformComponent" X="0" Y="0" Width="5" Height="2000"/>
+      <component type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" Bodytype="Kinematic"/>
+    </entity>-->
+
     <entity name="ball">
       <component type="RenderComponent" FillColor="LimeGreen" Shape="circle" />
-      <component type="TransformComponent" X="250" Y="0" Width="24" Height="24"/>
-      <component type="PhysicsComponent" XVelocity="40" YVelocity="20" Shape="circle" />
-      <event type="ExitsLeftEvent">
+      <component type="TransformComponent" X="250" Y="250" Width="24" Height="24"/>
+      <component type="PhysicsComponent" XVelocity="40" YVelocity="20" Shape="circle" Restitution="1" Mass="1" Friction="0" LinearDamping="0" Bodytype="Dynamic"/>
+      <!--<event type="CollisionEvent" CollidesWith="left_wall">-->
+      <event type="CrossesLineEvent" Location="0" Line="X" Direction="Negative">
         <action type="SetPositionAction" X="400" Y="300" />
         <action type="IncrementAction" Target="scene.player2Score" />
       </event>
       <!-- this is done differently then the other one to test both methods-->
-      <event type="ExitsRightEvent">
+      <event type="CrossesLineEvent" Location="800" Line="X" Direction="Positive">
         <action type="SetPositionAction" X="400" Y="300" />
         <action type="IncrementAction" Target="scene.player1Score" />
         <action type="FireTriggerAction" Name="player1Scores"/>

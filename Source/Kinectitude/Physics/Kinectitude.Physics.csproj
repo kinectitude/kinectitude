@@ -43,9 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CollisionEvent.cs" />
     <Compile Include="CrossesLineEvent.cs" />
-    <Compile Include="ExitsRightEvent.cs" />
-    <Compile Include="ExitsLeftEvent.cs" />
     <Compile Include="PhysicsComponent.cs" />
     <Compile Include="PhysicsManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

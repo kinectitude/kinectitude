@@ -153,7 +153,7 @@ namespace Kinectitude.Core.Components
             notifyYUpdate.Add(changeDelegate);
         }
 
-        public void SubscribeToWidht(Component component, ChangeDelegate changeDelegate)
+        public void SubscribeToWidth(Component component, ChangeDelegate changeDelegate)
         {
             creators[changeDelegate] = component;
             notifyWidthUpdate.Add(changeDelegate);
