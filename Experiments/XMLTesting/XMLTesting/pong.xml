@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<application  name ="pong" width ="800" height ="600">
+  <scene name ="main">
+    
+    <entity name ="paddle1" width ="24" height="128" X ="0" Y ="1" score ="0">
+      <KinectFollowComponent player="P1" joint ="HandLeft" type ="Y"/>
+      <RenderComponent colour ="LimeGreen"/>
+      <PhysicsComponent dx="0" dy="0"/>
+      <!--<TextRenderComponent text="score" X ="50" Y ="50"/>-->
+    </entity>
+
+    <entity name ="paddle2" width ="24" height="774" X ="0" Y ="1" score ="0">
+      <KinectFollowComponent player="P1" joint ="HandLeft" type ="Y"/>
+      <RenderComponent colour ="LimeGreen"/>
+      <PhysicsComponent dx="0" dy="0"/>
+      <!--<TextRenderComponent text="score" X ="550" Y ="50"/>-->
+    </entity>
+
+    <entity name ="ball" radius ="24" X ="0" Y ="1">
+      <RenderComponent colour ="LimeGreen"/>
+      <PhysicsComponent dx="8" dy="8"/>
+    </entity>
+    
+  </scene>
+</application>
+

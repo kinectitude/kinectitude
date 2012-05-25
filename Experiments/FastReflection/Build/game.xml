@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Game>
+
+  <Entity Name="PaddleOne">
+    <Component Type="PhysicsComponent" Dx="6.0" Dy="8.0" />
+    <Component Type="RenderComponent" Width="16" Height="128" Shape="Rectangle" />
+  </Entity>
+
+  <Entity Name="PaddleTwo">
+    <Component Type="PhysicsComponent" Dx="6.0" Dy="8.0" />
+    <Component Type="RenderComponent" Width="16" Height="128" Shape="Rectangle" />
+  </Entity>
+
+  <Entity Name="Ball">
+    <Component Type="PhysicsComponent" Dx="6.0" Dy="8.0" Name="Ball" />
+    <Component Type="RenderComponent" Width="32" Height="32" Shape="Ellipse" />
+  </Entity>
+
+</Game>
