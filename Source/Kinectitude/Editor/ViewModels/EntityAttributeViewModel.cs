@@ -30,14 +30,15 @@ namespace Kinectitude.Editor.ViewModels
                 if (!IsInherited)
                 {
                     CommandHistory.LogCommand(new RenameAttributeCommand(this, value));
-                    
+
+                    string oldKey = attribute.Key;
                     attribute.Key = value;
                     FindInheritedViewModel();
 
                     RaisePropertyChanged("Key");
 
                     EntityViewModel entityViewModel = EntityViewModel.GetViewModel(entity);
-                    entityViewModel.RaiseAttributeAvailable(value);
+                    entityViewModel.RaiseAttributeAvailable(oldKey, value);
                 }
             }
         }

@@ -26,15 +26,15 @@
                 <Separator />
                 <MenuItem Header="_Exit" Command="{Binding ExitCommand, Mode=OneWay}" InputGestureText="Alt+F4" />
             </MenuItem>
-            <MenuItem Header="_Edit" DataContext="{Binding CommandHistory}">
+            <MenuItem Header="_Edit">
                 <MenuItem Command="{Binding UndoCommand, Mode=OneWay}" InputGestureText="Ctrl+Z">
                     <MenuItem.Header>
-                        <TextBlock Text="{Binding LastUndoableCommandName, StringFormat=Undo {0}}" />
+                        <TextBlock Text="{Binding UndoableCommands[0], StringFormat=Undo {0}}" />
                     </MenuItem.Header>
                 </MenuItem>
                 <MenuItem Command="{Binding RedoCommand, Mode=OneWay}" InputGestureText="Ctrl+Y">
                     <MenuItem.Header>
-                        <TextBlock Text="{Binding LastRedoableCommandName, StringFormat=Redo {0}}" />
+                        <TextBlock Text="{Binding RedoableCommands[0], StringFormat=Redo {0}}" />
                     </MenuItem.Header>
                 </MenuItem>
                 <Separator />
@@ -211,8 +211,8 @@
 
                     <Border DockPanel.Dock="Top" Padding="0,4,4,0">
                         <StackPanel Orientation="Horizontal">
-                            <TextBox Text="{Binding StagedAttribute.Key}" Width="80" />
-                            <TextBox Text="{Binding StagedAttribute.Value}" Width="80" />
+                            <TextBox Text="{Binding StagedAttributeKey}" Width="80" />
+                            <TextBox Text="{Binding StagedAttributeValue}" Width="80" />
                         </StackPanel>
                     </Border>
                     

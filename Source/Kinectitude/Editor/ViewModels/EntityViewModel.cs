@@ -11,6 +11,28 @@ using System;
 
 namespace Kinectitude.Editor.ViewModels
 {
+    public class AttributeAvailableEventArgs : EventArgs
+    {
+        private readonly string oldKey;
+        private readonly string newKey;
+
+        public string OldKey
+        {
+            get { return oldKey; }
+        }
+
+        public string NewKey
+        {
+            get { return newKey; }
+        }
+
+        public AttributeAvailableEventArgs(string oldKey, string newKey)
+        {
+            this.oldKey = oldKey;
+            this.newKey = newKey;
+        }
+    }
+
     public class EntityViewModel : BaseModel
     {
         //private const string RenderComponent = "Kinectitude.Render.RenderComponent";
@@ -45,9 +67,10 @@ namespace Kinectitude.Editor.ViewModels
         private readonly ModelCollection<EntityAttributeViewModel> attributes;
         private readonly ModelCollection<ComponentViewModel> components;
         private readonly ModelCollection<EventViewModel> events;
-        private AttributeViewModel stagedAttribute;
+        private string stagedAttributeKey;
+        private string stagedAttributeValue;
 
-        public event EventHandler<EventArgs<string>> AttributeAvailable = delegate { };
+        public event EventHandler<AttributeAvailableEventArgs> AttributeAvailable = delegate { };
 
         public Entity Entity
         {
@@ -225,9 +248,30 @@ namespace Kinectitude.Editor.ViewModels
             get { return prototypes; }
         }
 
-        public AttributeViewModel StagedAttribute
+        public string StagedAttributeKey
         {
-            get { return stagedAttribute; }
+            get { return stagedAttributeKey; }
+            set
+            {
+                if (stagedAttributeKey != value)
+                {
+                    stagedAttributeKey = value;
+                    RaisePropertyChanged("StagedAttributeKey");
+                }
+            }
+        }
+
+        public string StagedAttributeValue
+        {
+            get { return stagedAttributeValue; }
+            set
+            {
+                if (stagedAttributeValue != value)
+                {
+                    stagedAttributeValue = value;
+                    RaisePropertyChanged("StagedAttributeValue");
+                }
+            }
         }
 
         public ICommand AddAttributeCommand
@@ -284,11 +328,6 @@ namespace Kinectitude.Editor.ViewModels
             var componentViewModels = from component in entity.Components select new ComponentViewModel(component);
             var eventViewModels = from evt in entity.Events select new EventViewModel(evt);
 
-            /*foreach (EntityAttributeViewModel attributeViewModel in attributeViewModels)
-            {
-                AttributeAvailable += attributeViewModel.OnAttributeAvailable;
-            }*/
-
             _prototypes = new ObservableCollection<EntityViewModel>();
             _attributes = new ObservableCollection<EntityAttributeViewModel>(attributeViewModels);
             _components = new ObservableCollection<ComponentViewModel>(componentViewModels);
@@ -303,23 +342,28 @@ namespace Kinectitude.Editor.ViewModels
             attributes = new ModelCollection<EntityAttributeViewModel>(_attributes);
             components = new ModelCollection<ComponentViewModel>(_components);
             events = new ModelCollection<EventViewModel>(_events);
+
+            
         }
 
         public void ExecuteAddAttributeCommand(object parameter)
         {
-            //AddAttribute(stagedAttribute);
+            EntityAttributeViewModel attribute = new EntityAttributeViewModel(entity, stagedAttributeKey);
+            attribute.Value = stagedAttributeValue;
 
-            //stagedAttribute = null;
-            //RaisePropertyChanged("StagedAttribute");
+            AddAttribute(attribute);
+
+            StagedAttributeKey = null;
+            StagedAttributeValue = null;
         }
 
         public void ExecuteRemoveAttributeCommand(object parameter)
         {
-            //AttributeViewModel attribute = parameter as AttributeViewModel;
-            //if (null != attribute)
-            //{
-            //    RemoveAttribute(attribute);
-            //}
+            EntityAttributeViewModel attribute = parameter as EntityAttributeViewModel;
+            if (null != attribute)
+            {
+                RemoveAttribute(attribute);
+            }
         }
 
         public void ExecuteAddComponentCommand(object parameter)
@@ -369,7 +413,6 @@ namespace Kinectitude.Editor.ViewModels
         {
             CommandHistory.LogCommand(new AddAttributeCommand(this, attribute));
             attribute.AddAttribute();
-            //AttributeAvailable += attribute.OnAttributeAvailable;
             _attributes.Add(attribute);
         }
 
@@ -377,7 +420,6 @@ namespace Kinectitude.Editor.ViewModels
         {
             CommandHistory.LogCommand(new RemoveAttributeCommand(this, attribute));
             attribute.RemoveAttribute();
-            //AttributeAvailable -= attribute.OnAttributeAvailable;
             _attributes.Remove(attribute);
         }
 
@@ -529,18 +571,32 @@ namespace Kinectitude.Editor.ViewModels
             }
         }
 
-        public void RaiseAttributeAvailable(string key)
+        public void RaiseAttributeAvailable(string oldKey, string key)
         {
-            AttributeAvailable(this, new EventArgs<string>(key));
+            foreach (EntityViewModel prototype in _prototypes)
+            {
+                EntityAttributeViewModel exposedAttribute = prototype.GetEntityAttributeViewModel(oldKey);
+
+                if (null != exposedAttribute)
+                {
+                    _attributes.Add(new EntityAttributeViewModel(entity, oldKey));
+                }
+            }
+        
+            AttributeAvailable(this, new AttributeAvailableEventArgs(oldKey, key));
         }
 
-        private void OnAttributeAvailable(object sender, EventArgs<string> args)
+        private void OnAttributeAvailable(object sender, AttributeAvailableEventArgs args)
         {
-            EntityAttributeViewModel localAttribute = _attributes.FirstOrDefault(x => x.Key == args.Value);
+            EntityAttributeViewModel localAttribute = _attributes.FirstOrDefault(x => x.Key == args.NewKey);
 
             if (null != localAttribute)
             {
                 localAttribute.FindInheritedViewModel();
+            }
+            else
+            {
+                _attributes.Add(new EntityAttributeViewModel(entity, args.NewKey));
             }
 
             AttributeAvailable(sender, args);

@@ -218,7 +218,11 @@ namespace Kinectitude.Editor.ViewModels
 
         public void NewGame(object parameter)
         {
-            Game game = new Game(this);
+            Game game = new Game(this) { Name = "Untitled Game", Width = 800, Height = 600 };
+            Scene scene = new Scene() { Name = "Scene 1" };
+            game.AddScene(scene);
+            game.FirstScene = scene;
+
             GameViewModel viewModel = new GameViewModel(game, this);
             Game = viewModel;
         }
@@ -234,23 +238,68 @@ namespace Kinectitude.Editor.ViewModels
 
             if (result == true)
             {
-                loadGameFromFile(dialog.FileName);
+                PrivateLoadGame(dialog.FileName);
+            }
+        }
+
+        public void RevertGame(object parameter)
+        {
+            if (null != Game.FileName)
+            {
+                PrivateLoadGame(Game.FileName);
+            }
+        }
+
+        private void PrivateLoadGame(string fileName)
+        {
+            IGameStorage storage = new XmlGameStorage(fileName, this);
+
+            try
+            {
+                Game game = storage.LoadGame();
+
+                GameViewModel gameViewModel = new GameViewModel(game, this);
+                gameViewModel.FileName = fileName;
+                Game = gameViewModel;
+            }
+            catch (PluginNotLoadedException e)
+            {
+                System.Windows.MessageBox.Show(e.Message);
             }
         }
 
         public void SaveGame(object parameter)
         {
-
+            if (null == Game.FileName)
+            {
+                SaveGameAs(parameter);
+            }
+            else
+            {
+                PrivateSaveGame(Game.FileName);
+            }
         }
 
         public void SaveGameAs(object parameter)
         {
+            Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
+            dialog.FileName = string.Empty;
+            dialog.DefaultExt = ".xml";
+            dialog.Filter = "Kinectitude XML Files (.xml)|*.xml";
 
+            Nullable<bool> result = dialog.ShowDialog();
+
+            if (result == true)
+            {
+                Game.FileName = dialog.FileName;
+                PrivateSaveGame(Game.FileName);
+            }
         }
 
-        public void RevertGame(object parameter)
+        private void PrivateSaveGame(string fileName)
         {
-            loadGameFromFile(Game.FileName);
+            IGameStorage storage = new XmlGameStorage(fileName, this);
+            storage.SaveGame(Game.Game);
         }
 
         public void OpenItem(object parameter)
@@ -275,24 +324,6 @@ namespace Kinectitude.Editor.ViewModels
         public void Exit(object parameter)
         {
             Application.Current.Shutdown();
-        }
-
-        private void loadGameFromFile(string fileName)
-        {
-            IGameStorage storage = new XmlGameStorage(fileName, this);
-
-            try
-            {
-                Game game = storage.LoadGame();
-
-                GameViewModel gameViewModel = new GameViewModel(game, this);
-                gameViewModel.FileName = fileName;
-                Game = gameViewModel;
-            }
-            catch (PluginNotLoadedException e)
-            {
-                System.Windows.MessageBox.Show(e.Message);
-            }
         }
     }
 }

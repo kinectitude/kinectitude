@@ -45,7 +45,7 @@ namespace Kinectitude.Editor.Storage
             public static readonly XName Root = "Root";
         }
 
-        private Game game;
+        private readonly Game game;
         private readonly string fileName;
         private readonly IPluginNamespace pluginNamespace;
         private readonly Queue<Tuple<XElement, Entity>> entities;
@@ -53,6 +53,7 @@ namespace Kinectitude.Editor.Storage
         public XmlGameStorage(string fileName, IPluginNamespace pluginNamespace)
         {
             this.fileName = fileName;
+            this.game = new Game(pluginNamespace);
             this.pluginNamespace = pluginNamespace;
             entities = new Queue<Tuple<XElement,Entity>>();
         }
@@ -74,35 +75,32 @@ namespace Kinectitude.Editor.Storage
             // First Pass
             // Create the Game object top-down, including properties, attributes, and parent relationships.
 
-            game = new Game(pluginNamespace)
-            {
-                Name = (string)gameElement.Attribute(Constants.Name),
-                Width = (int)gameElement.Attribute(Constants.Width),
-                Height = (int)gameElement.Attribute(Constants.Height)
-            };
+            game.Name = (string)gameElement.Attribute(Constants.Name);
+            game.Width = (int)gameElement.Attribute(Constants.Width);
+            game.Height = (int)gameElement.Attribute(Constants.Height);
 
             foreach (XElement usingElement in gameElement.Elements(Constants.Using))
             {
-                Using use = createUsing(usingElement);
+                Using use = CreateUsing(usingElement);
                 game.AddUsing(use);
             }
 
             foreach (XElement attributeElement in gameElement.Elements(Constants.Attribute))
             {
-                Attribute attribute = createAttribute(attributeElement);
+                Attribute attribute = CreateAttribute(attributeElement);
                 game.AddAttribute(attribute);
             }
 
             foreach (XElement prototypeElement in gameElement.Elements(Constants.Entity))
             {
-                Entity entity = createEntity(prototypeElement);
+                Entity entity = CreateEntity(prototypeElement);
                 entities.Enqueue(new Tuple<XElement, Entity>(prototypeElement, entity));
                 game.AddEntity(entity);
             }
 
             foreach (XElement sceneElement in gameElement.Elements(Constants.Scene))
             {
-                Scene scene = createScene(sceneElement);
+                Scene scene = CreateScene(sceneElement);
                 game.AddScene(scene);
             }
 
@@ -134,7 +132,7 @@ namespace Kinectitude.Editor.Storage
             return game;
         }
 
-        private Using createUsing(XElement element)
+        private Using CreateUsing(XElement element)
         {
             Using use = new Using
             {
@@ -143,14 +141,14 @@ namespace Kinectitude.Editor.Storage
 
             foreach (XElement aliasElement in element.Elements(Constants.Alias))
             {
-                Alias alias = createAlias(aliasElement);
+                Alias alias = CreateAlias(aliasElement);
                 use.AddAlias(alias);
             }
 
             return use;
         }
 
-        private Alias createAlias(XElement element)
+        private Alias CreateAlias(XElement element)
         {
             Alias alias = new Alias
             {
@@ -161,7 +159,7 @@ namespace Kinectitude.Editor.Storage
             return alias;
         }
 
-        private Scene createScene(XElement element)
+        private Scene CreateScene(XElement element)
         {
             Scene scene = new Scene
             {
@@ -170,13 +168,13 @@ namespace Kinectitude.Editor.Storage
 
             foreach (XElement attributeElement in element.Elements(Constants.Attribute))
             {
-                Attribute attribute = createAttribute(attributeElement);
+                Attribute attribute = CreateAttribute(attributeElement);
                 scene.AddAttribute(attribute);
             }
 
             foreach (XElement entityElement in element.Elements(Constants.Entity))
             {
-                Entity entity = createEntity(entityElement);
+                Entity entity = CreateEntity(entityElement);
                 entities.Enqueue(new Tuple<XElement,Entity>(entityElement, entity));
                 scene.AddEntity(entity);
             }
@@ -184,7 +182,7 @@ namespace Kinectitude.Editor.Storage
             return scene;
         }
 
-        private Entity createEntity(XElement element)
+        private Entity CreateEntity(XElement element)
         {
             Entity entity = new Entity
             {
@@ -193,25 +191,25 @@ namespace Kinectitude.Editor.Storage
 
             foreach (XElement attributeElement in element.Elements(Constants.Attribute))
             {
-                Attribute attribute = createAttribute(attributeElement);
+                Attribute attribute = CreateAttribute(attributeElement);
                 entity.AddAttribute(attribute);
             }
 
             foreach (XElement componentElement in element.Elements(Constants.Component))
             {
-                Component component = createComponent(componentElement);
+                Component component = CreateComponent(componentElement);
                 entity.AddComponent(component);
             }
 
             foreach (XElement eventElement in element.Elements(Constants.Event))
             {
-                Event evt = createEvent(eventElement);
+                Event evt = CreateEvent(eventElement);
                 entity.AddEvent(evt);
             }
             return entity;
         }
 
-        private Component createComponent(XElement element)
+        private Component CreateComponent(XElement element)
         {
             PluginDescriptor descriptor = game.GetPluginDescriptor((string)element.Attribute(Constants.Type));
             Component component = new Component(descriptor);
@@ -223,7 +221,7 @@ namespace Kinectitude.Editor.Storage
             return component;
         }
 
-        private Event createEvent(XElement element)
+        private Event CreateEvent(XElement element)
         {
             PluginDescriptor descriptor = game.GetPluginDescriptor((string)element.Attribute(Constants.Type));
             Event evt = new Event(descriptor);
@@ -235,13 +233,13 @@ namespace Kinectitude.Editor.Storage
 
             foreach (XElement actionElement in element.Elements(Constants.Action))
             {
-                Action action = createAction(actionElement);
+                Action action = CreateAction(actionElement);
                 evt.AddAction(action);
             }
             return evt;
         }
 
-        private Action createAction(XElement element)
+        private Action CreateAction(XElement element)
         {
             PluginDescriptor descriptor = game.GetPluginDescriptor((string)element.Attribute(Constants.Type));
             Action action = new Action(descriptor);
@@ -253,7 +251,7 @@ namespace Kinectitude.Editor.Storage
             return action;
         }
 
-        private Attribute createAttribute(XElement element)
+        private Attribute CreateAttribute(XElement element)
         {
             string key = (string)element.Attribute(Constants.Key);
             string value = (string)element.Attribute(Constants.Value);
@@ -263,6 +261,12 @@ namespace Kinectitude.Editor.Storage
 
         public void SaveGame(Game game)
         {
+            // Check if the project file exists
+
+
+
+            // Check if the project folder exists
+
             XElement document = new XElement
             (
                 Constants.Game,
@@ -272,28 +276,62 @@ namespace Kinectitude.Editor.Storage
                 new XAttribute(Constants.FirstScene, game.FirstScene.Name)
             );
 
+            foreach (Using use in game.Usings)
+            {
+                XElement element = SerializeUsing(use);
+                document.Add(element);
+            }
+
             foreach (Attribute attribute in game.Attributes)
             {
-                XElement element = serializeAttribute(attribute);
+                XElement element = SerializeAttribute(attribute);
                 document.Add(element);
             }
 
             foreach (Entity entity in game.Entities)
             {
-                XElement element = serializeEntity(entity);
+                XElement element = SerializeEntity(entity);
                 document.Add(element);
             }
 
             foreach (Scene scene in game.Scenes)
             {
-                XElement element = serializeScene(scene);
+                XElement element = SerializeScene(scene);
                 document.Add(element);
             }
 
             document.Save(fileName);
         }
 
-        private XElement serializeScene(Scene scene)
+        private XElement SerializeUsing(Using use)
+        {
+            XElement element = new XElement
+            (
+                Constants.Using,
+                new XAttribute(Constants.Path, use.Path)
+            );
+
+            foreach (Alias alias in use.Aliases)
+            {
+                XElement aliasElement = SerializeAlias(alias);
+                element.Add(aliasElement);
+            }
+
+            return element;
+        }
+
+        private XElement SerializeAlias(Alias alias)
+        {
+            XElement element = new XElement
+            (
+                Constants.Alias,
+                new XAttribute(Constants.Name, alias.Name),
+                new XAttribute(Constants.Class, alias.Class)
+            );
+            return element;
+        }
+
+        private XElement SerializeScene(Scene scene)
         {
             XElement element = new XElement
             (
@@ -303,20 +341,20 @@ namespace Kinectitude.Editor.Storage
 
             foreach (Attribute attribute in scene.Attributes)
             {
-                XElement attributeElement = serializeAttribute(attribute);
+                XElement attributeElement = SerializeAttribute(attribute);
                 element.Add(attributeElement);
             }
 
             foreach (Entity entity in scene.Entities)
             {
-                XElement entityElement = serializeEntity(entity);
+                XElement entityElement = SerializeEntity(entity);
                 element.Add(entityElement);
             }
 
             return element;
         }
 
-        private XElement serializeEntity(Entity entity)
+        private XElement SerializeEntity(Entity entity)
         {
             XElement element = new XElement(Constants.Entity);
 
@@ -335,25 +373,25 @@ namespace Kinectitude.Editor.Storage
 
             foreach (Attribute attribute in entity.Attributes)
             {
-                XElement attributeElement = serializeAttribute(attribute);
+                XElement attributeElement = SerializeAttribute(attribute);
                 element.Add(attributeElement);
             }
 
             foreach (Component component in entity.Components)
             {
-                XElement componentElement = serializeComponent(component);
+                XElement componentElement = SerializeComponent(component);
                 element.Add(componentElement);
             }
 
             foreach (Event evt in entity.Events)
             {
-                XElement eventElement = serializeEvent(evt);
+                XElement eventElement = SerializeEvent(evt);
                 element.Add(eventElement);
             }
             return element;
         }
 
-        private XElement serializeAttribute(Attribute attribute)
+        private XElement SerializeAttribute(Attribute attribute)
         {
             XElement element = new XElement
             (
@@ -364,7 +402,7 @@ namespace Kinectitude.Editor.Storage
             return element;
         }
 
-        private XElement serializeComponent(Component component)
+        private XElement SerializeComponent(Component component)
         {
             XElement element = new XElement(
                 Constants.Component,
@@ -379,7 +417,7 @@ namespace Kinectitude.Editor.Storage
             return element;
         }
 
-        private XElement serializeEvent(Event evt)
+        private XElement SerializeEvent(Event evt)
         {
             XElement element = new XElement
             (
@@ -395,13 +433,13 @@ namespace Kinectitude.Editor.Storage
 
             foreach (Action action in evt.Actions)
             {
-                XElement actionElement = serializeAction(action);
+                XElement actionElement = SerializeAction(action);
                 element.Add(actionElement);
             }
             return element;
         }
 
-        private XElement serializeAction(Action action)
+        private XElement SerializeAction(Action action)
         {
             XElement element = new XElement
             (

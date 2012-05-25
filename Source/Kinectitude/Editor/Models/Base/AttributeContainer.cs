@@ -11,50 +11,51 @@ namespace Kinectitude.Editor.Models.Base
 {
     public class AttributeContainer
     {
-        private readonly SortedDictionary<string, Attribute> attributes;
+        private readonly List<Attribute> attributes;
 
         public IEnumerable<Attribute> Attributes
         {
-            get { return attributes.Values; }
+            get { return attributes; }
         }
 
         protected AttributeContainer()
         {
-            attributes = new SortedDictionary<string, Attribute>();
+            attributes = new List<Attribute>();
         }
 
         public void AddAttribute(Attribute attribute)
         {
-            if (attributes.ContainsKey(attribute.Key))
+            Attribute existing = attributes.FirstOrDefault(x => x.Key == attribute.Key);
+
+            if (null == existing)
             {
-                RemoveAttribute(attributes[attribute.Key]);
+                attribute.Parent = this;
+                attributes.Add(attribute);
             }
-            attribute.Parent = this;
-            attributes.Add(attribute.Key, attribute);
         }
 
         public void RemoveAttribute(Attribute attribute)
         {
             attribute.Parent = null;
-            attributes.Remove(attribute.Key);
+            attributes.Remove(attribute);
         }
 
         public virtual Attribute GetAttribute(string key)
         {
-            Attribute ret = null;
-            attributes.TryGetValue(key, out ret);
-            return ret;
+            return attributes.FirstOrDefault(x => x.Key == key);
         }
 
         public void SetAttribute(string key, dynamic value)
         {
-            if (!attributes.ContainsKey(key))
+            Attribute attribute = GetAttribute(key);
+
+            if (null == attribute)
             {
-                attributes[key] = new Attribute(key, value);
+                attributes.Add(new Attribute(key, value));
             }
             else
             {
-                attributes[key].Value = value;
+                attribute.Value = value;
             }
         }
     }

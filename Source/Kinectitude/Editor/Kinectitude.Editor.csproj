@@ -121,7 +121,6 @@
     <Compile Include="ViewModels\BasePropertyViewModel.cs" />
     <Compile Include="ViewModels\EntityAttributeViewModel.cs" />
     <Compile Include="ViewModels\IAttributeViewModel.cs" />
-    <Compile Include="ViewModels\ViewModel.cs" />
     <Compile Include="Views\DetailsConverter.cs" />
     <Compile Include="Views\FolderConverter.cs" />
     <Compile Include="ViewModels\ComponentViewModel.cs" />

@@ -410,5 +410,51 @@ namespace Kinectitude.Tests.Editor
 
             Assert.IsFalse(childAttributeViewModel.CanInherit);
         }
+
+        [TestMethod]
+        public void InheritableAttributeExposesParentAttributeAfterKeyChange()
+        {
+            Entity parent = new Entity();
+            parent.Name = "parent";
+            parent.AddAttribute(new Attribute("test", "value"));
+
+            Entity child = new Entity();
+            child.AddPrototype(parent);
+
+            EntityViewModel childEntityViewModel = EntityViewModel.GetViewModel(child);
+
+            Assert.AreEqual(childEntityViewModel.Attributes.Count, 1);
+
+            EntityAttributeViewModel childAttributeViewModel = childEntityViewModel.GetEntityAttributeViewModel("test");
+            childAttributeViewModel.IsInherited = false;
+            childAttributeViewModel.Key = "test2";
+
+            Assert.AreEqual(childEntityViewModel.Attributes.Count, 2);
+            Assert.IsNotNull(childEntityViewModel.GetEntityAttributeViewModel("test"));
+            Assert.IsNotNull(childEntityViewModel.GetEntityAttributeViewModel("test2"));
+        }
+
+        [TestMethod]
+        public void ParentAttributeAvailableInChildAfterKeyChange()
+        {
+            Entity parent = new Entity();
+            parent.Name = "parent";
+            parent.AddAttribute(new Attribute("test", "value"));
+
+            Entity child = new Entity();
+            child.AddPrototype(parent);
+
+            EntityViewModel childEntityViewModel = EntityViewModel.GetViewModel(child);
+
+            EntityAttributeViewModel parentAttributeViewModel = EntityViewModel.GetViewModel(parent).GetEntityAttributeViewModel("test");
+            EntityAttributeViewModel childAttributeViewModel = childEntityViewModel.GetEntityAttributeViewModel("test");
+
+            childAttributeViewModel.IsInherited = false;
+            parentAttributeViewModel.Key = "test2";
+
+            Assert.AreEqual(childEntityViewModel.Attributes.Count, 2);
+            Assert.IsNotNull(childEntityViewModel.GetEntityAttributeViewModel("test"));
+            Assert.IsNotNull(childEntityViewModel.GetEntityAttributeViewModel("test2"));
+        }
     }
 }
