@@ -1,5 +1,6 @@
 ﻿using Kinectitude.Attributes;
 using Kinectitude.Core.Base;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Events
 {
@@ -8,12 +9,16 @@ namespace Kinectitude.Core.Events
     [Plugin("Trigger occurs", "")]
     internal class TriggerOccursEvent : Event
     {
+
+        public TriggerOccursEvent() { }
+
         [Plugin("Trigger", "")]
         public string Trigger { get; set; }
 
         public override void OnInitialize()
         {
-            Scene.RegisterTrigger(Trigger, this);
+            Scene scene = Entity.Scene;
+            scene.RegisterTrigger(Trigger, this);
         }
     }
 }

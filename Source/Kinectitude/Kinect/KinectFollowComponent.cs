@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using Kinectitude.Attributes;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Components;
-using Kinectitude.Core.Exceptions;
-using Kinectitude.Core.Interfaces;
+using Kinectitude.Core.ComponentInterfaces;
 using Microsoft.Kinect;
 
 namespace Kinectitude.Kinect
@@ -22,7 +21,7 @@ namespace Kinectitude.Kinect
         private float nextDy = 0;
 
         private TransformComponent transform;
-        private IPhysicsComponent physics = null;
+        private APhysicsComponent physics = null;
 
         [Plugin("Joint", "")]
         public JointType Joint { get; set; }
@@ -119,14 +118,15 @@ namespace Kinectitude.Kinect
 
         public override void Ready()
         {
-            transform = Entity.GetComponent(typeof(TransformComponent)) as TransformComponent;
+            transform = GetComponent<TransformComponent>();
+            //TODO this will be done automatcailly
             if (null == transform)
             {
                 List<Type> missing = new List<Type>();
                 missing.Add(typeof(TransformComponent));
-                throw MissingRequirementsException.MissingRequirement(this, missing);
+                //throw MissingRequirementsException.MissingRequirement(this, missing);
             }
-            physics = Entity.GetComponent(typeof(IPhysicsComponent)) as IPhysicsComponent;
+            physics = GetComponent<APhysicsComponent>();
         }
 
     }

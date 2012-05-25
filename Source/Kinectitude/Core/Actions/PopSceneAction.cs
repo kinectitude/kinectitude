@@ -1,16 +1,17 @@
 ﻿using Kinectitude.Attributes;
-using Action = Kinectitude.Core.Base.Action;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Actions
 {
-    [Plugin("Pop the scene", "")]
-    public sealed class PopSceneAction : Action
+    [Plugin("Pop scene", "Pops the currently running scene")]
+    internal sealed class PopSceneAction : Action
     {
         public PopSceneAction() { }
 
         public override void Run()
         {
-            Event.Scene.Game.PopScene();
+            Game game = Event.Entity.Scene.Game;
+            game.PopScene();
         }
     }
 }

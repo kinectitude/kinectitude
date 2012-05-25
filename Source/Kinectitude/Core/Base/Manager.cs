@@ -1,59 +1,75 @@
 ﻿using System.Collections.Generic;
+using Kinectitude.Attributes;
 
 namespace Kinectitude.Core.Base
 {
+
     public interface IManager : IUpdateable
     {
+        /// <summary>
+        /// Used to stop the IManager.
+        /// </summary>
         void Stop();
+
+        /// <summary>
+        /// Used to start the IManager.
+        /// </summary>
         void Start();
     }
 
     public class Manager<T> : IManager where T : IUpdateable
     {
-        protected readonly List<T> children;
-        protected Game Game { get;  private set; }
-        protected bool running;
+        protected readonly List<T> Children;
+
+        protected bool Running { get; private set; }
 
         public void Add(T item)
         {
-            children.Add(item);
+            Children.Add(item);
             OnAdd(item);
         }
 
         public void Remove(T item)
         {
-            children.Remove(item);
+            Children.Remove(item);
             OnRemove(item);
         }
 
         protected virtual void OnAdd(T item) { }
         protected virtual void OnRemove(T item) { }
 
-        public Manager(Game game)
+        protected Manager()
         {
-            Game = game;
-            children = new List<T>();
+            Children = new List<T>();
         }
 
         public virtual void OnUpdate(float frameDelta) { }
 
-        public void Stop()
-        {
-            if (running)
-            {
-                running = false;
-                OnStop();
-            }
-        }
         public void Start()
         {
-            if (!running)
+            if (!Running)
             {
-                running = true;
+                Running = true;
                 OnStart();
             }
         }
+
         protected virtual void OnStart() { }
+        
+        public void Stop()
+        {
+            if (Running)
+            {
+                Running = false;
+                OnStop();
+            }
+        }
+        
         protected virtual void OnStop() { }
+
+        protected T GetService<T>() where T : Service
+        {
+            return Game.CurrentGame.GetService<T>();
+        }
     }
 }

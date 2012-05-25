@@ -1,23 +1,23 @@
 ﻿using Kinectitude.Attributes;
 using Kinectitude.Core.Data;
-using Action = Kinectitude.Core.Base.Action;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Actions
 {
     [Plugin("Set an attribute", "")]
     public sealed class SetAttributeAction : Action
     {
-        [Plugin("Value", "")]
-        public SpecificReadable Value { get; set; }
+        [Plugin("Value", "Value to set the attribute to")]
+        public IExpressionReader Value { get; set; }
 
-        [Plugin("Key", "")]
-        public SpecificWriter Target { get; set; }
+        [Plugin("Key", "Attribute to change")]
+        public IValueWriter Target { get; set; }
 
         public SetAttributeAction() { }
 
         public override void Run()
         {
-            Target.SetValue(Value.GetValue());
+            Target.Value = Value.GetValue();
         }
     }
 }

@@ -1,14 +1,18 @@
 ﻿using System.Collections.Generic;
 using Kinectitude.Core.Events;
+using System;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Base
 {
-    public class DataContainer
+    public class DataContainer : IDataContainer
     {
-        private readonly Dictionary<string, string> attributes;
-        private readonly Dictionary<string, List<AttributeChangesEvent>> changeEvents;
+        private readonly Dictionary<string, string> attributes = new Dictionary<string,string>();
+
+        private readonly Dictionary<string, List<Action<string, string>>> callbacks = 
+            new Dictionary<string,List<Action<string,string>>>();
         
-        internal int Id { get; private set; }
+        public int Id { get; private set; }
         
         public string Name { get; set; }
 
@@ -25,42 +29,38 @@ namespace Kinectitude.Core.Base
 
             set
             {
-                if (attributes.ContainsKey(key))
+                string old = null;
+                attributes.TryGetValue(value, out old);
+                attributes[key] = value;
+                if (callbacks.ContainsKey(key))
                 {
-                    attributes[key] = value;
-                }
-                else
-                {
-                    attributes.Add(key, value);
-                }
-                if (changeEvents.ContainsKey(key))
-                {
-                    foreach (AttributeChangesEvent evt in changeEvents[key])
+                    foreach (Action<string, string> action in callbacks[key])
                     {
-                        if (evt.Trigger(this))
-                        {
-                            evt.DoActions();
-                        }
+                        action(old, value);
                     }
                 }
             }
         }
 
-        public DataContainer(int id) 
+        internal DataContainer(int id) 
         {
             this.Id = id;
-
-            attributes = new Dictionary<string, string>();
-            changeEvents = new Dictionary<string, List<AttributeChangesEvent>>();
         }
 
-        internal void AddAttributeChangesEvent(AttributeChangesEvent evt)
+        internal void notifyOfChange(string key, Action<string, string> callback)
         {
-            if (!changeEvents.ContainsKey(evt.Key))
+            List<Action<string, string>> addTo = null;
+            callbacks.TryGetValue(key, out addTo);
+            if (null == addTo)
             {
-                changeEvents[evt.Key] = new List<AttributeChangesEvent>();
+                addTo = new List<Action<string, string>>();
+                callbacks[key] = addTo;
+                addTo.Add(callback);
             }
-            changeEvents[evt.Key].Add(evt);
+            else
+            {
+                addTo.Add(callback);
+            }
         }
     }
 }

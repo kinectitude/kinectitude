@@ -2,7 +2,7 @@
 
 namespace Kinectitude.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, Inherited = true)]
     public class PluginAttribute : Attribute
     {
         private readonly string name;

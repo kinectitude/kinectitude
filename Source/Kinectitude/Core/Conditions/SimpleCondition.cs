@@ -1,13 +1,15 @@
 ﻿using Kinectitude.Core.Base;
 using Kinectitude.Core.Data;
+using Kinectitude.Core.Base;
+using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Conditions
 {
     internal class SimpleCondition : Condition
     {
-        private readonly SpecificReadable specificReadable;
+        private readonly ExpressionReader specificReadable;
         
-        internal SimpleCondition(SpecificReadable specificReadable, Event evt) : base(evt)
+        internal SimpleCondition(ExpressionReader specificReadable, Event evt) : base(evt)
         {
             this.specificReadable = specificReadable;
         }

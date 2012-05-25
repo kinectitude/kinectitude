@@ -2,6 +2,9 @@
 
 namespace Kinectitude.Player
 {
+    /// <summary>
+    /// Provides a clock for the game and framerate
+    /// </summary>
     public class Clock
     {
         private readonly long frequency;

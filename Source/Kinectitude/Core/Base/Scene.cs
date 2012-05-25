@@ -3,36 +3,35 @@ using System.Collections.Generic;
 using System.Reflection;
 using Kinectitude.Core.Events;
 using Kinectitude.Core.Loaders;
+using Kinectitude.Core.Base;
+using Kinectitude.Core.Events;
+using Action = Kinectitude.Core.Base.Action;
 
 namespace Kinectitude.Core.Base
 {    
-    public class Scene : DataContainer
+    internal class Scene : DataContainer
     {
         private readonly Dictionary<Type, IManager> managersDictionary;
         private readonly List<IManager> managers;
         private readonly Dictionary<int, Entity> entityById;
         private readonly Dictionary<string, List<TriggerOccursEvent>> triggers;
         private readonly SceneLoader seceneLoader;
+        private readonly Dictionary<string, Entity> entityByName;
+
         private bool started = false;
 
-        public List<SceneStartsEvent> OnStart
+        internal List<SceneStartsEvent> OnStart
         {
             get;
             private set;
         }
         
-        public Game Game
+        internal Game Game
         {
             get;
             private set;
         }
-        
-        internal Dictionary<string, Entity> EntityByName
-        {
-            get;
-            private set;
-        }
-        
+
         internal Dictionary<string, HashSet<int>> IsType
         {
             get;
@@ -77,7 +76,7 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        internal Scene(SceneLoader sceneLoader, Game game) : base(-2)
+        internal Scene(SceneLoader sceneLoader, Game game) : base(-1)
         {
             managersDictionary = new Dictionary<Type, IManager>();
             managers = new List<IManager>();
@@ -86,14 +85,14 @@ namespace Kinectitude.Core.Base
             IsType = sceneLoader.IsType;
             IsExactType = sceneLoader.IsExactType;
             entityById = sceneLoader.EntityById;
-            EntityByName = sceneLoader.EntityByName;
+            entityByName = sceneLoader.EntityByName;
             triggers = new Dictionary<string,List<TriggerOccursEvent>>();
             this.seceneLoader = sceneLoader;
         }
 
         public T GetManager<T>() where T : class
         {
-            return managersDictionary[typeof(T)] as T;  // TODO: This might be a good place to move the manager construction code
+            return managersDictionary[typeof(T)] as T;
         }
 
         internal void OnUpdate(float frameDelta)
@@ -114,7 +113,7 @@ namespace Kinectitude.Core.Base
             IManager parent = null;
             if (!managersDictionary.ContainsKey(manager))
             {
-                parent = ClassFactory.Create<IManager>(manager, Game);
+                parent = ClassFactory.Create<IManager>(manager);
                 managers.Add(parent);
                 managersDictionary.Add(manager, parent);
             }
@@ -125,7 +124,7 @@ namespace Kinectitude.Core.Base
                 
             foreach (Tuple<string, string> tuple in values)
             {
-                ClassFactory.SetParam(created, tuple.Item1, tuple.Item2, this, null, entity);
+                ClassFactory.SetParam(created, tuple.Item1, tuple.Item2, null, entity);
             }
             //TODO make this better?
             MethodInfo mi = manager.GetMethod("Add");
@@ -139,7 +138,7 @@ namespace Kinectitude.Core.Base
             action.Event = evt;
             foreach (Tuple<string, string> attrib in attribs)
             {
-                ClassFactory.SetParam(action, attrib.Item1, attrib.Item2, this, evt, evt.Entity);
+                ClassFactory.SetParam(action, attrib.Item1, attrib.Item2, evt, evt.Entity);
             }
             if (null == cond)
             {
@@ -174,6 +173,11 @@ namespace Kinectitude.Core.Base
             List<TriggerOccursEvent> tlist = new List<TriggerOccursEvent>();
             tlist.Add(evt);
             triggers.Add(name, tlist);
+        }
+
+        internal Entity EntityByName(string name)
+        {
+            return entityByName[name];
         }
 
     }

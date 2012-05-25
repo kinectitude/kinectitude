@@ -1,16 +1,18 @@
 ﻿using Kinectitude.Attributes;
 using Kinectitude.Core.Base;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Events
 {
     [Plugin("Scene starts", "")]
-    public class SceneStartsEvent : Event
+    internal sealed class SceneStartsEvent : Event
     {
         public SceneStartsEvent() { }
 
         public override void OnInitialize()
         {
-            Scene.OnStart.Add(this);
+            Scene scene = Entity.Scene;
+            scene.OnStart.Add(this);
         }
     }
 }

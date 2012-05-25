@@ -5,10 +5,10 @@ using Action = Kinectitude.Core.Base.Action;
 namespace Kinectitude.Core.Actions
 {
     [Plugin("Increment an attribute", "")]
-    public sealed class IncrementAction : Action
+    internal sealed class IncrementAction : Action
     {
         [Plugin("Key", "")]
-        public SpecificWriter Target { get; set; }
+        public IValueWriter Target { get; set; }
 
         [Plugin("Amount", "")]
         public double IncrementBy { get; set; }
@@ -20,7 +20,7 @@ namespace Kinectitude.Core.Actions
 
         public override void Run()
         {
-            Target.SetValue((double.Parse(Target.GetValue()) + IncrementBy).ToString());
+            Target.Value = (double.Parse(Target.Value) + IncrementBy).ToString();
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Drawing;
 using Kinectitude.Attributes;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Components;
-using Kinectitude.Core.Exceptions;
+//using Kinectitude.Core.Exceptions;
 using SlimDX;
 using SlimDX.Direct2D;
 using ColorConverter = System.Windows.Media.ColorConverter;
@@ -65,11 +65,12 @@ namespace Kinectitude.Render
         public override void Ready()
         {
             List<Type> missing = new List<Type>();
-            tc = Entity.GetComponent(typeof(TransformComponent)) as TransformComponent;
+            tc = GetComponent<TransformComponent>();
+            //TODO this will be done automatcially
             if (null == tc)
             {
                 missing.Add(typeof(TransformComponent));
-                throw MissingRequirementsException.MissingRequirement(this, missing);
+                //throw MissingRequirementsException.MissingRequirement(this, missing);
             }
             circular = "circle" == Shape;
         }

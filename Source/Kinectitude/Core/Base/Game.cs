@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using Kinectitude.Core.Loaders;
+using Kinectitude.Core.Base;
+using Kinectitude.Attributes;
 
 namespace Kinectitude.Core.Base
 {
 
     public class Game : DataContainer, IUpdateable
     {
-        private readonly Stack<Scene> currentScenes;
         private readonly GameLoader gameLoader;
+        private readonly Stack<Scene> currentScenes = new Stack<Scene>();
+        private readonly Dictionary<Type, Service> services = new Dictionary<Type, Service>();
+
+        internal static Game CurrentGame { get; private set; }
 
         public new string Name
         {
@@ -25,10 +30,10 @@ namespace Kinectitude.Core.Base
             get { return null != this["height"] ? int.Parse(this["height"]) : 600; }
         }
 
-        internal Game(GameLoader gameLoader) : base(-1)
+        internal Game(GameLoader gameLoader) : base(-2)
         {
-            currentScenes = new Stack<Scene>();
             this.gameLoader = gameLoader;
+            CurrentGame = this;
         }
 
         public void Start()
@@ -47,27 +52,8 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        public void AddService(object obj)
-        {
-            gameLoader.Services[obj.GetType()] = obj;
-        }
-
-        public void RemoveService(Type remove)
-        {
-            if (null != gameLoader.Services.ContainsKey(remove))
-            {
-                gameLoader.Services.Remove(remove);
-            }
-        }
-
-        public T GetService<T>() where T : class
-        {
-            return gameLoader.Services[typeof(T)] as T;
-        }
-
         internal void RunScene(string name)
         {
-            //should this be pop?  If so you can go back to a menu or something.  But they may not want that.  I think there should be both
             currentScenes.Pop().Running = false;
             Scene run = gameLoader.GetSceneLoader(name).Scene;
             currentScenes.Push(run);
@@ -92,5 +78,16 @@ namespace Kinectitude.Core.Base
             }
             currentScenes.Peek().Running = true;
         }
+
+        public void SetService(Service service)
+        {
+            services[service.GetType()] = service;
+        }
+
+        public T GetService<T>() where T : Service
+        {
+            return services[typeof(T)] as T;
+        }
+
     }
 }

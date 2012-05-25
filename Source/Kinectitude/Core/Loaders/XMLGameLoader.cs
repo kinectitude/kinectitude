@@ -54,7 +54,6 @@ namespace Kinectitude.Core.Loaders
                     PrototypeIs[myName].Add(myName);
                     if (null != node.Attribute("prototype"))
                     {
-                        //TODO do the prototype here.
                         string name = (string)node.Attribute("prototype");
                         name = name.Trim();
                         if (name.Contains(' '))

@@ -2,11 +2,14 @@
 <game name="pong" Width="800" Height="600">
 
   <define part="KinectFollowComponent" fullName="Kinectitude.Kinect.KinectFollowComponent" file="Kinectitude.Kinect.dll" />
+  <define part="KinectManager" fullName="Kinectitude.Kinect.KinectManager" file="Kinectitude.Kinect.dll" />
 
+  <define part="PhysicsManager" fullName="Kinectitude.Physics.PhysicsManager" file="Kinectitude.Physics.dll" />
   <define part="PhysicsComponent" fullName="Kinectitude.Physics.PhysicsComponent" file="Kinectitude.Physics.dll" />
   <define part="CrossesLineEvent" fullName="Kinectitude.Physics.CrossesLineEvent" file="Kinectitude.Physics.dll" />
   <define part="CollisionEvent" fullName="Kinectitude.Physics.CollisionEvent" file="Kinectitude.Physics.dll" />
 
+  <define part="RenderManager" fullName="Kinectitude.Render.RenderManager" file="Kinectitude.Render.dll" />
   <define part="RenderComponent" fullName="Kinectitude.Render.RenderComponent" file="Kinectitude.Render.dll" />
   <define part="TextRenderComponent" fullName="Kinectitude.Render.TextRenderComponent" file="Kinectitude.Render.dll" />
   <define part="SetTextAction" fullName="Kinectitude.Render.SetTextAction" file="Kinectitude.Render.dll" />
@@ -24,7 +27,7 @@
 
   <prototype name="bar">
     <component type="RenderComponent" FillColor="LimeGreen" Shape="rectangle"/>
-    <component type="TransformComponent" Width="800" Height="10" X="400" Y="455"/>
+    <component type="TransformComponent" Width="800" Height="10" X="400" Y="340"/>
   </prototype>
 
   <!-- tests that it will inherit from paddle-->
@@ -72,10 +75,8 @@
 
     <entity name="player1" prototype="paddle">
       <component type="TransformComponent" X="17" Y="250"/>
-      <event type="CrossesLineEvent" Line="Y" Location="450"  Direction="Positive">
+      <event type="CrossesLineEvent" Line="Y" Location="350"  Direction="Positive">
         <action type="SetAttributeAction" Target="scene.ready1" Value="player 1 is ready!"/>
-        <!-- <condition if="scene.ready2"> -->
-        <!-- TODO replace with line above this complicated epressions for ifs, checked in debug to see that it parsed it right-->
         <condition if="scene.ready2 and scene.ready1 or scene.ready1 and scene.ready2">
           <action type="ChangeSceneAction" Target="game"/>
         </condition>
@@ -86,7 +87,7 @@
       <component type="TransformComponent" X="782" Y="250"/>
       <!--this is testing to see that I can ovrride things in a prototype-->
       <component type="KinectFollowComponent" Player="P1" Joint="HandRight" />
-      <event type="CrossesLineEvent" Line="Y" Location="450"  Direction="Positive">
+      <event type="CrossesLineEvent" Line="Y" Location="350"  Direction="Positive">
         <action type="SetAttributeAction" Target="scene.ready2" Value="player 2 is ready!"/>
         <condition if="scene.ready1">
           <action type="ChangeSceneAction" Target="game"/>
@@ -109,26 +110,26 @@
     </entity>
 
     <entity name="top_wall">
-      <component type="TransformComponent" X="0" Y="0" Width="2000" Height="5"/>
+      <component type="TransformComponent" X="400" Y="0" Width="800" Height="2"/>
       <component type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" Bodytype="Kinematic"/>
+      <component type="RenderComponent" FillColor="LimeGreen" Shape="rectangle" />
     </entity>
 
     <entity name="bottom_wall">
-      <component type="TransformComponent" X="0" Y="600" Width="2000" Height="5"/>
+      <component type="TransformComponent" X="400" Y="600" Width="800" Height="2"/>
       <component type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" Bodytype="Kinematic"/>
     </entity>
 
-    <!--<entity name="left_wall">
-      <component type="TransformComponent" X="0" Y="0" Width="5" Height="2000"/>
+    <entity name="left_wall">
+      <component type="TransformComponent" X="0" Y="300" Width="2" Height="600"/>
       <component type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" Bodytype="Kinematic"/>
-    </entity>-->
+    </entity>
 
     <entity name="ball">
       <component type="RenderComponent" FillColor="LimeGreen" Shape="circle" />
       <component type="TransformComponent" X="250" Y="250" Width="24" Height="24"/>
-      <component type="PhysicsComponent" XVelocity="40" YVelocity="20" Shape="circle" Restitution="1" Mass="1" Friction="0" LinearDamping="0" Bodytype="Dynamic"/>
-      <!--<event type="CollisionEvent" CollidesWith="left_wall">-->
-      <event type="CrossesLineEvent" Location="0" Line="X" Direction="Negative">
+      <component type="PhysicsComponent" XVelocity="-40" YVelocity="20" Shape="circle" Restitution="1" Mass="1" Friction="0" LinearDamping="0" Bodytype="Dynamic"/>
+      <event type="CollisionEvent" CollidesWith="left_wall">
         <action type="SetPositionAction" X="400" Y="300" />
         <action type="IncrementAction" Target="scene.player2Score" />
       </event>

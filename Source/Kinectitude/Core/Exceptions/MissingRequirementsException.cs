@@ -5,10 +5,10 @@ using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Exceptions
 {
-    public class MissingRequirementsException : Exception
+    internal sealed class MissingRequirementsException : Exception
     {
 
-        private static string creationHelper(string name, Entity entity, List<Type> missingTypes)
+        private static string creationHelper(string name, IDataContainer entity, List<Type> missingTypes)
         {
             string identity = null != entity.Name ? entity.Name : "Entity " + entity.Id.ToString();
             StringBuilder sb = new StringBuilder();
@@ -23,16 +23,16 @@ namespace Kinectitude.Core.Exceptions
 
         private MissingRequirementsException(string message) : base(message) { }
 
-        public static MissingRequirementsException MissingRequirement(Component component, List<Type> missingTypes)
+        internal static MissingRequirementsException MissingRequirement(Component component, List<Type> missingTypes)
         {
-            return new MissingRequirementsException(
-                creationHelper(component.GetType().FullName, component.Entity, missingTypes));
+            return new MissingRequirementsException
+                (creationHelper(component.GetType().FullName, component.Entity, missingTypes));
         }
 
-        public static MissingRequirementsException MissingRequirement(Event Event, List<Type> missingTypes)
+        internal static MissingRequirementsException MissingRequirement(Event Event, List<Type> missingTypes)
         {
-            return new MissingRequirementsException(
-                creationHelper(Event.GetType().FullName, Event.Entity, missingTypes));
+            return new MissingRequirementsException
+                (creationHelper(Event.GetType().FullName, Event.Entity, missingTypes));
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Kinectitude.Attributes;
-using Action = Kinectitude.Core.Base.Action;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Actions
 {
@@ -13,7 +13,8 @@ namespace Kinectitude.Core.Actions
 
         public override void Run()
         {
-            Event.Scene.Game.PushScene(Target);
+            Game game = Event.Entity.Scene.Game;
+            game.PushScene(Target);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Kinectitude.Physics
 
         public World PhysicsWorld { get; private set; }
 
-        public PhysicsManager(Game game) : base(game)
+        public PhysicsManager() : base()
         {
             PhysicsWorld = new World(Vector2.Zero);
             PhysicsWorld.ClearForces();
@@ -18,7 +18,7 @@ namespace Kinectitude.Physics
         public override void OnUpdate(float t)
         {
             PhysicsWorld.Step(t);
-            foreach (PhysicsComponent pc in children)
+            foreach (PhysicsComponent pc in Children)
             {
                 pc.OnUpdate(t);
             }

@@ -4,7 +4,7 @@ using System.Drawing;
 using Kinectitude.Attributes;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Components;
-using Kinectitude.Core.Exceptions;
+//using Kinectitude.Core.Exceptions;
 using SlimDX;
 using SlimDX.DirectWrite;
 
@@ -59,12 +59,13 @@ namespace Kinectitude.Render
 
         public override void Ready()
         {
-            tc = Entity.GetComponent(typeof(TransformComponent)) as TransformComponent;
+            tc = GetComponent<TransformComponent>();
+            //TODO this will be done automatically
             if (null == tc)
             {
                 List<Type> missing = new List<Type>();
                 missing.Add(typeof(TransformComponent));
-                throw MissingRequirementsException.MissingRequirement(this, missing);
+                //throw MissingRequirementsException.MissingRequirement(this, missing);
             }
         }
     }

@@ -5,7 +5,11 @@ namespace Kinectitude.Core.Base
 
     public abstract class Component : IUpdateable
     {
-        public Entity Entity { get; internal set; }
+        internal Entity Entity;
+        public IDataContainer IEntity
+        {
+            get { return Entity; }
+        }
 
         public Component() { }
 
@@ -15,9 +19,15 @@ namespace Kinectitude.Core.Base
 
         public virtual void Ready() { }
 
-        public virtual Type ImplementationType()
+        public virtual Type ImplementationType
         {
-            return this.GetType();
+            get { return this.GetType(); }
         }
+
+        public T GetComponent<T>() where T : Component
+        {
+            return Entity.GetComponent<T>();
+        }
+
     }
 }

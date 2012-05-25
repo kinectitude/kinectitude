@@ -11,7 +11,7 @@ namespace Kinectitude.Kinect
         private const int scount = 6;
         private static Skeleton[] allSkeletons = new Skeleton[scount];
 
-        public KinectManager(Game game) : base(game) 
+        public KinectManager() : base() 
         {
             enable();
         }
@@ -53,7 +53,7 @@ namespace Kinectitude.Kinect
 
         private void sensorReady(object sender, AllFramesReadyEventArgs e)
         {
-            if (!running)
+            if (!Running)
             {
                 return;
             }
@@ -66,7 +66,7 @@ namespace Kinectitude.Kinect
                     {
                         return;
                     }
-                    foreach (KinectComponent kc in children)
+                    foreach (KinectComponent kc in Children)
                     {
                         KinectFollowComponent kfc = (KinectFollowComponent)kc;
                         if (KinectFollowComponent.PlayerType.P1 == kfc.followPlayer)
@@ -90,7 +90,7 @@ namespace Kinectitude.Kinect
             {
                 enable();
             }
-            foreach (KinectComponent kc in children)
+            foreach (KinectComponent kc in Children)
             {
                 kc.OnUpdate(t);
             }

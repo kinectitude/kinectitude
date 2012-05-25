@@ -5,8 +5,8 @@ using FarseerPhysics.Factories;
 using Kinectitude.Attributes;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Components;
-using Kinectitude.Core.Exceptions;
-using Kinectitude.Core.Interfaces;
+//using Kinectitude.Core.Exceptions;
+using Kinectitude.Core.ComponentInterfaces;
 using Microsoft.Xna.Framework;
 using FarseerPhysics.Dynamics.Contacts;
 
@@ -14,7 +14,7 @@ namespace Kinectitude.Physics
 {
 
     [Plugin("Physics Component", "")]
-    public class PhysicsComponent : Component, IPhysicsComponent
+    public class PhysicsComponent : APhysicsComponent
     {
         private const float sizeRatio = 1f / 100f;
         private const float speedRatio = 1f / 10f;
@@ -74,8 +74,7 @@ namespace Kinectitude.Physics
         }
 
         private float xVelocity;
-        [Plugin("Horizontal Velocity", "")]
-        public float XVelocity
+        public override float XVelocity
         {
             get { return xVelocity; }
             set 
@@ -89,8 +88,8 @@ namespace Kinectitude.Physics
         }
 
         private float yVelocity;
-        [Plugin("Vertical Velocity", "")]
-        public float YVelocity
+
+        public override float YVelocity
         {
             get { return yVelocity; }
             set
@@ -103,8 +102,7 @@ namespace Kinectitude.Physics
             }
         }
 
-        [Plugin("Angular Velocity", "")]
-        public float AngularVelocity { get; set; }
+        public override float AngularVelocity { get; set; }
 
         override public Type ManagerType(){return typeof(PhysicsManager);}
 
@@ -190,19 +188,20 @@ namespace Kinectitude.Physics
             this.pm = pm;
         }
 
-        public override Type ImplementationType()
+        public override Type ImplementationType
         {
-            return typeof(IPhysicsComponent);
+            get { return typeof(APhysicsComponent); }
         }
 
         public override void Ready()
         {
             List<Type> missing = new List<Type>();
-            tc = Entity.GetComponent(typeof(TransformComponent)) as TransformComponent;
+            tc = GetComponent<TransformComponent>();
             if (null == tc)
             {
                 missing.Add(typeof(TransformComponent));
-                throw MissingRequirementsException.MissingRequirement(this, missing);
+                //TODO this will be done automatically
+                //throw MissingRequirementsException.MissingRequirement(this, missing);
             }
 
             tc.SubscribeToX(this, SetPosition);
@@ -222,7 +221,7 @@ namespace Kinectitude.Physics
             }
 
             //Set fields on the body
-            body.UserData = Entity;
+            body.UserData = IEntity;
             body.BodyType = Bodytype;
             body.Restitution = Restitution;
             body.Mass = Mass;
@@ -244,10 +243,10 @@ namespace Kinectitude.Physics
                 Body bodyA = fixtureA.Body;
                 Body bodyB = fixtureB.Body;
 
-                Entity entityA = bodyA.UserData as Entity;
-                Entity entityB = bodyB.UserData as Entity;
+                IDataContainer entityA = bodyA.UserData as IDataContainer;
+                IDataContainer entityB = bodyB.UserData as IDataContainer;
 
-                Entity collidedWith = (entityA == Entity) ? entityB : entityA;
+                IDataContainer collidedWith = (entityA == IEntity) ? entityB : entityA;
 
                 foreach (CollisionEvent ce in collisionEvents)
                 {

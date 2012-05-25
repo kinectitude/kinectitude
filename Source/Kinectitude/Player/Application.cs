@@ -8,12 +8,16 @@ using SlimDX.Direct2D;
 using SlimDX.DirectWrite;
 using SlimDX.Windows;
 using FontStyle = SlimDX.DirectWrite.FontStyle;
+using Kinectitude.Render;
+using System.Reflection;
 
 namespace Kinectitude.Player
 {
     internal sealed class Application : IDisposable
     {
         private const float TimeStep = 1.0f / 60.0f;
+
+        private static RenderService renderService;
 
         private readonly Game game;
         private readonly RenderForm form;
@@ -33,11 +37,15 @@ namespace Kinectitude.Player
 
         public Application()
         {
+
             drawFactory = new SlimDX.Direct2D.Factory();
             SizeF dpi = drawFactory.DesktopDpi;
-
-            GameLoader gameLoader = GameLoader.GetGameLoader("game.xml");
+            Assembly loaded = Assembly.GetAssembly(typeof(RenderService));
+            GameLoader gameLoader = GameLoader.GetGameLoader("game.xml", new Assembly[] { loaded });
             game = gameLoader.Game;
+            //this part will go away
+            RenderService tmp = new RenderService();
+            game.SetService(tmp);
 
             Size size = new Size( (int)(game.Width * dpi.Width / 96.0f), (int)(game.Height * dpi.Height / 96.0f) );
             form = new RenderForm(game.Name);
@@ -57,11 +65,10 @@ namespace Kinectitude.Player
             textFormat.ParagraphAlignment = ParagraphAlignment.Center;
             textBrush = new SolidColorBrush(renderTarget, new Color4(1.0f, 1.0f, 1.0f));
             clearColor = new Color4(0.30f, 0.30f, 0.80f);
-
-            gameLoader.RegisterService(typeof(SlimDX.DirectWrite.Factory), writeFactory);
-
             clock = new Clock();
             accumulator = 0.0f;
+            renderService = game.GetService<RenderService>();
+            renderService.Factory = writeFactory;
         }
 
         public void Dispose()
@@ -114,7 +121,7 @@ namespace Kinectitude.Player
             renderTarget.Transform = Matrix3x2.Identity;
             renderTarget.Clear(clearColor);
 
-            Action<RenderTarget> onRender = game.GetService<Action<RenderTarget>>();
+            Action<RenderTarget> onRender = renderService.RenderTargetAction;
 
             if (null != onRender)
             {

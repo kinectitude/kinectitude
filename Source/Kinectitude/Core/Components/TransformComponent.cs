@@ -9,7 +9,7 @@ public delegate void ChangeDelegate();
 namespace Kinectitude.Core.Components
 {
     [Plugin("Transform Component", "")]
-    public class TransformComponent:Component
+    public class TransformComponent : Component
     {
         private List<ChangeDelegate> notifyXUpdate = new List<ChangeDelegate>();
         private List<ChangeDelegate> notifyYUpdate = new List<ChangeDelegate>();
@@ -143,13 +143,13 @@ namespace Kinectitude.Core.Components
 
         public void SubscribeToX(Component component, ChangeDelegate changeDelegate)
         {
-            creators[changeDelegate] =  component;
+            creators[changeDelegate] = component;
             notifyXUpdate.Add(changeDelegate);
         }
 
         public void SubscribeToY(Component component, ChangeDelegate changeDelegate)
         {
-            creators[changeDelegate] =  component;
+            creators[changeDelegate] = component;
             notifyYUpdate.Add(changeDelegate);
         }
 

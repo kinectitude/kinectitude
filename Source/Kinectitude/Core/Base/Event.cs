@@ -6,44 +6,59 @@ namespace Kinectitude.Core.Base
 {
     public abstract class Event
     {
-        private readonly List<Action> actions;
 
-        public Game Game { get; private set; }
+        private static readonly Queue<Event> eventQueue = new Queue<Event>();
 
-        public Entity Entity { get; private set; }
-        
-        internal Dictionary<string, ReadableData> AvailableSelectors { get; private set; }
-        
-        internal Scene Scene { get; private set; }
+        internal readonly Dictionary<string, TypeMatcher> AvailableSelectors =
+            new Dictionary<string, TypeMatcher>();
 
-        protected Event()
+        private readonly List<Action> actions = new List<Action>();
+
+        internal Entity Entity;
+
+        protected Event() { }
+
+        internal void Initialize()
         {
-            actions = new List<Action>();
-        }
-
-        internal void Initialize(Scene scene, Entity entity)
-        {
-            Scene = scene;
-            Game = scene.Game;
-            AvailableSelectors = new Dictionary<string, ReadableData>();
-            Entity = entity;
             OnInitialize();
         }
 
         public abstract void OnInitialize();
 
-        internal void AddAction(Action action)
+        public void AddAction(Action action)
         {
+            //TODO check assembly
             action.Event = this;
             actions.Add(action);
         }
 
         public void DoActions()
         {
+            if (0 == eventQueue.Count)
+            {
+                Run();
+            }
+            else
+            {
+                eventQueue.Enqueue(this);
+            }
+        }
+
+        private void Run()
+        {
             foreach (Action a in actions)
             {
                 a.Run();
             }
+            if (eventQueue.Count != 0)
+            {
+                eventQueue.Dequeue().Run();
+            }
+        }
+
+        public T GetComponent<T>() where T : Component
+        {
+            return Entity.GetComponent<T>();
         }
     }
 }

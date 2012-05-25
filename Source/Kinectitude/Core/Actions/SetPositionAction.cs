@@ -1,24 +1,23 @@
 ﻿using Kinectitude.Attributes;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Components;
-using Action = Kinectitude.Core.Base.Action;
 
 namespace Kinectitude.Core.Actions
 {
     [Plugin("Set position", "")]
-    public class SetPositionAction : Action
+    internal sealed class SetPositionAction : Action
     {
-        [Plugin("X", "")]
+        [Plugin("X", "The new X position for the entity")]
         public float X { get; set; }
 
-        [Plugin("Y", "")]
+        [Plugin("Y", "The new Y position for the entity")]
         public float Y { get; set; }
 
-        public SetPositionAction() : base() { }
+        public SetPositionAction() { }
 
         public override void Run()
         {
-            TransformComponent tc = Event.Entity.GetComponent(typeof(TransformComponent)) as TransformComponent;
+            TransformComponent tc = GetComponent<TransformComponent>();
             tc.X = X;
             tc.Y = Y;
         }

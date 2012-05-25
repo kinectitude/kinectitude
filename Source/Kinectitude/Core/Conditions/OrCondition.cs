@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Kinectitude.Core.Base;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Conditions
 {

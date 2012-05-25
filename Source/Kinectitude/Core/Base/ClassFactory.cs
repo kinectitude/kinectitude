@@ -9,10 +9,13 @@ using Kinectitude.Core.Components;
 using Kinectitude.Core.Data;
 using Kinectitude.Core.Events;
 using Kinectitude.Core.Exceptions;
+using Kinectitude.Core.Base;
+using Kinectitude.Core.Managers;
 
 namespace Kinectitude.Core.Base
 {
-    internal class ClassFactory{
+    internal class ClassFactory
+    {
         public static readonly Dictionary<string, Type> TypesDict = new Dictionary<string, Type>();
 
         private static readonly MethodInfo IntParse = typeof(int).GetMethod("Parse", new[] { typeof(string) });
@@ -20,42 +23,38 @@ namespace Kinectitude.Core.Base
         private static readonly MethodInfo LongParse = typeof(long).GetMethod("Parse", new[] { typeof(string) });
         private static readonly MethodInfo DoubleParse = typeof(double).GetMethod("Parse", new[] { typeof(string) });
         private static readonly MethodInfo BoolParse = typeof(bool).GetMethod("Parse", new[] { typeof(string) });
-        private static readonly MethodInfo EnumParse = 
+        private static readonly MethodInfo EnumParse =
             typeof(Enum).GetMethod("Parse", new[] { typeof(Type), typeof(string) });
 
-        //used for creating SpecificWriter
-        private static readonly MethodInfo CreateSpecificWriter = typeof(SpecificWriter).GetMethod
-            ("CreateSpecificWriteableData", BindingFlags.Static | BindingFlags.NonPublic);
+        //used for creating ValueWriter
+        private static readonly MethodInfo CreateValueWriter = typeof(ValueWriter).GetMethod
+            ("CreateValueWriter", BindingFlags.Static | BindingFlags.NonPublic);
 
-        //used for creating WriteableData
-        private static readonly MethodInfo CreateWriteableData = typeof(WriteableData).GetMethod
-            ("CreateWriteableData", BindingFlags.Static | BindingFlags.NonPublic);
+        //used for creating ExpressionReader
+        private static readonly MethodInfo CreateExpressionReader = typeof(ExpressionReader).GetMethod
+            ("CreateExpressionReader", BindingFlags.Static | BindingFlags.NonPublic);
 
-        //used for creating SpecificReadable
-        private static readonly MethodInfo CreateSpecificReadable = typeof(SpecificReadable).GetMethod
-            ("CreateSpecificReadable", BindingFlags.Static | BindingFlags.NonPublic);
-
-        //used for creating ReadableData
-        private static readonly MethodInfo CreateReadableData = typeof(ReadableData).GetMethod
-            ("CreateReadableData", BindingFlags.Static | BindingFlags.NonPublic);
+        //used for creating TypeMatcher
+        private static readonly MethodInfo CreateTypeMatcher = typeof(TypeMatcher).GetMethod
+            ("CreateTypeMatcher", BindingFlags.Static | BindingFlags.NonPublic);
 
         //empty constructors
-        private static readonly Dictionary<string, Func<object>> Constructors = 
+        private static readonly Dictionary<string, Func<object>> Constructors =
             new Dictionary<string, Func<object>>();
 
-        //manager constructors, takes Game argument
-        private static readonly Dictionary<string, Func<Game, object>> ManagerConstructors =
-            new Dictionary<string, Func<Game,object>>();
+        //empty constructors
+        private static readonly Dictionary<Type, Func<object>> ConstructorTypes =
+            new Dictionary<Type, Func<object>>();
 
         //normal setters
-        private static readonly Dictionary<Type, Dictionary<string, object>> SettersByType = 
-            new Dictionary<Type,Dictionary<string, object>>();
+        private static readonly Dictionary<Type, Dictionary<string, object>> SettersByType =
+            new Dictionary<Type, Dictionary<string, object>>();
 
         //stores the names set in define in case they are different
         private static readonly Dictionary<Type, string> ReferedDictionary = new Dictionary<Type, string>();
-        
+
         //used to get the type that the setter is for casting the object in the setter's dictionary.
-        private static Dictionary<Type, Dictionary<string, Type>> ParamType = 
+        private static Dictionary<Type, Dictionary<string, Type>> ParamType =
             new Dictionary<Type, Dictionary<string, Type>>();
 
         static ClassFactory()
@@ -72,18 +71,12 @@ namespace Kinectitude.Core.Base
             RegisterType("TriggerOccursEvent", typeof(TriggerOccursEvent));
             RegisterType("TransformComponent", typeof(TransformComponent));
             RegisterType("SetPositionAction", typeof(SetPositionAction));
+            RegisterType("TimeManager", typeof(TimeManager));
         }
 
         public static void RegisterType(string registeredName, Type type)
         {
-            if (typeof(IManager).IsAssignableFrom(type))
-            {
-                ManagerConstructors[registeredName] = createManagerConstructorDelegate(type);
-            }
-            else
-            {
-                Constructors[registeredName] = createConstructorDelegate(type);
-            }
+            Constructors[registeredName] = ConstructorTypes[type] = createConstructorDelegate(type);
             SettersByType[type] = new Dictionary<string, object>();
             ReferedDictionary[type] = registeredName;
             ParamType[type] = new Dictionary<string, Type>();
@@ -100,11 +93,11 @@ namespace Kinectitude.Core.Base
                     continue;
                 }
                 object setAction;
-                if (typeof(SpecificWriter) == pi.PropertyType || typeof(WriteableData) == pi.PropertyType)
+                if (typeof(IValueWriter) == pi.PropertyType)
                 {
-                    setAction = createWriterSetterDelegate(type, setMethod);
+                    setAction = createIValueWriter(type, setMethod);
                 }
-                else if (typeof(ReadableData) == pi.PropertyType || typeof(SpecificReadable) == pi.PropertyType)
+                else if (typeof(ITypeMatcher) == pi.PropertyType || typeof(IExpressionReader) == pi.PropertyType)
                 {
                     setAction = createReaderSetterDelegate(type, setMethod);
                 }
@@ -124,24 +117,25 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        public static T Create<T>(string name) where T : class
+        private static T CreateHelper<T, U>(U lookup, Dictionary<U, Func<object>> maker) where T : class
         {
-            Func<object> constructor = Constructors[name];
-            return constructor() as T;
+            Func<object> constructor = maker[lookup];
+            T returnVal = constructor() as T;
+            return returnVal;
         }
 
-        public static T Create<T>(Type type, Game game) where T : class
+        internal static T Create<T>(string name) where T : class
         {
-            if (!Constructors.ContainsKey(type.FullName))
-            {
-                RegisterType(type.FullName, type);
-            }
-            return ManagerConstructors[type.FullName](game) as T;
+            return CreateHelper<T, string>(name, Constructors);
         }
 
-        public static void SetParam(object obj, string param, string val, Scene s, Event evt, Entity entity)
+        internal static T Create<T>(Type type) where T : class
         {
+            return CreateHelper<T, Type>(type, ConstructorTypes);
+        }
 
+        internal static void SetParam(object obj, string param, string val, Event evt, Entity entity)
+        {
             Type setType = null;
             ParamType[obj.GetType()].TryGetValue(param, out setType);
 
@@ -151,17 +145,17 @@ namespace Kinectitude.Core.Base
             }
 
             Dictionary<string, object> setters = SettersByType[obj.GetType()];
-            if (typeof(SpecificWriter) == setType || typeof(WriteableData) == setType)
+            if (typeof(IValueWriter) == setType)
             {
-                Action<object, string, Entity, Scene> action =
-                    setters[param] as Action<object, string, Entity, Scene>;
-                action(obj, val, entity, s);
+                Action<object, string, Entity> action =
+                    setters[param] as Action<object, string, Entity>;
+                action(obj, val, entity);
             }
-            else if (typeof(SpecificReadable) == setType || typeof(ReadableData) == setType)
+            else if (typeof(IExpressionReader) == setType || typeof(ITypeMatcher) == setType)
             {
-                Action<object, string, Event, Scene> action =
-                    setters[param] as Action<object, string, Event, Scene>;
-                action(obj, val, evt, s);
+                Action<object, string, Event, Entity> action =
+                    setters[param] as Action<object, string, Event, Entity>;
+                action(obj, val, evt, entity);
             }
             else
             {
@@ -180,57 +174,41 @@ namespace Kinectitude.Core.Base
             ).Compile();
         }
 
-        public static Func<Game, object> createManagerConstructorDelegate(Type type)
-        {
-            ParameterExpression paramExpression = Expression.Parameter(typeof(Game));
-            return Expression.Lambda<Func<Game, object>>(
-                Expression.New(
-                    type.GetConstructor(new Type[] { typeof(Game) }), paramExpression
-                ), paramExpression
-            ).Compile();
-        }
-
-        private static Action<object, string, Entity, Scene> createWriterSetterDelegate
+        private static Action<object, string, Entity> createIValueWriter
             (Type type, MethodInfo method)
         {
             ParameterExpression target = Expression.Parameter(typeof(object));
             ParameterExpression value = Expression.Parameter(typeof(string));
             ParameterExpression entity = Expression.Parameter(typeof(Entity));
-            ParameterExpression scene = Expression.Parameter(typeof(Scene));
-            Type propertyType = method.GetParameters().Single().ParameterType;
 
-            MethodInfo mi = typeof(SpecificWriter) == propertyType ? CreateSpecificWriter : CreateWriteableData;
-
-            return Expression.Lambda<Action<object, string, Entity, Scene>>(
+            return Expression.Lambda<Action<object, string, Entity>>(
                 Expression.Call(
                     Expression.Convert(target, type),
                     method,
                     Expression.Call(
-                        mi,
+                        CreateValueWriter,
                         value,
-                        entity,
-                        scene
+                        entity
                     )
                 ),
                 target,
                 value,
-                entity,
-                scene
+                entity
             ).Compile();
         }
 
-        private static Action<object, string, Event, Scene> createReaderSetterDelegate
+        private static Action<object, string, Event, Entity> createReaderSetterDelegate
             (Type type, MethodInfo method)
         {
             ParameterExpression target = Expression.Parameter(typeof(object));
             ParameterExpression value = Expression.Parameter(typeof(string));
             ParameterExpression evt = Expression.Parameter(typeof(Event));
-            ParameterExpression scene = Expression.Parameter(typeof(Scene));
+            ParameterExpression entity = Expression.Parameter(typeof(Entity));
             Type propertyType = method.GetParameters().Single().ParameterType;
 
-            MethodInfo mi = typeof(SpecificReadable) == propertyType ? CreateSpecificReadable : CreateReadableData;
+            MethodInfo mi = typeof(IExpressionReader) == propertyType ? CreateExpressionReader : CreateTypeMatcher;
 
-            return Expression.Lambda<Action<object, string, Event, Scene>>(
+            return Expression.Lambda<Action<object, string, Event, Entity>>(
                 Expression.Call(
                     Expression.Convert(target, type),
                     method,
@@ -238,13 +216,13 @@ namespace Kinectitude.Core.Base
                         mi,
                         value,
                         evt,
-                        scene
+                        entity
                     )
                 ),
                 target,
                 value,
                 evt,
-                scene
+                entity
             ).Compile();
         }
 

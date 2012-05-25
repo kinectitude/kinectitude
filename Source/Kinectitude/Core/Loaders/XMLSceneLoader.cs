@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using Kinectitude.Core.Base;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Loaders
 {
@@ -70,7 +71,6 @@ namespace Kinectitude.Core.Loaders
                     //insert the prototype into the original
                     if (null != e.Attribute("prototype"))
                     {
-                        //TODO do the prototype here.
                         string name = (string)e.Attribute("prototype");
                         name = name.Trim();
                         if (name.Contains(' '))
@@ -103,6 +103,7 @@ namespace Kinectitude.Core.Loaders
                             entity[attrib.Name.ToString()] = attrib.Value;
                         }
                     }
+                    entity.Scene = Scene;
                     entityParse(parsedNode, entity);
                     entity.Ready();
                 }
@@ -118,8 +119,8 @@ namespace Kinectitude.Core.Loaders
                     case "#comment":
                         continue;
                     case "event":
-                        Event evt = createEvent(Game, node);
-                        evt.Initialize(Scene, entity);
+                        Event evt = createEvent(Game, node, entity);
+                        evt.Initialize();
                         break;
                     case "component":
                         string stringType = (string)node.Attribute("type");
@@ -172,9 +173,10 @@ namespace Kinectitude.Core.Loaders
             }
         }
 
-        private Event createEvent(Game game, XElement node)
+        private Event createEvent(Game game, XElement node, Entity entity)
         {
             Event evt = ClassFactory.Create<Event>((string)node.Attribute("type"));
+            evt.Entity = entity;
 
             foreach (XAttribute attrib in node.Attributes())
             {
@@ -184,7 +186,7 @@ namespace Kinectitude.Core.Loaders
                 }
                 string value = attrib.Value;
                 string param = attrib.Name.ToString();
-                ClassFactory.SetParam(evt, param, value, Scene, evt, evt.Entity);
+                ClassFactory.SetParam(evt, param, value, evt, evt.Entity);
             }
             addActions(game, node, evt);
             return evt;
@@ -192,7 +194,7 @@ namespace Kinectitude.Core.Loaders
 
         private Condition createCondition(Game game, Event e, XElement node)
         {
-            Condition c = Condition.CreateCondition((string)node.Attribute("if"), e, Scene);
+            Condition c = Condition.CreateCondition((string)node.Attribute("if"), e, e.Entity);
             addActions(game, node, e, c);
             return c;
         }

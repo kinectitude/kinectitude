@@ -1,10 +1,10 @@
 ﻿using Kinectitude.Attributes;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Data;
-using Kinectitude.Core.Interfaces;
+using Kinectitude.Core.ComponentInterfaces;
 using System.Collections.Generic;
 using System;
-using Kinectitude.Core.Exceptions;
+//using Kinectitude.Core.Exceptions;
 
 namespace Kinectitude.Physics
 {
@@ -12,18 +12,19 @@ namespace Kinectitude.Physics
     public class CollisionEvent : Event
     {
         [Plugin("Collides with","")]
-        public ReadableData CollidesWith { get; set; }
+        public ITypeMatcher CollidesWith { get; set; }
 
         public CollisionEvent() { }
 
         public override void OnInitialize()
         {
-            PhysicsComponent pc = Entity.GetComponent(typeof(IPhysicsComponent)) as PhysicsComponent;
+            PhysicsComponent pc = GetComponent<APhysicsComponent>() as PhysicsComponent;
             if (null == pc)
             {
                 List<Type> missing = new List<Type>();
                 missing.Add(typeof(PhysicsComponent));
-                throw MissingRequirementsException.MissingRequirement(this, missing);
+                //TODO this will be done automatically
+                //throw MissingRequirementsException.MissingRequirement(this, missing);
             }
             pc.AddCollisionEvent(this);
         }
