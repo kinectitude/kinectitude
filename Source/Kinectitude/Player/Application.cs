@@ -43,9 +43,6 @@ namespace Kinectitude.Player
             Assembly loaded = Assembly.GetAssembly(typeof(RenderService));
             GameLoader gameLoader = GameLoader.GetGameLoader("game.xml", new Assembly[] { loaded });
             game = gameLoader.Game;
-            //this part will go away
-            RenderService tmp = new RenderService();
-            game.SetService(tmp);
 
             Size size = new Size( (int)(game.Width * dpi.Width / 96.0f), (int)(game.Height * dpi.Height / 96.0f) );
             form = new RenderForm(game.Name);

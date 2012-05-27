@@ -180,5 +180,11 @@ namespace Kinectitude.Core.Base
             return entityByName[name];
         }
 
+
+        public void createEntity(string prototype)
+        {
+            seceneLoader.CreateEntity(prototype);
+        }
+
     }
 }

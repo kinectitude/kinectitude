@@ -72,6 +72,17 @@ namespace Kinectitude.Core.Base
             RegisterType("TransformComponent", typeof(TransformComponent));
             RegisterType("SetPositionAction", typeof(SetPositionAction));
             RegisterType("TimeManager", typeof(TimeManager));
+            RegisterType("CreateEntityAction", typeof(CreateEntityAction));
+        }
+
+
+        public static void loadServices(Assembly assembly)
+        {
+            foreach(Type type in assembly.GetTypes().Where(item => typeof(Service).IsAssignableFrom(item)))
+            {
+                Service service = Activator.CreateInstance(type) as Service;
+                Game.CurrentGame.SetService(service);
+            }
         }
 
         public static void RegisterType(string registeredName, Type type)

@@ -68,18 +68,30 @@ namespace Kinectitude.Core.Base
             run.Running = true;
         }
 
+        internal void Quit()
+        {
+            foreach (Service service in services.Values)
+            {
+                if (service.Running)
+                {
+                    service.Stop();
+                }
+            }
+            Environment.Exit(0);
+        }
+
         internal void PopScene()
         {
             currentScenes.Peek().Running = false;
             currentScenes.Pop();
             if (0 == currentScenes.Count)
             {
-                Environment.Exit(0);
+                Quit();
             }
             currentScenes.Peek().Running = true;
         }
 
-        public void SetService(Service service)
+        internal void SetService(Service service)
         {
             services[service.GetType()] = service;
         }

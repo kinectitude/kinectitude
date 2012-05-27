@@ -35,42 +35,45 @@ namespace Kinectitude.Core.Loaders
             {
                 Game[attrib.Name.ToString()] = attrib.Value;
             }
-            
-            foreach (XElement node in root.Elements())
+
+            foreach (XElement node in root.Elements().Where(input => "Using" == input.Name))
             {
-                if ("define" == node.Name)
+                string loadName = (string)node.Attribute("File");
+                foreach (XElement defined in node.Elements().Where(input => "Define" == input.Name))
                 {
-                    LoadReflection((string)node.Attribute("file"), (string)node.Attribute("part"),
-                        (string)node.Attribute("fullName"));
+                    LoadReflection(loadName, (string)defined.Attribute("Name"),
+                        (string)defined.Attribute("Class"));
                 }
-                else if ("scene" == node.Name)
+            }
+
+            foreach (XElement node in root.Elements().Where(input => "Prototype" == input.Name))
+            {
+                string myName = (string)node.Attribute("Name");
+                PrototypeIs[myName] = new List<string>();
+                PrototypeIs[myName].Add(myName);
+                if (null != node.Attribute("Prototype"))
                 {
-                    scenes[(string)node.Attribute("name")] = node;
-                }
-                else if ("prototype" == node.Name)
-                {
-                    string myName = (string)node.Attribute("name");
-                    PrototypeIs[myName] = new List<string>();
-                    PrototypeIs[myName].Add(myName);
-                    if (null != node.Attribute("prototype"))
+                    string name = (string)node.Attribute("Prototype");
+                    name = name.Trim();
+                    if (name.Contains(' '))
                     {
-                        string name = (string)node.Attribute("prototype");
-                        name = name.Trim();
-                        if (name.Contains(' '))
+                        string[] names = name.Split(' ');
+                        foreach (string n in names)
                         {
-                            string[] names = name.Split(' ');
-                            foreach (string n in names)
-                            {
-                                mergePrototpye(node, myName, n);
-                            }
-                        }
-                        else
-                        {
-                            mergePrototpye(node, myName, name);
+                            mergePrototpye(node, myName, n);
                         }
                     }
-                    Prototypes.Add(myName, node);
+                    else
+                    {
+                        mergePrototpye(node, myName, name);
+                    }
                 }
+                Prototypes.Add(myName, node);
+            }
+
+            foreach (XElement node in root.Elements().Where(input => "Scene" == input.Name))
+            {
+                scenes[(string)node.Attribute("Name")] = node;
             }
         }
 
@@ -86,15 +89,15 @@ namespace Kinectitude.Core.Loaders
             //keep track of all the nodes in the dst because they will need to be merged if they are also in src
             foreach (XElement node in dst.Elements())
             {
-                if ("event" == node.Name  || "trigger" == node.Name)
+                if ("Event" == node.Name  || "Trigger" == node.Name)
                 {
                     continue;
                 }
-                nodes.Add((string)node.Attribute("type"), node);
+                nodes.Add((string)node.Attribute("Type"), node);
             }
             foreach (XAttribute attr in src.Attributes())
             {
-                if ("name" == attr.Name || "type" == attr.Name)
+                if ("Name" == attr.Name || "Type" == attr.Name)
                 {
                     continue;
                 }
@@ -104,9 +107,9 @@ namespace Kinectitude.Core.Loaders
 
                 }
             }
-            foreach (XElement node in src.Elements("component"))
+            foreach (XElement node in src.Elements("Component"))
             {
-                string key = (string)node.Attribute("type");
+                string key = (string)node.Attribute("Type");
                 if (nodes.ContainsKey(key))
                 {
                     mergeXmlNodes(node, nodes[key]);
@@ -117,9 +120,9 @@ namespace Kinectitude.Core.Loaders
                     dst.AddFirst(copy);
                 }
             }
-            foreach (XElement node in src.Elements("event"))
+            foreach (XElement node in src.Elements("Event"))
             {
-                string key = (string)node.Attribute("type");
+                string key = (string)node.Attribute("Type");
                 XElement copy = new XElement(node);
                 dst.Add(copy);
             }

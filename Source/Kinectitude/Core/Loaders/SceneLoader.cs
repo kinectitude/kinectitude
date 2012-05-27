@@ -22,5 +22,8 @@ namespace Kinectitude.Core.Loaders
             GameLoader = gameLoader;
             Game = GameLoader.Game;
         }
+
+        internal abstract void CreateEntity(string name);
+
     }
 }

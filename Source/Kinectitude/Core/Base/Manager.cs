@@ -19,19 +19,24 @@ namespace Kinectitude.Core.Base
 
     public class Manager<T> : IManager where T : IUpdateable
     {
-        protected readonly List<T> Children;
+
+        private List<T> children;
+
+        protected List<T> Children {
+            get { return new List<T>(children); } 
+        }
 
         protected bool Running { get; private set; }
 
         public void Add(T item)
         {
-            Children.Add(item);
+            children.Add(item);
             OnAdd(item);
         }
 
         public void Remove(T item)
         {
-            Children.Remove(item);
+            children.Remove(item);
             OnRemove(item);
         }
 
@@ -40,7 +45,7 @@ namespace Kinectitude.Core.Base
 
         protected Manager()
         {
-            Children = new List<T>();
+            children = new List<T>();
         }
 
         public virtual void OnUpdate(float frameDelta) { }
@@ -67,9 +72,9 @@ namespace Kinectitude.Core.Base
         
         protected virtual void OnStop() { }
 
-        protected T GetService<T>() where T : Service
+        protected U GetService<U>() where U : Service
         {
-            return Game.CurrentGame.GetService<T>();
+            return Game.CurrentGame.GetService<U>();
         }
     }
 }

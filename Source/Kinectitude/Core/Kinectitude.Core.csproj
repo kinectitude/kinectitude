@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\ChangeSceneAction.cs" />
+    <Compile Include="Actions\CreateEntityAction.cs" />
     <Compile Include="Actions\FireTriggerAction.cs" />
     <Compile Include="Actions\IncrementAction.cs" />
     <Compile Include="Actions\PopSceneAction.cs" />

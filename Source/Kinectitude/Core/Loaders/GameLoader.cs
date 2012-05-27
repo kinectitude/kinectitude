@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Kinectitude.Core.Base;
-using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Loaders
 {
@@ -20,16 +19,22 @@ namespace Kinectitude.Core.Loaders
          */
         public static GameLoader GetGameLoader(string fileName, Assembly [] preloads)
         {
+            string extention = fileName.Substring(fileName.IndexOf('.'));
+            GameLoader gameLoader;
+            if (".xml" == extention)
+            {
+                gameLoader = new XMLGameLoader(fileName);
+            }
+            else
+            {
+                throw new ArgumentException("File " + fileName + " could not be loaded");
+            }
             foreach (Assembly loaded in preloads)
             {
                 loadedFiles.Add(loaded.Location, loaded);
+                ClassFactory.loadServices(loaded);
             }
-            string extention = fileName.Substring(fileName.IndexOf('.'));
-            if (".xml" == extention)
-            {
-                return new XMLGameLoader(fileName);
-            }
-            throw new ArgumentException("File " + fileName + " could not be loaded");
+            return gameLoader;
         }
 
         protected GameLoader()
@@ -47,6 +52,7 @@ namespace Kinectitude.Core.Loaders
             if (!loadedFiles.ContainsKey(file))
             {
                 assembly = Assembly.LoadFrom(Path.Combine(Environment.CurrentDirectory, "Plugins", file));
+                ClassFactory.loadServices(assembly);
                 loadedFiles.Add(file, assembly);
             }
             else

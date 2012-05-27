@@ -11,9 +11,12 @@ namespace Kinectitude.Kinect
         private const int scount = 6;
         private static Skeleton[] allSkeletons = new Skeleton[scount];
 
-        public KinectManager() : base() 
+        private KinectManager currentManager = null;
+
+        public KinectManager()
         {
             enable();
+            currentManager = this;
         }
 
         private void enable()
@@ -30,7 +33,6 @@ namespace Kinectitude.Kinect
                     MaxDeviationRadius = 0.04f
                 });
                 kinectDriver.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
-                kinectDriver.AllFramesReady += sensorReady;
                 kinectDriver.Start();
             }
         }
@@ -89,10 +91,27 @@ namespace Kinectitude.Kinect
             if (null == kinectDriver && 0 != KinectSensor.KinectSensors.Count)
             {
                 enable();
+                kinectDriver.AllFramesReady += sensorReady;
             }
             foreach (KinectComponent kc in Children)
             {
                 kc.OnUpdate(t);
+            }
+        }
+
+        protected override void OnStart()
+        {
+            if (null != kinectDriver)
+            {
+                kinectDriver.AllFramesReady += sensorReady;
+            }
+        }
+
+        protected override void OnStop()
+        {
+            if (null != kinectDriver)
+            {
+                kinectDriver.AllFramesReady -= sensorReady;
             }
         }
     }
