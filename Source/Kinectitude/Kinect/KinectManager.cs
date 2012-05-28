@@ -71,16 +71,27 @@ namespace Kinectitude.Kinect
                     foreach (KinectComponent kc in Children)
                     {
                         KinectFollowComponent kfc = (KinectFollowComponent)kc;
+                        float scaleValue = 0.5f;  // Experimentally determined value that we may need to calibrate upon startup based on the lowest hand position we want
+                        float x = -1f, y = -1f;
                         if (KinectFollowComponent.PlayerType.P1 == kfc.followPlayer)
                         {
-                            Joint scaledJoint = SkeletalExtensions.ScaleTo(skeletons[0].Joints[kfc.Joint], 800, 600 - 128, 0.4f, 0.4f);
-                            kfc.UpdatePosition(scaledJoint.Position.X, scaledJoint.Position.Y);
+                            x = skeletons[0].Joints[kfc.Joint].Position.X;
+                            y = skeletons[0].Joints[kfc.Joint].Position.Y;
                         }
                         else if (skeletons.Length > 1)
                         {
-                            Joint scaledJoint = SkeletalExtensions.ScaleTo(skeletons[1].Joints[kfc.Joint], 800, 600 - 128, 0.4f, 0.4f);
-                            kfc.UpdatePosition(scaledJoint.Position.X, scaledJoint.Position.Y);
+                            x = skeletons[1].Joints[kfc.Joint].Position.X;
+                            y = skeletons[1].Joints[kfc.Joint].Position.Y;
                         }
+
+                        if (x != -1 && y != -1)
+                        {
+                            y = (float)((1 - (y + 1) / 2) / scaleValue);
+                            if (y > 1) y = 1;
+                            if (y < 0) y = 0;
+                        }
+
+                        kfc.UpdatePosition(x * 800, y * 600);
                     }
                 }
             }
