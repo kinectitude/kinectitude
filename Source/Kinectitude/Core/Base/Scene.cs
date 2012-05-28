@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Kinectitude.Core.Events;
 using Kinectitude.Core.Loaders;
-using Kinectitude.Core.Base;
-using Kinectitude.Core.Events;
-using Action = Kinectitude.Core.Base.Action;
 
 namespace Kinectitude.Core.Base
 {    
@@ -45,7 +41,7 @@ namespace Kinectitude.Core.Base
         }
 
         private bool running = false;
-        public bool Running
+        internal bool Running
         {
             get { return running; }
             set
@@ -90,11 +86,6 @@ namespace Kinectitude.Core.Base
             this.seceneLoader = sceneLoader;
         }
 
-        public T GetManager<T>() where T : class
-        {
-            return managersDictionary[typeof(T)] as T;
-        }
-
         internal void OnUpdate(float frameDelta)
         {
             //should not be updated if not running
@@ -109,27 +100,10 @@ namespace Kinectitude.Core.Base
             Component created = ClassFactory.Create<Component>(stringType);
             created.Entity = entity;
             entity.AddComponent(created);
-            Type manager = created.ManagerType();
-            IManager parent = null;
-            if (!managersDictionary.ContainsKey(manager))
-            {
-                parent = ClassFactory.Create<IManager>(manager);
-                managers.Add(parent);
-                managersDictionary.Add(manager, parent);
-            }
-            else
-            {
-                parent = managersDictionary[manager];
-            }
-                
             foreach (Tuple<string, string> tuple in values)
             {
                 ClassFactory.SetParam(created, tuple.Item1, tuple.Item2, null, entity);
             }
-            //TODO make this better?
-            MethodInfo mi = manager.GetMethod("Add");
-            object[] argVal = { created };
-            mi.Invoke(parent, argVal);
         }
 
         internal void CreateAction(Event evt, string type, List<Tuple<string, string>> attribs, Condition cond = null)
@@ -180,10 +154,24 @@ namespace Kinectitude.Core.Base
             return entityByName[name];
         }
 
-
-        public void createEntity(string prototype)
+        internal void CreateEntity(string prototype)
         {
             seceneLoader.CreateEntity(prototype);
+        }
+
+        internal T GetManager<T>() where T : class, IManager
+        {
+            if (!managersDictionary.ContainsKey(typeof(T)))
+            {
+                T manager = ClassFactory.Create<T>(typeof(T));
+                managers.Add(manager);
+                managersDictionary.Add(typeof(T), manager);
+                return manager;
+            }
+            else
+            {
+                return managersDictionary[typeof(T)] as T;
+            }
         }
 
     }

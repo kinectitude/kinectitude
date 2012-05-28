@@ -1,5 +1,4 @@
-﻿using System;
-using Kinectitude.Core.Base;
+﻿using Kinectitude.Core.Base;
 using SlimDX.Direct2D;
 using SlimDX.DirectWrite;
 using Factory = SlimDX.DirectWrite.Factory;

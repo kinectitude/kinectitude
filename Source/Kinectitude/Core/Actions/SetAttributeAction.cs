@@ -1,6 +1,6 @@
 ﻿using Kinectitude.Attributes;
-using Kinectitude.Core.Data;
 using Kinectitude.Core.Base;
+using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Actions
 {

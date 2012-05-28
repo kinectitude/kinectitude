@@ -2,7 +2,6 @@
 using System.Text.RegularExpressions;
 using Kinectitude.Core.Conditions;
 using Kinectitude.Core.Data;
-using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Base
 {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Kinectitude.Attributes;
+﻿using Kinectitude.Attributes;
 using Action = Kinectitude.Core.Base.Action;
 
 namespace Kinectitude.Core.Actions
@@ -15,7 +11,7 @@ namespace Kinectitude.Core.Actions
 
         public override void Run()
         {
-            Event.Entity.Scene.createEntity(Prototype);
+            Event.Entity.Scene.CreateEntity(Prototype);
         }
     }
 }

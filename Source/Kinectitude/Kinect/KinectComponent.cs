@@ -1,11 +1,9 @@
-﻿using System;
-using Kinectitude.Core.Base;
+﻿using Kinectitude.Core.Base;
 
 namespace Kinectitude.Kinect
 {
     public abstract class KinectComponent : Component
     {
-        protected KinectComponent() : base() { }
-        override public Type ManagerType() { return typeof(KinectManager); }
+        protected KinectComponent() { }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Kinectitude.Core.Loaders;
-using Kinectitude.Core.Base;
-using Kinectitude.Attributes;
 
 namespace Kinectitude.Core.Base
 {

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using Kinectitude.Attributes;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Components;
-//using Kinectitude.Core.Exceptions;
 using SlimDX;
 using SlimDX.DirectWrite;
 
@@ -16,6 +13,8 @@ namespace Kinectitude.Render
         private Color4 renderColor;
         private TextFormat textFormat;
         private TransformComponent tc;
+
+        private RenderManager renderManager;
 
         [Plugin("Value", "")]
         public string Value
@@ -41,11 +40,6 @@ namespace Kinectitude.Render
             Value = action.Value.GetValue();
         }
 
-        public override Type ManagerType()
-        {
-            return typeof(RenderManager);
-        }
-
         public void Initialize(RenderManager manager)
         {
             textFormat = manager.TextFormat;
@@ -59,14 +53,15 @@ namespace Kinectitude.Render
 
         public override void Ready()
         {
+            renderManager = GetManager<RenderManager>();
+            renderManager.Add(this);
+
             tc = GetComponent<TransformComponent>();
-            //TODO this will be done automatically
-            if (null == tc)
-            {
-                List<Type> missing = new List<Type>();
-                missing.Add(typeof(TransformComponent));
-                //throw MissingRequirementsException.MissingRequirement(this, missing);
-            }
+        }
+
+        public override void Destroy()
+        {
+            renderManager.Remove(this);
         }
     }
 }

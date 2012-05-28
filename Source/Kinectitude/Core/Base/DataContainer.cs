@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using Kinectitude.Core.Events;
-using System;
-using Kinectitude.Core.Base;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Kinectitude.Core.Base
 {

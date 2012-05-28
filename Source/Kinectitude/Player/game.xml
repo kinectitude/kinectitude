@@ -53,7 +53,16 @@
     </Event>
   </Prototype>
 
-  <Prototype Name="leftBall" Prototype="ball">
+  <Prototype Name="rightBall" Prototype="ball">
+    <Event Type="CollisionEvent" CollidesWith="left_wall">
+      <Action Type="DestroyAction"/>
+    </Event>
+    <Event Type="CrossesLineEvent" Location="800" Line="X" Direction="Positive">
+      <Action Type="DestroyAction"/>
+    </Event>
+  </Prototype>
+
+  <Prototype Name="leftBall" Prototype="rightBall">
     <Component Type="PhysicsComponent" XVelocity="-40"/>
   </Prototype>
 
@@ -180,7 +189,7 @@
         <Action Type="ChangeSceneAction" Target="gameOver"/>
       </Event>
       <Event Type="AttributeEqualsEvent" Target="scene.player2Score" Value="10">
-        <Action Type="CreateEntityAction" Prototype="ball"/>
+        <Action Type="CreateEntityAction" Prototype="rightBall"/>
       </Event>
     </Entity>
 

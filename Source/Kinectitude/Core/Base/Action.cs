@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-namespace Kinectitude.Core.Base
+﻿namespace Kinectitude.Core.Base
 {
     public abstract class Action
     {

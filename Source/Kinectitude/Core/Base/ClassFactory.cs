@@ -9,7 +9,6 @@ using Kinectitude.Core.Components;
 using Kinectitude.Core.Data;
 using Kinectitude.Core.Events;
 using Kinectitude.Core.Exceptions;
-using Kinectitude.Core.Base;
 using Kinectitude.Core.Managers;
 
 namespace Kinectitude.Core.Base
@@ -73,6 +72,7 @@ namespace Kinectitude.Core.Base
             RegisterType("SetPositionAction", typeof(SetPositionAction));
             RegisterType("TimeManager", typeof(TimeManager));
             RegisterType("CreateEntityAction", typeof(CreateEntityAction));
+            RegisterType("DestroyAction", typeof(DestroyAction));
         }
 
 

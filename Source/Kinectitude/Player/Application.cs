@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Drawing;
+using System.Reflection;
 using System.Windows.Forms;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Loaders;
+using Kinectitude.Render;
 using SlimDX;
 using SlimDX.Direct2D;
 using SlimDX.DirectWrite;
 using SlimDX.Windows;
 using FontStyle = SlimDX.DirectWrite.FontStyle;
-using Kinectitude.Render;
-using System.Reflection;
 
 namespace Kinectitude.Player
 {

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using FarseerPhysics.Dynamics;
+using FarseerPhysics.Dynamics.Contacts;
 using FarseerPhysics.Factories;
 using Kinectitude.Attributes;
 using Kinectitude.Core.Base;
-using Kinectitude.Core.Components;
-//using Kinectitude.Core.Exceptions;
 using Kinectitude.Core.ComponentInterfaces;
+using Kinectitude.Core.Components;
 using Microsoft.Xna.Framework;
-using FarseerPhysics.Dynamics.Contacts;
 
 namespace Kinectitude.Physics
 {
@@ -104,8 +103,6 @@ namespace Kinectitude.Physics
 
         public override float AngularVelocity { get; set; }
 
-        override public Type ManagerType(){return typeof(PhysicsManager);}
-
         public PhysicsComponent() : base() { }
 
         public override void OnUpdate(float t)
@@ -183,11 +180,6 @@ namespace Kinectitude.Physics
             throw new NotImplementedException("THE PHYSICS COMPONENT WON'T SET THE SIZE CURRENTLY");
         }
 
-        public void Initialize(PhysicsManager pm)
-        {   
-            this.pm = pm;
-        }
-
         public override Type ImplementationType
         {
             get { return typeof(APhysicsComponent); }
@@ -195,15 +187,10 @@ namespace Kinectitude.Physics
 
         public override void Ready()
         {
-            List<Type> missing = new List<Type>();
-            tc = GetComponent<TransformComponent>();
-            if (null == tc)
-            {
-                missing.Add(typeof(TransformComponent));
-                //TODO this will be done automatically
-                //throw MissingRequirementsException.MissingRequirement(this, missing);
-            }
+            pm = GetManager<PhysicsManager>();
+            pm.Add(this);
 
+            tc = GetComponent<TransformComponent>();
             tc.SubscribeToX(this, SetPosition);
             tc.SubscribeToY(this, SetPosition);
             tc.SubscribeToHeight(this, SetSize);
@@ -259,6 +246,12 @@ namespace Kinectitude.Physics
 
             //Allow the collison to occur
             return true;
+        }
+
+        public override void Destroy()
+        {
+            pm.Remove(this);
+            pm.PhysicsWorld.RemoveBody(body);
         }
     }
 }

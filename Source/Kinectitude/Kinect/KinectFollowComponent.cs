@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using Kinectitude.Attributes;
-using Kinectitude.Core.Base;
-using Kinectitude.Core.Components;
+﻿using Kinectitude.Attributes;
 using Kinectitude.Core.ComponentInterfaces;
+using Kinectitude.Core.Components;
 using Microsoft.Kinect;
 
 namespace Kinectitude.Kinect
 {
     [Plugin("Kinect Motion Component", "")]
-    public class KinectFollowComponent:KinectComponent
+    public class KinectFollowComponent : KinectComponent
     {
-        public enum PlayerType { P1, P2};
+        public enum PlayerType { P1, P2 };
         public enum FollowType { X, Y, Both };
 
         public PlayerType followPlayer;
@@ -22,6 +19,8 @@ namespace Kinectitude.Kinect
 
         private TransformComponent transform;
         private APhysicsComponent physics = null;
+
+        private KinectManager manager;
 
         [Plugin("Joint", "")]
         public JointType Joint { get; set; }
@@ -118,16 +117,17 @@ namespace Kinectitude.Kinect
 
         public override void Ready()
         {
+            manager = GetManager<KinectManager>();
+            manager.Add(this);
+
             transform = GetComponent<TransformComponent>();
-            //TODO this will be done automatcailly
-            if (null == transform)
-            {
-                List<Type> missing = new List<Type>();
-                missing.Add(typeof(TransformComponent));
-                //throw MissingRequirementsException.MissingRequirement(this, missing);
-            }
             physics = GetComponent<APhysicsComponent>();
         }
 
+
+        public override void Destroy()
+        {
+            manager.Remove(this);
+        }
     }
 }

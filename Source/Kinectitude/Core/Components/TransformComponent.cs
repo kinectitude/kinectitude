@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Kinectitude.Attributes;
 using Kinectitude.Core.Base;
-using Kinectitude.Core.Managers;
 
 public delegate void ChangeDelegate();
 
@@ -134,12 +132,7 @@ namespace Kinectitude.Core.Components
             }
         }
 
-        public TransformComponent() : base() { }
-
-        public override Type ManagerType()
-        {
-            return typeof(TimeManager);
-        }
+        public TransformComponent() { }
 
         public void SubscribeToX(Component component, ChangeDelegate changeDelegate)
         {
@@ -164,5 +157,7 @@ namespace Kinectitude.Core.Components
             creators[changeDelegate] = component;
             notifyHeightUpdate.Add(changeDelegate);
         }
+
+        public override void Destroy() { }
     }
 }

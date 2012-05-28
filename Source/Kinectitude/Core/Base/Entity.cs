@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Base
 {
@@ -13,6 +12,15 @@ namespace Kinectitude.Core.Base
 
         internal Scene Scene { get; set; }
 
+        public T GetComponent<T>() where T : Component
+        {
+            if (!componentDictionary.ContainsKey(typeof(T)))
+            {
+                return null;
+            }
+            return componentDictionary[typeof(T)] as T;
+        }
+
         internal Entity(int id) : base(id)
         {
             componentDictionary = new Dictionary<Type, Component>();
@@ -24,20 +32,19 @@ namespace Kinectitude.Core.Base
             componentList.Add(component);
         }
 
-        public T GetComponent<T>() where T : Component
-        {
-            if (!componentDictionary.ContainsKey(typeof(T)))
-            {
-                return null;
-            }
-            return componentDictionary[typeof(T)] as T;
-        }
-
         internal void Ready()
         {
             foreach (Component component in componentList)
             {
                 component.Ready();
+            }
+        }
+
+        internal void Destroy()
+        {
+            foreach (Component component in componentList)
+            {
+                component.Destroy();
             }
         }
     }

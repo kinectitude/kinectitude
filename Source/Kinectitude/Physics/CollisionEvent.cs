@@ -1,10 +1,9 @@
-﻿using Kinectitude.Attributes;
-using Kinectitude.Core.Base;
-using Kinectitude.Core.Data;
-using Kinectitude.Core.ComponentInterfaces;
+﻿using System;
 using System.Collections.Generic;
-using System;
-//using Kinectitude.Core.Exceptions;
+using Kinectitude.Attributes;
+using Kinectitude.Core.Base;
+using Kinectitude.Core.ComponentInterfaces;
+using Kinectitude.Core.Data;
 
 namespace Kinectitude.Physics
 {

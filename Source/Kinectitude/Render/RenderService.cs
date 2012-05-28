@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Kinectitude.Core.Base;
-using Factory = SlimDX.DirectWrite.Factory;
 using SlimDX.Direct2D;
-using Kinectitude.Attributes;
+using Factory = SlimDX.DirectWrite.Factory;
 
 namespace Kinectitude.Render
 {

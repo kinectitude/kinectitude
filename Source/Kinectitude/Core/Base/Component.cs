@@ -13,8 +13,6 @@ namespace Kinectitude.Core.Base
 
         public Component() { }
 
-        public abstract Type ManagerType();
-
         public virtual void OnUpdate(float frameDelta) { }
 
         public virtual void Ready() { }
@@ -29,5 +27,11 @@ namespace Kinectitude.Core.Base
             return Entity.GetComponent<T>();
         }
 
+        public T GetManager<T>() where T : class, IManager
+        {
+            return Entity.Scene.GetManager<T>();
+        }
+
+        public abstract void Destroy();
     }
 }

@@ -9,7 +9,7 @@ namespace Kinectitude.Physics
 
         public World PhysicsWorld { get; private set; }
 
-        public PhysicsManager() : base()
+        public PhysicsManager()
         {
             PhysicsWorld = new World(Vector2.Zero);
             PhysicsWorld.ClearForces();
@@ -22,11 +22,6 @@ namespace Kinectitude.Physics
             {
                 pc.OnUpdate(t);
             }
-        }
-
-        protected override void OnAdd(PhysicsComponent item)
-        {
-            item.Initialize(this);
         }
     }
 }

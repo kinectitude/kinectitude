@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Coding4Fun.Kinect.Wpf;
 using Kinectitude.Core.Base;
 using Microsoft.Kinect;
 
