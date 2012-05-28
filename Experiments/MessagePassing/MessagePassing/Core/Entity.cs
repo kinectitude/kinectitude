@@ -322,5 +322,10 @@ namespace MessagePassing.Core
                 }
             }
         }
+
+        public bool MatchesType(string prototype)
+        {
+            return true;    // Actually check if prototype is in our list.
+        }
     }
 }

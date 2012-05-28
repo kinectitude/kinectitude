@@ -114,6 +114,8 @@ namespace MessagePassing
 
             coin.Subscribe("Physics.Collision", (data) =>
                 {
+                    var other = (IDictionary<string, object>)data[0];
+                    coin["transfer"] = other["health"];
                     coin.Publish("AddMoney", coin["money"]);
                 }
             , "Player");
@@ -162,6 +164,11 @@ namespace MessagePassing
             }
 
             if (coinPhysics.Type != "Coin")
+            {
+                passed = false;
+            }
+
+            if ((int)coin["transfer"] != 110)
             {
                 passed = false;
             }

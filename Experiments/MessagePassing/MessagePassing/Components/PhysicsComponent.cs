@@ -54,6 +54,11 @@ namespace MessagePassing.Components
             }
         }
 
+        public IDictionary<string, object> Variables
+        {
+            get { return ComponentContainer.Variables; }
+        }
+
         public PhysicsComponent()
         {
             collisionCallbacks = new Dictionary<string, MessageCallback>();
@@ -78,7 +83,7 @@ namespace MessagePassing.Components
 
             if (null != callback)
             {
-                callback(null);
+                callback(other.Variables);
             }
         }
 

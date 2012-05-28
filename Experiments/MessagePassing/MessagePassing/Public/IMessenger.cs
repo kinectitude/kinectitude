@@ -5,7 +5,7 @@ namespace MessagePassing.Public
     /// Used to receive information after a user or component event occurs.
     /// </summary>
     /// <param name="data">An array of generically-typed results from the event. The length is variable.</param>
-    public delegate void MessageCallback(object[] data);
+    public delegate void MessageCallback(params object[] data);
 
     /// <summary>
     /// Interface provided to components so that they can publish messages and subscribe to outside ones.

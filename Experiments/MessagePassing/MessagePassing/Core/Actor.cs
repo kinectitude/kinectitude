@@ -26,6 +26,11 @@ namespace MessagePassing.Core
             }
         }
 
+        public IDictionary<string, object> Variables
+        {
+            get { return new Dictionary<string, object>(localVariables); }
+        }
+
         protected Actor()
         {
             localVariables = new Dictionary<string, object>();
