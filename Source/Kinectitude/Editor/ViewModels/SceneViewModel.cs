@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Kinectitude.Editor.Base;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using Kinectitude.Editor.Commands;
+using System.Linq;
+using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Commands.Base;
-using Kinectitude.Editor.Models;
 using Kinectitude.Editor.Commands.Scene;
 using Kinectitude.Editor.Models.Base;
+using System.Windows.Input;
 
 namespace Kinectitude.Editor.ViewModels
 {
@@ -34,8 +30,9 @@ namespace Kinectitude.Editor.ViewModels
             return sceneViewModel;
         }
 
+        private string stagedAttributeKey;
+        private string stagedAttributeValue;
         private EntityViewModel currentEntity;
-
         private readonly Scene scene;
         private readonly ObservableCollection<AttributeViewModel> _attributes;
         private readonly ObservableCollection<EntityViewModel> _entities;
@@ -78,6 +75,42 @@ namespace Kinectitude.Editor.ViewModels
             get { return entities; }
         }
 
+        public string StagedAttributeKey
+        {
+            get { return stagedAttributeKey; }
+            set
+            {
+                if (stagedAttributeKey != value)
+                {
+                    stagedAttributeKey = value;
+                    RaisePropertyChanged("StagedAttributeKey");
+                }
+            }
+        }
+
+        public string StagedAttributeValue
+        {
+            get { return stagedAttributeValue; }
+            set
+            {
+                if (stagedAttributeValue != value)
+                {
+                    stagedAttributeValue = value;
+                    RaisePropertyChanged("StagedAttributeValue");
+                }
+            }
+        }
+
+        public ICommand AddAttributeCommand
+        {
+            get { return new DelegateCommand(null, ExecuteAddAttributeCommand); }
+        }
+
+        public ICommand RemoveAttributeCommand
+        {
+            get { return new DelegateCommand(null, ExecuteRemoveAttributeCommand); }
+        }
+
         public SceneViewModel(Scene scene)
         {
             this.scene = scene;
@@ -90,6 +123,40 @@ namespace Kinectitude.Editor.ViewModels
 
             attributes = new ModelCollection<AttributeViewModel>(_attributes);
             entities = new ModelCollection<EntityViewModel>(_entities);
+        }
+
+        public void ExecuteAddAttributeCommand(object parameter)
+        {
+            AttributeViewModel attribute = AttributeViewModel.GetViewModel(scene, stagedAttributeKey);
+            attribute.Value = stagedAttributeValue;
+
+            AddAttribute(attribute);
+
+            StagedAttributeKey = null;
+            StagedAttributeValue = null;
+        }
+
+        public void ExecuteRemoveAttributeCommand(object parameter)
+        {
+            AttributeViewModel attribute = parameter as AttributeViewModel;
+            if (null != attribute)
+            {
+                RemoveAttribute(attribute);
+            }
+        }
+
+        public void AddAttribute(AttributeViewModel attribute)
+        {
+            CommandHistory.LogCommand(new AddAttributeCommand(this, attribute));
+            attribute.AddAttribute();
+            _attributes.Add(attribute);
+        }
+
+        public void RemoveAttribute(AttributeViewModel attribute)
+        {
+            CommandHistory.LogCommand(new RemoveAttributeCommand(this, attribute));
+            attribute.RemoveAttribute();
+            _attributes.Remove(attribute);
         }
     }
 }

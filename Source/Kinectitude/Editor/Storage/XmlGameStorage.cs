@@ -35,6 +35,7 @@ namespace Kinectitude.Editor.Storage
             public static readonly XName Name = "Name";
             public static readonly XName Width = "Width";
             public static readonly XName Height = "Height";
+            public static readonly XName IsFullScreen = "IsFullScreen";
             public static readonly XName FirstScene = "FirstScene";
             public static readonly XName Prototype = "Prototype";
             public static readonly XName Type = "Type";
@@ -42,6 +43,8 @@ namespace Kinectitude.Editor.Storage
             public static readonly XName Value = "Value";
             public static readonly XName Path = "Path";
             public static readonly XName Class = "Class";
+
+            public static readonly XName Project = "Project";
             public static readonly XName Root = "Root";
         }
 
@@ -263,7 +266,22 @@ namespace Kinectitude.Editor.Storage
         {
             // Check if the project file exists
 
+            string projectFolder = Path.GetDirectoryName(fileName);
+            string assetFolder = Path.GetFileNameWithoutExtension(fileName);
+            string gameFile = Path.Combine(projectFolder, assetFolder, "game.xml");
 
+            if (!File.Exists(fileName))
+            {
+                XElement project = new XElement
+                (
+                    Constants.Project,
+                    new XElement(Constants.Root, assetFolder)
+                );
+                project.Save(fileName);
+            }
+
+            FileInfo file = new FileInfo(gameFile);
+            file.Directory.Create();
 
             // Check if the project folder exists
 
@@ -273,6 +291,7 @@ namespace Kinectitude.Editor.Storage
                 new XAttribute(Constants.Name, game.Name),
                 new XAttribute(Constants.Width, game.Width),
                 new XAttribute(Constants.Height, game.Height),
+                new XAttribute(Constants.IsFullScreen, game.IsFullScreen),
                 new XAttribute(Constants.FirstScene, game.FirstScene.Name)
             );
 
@@ -282,15 +301,15 @@ namespace Kinectitude.Editor.Storage
                 document.Add(element);
             }
 
-            foreach (Attribute attribute in game.Attributes)
-            {
-                XElement element = SerializeAttribute(attribute);
-                document.Add(element);
-            }
-
             foreach (Entity entity in game.Entities)
             {
                 XElement element = SerializeEntity(entity);
+                document.Add(element);
+            }
+
+            foreach (Attribute attribute in game.Attributes)
+            {
+                XElement element = SerializeAttribute(attribute);
                 document.Add(element);
             }
 
@@ -300,7 +319,7 @@ namespace Kinectitude.Editor.Storage
                 document.Add(element);
             }
 
-            document.Save(fileName);
+            document.Save(gameFile);
         }
 
         private XElement SerializeUsing(Using use)
