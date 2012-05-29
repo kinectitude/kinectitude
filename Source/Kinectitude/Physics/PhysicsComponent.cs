@@ -180,11 +180,6 @@ namespace Kinectitude.Physics
             throw new NotImplementedException("THE PHYSICS COMPONENT WON'T SET THE SIZE CURRENTLY");
         }
 
-        public override Type ImplementationType
-        {
-            get { return typeof(APhysicsComponent); }
-        }
-
         public override void Ready()
         {
             pm = GetManager<PhysicsManager>();

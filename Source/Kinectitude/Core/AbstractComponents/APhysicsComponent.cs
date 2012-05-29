@@ -1,5 +1,6 @@
 ﻿using Kinectitude.Core.Base;
 using Kinectitude.Attributes;
+using System;
 
 namespace Kinectitude.Core.ComponentInterfaces
 {
@@ -11,5 +12,10 @@ namespace Kinectitude.Core.ComponentInterfaces
         public abstract float YVelocity { get; set; }
         [Plugin("Angular Velocity", "")]
         public abstract float AngularVelocity { get; set; }
+
+        public override Type ImplementationType
+        {
+            get { return typeof(APhysicsComponent); }
+        }
     }
 }

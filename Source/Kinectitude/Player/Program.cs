@@ -19,15 +19,12 @@ namespace Kinectitude.Player
             }
         }
 
-        static Assembly CurrentDomain_AssemblyResolve(object sender,
-                                              ResolveEventArgs args)
+        static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             var assemblyname = args.Name.Split(',')[0];
             var assemblyFileName = ".\\Plugins\\Kinectitude.Render.dll";
             var assembly = Assembly.LoadFrom(assemblyFileName);
             return assembly;
         }
-
-
     }
 }

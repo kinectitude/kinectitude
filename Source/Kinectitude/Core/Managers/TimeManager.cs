@@ -2,7 +2,10 @@
 
 namespace Kinectitude.Core.Managers
 {
-    class TimeManager : Manager<Component>
+    /// <summary>
+    /// A basic manager used to update components on how much time has passed since the last update.
+    /// </summary>
+    public class TimeManager : Manager<Component>
     {
 
         public TimeManager() { }

@@ -16,6 +16,10 @@ namespace Kinectitude.Core.Data
         /// <returns>The string value of an expression</returns>
         string GetValue();
 
+        /// <summary>
+        /// Calls the callback function when this expression changes
+        /// </summary>
+        /// <param name="callback"></param>
         void notifyOfChange(Action<string, string> callback);
 
     }
