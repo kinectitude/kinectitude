@@ -1,4 +1,4 @@
-﻿using Kinectitude.Attributes;
+﻿using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Data;
 using Action = Kinectitude.Core.Base.Action;
 

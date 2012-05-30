@@ -1,4 +1,4 @@
-﻿using Kinectitude.Attributes;
+﻿using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Components;
 

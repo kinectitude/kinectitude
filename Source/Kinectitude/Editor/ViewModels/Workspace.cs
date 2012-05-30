@@ -9,7 +9,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.IO;
 using System.Windows;
-using Kinectitude.Attributes;
+using Kinectitude.Core.Attributes;
 using Kinectitude.Editor.Models.Plugins;
 using Kinectitude.Editor.Models;
 using Kinectitude.Editor.Models.Base;

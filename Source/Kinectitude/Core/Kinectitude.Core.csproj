@@ -49,6 +49,10 @@
     <Compile Include="Actions\PushSceneAction.cs" />
     <Compile Include="Actions\SetAttributeAction.cs" />
     <Compile Include="Actions\SetPositionAction.cs" />
+    <Compile Include="Attributes\PluginAttribute.cs" />
+    <Compile Include="Attributes\PresetAttribute.cs" />
+    <Compile Include="Attributes\ProvidesAttribute.cs" />
+    <Compile Include="Attributes\RequiresAttribute.cs" />
     <Compile Include="Base\Action.cs" />
     <Compile Include="Base\ClassFactory.cs" />
     <Compile Include="Base\Condition.cs" />
@@ -108,13 +112,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Attributes\Kinectitude.Attributes.csproj">
-      <Project>{52A964EE-E3ED-4AC5-843F-9FAA26055B39}</Project>
-      <Name>Kinectitude.Attributes</Name>
-      <Private>False</Private>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

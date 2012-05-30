@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using FarseerPhysics.Dynamics;
 using FarseerPhysics.Dynamics.Contacts;
 using FarseerPhysics.Factories;
-using Kinectitude.Attributes;
+using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.ComponentInterfaces;
 using Kinectitude.Core.Components;

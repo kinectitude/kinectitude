@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Kinectitude.Attributes;
+using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Actions;
 using Kinectitude.Core.Components;
 using Kinectitude.Core.Data;

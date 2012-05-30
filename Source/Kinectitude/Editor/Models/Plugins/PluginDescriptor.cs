@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
-using Kinectitude.Attributes;
+using Kinectitude.Core.Attributes;
 using Kinectitude.Editor.Models.Properties;
 
 namespace Kinectitude.Editor.Models.Plugins

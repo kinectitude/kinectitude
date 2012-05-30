@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Kinectitude.Attributes;
+using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Base;
 using System;
 using Kinectitude.Core.Data;

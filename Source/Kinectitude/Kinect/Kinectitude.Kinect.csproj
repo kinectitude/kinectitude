@@ -49,11 +49,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Attributes\Kinectitude.Attributes.csproj">
-      <Project>{52A964EE-E3ED-4AC5-843F-9FAA26055B39}</Project>
-      <Name>Kinectitude.Attributes</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\Core\Kinectitude.Core.csproj">
       <Project>{AEAB17EC-574C-4177-9204-FE48F4C3F429}</Project>
       <Name>Kinectitude.Core</Name>
