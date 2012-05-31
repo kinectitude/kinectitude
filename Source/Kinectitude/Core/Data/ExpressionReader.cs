@@ -22,7 +22,11 @@ namespace Kinectitude.Core.Data
                     throw new IllegalPlacementException("!", "events or actions");
                 }
             }
-            return new NormalExpressionReader(vals[1], TypeMatcher.CreateTypeMatcher(vals[0], evt, entity), entity);
+            if (vals.Length > 2)
+            {
+
+            }
+            return new EntityValueReader(vals[1], TypeMatcher.CreateTypeMatcher(vals[0], evt, entity), entity);
         }
 
         public abstract string GetValue();

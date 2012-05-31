@@ -4,7 +4,7 @@ using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Data
 {
-    internal sealed class NormalExpressionReader : ExpressionReader
+    internal sealed class EntityValueReader : ExpressionReader
     {
         private readonly string value;
 
@@ -15,7 +15,7 @@ namespace Kinectitude.Core.Data
 
         private readonly List<Action<string>> callbacks = new List<Action<string>>();
 
-        internal NormalExpressionReader(string value, TypeMatcher readableSelector, Entity entity)
+        internal EntityValueReader(string value, TypeMatcher readableSelector, Entity entity)
         {
             ReadableSelector = readableSelector;
             this.value = value;

@@ -86,6 +86,7 @@
     <Compile Include="Conditions\AndCondition.cs" />
     <Compile Include="Conditions\OrCondition.cs" />
     <Compile Include="Conditions\SimpleCondition.cs" />
+    <Compile Include="Data\ComponentValueReader.cs" />
     <Compile Include="Data\ConstantExpressionReader.cs" />
     <Compile Include="Data\MultiTypeMatcher.cs" />
     <Compile Include="Data\SingleTypeMatcher.cs" />

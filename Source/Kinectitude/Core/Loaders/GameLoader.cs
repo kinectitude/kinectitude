@@ -32,8 +32,12 @@ namespace Kinectitude.Core.Loaders
             }
             foreach (Assembly loaded in preloads)
             {
-                loadedFiles.Add(loaded.Location, loaded);
-                ClassFactory.LoadServices(loaded);
+                string name = Path.GetFileName(loaded.Location);
+                if (!loadedFiles.ContainsKey(name))
+                {
+                    loadedFiles.Add(name, loaded);
+                    ClassFactory.LoadServices(loaded);
+                }
             }
             return gameLoader;
         }
