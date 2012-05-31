@@ -4,54 +4,49 @@ using Kinectitude.Core.Base;
 using Kinectitude.Core.Components;
 using SlimDX;
 using SlimDX.Direct2D;
-using ColorConverter = System.Windows.Media.ColorConverter;
+using RenderTarget = SlimDX.Direct2D.RenderTarget;
 
 namespace Kinectitude.Render
 {
     [Plugin("Render Component", "")]
     public class RenderComponent : Component, IRender
     {
-        private bool circular;
+        public enum ShapeType
+        {
+            Rectangle,
+            Ellipse
+        }
+
         private Color4 renderColor;
-
-        private TransformComponent tc;
-
+        private SolidColorBrush brush;
+        private TransformComponent transformComponent;
         private RenderManager renderManager;
+        private Ellipse ellipse;
+        private RectangleF rectangle;
 
         [Plugin("Shape", "")]
-        public string Shape { get; set; }
+        public ShapeType Shape
+        {
+            get;
+            set;
+        }
 
         [Plugin("Fill Color", "")]
         public string FillColor
         {
-            set 
-            {
-                System.Windows.Media.Color color = (System.Windows.Media.Color)ColorConverter.ConvertFromString(value);
-                renderColor = new Color4((float)color.R / 255.0f, (float)color.G / 255.0f, (float)color.B / 255.0f);
-            } 
+            set { renderColor = RenderService.ColorFromString(value); } 
         }
 
         public RenderComponent() { }
 
-        public void Initialize(RenderManager manager) { }
-
-        public void Render(SlimDX.Direct2D.RenderTarget renderTarget)
+        public void Render(RenderTarget renderTarget)
         {
-            SolidColorBrush brush = new SolidColorBrush(renderTarget, renderColor);
-            if (circular)
+            if (Shape == ShapeType.Ellipse)
             {
-                Ellipse ellipse = new Ellipse()
-                {
-                    Center = new System.Drawing.PointF(tc.X, tc.Y),
-                    RadiusX = tc.Width,
-                    RadiusY = tc.Height
-                };
                 renderTarget.FillEllipse(brush, ellipse);
             }
-            else
+            else if (Shape == ShapeType.Rectangle)
             {
-                RectangleF rectangle =
-                    new RectangleF(tc.X - tc.Width / 2.0f, tc.Y - tc.Height / 2.0f, tc.Width, tc.Height);
                 renderTarget.FillRectangle(brush, rectangle);
             }
         }
@@ -61,9 +56,50 @@ namespace Kinectitude.Render
             renderManager = GetManager<RenderManager>();
             renderManager.Add(this);
 
-            tc = GetComponent<TransformComponent>();
+            brush = renderManager.CreateSolidColorBrush(renderColor);
 
-            circular = "circle" == Shape;
+            transformComponent = GetComponent<TransformComponent>();
+            transformComponent.SubscribeToX(this, OnTransformChanged);
+            transformComponent.SubscribeToY(this, OnTransformChanged);
+            transformComponent.SubscribeToWidth(this, OnTransformChanged);
+            transformComponent.SubscribeToHeight(this, OnTransformChanged);
+
+            if (Shape == ShapeType.Ellipse)
+            {
+                ellipse = new Ellipse()
+                {
+                    Center = new PointF(transformComponent.X, transformComponent.Y),
+                    RadiusX = transformComponent.Width / 2.0f,
+                    RadiusY = transformComponent.Height / 2.0f
+                };
+            }
+            else if (Shape == ShapeType.Rectangle)
+            {
+                rectangle = new RectangleF()
+                {
+                    X = transformComponent.X - transformComponent.Width / 2.0f,
+                    Y = transformComponent.Y - transformComponent.Height / 2.0f,
+                    Width = transformComponent.Width,
+                    Height = transformComponent.Height
+                };
+            }
+        }
+
+        public void OnTransformChanged()
+        {
+            if (Shape == ShapeType.Ellipse)
+            {
+                ellipse.Center = new PointF(transformComponent.X, transformComponent.Y);
+                ellipse.RadiusX = transformComponent.Width / 2.0f;
+                ellipse.RadiusY = transformComponent.Height / 2.0f;
+            }
+            else if (Shape == ShapeType.Rectangle)
+            {
+                rectangle.X = transformComponent.X - transformComponent.Width / 2.0f;
+                rectangle.Y = transformComponent.Y - transformComponent.Height / 2.0f;
+                rectangle.Width = transformComponent.Width;
+                rectangle.Height = transformComponent.Height;
+            }
         }
 
         public override void Destroy()

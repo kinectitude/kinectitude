@@ -22,24 +22,28 @@
     
   <Prototype Name="paddle">
     <Component Type="KinectFollowComponent" Direction="Y" Player="P1" Joint="HandLeft"/>
-    <Component Type="RenderComponent" FillColor="LimeGreen" Shape="rectangle"/>
-    <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" Bodytype="Kinematic"/>
+    <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Rectangle"/>
+    <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" Bodytype="Kinematic"/>
     <Component Type="TransformComponent" Width="24" Height="128"/>
   </Prototype>
 
-  <Prototype Name="score">
+  <Prototype Name="text">
+    <Component Type="TextRenderComponent" FontFamily="Arial" FontWeight="Normal" FontStyle="Normal" FontStretch="Normal" FontSize="36" FontColor="White" />
+  </Prototype>
+  
+  <Prototype Name="score" Prototype="text">
     <Component Type="TextRenderComponent" Value="0" FontColor="White" />
   </Prototype>
 
   <Prototype Name="bar">
-    <Component Type="RenderComponent" FillColor="LimeGreen" Shape="rectangle"/>
+    <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Rectangle"/>
     <Component Type="TransformComponent" Width="800" Height="10" X="400" Y="340"/>
   </Prototype>
   
   <Prototype Name="ball" Value="0">
-    <Component Type="RenderComponent" FillColor="Red" Shape="circle" />
+    <Component Type="RenderComponent" FillColor="Red" Shape="Ellipse" />
     <Component Type="TransformComponent" X="250" Y="250" Width="24" Height="24"/>
-    <Component Type="PhysicsComponent" XVelocity="40" YVelocity="20" Shape="circle" Restitution="1" Mass="1" Friction="0" LinearDamping="0" Bodytype="Dynamic"/>
+    <Component Type="PhysicsComponent" XVelocity="40" YVelocity="20" Shape="Ellipse" Restitution="1" Mass="1" Friction="0" LinearDamping="0" Bodytype="Dynamic"/>
     <Event Type="CollisionEvent" CollidesWith="left_wall">
       <Action Type="SetPositionAction" X="400" Y="300" />
       <Action Type="IncrementAction" Target="scene.player2Score"/>
@@ -84,17 +88,17 @@
 
   <Scene Name="main" numReadY="0" ready1="" ready2="">
 
-    <Entity Name="topText">
+    <Entity Name="topText" Prototype="text">
       <Component Type="TransformComponent" X="250" Y="24"/>
       <Component Type="TextRenderComponent" Value="Kinect Wimbledon Delux" FontColor="Yellow" />
     </Entity>
 
-    <Entity Name="instructions">
+    <Entity Name="instructions" Prototype="text">
       <Component Type="TransformComponent" X="220" Y="80"/>
       <Component Type="TextRenderComponent" Value="Move below the line to start" FontColor="White" />
     </Entity>
 
-    <Entity Name="ready1">
+    <Entity Name="ready1" Prototype="text">
       <Component Type="TransformComponent" X="25" Y="125"/>
       <Component Type="TextRenderComponent" Value="Player 1 Not ready!" FontColor="White" />
       <Event Type="AttributeChangesEvent" Target="scene.ready1">
@@ -102,7 +106,7 @@
       </Event>
     </Entity>
 
-    <Entity Name="ready2">
+    <Entity Name="ready2" Prototype="text">
       <Component Type="TransformComponent" X="425" Y="125"/>
       <Component Type="TextRenderComponent" Value="Player 2 Not ready!" FontColor="White" />
       <Event Type="AttributeChangesEvent" Target="scene.ready2">
@@ -154,22 +158,22 @@
 
     <Entity Name="top_wall">
       <Component Type="TransformComponent" X="400" Y="0" Width="800" Height="2"/>
-      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" Bodytype="Kinematic"/>
-      <Component Type="RenderComponent" FillColor="LimeGreen" Shape="rectangle" />
+      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" Bodytype="Kinematic"/>
+      <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Rectangle" />
     </Entity>
 
     <Entity Name="bottom_wall">
       <Component Type="TransformComponent" X="400" Y="600" Width="800" Height="2"/>
-      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" Bodytype="Kinematic"/>
+      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" Bodytype="Kinematic"/>
     </Entity>
 
     <Entity Name="left_wall">
       <Component Type="TransformComponent" X="0" Y="300" Width="2" Height="600"/>
-      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" Bodytype="Kinematic"/>
+      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" Bodytype="Kinematic"/>
     </Entity>
 
     <Entity Name="mainBall" Prototype="ball">
-      <Component Type="RenderComponent" FillColor="LimeGreen" Shape="circle" />
+      <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Ellipse" />
     </Entity>
 
     <Entity Prototype="score">
@@ -177,7 +181,7 @@
       <Event Type="TriggerOccursEvent" Trigger="player1Scores">
         <Action Type="SetTextAction" Value="scene.player1Score" />
       </Event>
-      <Event Type="AttributeEqualsEvent" Target="scene.player1Score" Value="100">
+      <Event Type="AttributeEqualsEvent" Target="scene.player1Score" Value="15">
         <Action Type="SetAttributeAction" Target="game.winner" Value="player 1 wins"/>
         <Action Type="ChangeSceneAction" Target="gameOver"/>
       </Event>
@@ -191,7 +195,7 @@
       <Event Type="AttributeChangesEvent" Target="scene.player2Score">
         <Action Type="SetTextAction" Value="scene.player2Score" />
       </Event>
-      <Event Type="AttributeEqualsEvent" Target="scene.player2Score" Value="100">
+      <Event Type="AttributeEqualsEvent" Target="scene.player2Score" Value="15">
         <Action Type="SetAttributeAction" Target="game.winner" Value="player 2 wins"/>
         <Action Type="ChangeSceneAction" Target="gameOver"/>
       </Event>
@@ -203,7 +207,8 @@
   </Scene>
 
   <Scene Name="gameOver">
-    <Entity Name="gameOver">
+    
+    <Entity Name="gameOver" Prototype="text">
       <Component Type="TransformComponent" X="300" Y="20"/>
       <!-- we should make this work later so it can have at least an inital value of what it is
       <Component Type="TextRenderComponent" Value="={game.winner}" FontColor="White" />-->
@@ -214,7 +219,7 @@
       </Event>
     </Entity>
 
-    <Entity Name="instructions">
+    <Entity Name="instructions" Prototype="text">
       <Component Type="TransformComponent" X="100" Y="100"/>
       <Component Type="TextRenderComponent" Value="Top line to for menu bottom to quit" FontColor="White" />
     </Entity>

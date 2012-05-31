@@ -6,6 +6,5 @@ namespace Kinectitude.Render
     public interface IRender : IUpdateable
     {
         void Render(RenderTarget renderTarget);
-        void Initialize(RenderManager manager);
     }
 }

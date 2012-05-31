@@ -17,61 +17,41 @@ namespace Kinectitude.Player
     {
         private const float TimeStep = 1.0f / 60.0f;
 
-        private static RenderService renderService;
-
-        private readonly Game game;
+        private readonly RenderService renderService;
         private readonly RenderForm form;
-        private readonly WindowRenderTarget renderTarget;
-        private readonly SlimDX.Direct2D.Factory drawFactory;
-        private readonly SlimDX.DirectWrite.Factory writeFactory;
-        private readonly SolidColorBrush textBrush;
-        private readonly TextFormat textFormat;
-        private readonly Color4 clearColor;
+        private readonly Game game;
         private readonly Clock clock;
-
-        private float frameDelta;
-        private float frameAccumulator;
-        private float framesPerSecond;
-        private int frameCount;
         private float accumulator;
 
         public Application()
         {
-
-            drawFactory = new SlimDX.Direct2D.Factory();
-            SizeF dpi = drawFactory.DesktopDpi;
             Assembly loaded = Assembly.GetAssembly(typeof(RenderService));
             GameLoader gameLoader = GameLoader.GetGameLoader("game.xml", new Assembly[] { loaded });
             game = gameLoader.Game;
 
-            Size size = new Size( (int)(game.Width * dpi.Width / 96.0f), (int)(game.Height * dpi.Height / 96.0f) );
+            SlimDX.Direct2D.Factory drawFactory = new SlimDX.Direct2D.Factory();
+            SizeF dpi = drawFactory.DesktopDpi;
+
+            Size size = new Size((int)(game.Width * dpi.Width / 96.0f), (int)(game.Height * dpi.Height / 96.0f));
+
             form = new RenderForm(game.Name);
             form.ClientSize = size;
             form.FormBorderStyle = FormBorderStyle.FixedSingle;
             form.MaximizeBox = false;
+            
+            clock = new Clock();
 
-            renderTarget = new WindowRenderTarget(drawFactory, new WindowRenderTargetProperties()
+            renderService = game.GetService<RenderService>();
+            renderService.RenderTarget = new WindowRenderTarget(drawFactory, new WindowRenderTargetProperties()
             {
                 Handle = form.Handle,
                 PixelSize = size
             });
-            
-            writeFactory = new SlimDX.DirectWrite.Factory(SlimDX.DirectWrite.FactoryType.Shared);
-            textFormat = writeFactory.CreateTextFormat("Consolas", FontWeight.Regular, FontStyle.Normal, FontStretch.Normal, 18.0f, "en-us");
-            textFormat.TextAlignment = TextAlignment.Center;
-            textFormat.ParagraphAlignment = ParagraphAlignment.Center;
-            textBrush = new SolidColorBrush(renderTarget, new Color4(1.0f, 1.0f, 1.0f));
-            clearColor = new Color4(0.30f, 0.30f, 0.80f);
-            clock = new Clock();
-            accumulator = 0.0f;
-            renderService = game.GetService<RenderService>();
-            renderService.Factory = writeFactory;
         }
 
         public void Dispose()
         {
-            renderTarget.Dispose();
-            drawFactory.Dispose();
+            renderService.Dispose();
             form.Dispose();
             GC.SuppressFinalize(this);
         }
@@ -83,52 +63,18 @@ namespace Kinectitude.Player
 
             MessagePump.Run(form, () =>
                 {
-                    frameDelta = clock.Update();
+                    float frameDelta = clock.Update();
                     accumulator += frameDelta;
 
                     while (accumulator > TimeStep)
                     {
-                        Update(TimeStep);
+                        game.OnUpdate(TimeStep);
                         accumulator -= TimeStep;
                     }
 
-                    Render();
+                    renderService.Render();
                 }
             );
-        }
-
-        private void Update(float frameDelta)
-        {
-            game.OnUpdate(frameDelta);
-        }
-
-        private void Render()
-        {
-            frameAccumulator += frameDelta;
-            ++frameCount;
-
-            if (frameAccumulator >= 1.0f)
-            {
-                framesPerSecond = frameCount / frameAccumulator;
-                frameAccumulator = 0.0f;
-                frameCount = 0;
-            }
-
-            renderTarget.BeginDraw();
-            renderTarget.Transform = Matrix3x2.Identity;
-            renderTarget.Clear(clearColor);
-
-            Action<RenderTarget> onRender = renderService.RenderTargetAction;
-
-            if (null != onRender)
-            {
-                onRender(renderTarget);
-            }
-
-            RectangleF layoutRect = form.ClientRectangle;
-            renderTarget.DrawText(framesPerSecond.ToString(), textFormat, layoutRect, textBrush);
-
-            renderTarget.EndDraw();
         }
     }
 }

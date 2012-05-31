@@ -3,9 +3,10 @@ using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Components;
 using SlimDX;
+using SlimDX.Direct2D;
 using SlimDX.DirectWrite;
-using Color = System.Windows.Media.Color;
-using ColorConverter = System.Windows.Media.ColorConverter;
+using FontStyle = SlimDX.DirectWrite.FontStyle;
+using RenderTarget = SlimDX.Direct2D.RenderTarget;
 
 namespace Kinectitude.Render
 {
@@ -13,9 +14,10 @@ namespace Kinectitude.Render
     public class TextRenderComponent : Component, IRender
     {
         private Color4 renderColor;
+        private SolidColorBrush brush;
         private TextFormat textFormat;
-        private TransformComponent tc;
-
+        private RectangleF layoutRectangle;
+        private TransformComponent transformComponent;
         private RenderManager renderManager;
 
         [Plugin("Value", "")]
@@ -25,32 +27,57 @@ namespace Kinectitude.Render
             set;
         }
 
+        [Plugin("Font Family", "")]
+        public string FontFamily
+        {
+            get;
+            set;
+        }
+
+        [Plugin("Font Weight", "")]
+        public FontWeight FontWeight
+        {
+            get;
+            set;
+        }
+
+        [Plugin("Font Style", "")]
+        public FontStyle FontStyle
+        {
+            get;
+            set;
+        }
+
+        [Plugin("Font Stretch", "")]
+        public FontStretch FontStretch
+        {
+            get;
+            set;
+        }
+
+        [Plugin("Font Size", "")]
+        public float FontSize
+        {
+            get;
+            set;
+        }
+
         [Plugin("Font Color", "")]
         public string FontColor
         {
-            set
-            {
-                Color color = (Color)ColorConverter.ConvertFromString(value);
-                renderColor = new Color4((float)color.R / 255.0f, (float)color.G / 255.0f, (float)color.B / 255.0f);
-            }
+            set { renderColor = RenderService.ColorFromString(value); }
         }
 
-        public TextRenderComponent() : base() { }
+        public TextRenderComponent() { }
 
         public void OnSetTextAction(SetTextAction action)
         {
             Value = action.Value.GetValue();
         }
 
-        public void Initialize(RenderManager manager)
+        public void Render(RenderTarget renderTarget)
         {
-            textFormat = manager.TextFormat;
-        }
-
-        public void Render(SlimDX.Direct2D.RenderTarget renderTarget)
-        {
-            renderTarget.DrawText(Value, textFormat, new RectangleF(tc.X, tc.Y, 0.0f, 0.0f), 
-                new SlimDX.Direct2D.SolidColorBrush(renderTarget, renderColor));
+            renderTarget.DrawText(Value, textFormat, layoutRectangle, brush);
         }
 
         public override void Ready()
@@ -58,11 +85,42 @@ namespace Kinectitude.Render
             renderManager = GetManager<RenderManager>();
             renderManager.Add(this);
 
-            tc = GetComponent<TransformComponent>();
+            textFormat = renderManager.DirectWriteFactory.CreateTextFormat(FontFamily, FontWeight, FontStyle, FontStretch, FontSize, "en-us");
+            textFormat.FlowDirection = FlowDirection.TopToBottom;
+            textFormat.IncrementalTabStop = textFormat.FontSize * 4.0f;
+            textFormat.ParagraphAlignment = ParagraphAlignment.Near;
+            textFormat.ReadingDirection = ReadingDirection.LeftToRight;
+            textFormat.TextAlignment = TextAlignment.Leading;
+            textFormat.WordWrapping = WordWrapping.NoWrap;
+
+            brush = renderManager.CreateSolidColorBrush(renderColor);
+
+            transformComponent = GetComponent<TransformComponent>();
+            transformComponent.SubscribeToX(this, OnTransformChanged);
+            transformComponent.SubscribeToY(this, OnTransformChanged);
+            transformComponent.SubscribeToWidth(this, OnTransformChanged);
+            transformComponent.SubscribeToHeight(this, OnTransformChanged);
+
+            layoutRectangle = new RectangleF()
+            {
+                X = transformComponent.X,
+                Y = transformComponent.Y,
+                Width = transformComponent.Width,
+                Height = transformComponent.Height
+            };
+        }
+
+        public void OnTransformChanged()
+        {
+            layoutRectangle.X = transformComponent.X;
+            layoutRectangle.Y = transformComponent.Y;
+            layoutRectangle.Width = transformComponent.Width;
+            layoutRectangle.Height = transformComponent.Height;
         }
 
         public override void Destroy()
         {
+            textFormat.Dispose();
             renderManager.Remove(this);
         }
     }
