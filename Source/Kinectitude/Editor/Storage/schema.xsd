@@ -1,12 +1,11 @@
 <?xml version="1.0"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.kinectitude.com" xmlns="http://www.kinectitude.com" elementFormDefault="unqualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.kinectitude.com/2012/v1" xmlns="http://www.kinectitude.com/2012/v1" elementFormDefault="unqualified">
   
   <xs:element name="Game">
     <xs:complexType>
       <xs:sequence>
         <xs:element ref="Using" minOccurs="0" maxOccurs="unbounded" />
-        <xs:element ref="Entity" minOccurs="0" maxOccurs="unbounded" />
-        <xs:element ref="Attribute" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element ref="Prototype" minOccurs="0" maxOccurs="unbounded" />
         <xs:element ref="Scene" minOccurs="1" maxOccurs="unbounded" />
       </xs:sequence>
       <xs:attribute name="Name" type="xs:string" use="required" />
@@ -14,19 +13,20 @@
       <xs:attribute name="Height" type="xs:positiveInteger" use="required" />
       <xs:attribute name="FirstScene" type="xs:string" use="required" />
       <xs:attribute name="IsFullScreen" type="xs:boolean" use="required" />
+      <xs:anyAttribute processContents="lax" />
     </xs:complexType>
   </xs:element>
 
   <xs:element name="Using">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="Alias" minOccurs="1" maxOccurs="unbounded" />
+        <xs:element ref="Define" minOccurs="1" maxOccurs="unbounded" />
       </xs:sequence>
-      <xs:attribute name="Path" type="xs:string" use="required" />
+      <xs:attribute name="File" type="xs:string" use="required" />
     </xs:complexType>
   </xs:element>
 
-  <xs:element name="Alias">
+  <xs:element name="Define">
     <xs:complexType>
       <xs:attribute name="Name" use="required" />
       <xs:attribute name="Class" use="required" />
@@ -36,31 +36,26 @@
   <xs:element name="Scene">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="Attribute" minOccurs="0" maxOccurs="unbounded" />
         <xs:element ref="Entity" minOccurs="0" maxOccurs="unbounded" />
       </xs:sequence>
       <xs:attribute name="Name" type="xs:string" use="required" />
+      <xs:anyAttribute processContents="lax" />
     </xs:complexType>
   </xs:element>
 
-  <xs:element name="Attribute">
-    <xs:complexType>
-      <xs:attribute name="Key" type="xs:string" use="required" />
-      <xs:attribute name="Value" use="required" />
-    </xs:complexType>
-  </xs:element>
+  <xs:complexType name="EntityType">
+    <xs:sequence>
+      <xs:element ref="Component" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element ref="Event" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+    <xs:attribute name="Name" type="xs:string" />
+    <xs:attribute name="Prototype" type="xs:string" />
+    <xs:anyAttribute processContents="lax" />
+  </xs:complexType>
   
-  <xs:element name="Entity">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref="Attribute" minOccurs="0" maxOccurs="unbounded" />
-        <xs:element ref="Component" minOccurs="0" maxOccurs="unbounded" />
-        <xs:element ref="Event" minOccurs="0" maxOccurs="unbounded" />
-      </xs:sequence>
-      <xs:attribute name="Name" type="xs:string" />
-      <xs:attribute name="Prototype" type="xs:string" />
-    </xs:complexType>
-  </xs:element>
+  <xs:element name="Entity" type="EntityType" />
+
+  <xs:element name="Prototype" type="EntityType" />
     
   <xs:element name="Component">
     <xs:complexType>

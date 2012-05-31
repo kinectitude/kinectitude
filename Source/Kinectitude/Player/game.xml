@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Game Name="pong" Width="800" Height="600">
+<!--Game Name="pong" Width="800" Height="600" FirstScene="main" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1"-->
+<Game Name="pong" Width="800" Height="600" FirstScene="main" IsFullScreen="false">
 
   <Using File="Kinectitude.Kinect.dll">
     <Define Name="KinectFollowComponent" Class="Kinectitude.Kinect.KinectFollowComponent"/>
