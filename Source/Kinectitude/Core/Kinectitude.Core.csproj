@@ -29,6 +29,22 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Test|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Test\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;TEST</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisLogFile>..\..\..\Build\Debug\Kinectitude.Core.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -71,14 +87,15 @@
     <Compile Include="Conditions\OrCondition.cs" />
     <Compile Include="Conditions\SimpleCondition.cs" />
     <Compile Include="Data\ConstantExpressionReader.cs" />
+    <Compile Include="Data\MultiTypeMatcher.cs" />
     <Compile Include="Data\SingleTypeMatcher.cs" />
     <Compile Include="Data\IExpressionReader.cs" />
     <Compile Include="Data\ITypeMatcher.cs" />
     <Compile Include="Data\IValueWriter.cs" />
-    <Compile Include="Data\MultiTypeMatcher.cs" />
+    <Compile Include="Data\ListedTypeMatcher.cs" />
     <Compile Include="Data\PrototypeTypeMatcher.cs" />
     <Compile Include="Data\TypeMatcher.cs" />
-    <Compile Include="Data\RegularExpressionReader.cs" />
+    <Compile Include="Data\NormalExpressionReader.cs" />
     <Compile Include="Data\ExpressionReader.cs" />
     <Compile Include="Data\ValueWriter.cs" />
     <Compile Include="Events\AttributeChangesEvent.cs" />

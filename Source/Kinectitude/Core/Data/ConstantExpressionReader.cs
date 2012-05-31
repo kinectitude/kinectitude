@@ -16,6 +16,6 @@ namespace Kinectitude.Core.Data
             return value;
         }
 
-        public override void notifyOfChange(Action<string, string> callback) { }
+        public override void notifyOfChange(Action<string> callback) { }
     }
 }

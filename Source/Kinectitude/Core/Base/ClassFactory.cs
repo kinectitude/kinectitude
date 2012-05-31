@@ -15,7 +15,7 @@ namespace Kinectitude.Core.Base
 {
     internal class ClassFactory
     {
-        public static readonly Dictionary<string, Type> TypesDict = new Dictionary<string, Type>();
+        internal static readonly Dictionary<string, Type> TypesDict = new Dictionary<string, Type>();
 
         private static readonly MethodInfo IntParse = typeof(int).GetMethod("Parse", new[] { typeof(string) });
         private static readonly MethodInfo FloatParse = typeof(float).GetMethod("Parse", new[] { typeof(string) });
@@ -38,15 +38,17 @@ namespace Kinectitude.Core.Base
             ("CreateTypeMatcher", BindingFlags.Static | BindingFlags.NonPublic);
 
         //empty constructors
-        private static readonly Dictionary<string, Func<object>> Constructors =
+        private static readonly Dictionary<string, Func<object>> constructors =
             new Dictionary<string, Func<object>>();
 
         //empty constructors
         private static readonly Dictionary<Type, Func<object>> ConstructorTypes =
             new Dictionary<Type, Func<object>>();
 
-        //normal setters
         private static readonly Dictionary<Type, Dictionary<string, object>> SettersByType =
+            new Dictionary<Type, Dictionary<string, object>>();
+
+        private static readonly Dictionary<Type, Dictionary<string, object>> GettersByType =
             new Dictionary<Type, Dictionary<string, object>>();
 
         //stores the names set in define in case they are different
@@ -75,8 +77,7 @@ namespace Kinectitude.Core.Base
             RegisterType("DestroyAction", typeof(DestroyAction));
         }
 
-
-        public static void loadServices(Assembly assembly)
+        internal static void LoadServices(Assembly assembly)
         {
             foreach(Type type in assembly.GetTypes().Where(item => typeof(Service).IsAssignableFrom(item)))
             {
@@ -85,45 +86,47 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        public static void RegisterType(string registeredName, Type type)
+        internal static void RegisterType(string registeredName, Type type)
         {
-            Constructors[registeredName] = ConstructorTypes[type] = createConstructorDelegate(type);
+            constructors[registeredName] = ConstructorTypes[type] = createConstructorDelegate(type);
             SettersByType[type] = new Dictionary<string, object>();
             ReferedDictionary[type] = registeredName;
             ParamType[type] = new Dictionary<string, Type>();
-            foreach (PropertyInfo pi in type.GetProperties())
+            GettersByType[type] = new Dictionary<string, object>();
+
+            foreach (PropertyInfo pi in type.GetProperties().Where(item => Attribute.IsDefined(item, typeof(PluginAttribute))))
             {
-                MethodInfo setMethod = pi.GetSetMethod();
-                if (null == setMethod)
-                {
-                    continue;
-                }
+
                 ParamType[type][pi.Name] = pi.PropertyType;
-                if (!Attribute.IsDefined(pi, typeof(PluginAttribute)))
-                {
-                    continue;
-                }
-                object setAction;
+
+                object setter;
+                object getter;
+
                 if (typeof(IValueWriter) == pi.PropertyType)
                 {
-                    setAction = createIValueWriter(type, setMethod);
+                    createIValueWriter(type, pi, out setter, out getter);
                 }
                 else if (typeof(ITypeMatcher) == pi.PropertyType || typeof(IExpressionReader) == pi.PropertyType)
                 {
-                    setAction = createReaderSetterDelegate(type, setMethod);
+                    createReaderDelegate(type, pi, out setter, out getter);
                 }
                 else
                 {
-                    setAction = createSetterDelegate(type, setMethod);
+                    createBasicDelegate(type, pi, out setter, out getter);
                 }
 
-                if (null != setAction)
+                if (null != setter)
                 {
-                    SettersByType[type][pi.Name] = setAction;
+                    SettersByType[type][pi.Name] = setter;
                 }
                 else
                 {
                     //TODO throw exception
+                }
+
+                if(null != getter)
+                {
+                    GettersByType[type][pi.Name] = getter;
                 }
             }
         }
@@ -137,7 +140,7 @@ namespace Kinectitude.Core.Base
 
         internal static T Create<T>(string name) where T : class
         {
-            return CreateHelper<T, string>(name, Constructors);
+            return CreateHelper<T, string>(name, constructors);
         }
 
         internal static T Create<T>(Type type) where T : class
@@ -156,6 +159,7 @@ namespace Kinectitude.Core.Base
             }
 
             Dictionary<string, object> setters = SettersByType[obj.GetType()];
+
             if (typeof(IValueWriter) == setType)
             {
                 Action<object, string, Entity> action =
@@ -176,6 +180,18 @@ namespace Kinectitude.Core.Base
             }
         }
 
+        internal static T GetClassParam<T>(object obj, string param) where T : class
+        {
+            Func<object, object> getter = GettersByType[obj.GetType()][param] as Func<object, object>;
+            return getter(obj) as T;
+        }
+
+        internal static T GetPrimativeParam<T>(object obj, string param) where T : struct
+        {
+            Func<object, object> getter = GettersByType[obj.GetType()][param] as Func<object, object>;
+            return (T)getter(obj);
+        }
+
         private static Func<object> createConstructorDelegate(Type type)
         {
             return Expression.Lambda<Func<object>>(
@@ -185,88 +201,121 @@ namespace Kinectitude.Core.Base
             ).Compile();
         }
 
-        private static Action<object, string, Entity> createIValueWriter
-            (Type type, MethodInfo method)
+
+        private static object createGetter<T>(PropertyInfo pi)
         {
+            if (null != pi.GetGetMethod())
+            {
+                ParameterExpression parameter = Expression.Parameter(typeof(object));
+                UnaryExpression cast = Expression.TypeAs(parameter, pi.DeclaringType);
+                Expression getterBody = Expression.Property(cast, pi);
+                return Expression.Lambda<Func<object, T>>(getterBody, parameter).Compile();
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static void createIValueWriter(Type type, PropertyInfo pi, out object setter, out object getter)
+        {
+
             ParameterExpression target = Expression.Parameter(typeof(object));
             ParameterExpression value = Expression.Parameter(typeof(string));
             ParameterExpression entity = Expression.Parameter(typeof(Entity));
 
-            return Expression.Lambda<Action<object, string, Entity>>(
-                Expression.Call(
-                    Expression.Convert(target, type),
-                    method,
-                    Expression.Call(
-                        CreateValueWriter,
+            setter = Expression.Lambda<Action<object, string, Entity>>
+                        (Expression.Call(
+                            Expression.Convert(target, type),
+                            pi.GetSetMethod(),
+                            Expression.Call(
+                                CreateValueWriter,
+                                value,
+                                entity
+                            )
+                        ),
+                        target,
                         value,
                         entity
-                    )
-                ),
-                target,
-                value,
-                entity
-            ).Compile();
+                        ).Compile();
+
+            getter = createGetter<IValueWriter>(pi);
         }
 
-        private static Action<object, string, Event, Entity> createReaderSetterDelegate
-            (Type type, MethodInfo method)
+        private static void createReaderDelegate(Type type, PropertyInfo pi, out object setter, out object getter)
         {
             ParameterExpression target = Expression.Parameter(typeof(object));
             ParameterExpression value = Expression.Parameter(typeof(string));
             ParameterExpression evt = Expression.Parameter(typeof(Event));
             ParameterExpression entity = Expression.Parameter(typeof(Entity));
-            Type propertyType = method.GetParameters().Single().ParameterType;
+            MethodInfo setMethod = pi.GetSetMethod();
+            Type propertyType = setMethod.GetParameters().Single().ParameterType;
 
             MethodInfo mi = typeof(IExpressionReader) == propertyType ? CreateExpressionReader : CreateTypeMatcher;
 
-            return Expression.Lambda<Action<object, string, Event, Entity>>(
-                Expression.Call(
-                    Expression.Convert(target, type),
-                    method,
-                    Expression.Call(
-                        mi,
+            setter = Expression.Lambda<Action<object, string, Event, Entity>>(
+                        Expression.Call(
+                            Expression.Convert(target, type),
+                            setMethod,
+                            Expression.Call(
+                                mi,
+                                value,
+                                evt,
+                                entity
+                            )
+                        ),
+                        target,
                         value,
                         evt,
                         entity
-                    )
-                ),
-                target,
-                value,
-                evt,
-                entity
-            ).Compile();
+                    ).Compile();
+            //object works, may as well use it here instead of using an if statement
+            getter = createGetter<object>(pi);
         }
 
-        private static Action<object, string> createSetterDelegate(Type type, MethodInfo method)
+        private static void createBasicDelegate(Type type, PropertyInfo pi, out object setter, out object getter)
         {
+            MethodInfo setMethod = pi.GetSetMethod();
             ParameterExpression target = Expression.Parameter(typeof(object));
             ParameterExpression stringParameter = Expression.Parameter(typeof(string));
-            var propertyType = method.GetParameters().Single().ParameterType;
+            var propertyType = setMethod.GetParameters().Single().ParameterType;
             Expression convertedParameter = null;
 
             if (typeof(string) == propertyType)
             {
                 convertedParameter = stringParameter;
+                //use object, so that everything can be an object but primatives and enums.
+                getter = createGetter<object>(pi);
             }
             else if (typeof(int) == propertyType)
             {
                 convertedParameter = Expression.Call(IntParse, stringParameter);
+                //primatives can't be object.
+                getter = createGetter<int>(pi);
             }
             else if (typeof(double) == propertyType)
             {
                 convertedParameter = Expression.Call(DoubleParse, stringParameter);
+                //primatives can't be object.
+                getter = createGetter<double>(pi);
             }
             else if (typeof(bool) == propertyType)
             {
                 convertedParameter = Expression.Call(BoolParse, stringParameter);
+                //primatives can't be object.
+                getter = createGetter<bool>(pi);
             }
             else if (typeof(float) == propertyType)
             {
                 convertedParameter = Expression.Call(FloatParse, stringParameter);
+                //primatives can't be object.
+                getter = createGetter<float>(pi);
             }
             else if (typeof(long) == propertyType)
             {
                 convertedParameter = Expression.Call(LongParse, stringParameter);
+                //primatives can't be object.
+                getter = createGetter<long>(pi);
             }
             else if (propertyType.IsEnum)
             {
@@ -278,16 +327,26 @@ namespace Kinectitude.Core.Base
                     ),
                     propertyType
                 );
+                //can't use object because enums are not nullable, not sure what to do.
+                //TODO ENUMS getter
+                //getter = createGetter<object>(pi);
+                getter = null;
             }
-            return Expression.Lambda<Action<object, string>>(
-                Expression.Call(
-                    Expression.Convert(target, type),
-                    method,
-                    convertedParameter
-                ),
-                target,
-                stringParameter
-            ).Compile();
+            else
+            {
+                //TODO throw exception that means something
+                throw new ArgumentException("Can't find the type of the argument");
+            }
+
+            setter = Expression.Lambda<Action<object, string>>(
+                        Expression.Call(
+                            Expression.Convert(target, type),
+                            setMethod,
+                            convertedParameter
+                        ),
+                        target,
+                        stringParameter
+                    ).Compile();
         }
     }
 }

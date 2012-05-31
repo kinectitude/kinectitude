@@ -22,7 +22,7 @@ namespace Kinectitude.Core.Events
             Target.notifyOfChange(Trigger);
         }
 
-        public void Trigger(string oldValue, string newValue)
+        public void Trigger(string newValue)
         {
             if (Value.GetValue() == Target.GetValue())
             {

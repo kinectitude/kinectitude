@@ -12,6 +12,7 @@ namespace Kinectitude.Core.Loaders
 
         internal Dictionary<string, MethodInfo> MemberSetters { get; private set; }
         internal Dictionary<string, Type> MemberType { get; private set; }
+        internal readonly HashSet<string> AvaliblePrototypes = new HashSet<string>();
         public Game Game { get; protected set; }
 
         /**
@@ -32,7 +33,7 @@ namespace Kinectitude.Core.Loaders
             foreach (Assembly loaded in preloads)
             {
                 loadedFiles.Add(loaded.Location, loaded);
-                ClassFactory.loadServices(loaded);
+                ClassFactory.LoadServices(loaded);
             }
             return gameLoader;
         }
@@ -52,7 +53,7 @@ namespace Kinectitude.Core.Loaders
             if (!loadedFiles.ContainsKey(file))
             {
                 assembly = Assembly.LoadFrom(Path.Combine(Environment.CurrentDirectory, "Plugins", file));
-                ClassFactory.loadServices(assembly);
+                ClassFactory.LoadServices(assembly);
                 loadedFiles.Add(file, assembly);
             }
             else

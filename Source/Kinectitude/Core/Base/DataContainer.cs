@@ -7,8 +7,8 @@ namespace Kinectitude.Core.Base
     {
         private readonly Dictionary<string, string> attributes = new Dictionary<string,string>();
 
-        private readonly Dictionary<string, List<Action<string, string>>> callbacks = 
-            new Dictionary<string,List<Action<string,string>>>();
+        private readonly Dictionary<string, List<Action<string>>> callbacks = 
+            new Dictionary<string,List<Action<string>>>();
         
         public int Id { get; private set; }
         
@@ -32,9 +32,9 @@ namespace Kinectitude.Core.Base
                 attributes[key] = value;
                 if (callbacks.ContainsKey(key))
                 {
-                    foreach (Action<string, string> action in callbacks[key])
+                    foreach (Action<string> action in callbacks[key])
                     {
-                        action(old, value);
+                        action(value);
                     }
                 }
             }
@@ -45,13 +45,13 @@ namespace Kinectitude.Core.Base
             this.Id = id;
         }
 
-        internal void notifyOfChange(string key, Action<string, string> callback)
+        internal void NotifyOfChange(string key, Action<string> callback)
         {
-            List<Action<string, string>> addTo = null;
+            List<Action<string>> addTo = null;
             callbacks.TryGetValue(key, out addTo);
             if (null == addTo)
             {
-                addTo = new List<Action<string, string>>();
+                addTo = new List<Action<string>>();
                 callbacks[key] = addTo;
                 addTo.Add(callback);
             }
@@ -59,6 +59,12 @@ namespace Kinectitude.Core.Base
             {
                 addTo.Add(callback);
             }
+        }
+
+        internal void StopNotifications(string key, Action<string> callback)
+        {
+            List<Action<string>> removeFrom = callbacks[key];
+            removeFrom.Remove(callback);
         }
     }
 }

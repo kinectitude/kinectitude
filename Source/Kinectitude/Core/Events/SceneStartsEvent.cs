@@ -1,6 +1,5 @@
 ﻿using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Base;
-using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Events
 {

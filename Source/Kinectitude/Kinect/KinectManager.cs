@@ -72,7 +72,7 @@ namespace Kinectitude.Kinect
                         KinectFollowComponent kfc = (KinectFollowComponent)kc;
                         float scaleValue = 0.5f;  // Experimentally determined value that we may need to calibrate upon startup based on the lowest hand position we want
                         float x = -1f, y = -1f;
-                        if (KinectFollowComponent.PlayerType.P1 == kfc.followPlayer)
+                        if (KinectFollowComponent.PlayerType.P1 == kfc.Player)
                         {
                             x = skeletons[0].Joints[kfc.Joint].Position.X;
                             y = skeletons[0].Joints[kfc.Joint].Position.Y;

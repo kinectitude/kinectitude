@@ -11,16 +11,17 @@ namespace Kinectitude.Core.Actions
         public IValueWriter Target { get; set; }
 
         [Plugin("Amount", "")]
-        public double IncrementBy { get; set; }
+        public IExpressionReader IncrementBy { get; set; }
 
-        public IncrementAction()
-        {
-            IncrementBy = 1;
-        }
+        public IncrementAction() { }
 
         public override void Run()
         {
-            Target.Value = (double.Parse(Target.Value) + IncrementBy).ToString();
+            if (null == IncrementBy)
+            {
+                IncrementBy = ExpressionReader.CreateExpressionReader("1", Event, Event.Entity);
+            }
+            Target.Value = (double.Parse(Target.Value) + double.Parse(IncrementBy.GetValue())).ToString();
         }
     }
 }

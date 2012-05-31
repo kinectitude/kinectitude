@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Kinectitude.Core.Data
 {
@@ -17,10 +14,10 @@ namespace Kinectitude.Core.Data
         string GetValue();
 
         /// <summary>
-        /// Calls the callback function when this expression changes
+        /// Calls the callback function when the value of this expression changes
         /// </summary>
-        /// <param name="callback"></param>
-        void notifyOfChange(Action<string, string> callback);
+        /// <param name="callback">The callback to call</param>
+        void notifyOfChange(Action<string> callback);
 
     }
 }

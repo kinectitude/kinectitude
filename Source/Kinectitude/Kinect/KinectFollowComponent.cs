@@ -11,9 +11,6 @@ namespace Kinectitude.Kinect
         public enum PlayerType { P1, P2 };
         public enum FollowType { X, Y, Both };
 
-        public PlayerType followPlayer;
-        private FollowType followType;
-
         private float nextDx = 0;
         private float nextDy = 0;
 
@@ -26,47 +23,10 @@ namespace Kinectitude.Kinect
         public JointType Joint { get; set; }
 
         [Plugin("Player", "")]
-        public string Player
-        {
-            set
-            {
-                switch (value)
-                {
-                    case "P1":
-                        followPlayer = PlayerType.P1;
-                        break;
-                    case "P2":
-                        followPlayer = PlayerType.P2;
-                        break;
-                    default:
-                        break;
-                    //TODO some error
-                }
-            }
-        }
+        public PlayerType Player { get; set; }
 
         [Plugin("Axis", "")]
-        public string Direction
-        {
-            set
-            {
-                switch (value.ToLower())
-                {
-                    case ("x"):
-                        followType = FollowType.X;
-                        break;
-                    case ("y"):
-                        followType = FollowType.Y;
-                        break;
-                    case ("both"):
-                        followType = FollowType.Both;
-                        break;
-                    default:
-                        //TODO
-                        break;
-                }
-            }
-        }
+        public FollowType Direction { get; set; }
 
         public KinectFollowComponent() : base() { }
 
@@ -83,7 +43,7 @@ namespace Kinectitude.Kinect
             //if they are following with physics, we will set a velocity
             if (null != physics)
             {
-                switch (followType)
+                switch (Direction)
                 {
                     case FollowType.X:
                         physics.XVelocity = nextDx;
@@ -99,7 +59,7 @@ namespace Kinectitude.Kinect
             }
             else
             {
-                switch (followType)
+                switch (Direction)
                 {
                     case FollowType.X:
                         transform.X += nextDx;

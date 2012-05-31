@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Kinectitude.Core.Base;
-using Kinectitude.Core.Data;
 using Kinectitude.Core.Exceptions;
 
 namespace Kinectitude.Core.Data
@@ -22,14 +21,13 @@ namespace Kinectitude.Core.Data
                 {
                     throw new IllegalPlacementException("!", "events or actions");
                 }
-                return new RegularExpressionReader(vals[1], TypeMatcher.CreateTypeMatcher(value, evt, entity));
             }
-            return new RegularExpressionReader(vals[1], TypeMatcher.CreateTypeMatcher(vals[0], evt, entity));
+            return new NormalExpressionReader(vals[1], TypeMatcher.CreateTypeMatcher(vals[0], evt, entity), entity);
         }
 
         public abstract string GetValue();
 
-        public abstract void notifyOfChange(Action<string, string> callback);
+        public abstract void notifyOfChange(Action<string> callback);
 
     }
 }

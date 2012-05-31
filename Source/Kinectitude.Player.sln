@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinectitude.Player", "Kinectitude\Player\Kinectitude.Player.csproj", "{753C2E85-FCF6-46E1-939C-D35C0B047E40}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinectitude.Attributes", "Kinectitude\Attributes\Kinectitude.Attributes.csproj", "{52A964EE-E3ED-4AC5-843F-9FAA26055B39}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinectitude.Core", "Kinectitude\Core\Kinectitude.Core.csproj", "{AEAB17EC-574C-4177-9204-FE48F4C3F429}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinectitude.Kinect", "Kinectitude\Kinect\Kinectitude.Kinect.csproj", "{43DCBEE6-F87E-4F59-9146-3E67B1ED3C45}"
@@ -33,16 +31,6 @@ Global
 		{753C2E85-FCF6-46E1-939C-D35C0B047E40}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{753C2E85-FCF6-46E1-939C-D35C0B047E40}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{753C2E85-FCF6-46E1-939C-D35C0B047E40}.Release|x86.ActiveCfg = Release|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Release|Any CPU.Build.0 = Release|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Release|x86.ActiveCfg = Release|Any CPU
 		{AEAB17EC-574C-4177-9204-FE48F4C3F429}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AEAB17EC-574C-4177-9204-FE48F4C3F429}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AEAB17EC-574C-4177-9204-FE48F4C3F429}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

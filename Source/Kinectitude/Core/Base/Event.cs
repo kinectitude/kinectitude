@@ -6,11 +6,6 @@ namespace Kinectitude.Core.Base
     public abstract class Event
     {
 
-        private static readonly Queue<Event> eventQueue = new Queue<Event>();
-
-        internal readonly Dictionary<string, TypeMatcher> AvailableSelectors =
-            new Dictionary<string, TypeMatcher>();
-
         private readonly List<Action> actions = new List<Action>();
 
         internal Entity Entity;
@@ -33,25 +28,9 @@ namespace Kinectitude.Core.Base
 
         public void DoActions()
         {
-            if (0 == eventQueue.Count)
-            {
-                Run();
-            }
-            else
-            {
-                eventQueue.Enqueue(this);
-            }
-        }
-
-        private void Run()
-        {
             foreach (Action a in actions)
             {
                 a.Run();
-            }
-            if (eventQueue.Count != 0)
-            {
-                eventQueue.Dequeue().Run();
             }
         }
 

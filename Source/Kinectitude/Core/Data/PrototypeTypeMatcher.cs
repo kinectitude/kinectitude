@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Data
 {
-    internal sealed class PrototypeTypeMatcher : TypeMatcher
+    internal sealed class PrototypeTypeMatcher : MultiTypeMatcher
     {
         private readonly HashSet<int> prototype;
 
@@ -16,7 +17,12 @@ namespace Kinectitude.Core.Data
         {
             if (prototype.Contains(dataContainer.Id))
             {
-                DataContainer = dataContainer as DataContainer;
+                OldDataContainer = this.DataContainer;
+                this.DataContainer = dataContainer as DataContainer;
+                foreach (Action<DataContainer> toNotify in notify)
+                {
+                    toNotify(this.DataContainer);
+                }
                 return true;
             }
             return false;

@@ -123,22 +123,22 @@ namespace Kinectitude.Physics
             {
                 foreach (CrossesLineEvent evt in crossesLineEvents)
                 {
-                    double cross = evt.Position;
+                    double cross = evt.Location;
                     //from neg and positive
                     bool neg = true;
                     bool pos = true;
-                    if (CrossesLineEvent.FromDirection.Negative == evt.From)
+                    if (CrossesLineEvent.FromDirection.Negative == evt.Direction)
                     {
                         pos = false;
                     }
-                    else if (CrossesLineEvent.FromDirection.Positive == evt.From)
+                    else if (CrossesLineEvent.FromDirection.Positive == evt.Direction)
                     {
                         neg = false;
                     }
 
                     double prev;
                     double next;
-                    if (CrossesLineEvent.LineType.X == evt.Cross)
+                    if (CrossesLineEvent.LineType.X == evt.Line)
                     {
                         prev = prevX;
                         next = x;

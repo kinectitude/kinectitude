@@ -7,7 +7,8 @@ namespace Kinectitude.Core.Base
 
     public class Game : DataContainer, IUpdateable
     {
-        private readonly GameLoader gameLoader;
+        //public to see if types exist
+        public readonly GameLoader GameLoader;
         private readonly Stack<Scene> currentScenes = new Stack<Scene>();
         private readonly Dictionary<Type, Service> services = new Dictionary<Type, Service>();
 
@@ -30,13 +31,13 @@ namespace Kinectitude.Core.Base
 
         internal Game(GameLoader gameLoader) : base(-2)
         {
-            this.gameLoader = gameLoader;
+            this.GameLoader = gameLoader;
             CurrentGame = this;
         }
 
         public void Start()
         {
-            Scene main = gameLoader.GetSceneLoader("main").Scene;
+            Scene main = GameLoader.GetSceneLoader("main").Scene;
             currentScenes.Push(main);
             main.Running = true;
         }
@@ -53,7 +54,7 @@ namespace Kinectitude.Core.Base
         internal void RunScene(string name)
         {
             currentScenes.Pop().Running = false;
-            Scene run = gameLoader.GetSceneLoader(name).Scene;
+            Scene run = GameLoader.GetSceneLoader(name).Scene;
             currentScenes.Push(run);
             run.Running = true;
         }
@@ -61,7 +62,7 @@ namespace Kinectitude.Core.Base
         internal void PushScene(string name)
         {
             currentScenes.Peek().Running = false;
-            Scene run = gameLoader.GetSceneLoader(name).Scene;
+            Scene run = GameLoader.GetSceneLoader(name).Scene;
             currentScenes.Push(run);
             run.Running = true;
         }

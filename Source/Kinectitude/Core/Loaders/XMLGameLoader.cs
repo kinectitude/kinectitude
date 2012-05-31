@@ -18,9 +18,9 @@ namespace Kinectitude.Core.Loaders
             XMLGameLoader.mergeXmlNodes(prototype, newPrototype);
             foreach (string isPrototype in PrototypeIs[mergeWith])
             {
-                if (!PrototypeIs[myName].Contains(mergeWith))
+                if (!PrototypeIs[myName].Contains(isPrototype))
                 {
-                    PrototypeIs[myName].Add(mergeWith);
+                    PrototypeIs[myName].Add(isPrototype);
                 }
             }
         }
@@ -69,6 +69,7 @@ namespace Kinectitude.Core.Loaders
                     }
                 }
                 Prototypes.Add(myName, node);
+                AvaliblePrototypes.Add(myName);
             }
 
             foreach (XElement node in root.Elements().Where(input => "Scene" == input.Name))

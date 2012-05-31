@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Kinectitude.Core.Base;
+﻿using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Data
 {

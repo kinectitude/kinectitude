@@ -4,6 +4,8 @@ using Kinectitude.Core.Base;
 using Kinectitude.Core.Components;
 using SlimDX;
 using SlimDX.DirectWrite;
+using Color = System.Windows.Media.Color;
+using ColorConverter = System.Windows.Media.ColorConverter;
 
 namespace Kinectitude.Render
 {
@@ -28,7 +30,7 @@ namespace Kinectitude.Render
         {
             set
             {
-                System.Windows.Media.Color color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(value);
+                Color color = (Color)ColorConverter.ConvertFromString(value);
                 renderColor = new Color4((float)color.R / 255.0f, (float)color.G / 255.0f, (float)color.B / 255.0f);
             }
         }

@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Kinectitude.Core.Base;
-using Kinectitude.Core.Data;
 using Kinectitude.Core.Exceptions;
+using Kinectitude.Core.Loaders;
 
 namespace Kinectitude.Core.Data
 {
@@ -10,16 +11,27 @@ namespace Kinectitude.Core.Data
     {
 
         internal DataContainer DataContainer { get; set; }
+        //used to see if an expression has changed when the data container changes
+        internal DataContainer OldDataContainer { get; set; }
 
         public abstract bool MatchAndSet(IDataContainer entity);
 
-        internal static TypeMatcher CreationHelper(string value, Dictionary<string,HashSet<int>> from)
+        internal static TypeMatcher CreationHelper(string value, Dictionary<string,HashSet<int>> from, GameLoader loader)
         {
             value = value.Substring(1);
-            HashSet<int> matcher = from[value];
+            HashSet<int> matcher = null;
+            from.TryGetValue(value, out matcher);
             if (null == matcher)
             {
-                throw new NoSuchPrototypeException(value);
+                if (!loader.AvaliblePrototypes.Contains(value))
+                {
+                    throw new NoSuchPrototypeException(value);
+                }
+                else
+                {
+                    matcher = new HashSet<int>();
+                    from[value] = matcher;
+                }
             }
             return new PrototypeTypeMatcher(matcher);
         }
@@ -35,7 +47,7 @@ namespace Kinectitude.Core.Data
                 {
                     readableList.Add(CreateTypeMatcher(readable, evt, entity));
                 }
-                return new MultiTypeMatcher(readableList);
+                return new ListedTypeMatcher(readableList);
             }
             if ('!' == value[0])
             {
@@ -44,7 +56,7 @@ namespace Kinectitude.Core.Data
                     throw new IllegalPlacementException("!", "events or actions");
                 }
                 value = value.Substring(1);
-                TypeMatcher matcher = evt.AvailableSelectors[value];
+                TypeMatcher matcher = ClassFactory.GetClassParam<ITypeMatcher>(evt, value) as TypeMatcher;
                 if (null == matcher)
                 {
                     throw new InvalidAttributeException
@@ -54,11 +66,11 @@ namespace Kinectitude.Core.Data
             }
             if ('$' == value[0])
             {
-                CreationHelper(value, scene.IsType);
+                return CreationHelper(value, scene.IsType, scene.Game.GameLoader);
             }
             if ('#' == value[0])
             {
-                CreationHelper(value, scene.IsExactType);
+                return CreationHelper(value, scene.IsExactType, scene.Game.GameLoader);
             }
             if ("game" == value)
             {
@@ -83,5 +95,7 @@ namespace Kinectitude.Core.Data
                 return DataContainer[key];
             }
         }
+
+        internal abstract void NotifyOfChange(Action<DataContainer> action);
     }
 }

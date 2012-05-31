@@ -9,6 +9,9 @@ namespace Kinectitude.Core.Base
         private readonly Dictionary<Type, Component> componentDictionary;
         //used so that all components can be ready when the entity is ready
         private readonly List<Component> componentList = new List<Component>();
+        //Used to automatically unsuscribe all components' and events' change listeners
+        internal readonly List<Tuple<DataContainer, string, Action<string>>> Changes = 
+            new List<Tuple<DataContainer, string, Action<string>>>();
 
         internal Scene Scene { get; set; }
 
@@ -42,6 +45,11 @@ namespace Kinectitude.Core.Base
 
         internal void Destroy()
         {
+            foreach (Tuple<DataContainer, string, Action<string>> unsubscribe in Changes)
+            {
+                unsubscribe.Item1.StopNotifications(unsubscribe.Item2, unsubscribe.Item3);
+            }
+
             foreach (Component component in componentList)
             {
                 component.Destroy();

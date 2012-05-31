@@ -35,15 +35,14 @@
     <Component Type="RenderComponent" FillColor="LimeGreen" Shape="rectangle"/>
     <Component Type="TransformComponent" Width="800" Height="10" X="400" Y="340"/>
   </Prototype>
-
-
-  <Prototype Name="ball">
+  
+  <Prototype Name="ball" Value="0">
     <Component Type="RenderComponent" FillColor="Red" Shape="circle" />
     <Component Type="TransformComponent" X="250" Y="250" Width="24" Height="24"/>
     <Component Type="PhysicsComponent" XVelocity="40" YVelocity="20" Shape="circle" Restitution="1" Mass="1" Friction="0" LinearDamping="0" Bodytype="Dynamic"/>
     <Event Type="CollisionEvent" CollidesWith="left_wall">
       <Action Type="SetPositionAction" X="400" Y="300" />
-      <Action Type="IncrementAction" Target="scene.player2Score" />
+      <Action Type="IncrementAction" Target="scene.player2Score"/>
     </Event>
     <!-- this is done differently then the other one to test both methods-->
     <Event Type="CrossesLineEvent" Location="800" Line="X" Direction="Positive">
@@ -53,19 +52,21 @@
     </Event>
   </Prototype>
 
-  <Prototype Name="rightBall" Prototype="ball">
+  <Prototype Name="rightBall" Prototype="ball" Value="0.1">
     <Event Type="CollisionEvent" CollidesWith="left_wall">
+      <Action Type="IncrementAction" Target="scene.player2Score" />
       <Action Type="DestroyAction"/>
     </Event>
     <Event Type="CrossesLineEvent" Location="800" Line="X" Direction="Positive">
+      <Action Type="IncrementAction" Target="scene.player1Score" />
       <Action Type="DestroyAction"/>
     </Event>
   </Prototype>
 
-  <Prototype Name="leftBall" Prototype="rightBall">
+  <Prototype Name="leftBall" Prototype="rightBall" Value="0.1">
     <Component Type="PhysicsComponent" XVelocity="-40"/>
   </Prototype>
-
+  
   <!-- tests that it will inherit from paddle-->
   <Prototype Name="endPaddle" Prototype="paddle">
     <Event Type="CrossesLineEvent" Line="Y" Location="440"  Direction="Positive">
@@ -126,7 +127,7 @@
       <Event Type="CrossesLineEvent" Line="Y" Location="350"  Direction="Positive">
         <Action Type="SetAttributeAction" Target="scene.ready2" Value="player 2 is ready!"/>
         <Condition If="scene.ready1">
-          <Action Type="ChangeSceneAction" Target="Game"/>
+          <Action Type="ChangeSceneAction" Target="game"/>
         </Condition>
       </Event>
     </Entity>
@@ -134,15 +135,21 @@
     <Entity Name="readybar" Prototype="bar"/>
   </Scene>
 
-  <Scene Name="Game" player1Score="0" player2Score="0">
+  <Scene Name="game" player1Score="0" player2Score="0">
 
     <Entity Name="player1" Prototype="paddle">
       <Component Type="TransformComponent" X="17" Y="250"/>
+      <Event Type="CollisionEvent" CollidesWith="$ball">
+        <Action Type="IncrementAction" Target="scene.player1Score" IncrementBy="!CollidesWith.Value"/>
+      </Event>
     </Entity>
 
     <Entity Name="player2" Prototype="paddle">
       <Component Type="KinectFollowComponent" Player="P1" Joint="HandRight" />
       <Component Type="TransformComponent" X="782" Y="250"/>
+      <Event Type="CollisionEvent" CollidesWith="$ball">
+        <Action Type="IncrementAction" Target="scene.player2Score" IncrementBy="!CollidesWith.Value"/>
+      </Event>
     </Entity>
 
     <Entity Name="top_wall">
@@ -170,7 +177,7 @@
       <Event Type="TriggerOccursEvent" Trigger="player1Scores">
         <Action Type="SetTextAction" Value="scene.player1Score" />
       </Event>
-      <Event Type="AttributeEqualsEvent" Target="scene.player1Score" Value="15">
+      <Event Type="AttributeEqualsEvent" Target="scene.player1Score" Value="100">
         <Action Type="SetAttributeAction" Target="game.winner" Value="player 1 wins"/>
         <Action Type="ChangeSceneAction" Target="gameOver"/>
       </Event>
@@ -184,7 +191,7 @@
       <Event Type="AttributeChangesEvent" Target="scene.player2Score">
         <Action Type="SetTextAction" Value="scene.player2Score" />
       </Event>
-      <Event Type="AttributeEqualsEvent" Target="scene.player2Score" Value="15">
+      <Event Type="AttributeEqualsEvent" Target="scene.player2Score" Value="100">
         <Action Type="SetAttributeAction" Target="game.winner" Value="player 2 wins"/>
         <Action Type="ChangeSceneAction" Target="gameOver"/>
       </Event>

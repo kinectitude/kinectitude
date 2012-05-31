@@ -1,4 +1,5 @@
-﻿using Kinectitude.Core.Base;
+﻿using System;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Data
 {
@@ -14,5 +15,7 @@ namespace Kinectitude.Core.Data
             //no need to set, it already is
             return dataContainer == DataContainer;
         }
+
+        internal override void NotifyOfChange(Action<DataContainer> action) { }
     }
 }

@@ -1,29 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Kinectitude.Core.Base;
-using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Data
 {
-    internal class MultiTypeMatcher : TypeMatcher
+    internal abstract class MultiTypeMatcher : TypeMatcher
     {
-        private readonly List<ITypeMatcher> readables;
+        protected readonly List<Action<DataContainer>> notify = new List<Action<DataContainer>>();
 
-        internal MultiTypeMatcher(List<ITypeMatcher> readables)
+        internal override void NotifyOfChange(Action<DataContainer> action)
         {
-            this.readables = readables;
-        }
-
-        public override bool MatchAndSet(IDataContainer DataContainer)
-        {
-            foreach (TypeMatcher r in readables)
-            {
-                if (MatchAndSet(DataContainer))
-                {
-                    DataContainer = DataContainer as DataContainer;
-                    return true;
-                }
-            }
-            return false;
+            notify.Add(action);
         }
     }
 }
