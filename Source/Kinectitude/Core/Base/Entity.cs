@@ -6,32 +6,41 @@ namespace Kinectitude.Core.Base
     internal class Entity : DataContainer, IDataContainer
     {
         //used to get a specific component
-        private readonly Dictionary<Type, Component> componentDictionary;
+        private readonly Dictionary<Type, Component> componentDictionary = new Dictionary<Type, Component>();
+
+        //used by ComponentValueReader to get the component
+        private readonly Dictionary<string, Component> componentNameDictionary = new Dictionary<string, Component>();
+
         //used so that all components can be ready when the entity is ready
         private readonly List<Component> componentList = new List<Component>();
+
         //Used to automatically unsuscribe all components' and events' change listeners
         internal readonly List<Tuple<DataContainer, string, Action<string>>> Changes = 
             new List<Tuple<DataContainer, string, Action<string>>>();
 
         internal Scene Scene { get; set; }
 
-        public T GetComponent<T>() where T : Component
+        internal T GetComponent<T>() where T : Component
         {
-            if (!componentDictionary.ContainsKey(typeof(T)))
-            {
-                return null;
-            }
-            return componentDictionary[typeof(T)] as T;
+            Component component = null;
+            componentDictionary.TryGetValue(typeof(T), out component);
+            return component as T;
         }
 
-        internal Entity(int id) : base(id)
+        //used by ComponentValueReader
+        internal Component GetComponent(string name)
         {
-            componentDictionary = new Dictionary<Type, Component>();
+            Component component = null;
+            componentNameDictionary.TryGetValue(name, out component);
+            return component;
         }
 
-        internal void AddComponent(Component component)
+        internal Entity(int id) : base(id) { }
+
+        internal void AddComponent(Component component, string name)
         {
             componentDictionary[component.ImplementationType] = component;
+            componentNameDictionary[name] = component;
             componentList.Add(component);
         }
 

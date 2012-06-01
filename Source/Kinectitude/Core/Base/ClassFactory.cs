@@ -45,11 +45,17 @@ namespace Kinectitude.Core.Base
         private static readonly Dictionary<Type, Func<object>> ConstructorTypes =
             new Dictionary<Type, Func<object>>();
 
+        //stores setters that are used by the user
         private static readonly Dictionary<Type, Dictionary<string, object>> SettersByType =
             new Dictionary<Type, Dictionary<string, object>>();
 
+        //stores getters for components, and actions of primatives
         private static readonly Dictionary<Type, Dictionary<string, object>> GettersByType =
             new Dictionary<Type, Dictionary<string, object>>();
+
+        //stores getters for components, and actions of primatives
+        private static readonly Dictionary<Type, Dictionary<string, Func<object, string>>> GettersByName =
+            new Dictionary<Type, Dictionary<string, Func<object, string>>>();
 
         //stores the names set in define in case they are different
         private static readonly Dictionary<Type, string> ReferedDictionary = new Dictionary<Type, string>();
@@ -93,6 +99,7 @@ namespace Kinectitude.Core.Base
             ReferedDictionary[type] = registeredName;
             ParamType[type] = new Dictionary<string, Type>();
             GettersByType[type] = new Dictionary<string, object>();
+            GettersByName[type] = new Dictionary<string, Func<object, string>>();
 
             foreach (PropertyInfo pi in type.GetProperties().Where(item => Attribute.IsDefined(item, typeof(PluginAttribute))))
             {
@@ -101,18 +108,19 @@ namespace Kinectitude.Core.Base
 
                 object setter;
                 object getter;
+                Func<object, string> stringGetter;
 
                 if (typeof(IValueWriter) == pi.PropertyType)
                 {
-                    createIValueWriter(type, pi, out setter, out getter);
+                    createIValueWriter(type, pi, out setter, out getter, out stringGetter);
                 }
                 else if (typeof(ITypeMatcher) == pi.PropertyType || typeof(IExpressionReader) == pi.PropertyType)
                 {
-                    createReaderDelegate(type, pi, out setter, out getter);
+                    createReaderDelegate(type, pi, out setter, out getter, out stringGetter);
                 }
                 else
                 {
-                    createBasicDelegate(type, pi, out setter, out getter);
+                    createBasicDelegate(type, pi, out setter, out getter, out stringGetter);
                 }
 
                 if (null != setter)
@@ -127,6 +135,8 @@ namespace Kinectitude.Core.Base
                 if(null != getter)
                 {
                     GettersByType[type][pi.Name] = getter;
+                    //if it has a getter, it should have a string representation
+                    GettersByName[type][pi.Name] = stringGetter;
                 }
             }
         }
@@ -180,16 +190,15 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        internal static T GetClassParam<T>(object obj, string param) where T : class
+        internal static T GetParam<T>(object obj, string param) where T : class
         {
-            Func<object, object> getter = GettersByType[obj.GetType()][param] as Func<object, object>;
-            return getter(obj) as T;
+            Func<object, T> getter = GettersByType[obj.GetType()][param] as Func<object, T>;
+            return getter(obj);
         }
 
-        internal static T GetPrimativeParam<T>(object obj, string param) where T : struct
+        internal static string GetStringParam(object obj, string param)
         {
-            Func<object, object> getter = GettersByType[obj.GetType()][param] as Func<object, object>;
-            return (T)getter(obj);
+            return GettersByName[obj.GetType()][param](obj);
         }
 
         private static Func<object> createConstructorDelegate(Type type)
@@ -202,7 +211,7 @@ namespace Kinectitude.Core.Base
         }
 
 
-        private static object createGetter<T>(PropertyInfo pi)
+        private static Func<object, T> createGetter<T>(PropertyInfo pi)
         {
             if (null != pi.GetGetMethod())
             {
@@ -217,7 +226,8 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        private static void createIValueWriter(Type type, PropertyInfo pi, out object setter, out object getter)
+        private static void createIValueWriter
+            (Type type, PropertyInfo pi, out object setter, out object getter, out Func<object, string> stringGetter)
         {
 
             ParameterExpression target = Expression.Parameter(typeof(object));
@@ -239,10 +249,13 @@ namespace Kinectitude.Core.Base
                         entity
                         ).Compile();
 
-            getter = createGetter<IValueWriter>(pi);
+            Func<object, IValueWriter> returnedGetter = createGetter<IValueWriter>(pi);
+            getter = returnedGetter;
+            stringGetter = new Func<object, string>(input => returnedGetter(input).Value);
         }
 
-        private static void createReaderDelegate(Type type, PropertyInfo pi, out object setter, out object getter)
+        private static void createReaderDelegate
+            (Type type, PropertyInfo pi, out object setter, out object getter, out Func<object, string> stringGetter)
         {
             ParameterExpression target = Expression.Parameter(typeof(object));
             ParameterExpression value = Expression.Parameter(typeof(string));
@@ -251,7 +264,22 @@ namespace Kinectitude.Core.Base
             MethodInfo setMethod = pi.GetSetMethod();
             Type propertyType = setMethod.GetParameters().Single().ParameterType;
 
-            MethodInfo mi = typeof(IExpressionReader) == propertyType ? CreateExpressionReader : CreateTypeMatcher;
+            MethodInfo mi;
+
+            if (typeof(IExpressionReader) == propertyType)
+            {
+                mi = CreateExpressionReader;
+                Func<object, IExpressionReader> expressionGetter = createGetter<IExpressionReader>(pi);
+                getter = expressionGetter;
+                stringGetter = new Func<object, string>(input => expressionGetter(input).GetValue());
+            }
+            else
+            {
+                mi = CreateTypeMatcher;
+                Func<object, ITypeMatcher> typeGetter = createGetter<ITypeMatcher>(pi);
+                getter = typeGetter;
+                stringGetter = new Func<object, string>(input => typeGetter(input).NameOfLastMatch);
+            }
 
             setter = Expression.Lambda<Action<object, string, Event, Entity>>(
                         Expression.Call(
@@ -269,11 +297,10 @@ namespace Kinectitude.Core.Base
                         evt,
                         entity
                     ).Compile();
-            //object works, may as well use it here instead of using an if statement
-            getter = createGetter<object>(pi);
         }
 
-        private static void createBasicDelegate(Type type, PropertyInfo pi, out object setter, out object getter)
+        private static void createBasicDelegate
+            (Type type, PropertyInfo pi, out object setter, out object getter, out Func<object, string> stringGetter)
         {
             MethodInfo setMethod = pi.GetSetMethod();
             ParameterExpression target = Expression.Parameter(typeof(object));
@@ -284,38 +311,42 @@ namespace Kinectitude.Core.Base
             if (typeof(string) == propertyType)
             {
                 convertedParameter = stringParameter;
-                //use object, so that everything can be an object but primatives and enums.
-                getter = createGetter<object>(pi);
+                getter = stringGetter = createGetter<string>(pi);
             }
             else if (typeof(int) == propertyType)
             {
                 convertedParameter = Expression.Call(IntParse, stringParameter);
-                //primatives can't be object.
-                getter = createGetter<int>(pi);
+                Func<object, int> intGetter = createGetter<int>(pi);
+                getter = intGetter;
+                stringGetter = new Func<object, string>(input => intGetter(input).ToString());
             }
             else if (typeof(double) == propertyType)
             {
                 convertedParameter = Expression.Call(DoubleParse, stringParameter);
-                //primatives can't be object.
-                getter = createGetter<double>(pi);
+                Func<object, double> doubleGetter = createGetter<double>(pi);
+                getter = doubleGetter;
+                stringGetter = new Func<object, string>(input => doubleGetter(input).ToString());
             }
             else if (typeof(bool) == propertyType)
             {
                 convertedParameter = Expression.Call(BoolParse, stringParameter);
-                //primatives can't be object.
-                getter = createGetter<bool>(pi);
+                Func<object, bool> boolGetter = createGetter<bool>(pi);
+                getter = boolGetter;
+                stringGetter = new Func<object, string>(input => boolGetter(input).ToString());
             }
             else if (typeof(float) == propertyType)
             {
                 convertedParameter = Expression.Call(FloatParse, stringParameter);
-                //primatives can't be object.
-                getter = createGetter<float>(pi);
+                Func<object, float> floatGetter = createGetter<float>(pi);
+                getter = floatGetter;
+                stringGetter = new Func<object, string>(input => floatGetter(input).ToString());
             }
             else if (typeof(long) == propertyType)
             {
                 convertedParameter = Expression.Call(LongParse, stringParameter);
-                //primatives can't be object.
-                getter = createGetter<long>(pi);
+                Func<object, long> longGetter = createGetter<long>(pi);
+                getter = longGetter;
+                stringGetter = new Func<object, string>(input => longGetter(input).ToString());
             }
             else if (propertyType.IsEnum)
             {
@@ -328,9 +359,9 @@ namespace Kinectitude.Core.Base
                     propertyType
                 );
                 //can't use object because enums are not nullable, not sure what to do.
-                //TODO ENUMS getter
-                //getter = createGetter<object>(pi);
-                getter = null;
+                //TODO ENUMS getter?
+                //getters may not be needed, since the attributes must take a primative type.
+                getter = stringGetter = null;
             }
             else
             {

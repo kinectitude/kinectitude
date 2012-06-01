@@ -99,7 +99,7 @@ namespace Kinectitude.Core.Base
         {
             Component created = ClassFactory.Create<Component>(stringType);
             created.Entity = entity;
-            entity.AddComponent(created);
+            entity.AddComponent(created, stringType);
             foreach (Tuple<string, string> tuple in values)
             {
                 ClassFactory.SetParam(created, tuple.Item1, tuple.Item2, null, entity);

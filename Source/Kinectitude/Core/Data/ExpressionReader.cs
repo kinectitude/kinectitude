@@ -10,8 +10,10 @@ namespace Kinectitude.Core.Data
         internal static ExpressionReader CreateExpressionReader(string value, Event evt, Entity entity)
         {
             double d;
-            if (!value.Contains('.') || double.TryParse(value, out d))
+            if (value.Contains('\\') || '!' != value[0] && !value.Contains('.') || double.TryParse(value, out d))
             {
+                value = value.Replace("\\\\", "\\").Replace("\\!", "!")
+                    .Replace("\\.", ".").Replace("\\{", "{").Replace("\\}","}");
                 return new ConstantExpressionReader(value);
             }
             string[] vals = value.Split('.');
@@ -22,11 +24,20 @@ namespace Kinectitude.Core.Data
                     throw new IllegalPlacementException("!", "events or actions");
                 }
             }
-            if (vals.Length > 2)
+            switch(vals.Length)
             {
-
+                case 1:
+                    return new ParameterValueReader(evt, value.Substring(1));
+                case 2:
+                    return new EntityValueReader(vals[1], TypeMatcher.CreateTypeMatcher(vals[0], evt, entity), entity);
+                case 3:
+                    string[] part = new string [] { vals[1], vals[2] };
+                    return new ComponentValueReader(part, TypeMatcher.CreateTypeMatcher(vals[0], evt, entity));
+                default:
+                    //TODO make this a better exception
+                    throw new ArgumentException("Invalid reader");
             }
-            return new EntityValueReader(vals[1], TypeMatcher.CreateTypeMatcher(vals[0], evt, entity), entity);
+
         }
 
         public abstract string GetValue();

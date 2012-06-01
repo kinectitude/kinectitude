@@ -34,7 +34,7 @@
   </Prototype>
   
   <Prototype Name="score" Prototype="text">
-    <Component Type="TextRenderComponent" Value="0" FontColor="White" />
+    <Component Type="TextRenderComponent" Value="0"/>
   </Prototype>
 
   <Prototype Name="bar">
@@ -55,6 +55,11 @@
       <Action Type="SetPositionAction" X="400" Y="300" />
       <Action Type="IncrementAction" Target="scene.player1Score" />
       <Action Type="FireTriggerAction" Name="player1Scores"/>
+    </Event>
+    <Event Type="CollisionEvent" CollidesWith="$paddle">
+      <Action Type="SetAttributeAction" Target="scene.lastHit" Value="!CollidesWith"/>
+      <Action Type="SetAttributeAction" Target="scene.lastX" Value="!CollidesWith.TransformComponent.X"/>
+      <Action Type="SetAttributeAction" Target="scene.lastY" Value="!CollidesWith.TransformComponent.Y"/>
     </Event>
   </Prototype>
 
@@ -211,6 +216,45 @@
       </Event>
     </Entity>
 
+    <Entity Prototype="text">
+      <Component Type="TransformComponent" X="150" Y="75"/>
+      <Component Type="TextRenderComponent" Value="Last hit by" FontSize="25"/>
+    </Entity>
+
+    <Entity Prototype="text">
+      <Component Type="TransformComponent" X="270" Y="75"/>
+      <Component Type="TextRenderComponent" Value="Nobody!" FontSize="25"/>
+      <Event Type="AttributeChangesEvent" Target="scene.lastHit">
+        <Action Type="SetTextAction" Value="scene.lastHit"/>
+      </Event>
+    </Entity>
+
+    <Entity Prototype="text">
+      <Component Type="TransformComponent" X="370" Y="75"/>
+      <Component Type="TextRenderComponent" Value="At X =" FontSize="25"/>
+    </Entity>
+
+    <Entity Prototype="text">
+      <Component Type="TransformComponent" X="445" Y="75"/>
+      <Component Type="TextRenderComponent" Value="N/A" FontSize="25"/>
+      <Event Type="AttributeChangesEvent" Target="scene.lastX">
+        <Action Type="SetTextAction" Value="scene.lastX"/>
+      </Event>
+    </Entity>
+
+    <Entity Prototype="text">
+      <Component Type="TransformComponent" X="500" Y="75"/>
+      <Component Type="TextRenderComponent" Value="Y =" FontSize="25"/>
+    </Entity>
+
+    <Entity Prototype="text">
+      <Component Type="TransformComponent" X="550" Y="75"/>
+      <Component Type="TextRenderComponent" Value="N/A" FontSize="25"/>
+      <Event Type="AttributeChangesEvent" Target="scene.lastY">
+        <Action Type="SetTextAction" Value="scene.lastY"/>
+      </Event>
+    </Entity>
+    
   </Scene>
 
   <Scene Name="gameOver">

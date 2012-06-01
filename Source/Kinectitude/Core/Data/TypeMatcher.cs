@@ -11,6 +11,7 @@ namespace Kinectitude.Core.Data
     {
 
         internal DataContainer DataContainer { get; set; }
+
         //used to see if an expression has changed when the data container changes
         internal DataContainer OldDataContainer { get; set; }
 
@@ -56,7 +57,7 @@ namespace Kinectitude.Core.Data
                     throw new IllegalPlacementException("!", "events or actions");
                 }
                 value = value.Substring(1);
-                TypeMatcher matcher = ClassFactory.GetClassParam<ITypeMatcher>(evt, value) as TypeMatcher;
+                TypeMatcher matcher = ClassFactory.GetParam<ITypeMatcher>(evt, value) as TypeMatcher;
                 if (null == matcher)
                 {
                     throw new InvalidAttributeException
@@ -97,5 +98,18 @@ namespace Kinectitude.Core.Data
         }
 
         internal abstract void NotifyOfChange(Action<DataContainer> action);
+
+
+        public string NameOfLastMatch
+        {
+            get 
+            {
+                if (null == DataContainer)
+                {
+                    return null;
+                }
+                return DataContainer.Name; 
+            }
+        }
     }
 }
