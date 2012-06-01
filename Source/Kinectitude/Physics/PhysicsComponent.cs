@@ -33,7 +33,7 @@ namespace Kinectitude.Physics
         [Preset("Collision Event Line", BodyType.Kinematic)]
         [Preset("Wall", BodyType.Kinematic)]
         [Plugin("Body Type", "")]
-        public BodyType Bodytype { get; set; }
+        public BodyType BodyType { get; set; }
 
         [Preset("Bouncy Ball", 1.0)]
         [Preset("Collision Event Line", 0.0)]
@@ -204,7 +204,7 @@ namespace Kinectitude.Physics
 
             //Set fields on the body
             body.UserData = IEntity;
-            body.BodyType = Bodytype;
+            body.BodyType = BodyType;
             body.Restitution = Restitution;
             body.Mass = Mass;
             body.Friction = Friction;

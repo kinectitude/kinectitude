@@ -39,14 +39,14 @@ namespace Kinectitude.Render
             renderService.RenderAction -= Render;
         }
 
-        public SolidColorBrush GetSolidColorBrush(Color4 color)
+        public SolidColorBrush GetSolidColorBrush(Color4 color, float opacity)
         {
-            return renderService.GetSolidColorBrush(color);
+            return renderService.GetSolidColorBrush(color, opacity);
         }
 
-        public SolidColorBrush GetSolidColorBrush(string color)
+        public SolidColorBrush GetSolidColorBrush(string color, float opacity)
         {
-            return renderService.GetSolidColorBrush(RenderService.ColorFromString(color));
+            return renderService.GetSolidColorBrush(RenderService.ColorFromString(color), opacity);
         }
 
         public Bitmap GetBitmap(string image)

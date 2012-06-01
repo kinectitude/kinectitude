@@ -131,6 +131,13 @@ namespace Kinectitude.Render
             set;
         }
 
+        [Plugin("Opacity", "")]
+        public float Opacity
+        {
+            get;
+            set;
+        }
+
         public TextRenderComponent()
         {
             FontFamily = "Arial";
@@ -145,6 +152,7 @@ namespace Kinectitude.Render
             ReadingDirection = ReadingDirection.LeftToRight;
             TextAlignment = TextAlignment.Leading;
             WordWrapping = WordWrapping.NoWrap;
+            Opacity = 1.0f;
         }
 
         public void OnSetTextAction(SetTextAction action)
@@ -170,7 +178,7 @@ namespace Kinectitude.Render
             textFormat.TextAlignment = TextAlignment;
             textFormat.WordWrapping = WordWrapping;
 
-            brush = renderManager.GetSolidColorBrush(FontColor);
+            brush = renderManager.GetSolidColorBrush(FontColor, Opacity);
 
             transformComponent = GetComponent<TransformComponent>();
             transformComponent.SubscribeToX(this, UpdateTransform);

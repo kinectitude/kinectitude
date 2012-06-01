@@ -17,6 +17,7 @@ namespace Kinectitude.Render
         {
             Color convertedColor = (Color)ColorConverter.ConvertFromString(color);
             return new Color4((float)convertedColor.R / 255.0f, (float)convertedColor.G / 255.0f, (float)convertedColor.B / 255.0f);
+
         }
 
         private RenderTarget renderTarget;
@@ -76,13 +77,13 @@ namespace Kinectitude.Render
             return false;
         }
 
-        public SolidColorBrush GetSolidColorBrush(Color4 color)
+        public SolidColorBrush GetSolidColorBrush(Color4 color, float opacity)
         {
             SolidColorBrush brush;
             brushes.TryGetValue(color, out brush);
             if (null == brush)
             {
-                brush = new SolidColorBrush(renderTarget, color);
+                brush = new SolidColorBrush(renderTarget, color, new BrushProperties() { Opacity = opacity });
                 brushes[color] = brush;
             }
             return brush;

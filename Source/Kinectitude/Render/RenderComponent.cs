@@ -17,7 +17,8 @@ namespace Kinectitude.Render
             Ellipse
         }
 
-        private SolidColorBrush brush;
+        private SolidColorBrush fillBrush;
+        private SolidColorBrush lineBrush;
         private TransformComponent transformComponent;
         private RenderManager renderManager;
         private Ellipse ellipse;
@@ -37,17 +38,45 @@ namespace Kinectitude.Render
             set;
         }
 
-        public RenderComponent() { }
+        [Plugin("Line Thickness", "")]
+        public float LineThickness
+        {
+            get;
+            set;
+        }
+
+        [Plugin("Line Color", "")]
+        public string LineColor
+        {
+            get;
+            set;
+        }
+
+        [Plugin("Opacity", "")]
+        public float Opacity
+        {
+            get;
+            set;
+        }
+
+        public RenderComponent()
+        {
+            Opacity = 1.0f;
+            LineColor = "Black";
+            LineThickness = 0.0f;
+        }
 
         public void Render(RenderTarget renderTarget)
         {
             if (Shape == ShapeType.Ellipse)
             {
-                renderTarget.FillEllipse(brush, ellipse);
+                renderTarget.FillEllipse(fillBrush, ellipse);
+                renderTarget.DrawEllipse(lineBrush, ellipse, LineThickness);
             }
             else if (Shape == ShapeType.Rectangle)
             {
-                renderTarget.FillRectangle(brush, rectangle);
+                renderTarget.FillRectangle(fillBrush, rectangle);
+                renderTarget.DrawRectangle(lineBrush, rectangle, LineThickness);
             }
         }
 
@@ -56,7 +85,8 @@ namespace Kinectitude.Render
             renderManager = GetManager<RenderManager>();
             renderManager.Add(this);
 
-            brush = renderManager.GetSolidColorBrush(FillColor);
+            fillBrush = renderManager.GetSolidColorBrush(FillColor, Opacity);
+            lineBrush = renderManager.GetSolidColorBrush(LineColor, 1.0f);
 
             transformComponent = GetComponent<TransformComponent>();
             transformComponent.SubscribeToX(this, UpdateTransform);
