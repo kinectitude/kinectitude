@@ -1,58 +1,51 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Game xmlns="http://www.kinectitude.com" Name="Pong" Width="800" Height="600" FirstScene="Main Menu" IsFullScreen="false">
-
-  <Using Path="Kinect.dll">
-    <Alias Name="KinectComponent" Class="Kinectitude.Kinect.KinectComponent" />
-    <Alias Name="KinectFollowComponent" Class="Kinectitude.Kinect.KinectFollowComponent" />
-    <Alias Name="KinectManager" Class="Kinectitude.Kinect.KinectManager" />
+<Game xmlns="http://www.kinectitude.com/2012/v1" Name="Pong" Width="800" Height="600" FirstScene="Main Menu" IsFullScreen="false">
+  
+  <Using File="Kinect.dll">
+    <Define Name="KinectComponent" Class="Kinectitude.Kinect.KinectComponent" />
+    <Define Name="KinectFollowComponent" Class="Kinectitude.Kinect.KinectFollowComponent" />
+    <Define Name="KinectManager" Class="Kinectitude.Kinect.KinectManager" />
   </Using>
   
-  <Using Path="Physics.dll">
-    <Alias Name="PhysicsComponent" Class="Kinectitude.Physics.PhysicsComponent" />
-    <Alias Name="PhysicsManager" Class="Kinectitude.Physics.PhysicsManager" />
-    <Alias Name="CrossesLineEvent" Class="Kinectitude.Physics.CrossesLineEvent" />
-    <Alias Name="ExitsLeftEvent" Class="Kinectitude.Physics.ExitsLeftEvent" />
-    <Alias Name="ExitsRightEvent" Class="Kinectitude.Physics.ExitsRightEvent" />
+  <Using File="Physics.dll">
+    <Define Name="PhysicsComponent" Class="Kinectitude.Physics.PhysicsComponent" />
+    <Define Name="PhysicsManager" Class="Kinectitude.Physics.PhysicsManager" />
+    <Define Name="CrossesLineEvent" Class="Kinectitude.Physics.CrossesLineEvent" />
   </Using>
   
-  <Using Path="Render.dll">
-    <Alias Name="RenderComponent" Class="Kinectitude.Render.RenderComponent" />
-    <Alias Name="RenderManager" Class="Kinectitude.Render.RenderManager" />
-    <Alias Name="TextRenderComponent" Class="Kinectitude.Render.TextRenderComponent" />
-    <Alias Name="SetTextAction" Class="Kinectitude.Render.SetTextAction" />
+  <Using File="Render.dll">
+    <Define Name="RenderComponent" Class="Kinectitude.Render.RenderComponent" />
+    <Define Name="RenderManager" Class="Kinectitude.Render.RenderManager" />
+    <Define Name="TextRenderComponent" Class="Kinectitude.Render.TextRenderComponent" />
+    <Define Name="SetTextAction" Class="Kinectitude.Render.SetTextAction" />
   </Using>
   
-  <Entity Name="Paddle">
-    
-    <Attribute Key="score" Value="0" />
-
+  <Prototype Name="Paddle" score="0">
     <Component Type="TransformComponent" Width="24" Height="128" />
     <Component Type="KinectFollowComponent" Direction="Y" />
     <Component Type="RenderComponent" Fillcolor="LimeGreen" />
     <Component Type="PhysicsComponent" Dx="0" Dy="0" />
-  </Entity>
+  </Prototype>
 
-  <Entity Name="PlayerOnePaddle" Prototype="Paddle">
+  <Prototype Name="PlayerOnePaddle" Prototype="Paddle">
     <Component Type="KinectFollowComponent" Player="P1" Joint="HandLeft" />
-  </Entity>
-  
-  <Entity Name="PlayerTwoPaddle" Prototype="Paddle">
+  </Prototype>
+
+  <Prototype Name="PlayerTwoPaddle" Prototype="Paddle">
     <Component Type="KinectFollowComponent" Player="P1" Joint="HandRight" />
-  </Entity>
-  
-  <Entity Name="Score">
+  </Prototype>
+
+  <Prototype Name="Score">
     <Component Type="TextRenderComponent" Fontcolor="White" />
-  </Entity>
-  
-  <Entity Name="Bar">
+  </Prototype>
+
+  <Prototype Name="Bar">
     <Component Type="TransformComponent" Width="800" Height="10" />
     <Component Type="RenderComponent" Fillcolor="LimeGreen" />
-  </Entity>
+  </Prototype>
 
-  <Scene Name="Main Menu">
+  <Scene Name="Main Menu" numReady="0">
 
-    <Attribute Key="numReady" Value="0" />
-    
     <Entity>
       <Component Type="TransformComponent" X="250" Y="24" />
       <Component Type="TextRenderComponent" Value="Kinect Wimbledon Deluxe" Fontcolor="Yellow" />
@@ -143,11 +136,11 @@
       <Component Type="RenderComponent" Fillcolor="LimeGreen" Shape="Ellipse" />
       <Component Type="PhysicsComponent" Dx="6" Dy="6" />
       
-      <Event Type="ExitsLeftEvent">
+      <Event Type="CrossesLineEvent" Line="X" Location="0" Direction="Negative">
         <Action Type="SetPositionAction" X="400" Y="300" />
         <Action Type="FireTriggerAction" Name="Player2Scores" />
       </Event>
-      <Event Type="ExitsRightEvent">
+      <Event Type="CrossesLineEvent" Line="X" Location="800" Direction="Positive">
         <Action Type="SetPositionAction" X="400" Y="300" />
         <Action Type="FireTriggerAction" Name="Player1Scores" />
       </Event>

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Kinectitude.Editor.Commands.Base;
+﻿using Kinectitude.Editor.Commands.Base;
 using Kinectitude.Editor.ViewModels;
 
 namespace Kinectitude.Editor.Commands.Game
 {
-    public class DeleteSceneCommand : IUndoableCommand
+    internal sealed class DeleteSceneCommand : IUndoableCommand
     {
         private readonly GameViewModel game;
         private readonly SceneViewModel scene;

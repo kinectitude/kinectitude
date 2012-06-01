@@ -1,13 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Collections.ObjectModel;
-using System;
-using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.Models.Plugins;
+using Kinectitude.Editor.Storage;
 
 namespace Kinectitude.Editor.Models.Base
 {
-    public class Game : AttributeContainer, IEntityContainer
+    internal sealed class Game : AttributeContainer, IEntityContainer
     {
         private string name;
         private string description;
@@ -112,12 +109,12 @@ namespace Kinectitude.Editor.Models.Base
 
         public void AddUsing(Using use)
         {
-            usings.Add(use.Path, use);
+            usings.Add(use.File, use);
         }
 
         public void RemoveUsing(Using use)
         {
-            usings.Remove(use.Path);
+            usings.Remove(use.File);
         }
 
         public Scene GetScene(string name)
@@ -131,10 +128,10 @@ namespace Kinectitude.Editor.Models.Base
         {
             foreach (Using use in Usings)
             {
-                Alias alias = use.GetAlias(name);
-                if (null != alias)
+                Define define = use.GetDefine(name);
+                if (null != define)
                 {
-                    name = alias.Class;
+                    name = define.Class;
                     break;
                 }
             }

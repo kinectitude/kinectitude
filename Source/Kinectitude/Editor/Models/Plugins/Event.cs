@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
-using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Models;
+﻿using System.Collections.Generic;
 using Kinectitude.Editor.Models.Base;
 
 namespace Kinectitude.Editor.Models.Plugins
 {
-    public class Event : Plugin, IActionContainer
+    internal sealed class Event : Plugin, IActionContainer
     {
         private IEventContainer parent;
 
@@ -28,9 +22,6 @@ namespace Kinectitude.Editor.Models.Plugins
 
         public Event(PluginDescriptor descriptor) : base(descriptor)
         {
-            //_actions = new List<IAction>();
-            //actions = new ReadOnlyCollection<IAction>(_actions);
-
             actions = new List<IAction>();
         }
 

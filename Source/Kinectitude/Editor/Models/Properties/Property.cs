@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace Kinectitude.Editor.Models.Properties
 {
-    public abstract class Property<T> : Property
+    internal abstract class Property<T> : Property
     {
         private T value;
 
@@ -27,7 +23,7 @@ namespace Kinectitude.Editor.Models.Properties
         }
     }
 
-    public abstract class Property
+    internal abstract class Property
     {
         public static Property CreateProperty(PropertyDescriptor descriptor)
         {

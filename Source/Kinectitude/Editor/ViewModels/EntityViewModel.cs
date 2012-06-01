@@ -1,17 +1,17 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Kinectitude.Editor.Base;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Windows.Input;
-using Kinectitude.Editor.Models.Base;
-using Kinectitude.Editor.Commands.Entity;
+using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Commands.Base;
-using System;
+using Kinectitude.Editor.Commands.Entity;
+using Kinectitude.Editor.Models.Base;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    public class AttributeAvailableEventArgs : EventArgs
+    internal sealed class AttributeAvailableEventArgs : EventArgs
     {
         private readonly string oldKey;
         private readonly string newKey;
@@ -33,7 +33,7 @@ namespace Kinectitude.Editor.ViewModels
         }
     }
 
-    public class EntityViewModel : BaseModel
+    internal sealed class EntityViewModel : BaseModel
     {
         //private const string RenderComponent = "Kinectitude.Render.RenderComponent";
         //private const string Shape = "Shape";
@@ -325,7 +325,7 @@ namespace Kinectitude.Editor.ViewModels
 
             var prototypeViewModels = from prototype in entity.Prototypes select EntityViewModel.GetViewModel(prototype);
             var attributeViewModels = from attribute in entity.Attributes select new EntityAttributeViewModel(entity, attribute.Key);
-            var componentViewModels = from component in entity.Components select new ComponentViewModel(component);
+            var componentViewModels = from component in entity.Components select new ComponentViewModel(entity, component.Descriptor);
             var eventViewModels = from evt in entity.Events select new EventViewModel(evt);
 
             _prototypes = new ObservableCollection<EntityViewModel>();
@@ -342,8 +342,6 @@ namespace Kinectitude.Editor.ViewModels
             attributes = new ModelCollection<EntityAttributeViewModel>(_attributes);
             components = new ModelCollection<ComponentViewModel>(_components);
             events = new ModelCollection<EventViewModel>(_events);
-
-            
         }
 
         public void ExecuteAddAttributeCommand(object parameter)
@@ -451,8 +449,6 @@ namespace Kinectitude.Editor.ViewModels
 
             foreach (EntityAttributeViewModel inheritedAttribute in prototype.Attributes)
             {
-                // TODO handle case for local non-inheriting attribute which has same key as one of the new ones
-
                 EntityAttributeViewModel localAttribute = _attributes.FirstOrDefault(x => x.Key == inheritedAttribute.Key);
                 if (null == localAttribute)
                 {
@@ -466,7 +462,12 @@ namespace Kinectitude.Editor.ViewModels
 
             foreach (ComponentViewModel inheritedComponent in prototype.Components)
             {
-
+                ComponentViewModel localComponent = _components.FirstOrDefault(x => x.Descriptor == inheritedComponent.Descriptor);
+                if (null == localComponent)
+                {
+                    localComponent = new ComponentViewModel(entity, inheritedComponent.Descriptor);
+                    _components.Add(localComponent);
+                }
             }
 
             foreach (EventViewModel inheritedEvent in prototype.Events)
@@ -486,12 +487,19 @@ namespace Kinectitude.Editor.ViewModels
 
             foreach (EntityAttributeViewModel inheritedAttribute in prototype.Attributes)
             {
-                // TODO handle case for local non-inheriting attribute which has same key as one of the new ones
-
                 EntityAttributeViewModel localAttribute = _attributes.FirstOrDefault(x => x.Key == inheritedAttribute.Key);
                 if (null != localAttribute)
                 {
                     localAttribute.FindInheritedViewModel();
+                }
+            }
+
+            foreach (ComponentViewModel inheritedComponent in prototype.Components)
+            {
+                ComponentViewModel localComponent = _components.FirstOrDefault(x => x.Descriptor == inheritedComponent.Descriptor);
+                if (null != localComponent)
+                {
+                    // TODO Recalc parent
                 }
             }
 
@@ -539,9 +547,13 @@ namespace Kinectitude.Editor.ViewModels
         {
             if (args.Action == NotifyCollectionChangedAction.Add)
             {
-                foreach (ComponentViewModel component in args.NewItems)
+                foreach (ComponentViewModel inheritedComponent in args.NewItems)
                 {
-
+                    ComponentViewModel localComponent = _components.FirstOrDefault(x => x.Descriptor == inheritedComponent.Descriptor);
+                    if (null != localComponent)
+                    {
+                        _components.Remove(localComponent);
+                    }
                 }
             }
             else if (args.Action == NotifyCollectionChangedAction.Remove)

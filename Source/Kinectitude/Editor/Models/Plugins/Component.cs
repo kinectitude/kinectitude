@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
+﻿using Kinectitude.Editor.Models.Base;
 using Kinectitude.Editor.Models.Properties;
-using Kinectitude.Editor.Models.Base;
 
 namespace Kinectitude.Editor.Models.Plugins
 {
-    public class Component : Plugin
+    internal sealed class Component : Plugin
     {
         private Entity parent;
 
@@ -28,7 +23,7 @@ namespace Kinectitude.Editor.Models.Plugins
             {
                 foreach (Entity prototype in parent.Prototypes)
                 {
-                    Component ancestor = prototype.GetComponent(Descriptor.Name);
+                    Component ancestor = prototype.GetComponent(Descriptor.ClassName);
                     if (null != ancestor)
                     {
                         property = ancestor.GetProperty<T>(name);

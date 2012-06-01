@@ -3,9 +3,8 @@ using Kinectitude.Editor.Base;
 
 namespace Kinectitude.Editor.Commands.Base
 {
-    public static class CommandHistory
+    internal static class CommandHistory
     {
-        
         private static readonly ObservableStack<IUndoableCommand> undo;
         private static readonly ObservableStack<IUndoableCommand> redo;
         private static bool replay;

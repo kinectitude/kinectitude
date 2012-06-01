@@ -1,16 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Kinectitude.Editor.Base;
-using Attribute = Kinectitude.Editor.Models.Base.Attribute;
-using System.ComponentModel;
-using Kinectitude.Editor.Models.Base;
-using System.Collections.Specialized;
 using Kinectitude.Editor.Commands.Attribute;
 using Kinectitude.Editor.Commands.Base;
-using System;
+using Kinectitude.Editor.Models.Base;
+using Attribute = Kinectitude.Editor.Models.Base.Attribute;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    public class AttributeViewModel : BaseModel, IAttributeViewModel
+    internal sealed class AttributeViewModel : BaseModel, IAttributeViewModel
     {
         private static readonly Dictionary<Tuple<AttributeContainer, string>, AttributeViewModel> attributes;
 

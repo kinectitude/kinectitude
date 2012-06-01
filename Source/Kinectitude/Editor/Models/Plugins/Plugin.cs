@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using Kinectitude.Editor.Models.Properties;
 
 namespace Kinectitude.Editor.Models.Plugins
 {
-    public class Plugin
+    internal class Plugin
     {
         private readonly PluginDescriptor descriptor;
         private readonly SortedDictionary<string, Property> properties;

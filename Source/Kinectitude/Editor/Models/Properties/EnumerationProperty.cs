@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 
 namespace Kinectitude.Editor.Models.Properties
 {
-    public class EnumerationProperty : Property<string>
+    internal sealed class EnumerationProperty : Property<string>
     {
         public new string Value
         {

@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace Kinectitude.Editor.Models.Base
 {
-    public class Attribute
+    internal sealed class Attribute
     {
         public static dynamic TryParse(string value)
         {

@@ -1,16 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Kinectitude.Editor.Base;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Windows.Data;
-using System.Collections;
 
 namespace Kinectitude.Editor.Views
 {
-    public class Folder
+    internal sealed class Folder
     {
         private readonly string name;
         private readonly IEnumerable children;
@@ -32,7 +28,7 @@ namespace Kinectitude.Editor.Views
         }
     }
 
-    public class FolderConverter : IMultiValueConverter
+    internal sealed class FolderConverter : IMultiValueConverter
     {
 
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)

@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.ComponentModel;
 using Kinectitude.Editor.Base;
-using System.ComponentModel;
+using Kinectitude.Editor.Commands.Attribute;
 using Kinectitude.Editor.Commands.Base;
 using Kinectitude.Editor.Models.Base;
 using Attribute = Kinectitude.Editor.Models.Base.Attribute;
-using Kinectitude.Editor.Commands.Attribute;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    public class EntityAttributeViewModel : BaseModel, IAttributeViewModel
+    internal sealed class EntityAttributeViewModel : BaseModel, IAttributeViewModel
     {
         private readonly Entity entity;
         private EntityAttributeViewModel inheritedViewModel;
@@ -59,10 +55,7 @@ namespace Kinectitude.Editor.ViewModels
 
         public bool CanInherit
         {
-            get
-            {
-                return null != inheritedViewModel;
-            }
+            get { return null != inheritedViewModel; }
         }
 
         public bool IsLocal
@@ -72,10 +65,7 @@ namespace Kinectitude.Editor.ViewModels
 
         public bool IsInherited
         {
-            get
-            {
-                return null != inheritedViewModel && attribute == inheritedViewModel.Attribute;
-            }
+            get { return null != inheritedViewModel && attribute == inheritedViewModel.Attribute; }
             set
             {
                 CommandHistory.LogCommand(new SetAttributeInheritedCommand(this, value));

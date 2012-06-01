@@ -1,37 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Linq;
 using System.IO;
-using Kinectitude.Editor.Models;
+using System.Linq;
+using System.Xml;
+using System.Xml.Linq;
+using System.Xml.Schema;
+using Kinectitude.Editor.Models.Base;
 using Kinectitude.Editor.Models.Plugins;
 using Kinectitude.Editor.Models.Properties;
 using Action = Kinectitude.Editor.Models.Plugins.Action;
 using Attribute = Kinectitude.Editor.Models.Base.Attribute;
-using System.Xml.Schema;
-using System.Xml;
-using Kinectitude.Editor.Models.Base;
 
 namespace Kinectitude.Editor.Storage
 {
-    public class XmlGameStorage : IGameStorage
+    internal sealed class XmlGameStorage : IGameStorage
     {
         private static class Constants
         {
-            private static readonly XNamespace Namespace  = "http://www.kinectitude.com";
+            private static readonly XNamespace Namespace = "http://www.kinectitude.com/2012/v1";
 
             public static readonly XName Game = Namespace + "Game";
             public static readonly XName Using = Namespace + "Using";
-            public static readonly XName Alias = Namespace + "Alias";
+            public static readonly XName Define = Namespace + "Define";
             public static readonly XName Scene = Namespace + "Scene";
+            public static readonly XName PrototypeElement = Namespace + "Prototype";
             public static readonly XName Entity = Namespace + "Entity";
-            public static readonly XName Attribute = Namespace + "Attribute";
             public static readonly XName Component = Namespace + "Component";
             public static readonly XName Event = Namespace + "Event";
             public static readonly XName Condition = Namespace + "Condition";
             public static readonly XName Action = Namespace + "Action";
 
+            public static readonly XName Xmlns = "xmlns";
             public static readonly XName Name = "Name";
             public static readonly XName Width = "Width";
             public static readonly XName Height = "Height";
@@ -39,14 +38,16 @@ namespace Kinectitude.Editor.Storage
             public static readonly XName FirstScene = "FirstScene";
             public static readonly XName Prototype = "Prototype";
             public static readonly XName Type = "Type";
-            public static readonly XName Key = "Key";
-            public static readonly XName Value = "Value";
-            public static readonly XName Path = "Path";
+            public static readonly XName File = "File";
             public static readonly XName Class = "Class";
 
             public static readonly XName Project = "Project";
             public static readonly XName Root = "Root";
         }
+
+        private static readonly XName[] gameProperties = new[] { Constants.Xmlns, Constants.Name, Constants.Width, Constants.Height, Constants.IsFullScreen, Constants.FirstScene };
+        private static readonly XName[] sceneProperties = new[] { Constants.Name };
+        private static readonly XName[] entityProperties = new[] { Constants.Name, Constants.Prototype };
 
         private readonly Game game;
         private readonly string fileName;
@@ -81,6 +82,7 @@ namespace Kinectitude.Editor.Storage
             game.Name = (string)gameElement.Attribute(Constants.Name);
             game.Width = (int)gameElement.Attribute(Constants.Width);
             game.Height = (int)gameElement.Attribute(Constants.Height);
+            game.IsFullScreen = (bool)gameElement.Attribute(Constants.IsFullScreen);
 
             foreach (XElement usingElement in gameElement.Elements(Constants.Using))
             {
@@ -88,16 +90,16 @@ namespace Kinectitude.Editor.Storage
                 game.AddUsing(use);
             }
 
-            foreach (XElement attributeElement in gameElement.Elements(Constants.Attribute))
+            foreach (XAttribute xmlAttribute in gameElement.Attributes().Where(x => !gameProperties.Contains(x.Name)))
             {
-                Attribute attribute = CreateAttribute(attributeElement);
+                Attribute attribute = CreateAttribute(xmlAttribute);
                 game.AddAttribute(attribute);
             }
 
-            foreach (XElement prototypeElement in gameElement.Elements(Constants.Entity))
+            foreach (XElement prototypeElement in gameElement.Elements(Constants.PrototypeElement))
             {
                 Entity entity = CreateEntity(prototypeElement);
-                entities.Enqueue(new Tuple<XElement, Entity>(prototypeElement, entity));
+                entities.Enqueue(Tuple.Create<XElement, Entity>(prototypeElement, entity));
                 game.AddEntity(entity);
             }
 
@@ -139,27 +141,27 @@ namespace Kinectitude.Editor.Storage
         {
             Using use = new Using
             {
-                Path = (string)element.Attribute(Constants.Path)
+                File = (string)element.Attribute(Constants.File)
             };
 
-            foreach (XElement aliasElement in element.Elements(Constants.Alias))
+            foreach (XElement defineElement in element.Elements(Constants.Define))
             {
-                Alias alias = CreateAlias(aliasElement);
-                use.AddAlias(alias);
+                Define define = CreateDefine(defineElement);
+                use.AddDefine(define);
             }
 
             return use;
         }
 
-        private Alias CreateAlias(XElement element)
+        private Define CreateDefine(XElement element)
         {
-            Alias alias = new Alias
+            Define define = new Define
             {
                 Name = (string)element.Attribute(Constants.Name),
                 Class = (string)element.Attribute(Constants.Class)
             };
 
-            return alias;
+            return define;
         }
 
         private Scene CreateScene(XElement element)
@@ -169,16 +171,16 @@ namespace Kinectitude.Editor.Storage
                 Name = (string)element.Attribute(Constants.Name)
             };
 
-            foreach (XElement attributeElement in element.Elements(Constants.Attribute))
+            foreach (XAttribute xmlAttribute in element.Attributes().Where(x => !sceneProperties.Contains(x.Name)))
             {
-                Attribute attribute = CreateAttribute(attributeElement);
+                Attribute attribute = CreateAttribute(xmlAttribute);
                 scene.AddAttribute(attribute);
             }
 
             foreach (XElement entityElement in element.Elements(Constants.Entity))
             {
                 Entity entity = CreateEntity(entityElement);
-                entities.Enqueue(new Tuple<XElement,Entity>(entityElement, entity));
+                entities.Enqueue(Tuple.Create<XElement,Entity>(entityElement, entity));
                 scene.AddEntity(entity);
             }
 
@@ -192,9 +194,9 @@ namespace Kinectitude.Editor.Storage
                 Name = (string)element.Attribute(Constants.Name)
             };
 
-            foreach (XElement attributeElement in element.Elements(Constants.Attribute))
+            foreach (XAttribute xmlAttribute in element.Attributes().Where(x => !entityProperties.Contains(x.Name)))
             {
-                Attribute attribute = CreateAttribute(attributeElement);
+                Attribute attribute = CreateAttribute(xmlAttribute);
                 entity.AddAttribute(attribute);
             }
 
@@ -254,10 +256,10 @@ namespace Kinectitude.Editor.Storage
             return action;
         }
 
-        private Attribute CreateAttribute(XElement element)
+        private Attribute CreateAttribute(XAttribute xmlAttribute)
         {
-            string key = (string)element.Attribute(Constants.Key);
-            string value = (string)element.Attribute(Constants.Value);
+            string key = (string)xmlAttribute.Name.LocalName;
+            string value = (string)xmlAttribute.Value;
             Attribute attribute = new Attribute(key, value);
             return attribute;
         }
@@ -303,14 +305,14 @@ namespace Kinectitude.Editor.Storage
 
             foreach (Entity entity in game.Entities)
             {
-                XElement element = SerializeEntity(entity);
+                XElement element = SerializeEntity(entity, Constants.PrototypeElement);
                 document.Add(element);
             }
 
             foreach (Attribute attribute in game.Attributes)
             {
-                XElement element = SerializeAttribute(attribute);
-                document.Add(element);
+                XAttribute xmlAttribute = SerializeAttribute(attribute);
+                document.Add(xmlAttribute);
             }
 
             foreach (Scene scene in game.Scenes)
@@ -327,25 +329,25 @@ namespace Kinectitude.Editor.Storage
             XElement element = new XElement
             (
                 Constants.Using,
-                new XAttribute(Constants.Path, use.Path)
+                new XAttribute(Constants.File, use.File)
             );
 
-            foreach (Alias alias in use.Aliases)
+            foreach (Define define in use.Defines)
             {
-                XElement aliasElement = SerializeAlias(alias);
-                element.Add(aliasElement);
+                XElement defineElement = SerializeDefine(define);
+                element.Add(defineElement);
             }
 
             return element;
         }
 
-        private XElement SerializeAlias(Alias alias)
+        private XElement SerializeDefine(Define define)
         {
             XElement element = new XElement
             (
-                Constants.Alias,
-                new XAttribute(Constants.Name, alias.Name),
-                new XAttribute(Constants.Class, alias.Class)
+                Constants.Define,
+                new XAttribute(Constants.Name, define.Name),
+                new XAttribute(Constants.Class, define.Class)
             );
             return element;
         }
@@ -360,22 +362,22 @@ namespace Kinectitude.Editor.Storage
 
             foreach (Attribute attribute in scene.Attributes)
             {
-                XElement attributeElement = SerializeAttribute(attribute);
-                element.Add(attributeElement);
+                XAttribute xmlAttribute = SerializeAttribute(attribute);
+                element.Add(xmlAttribute);
             }
 
             foreach (Entity entity in scene.Entities)
             {
-                XElement entityElement = SerializeEntity(entity);
+                XElement entityElement = SerializeEntity(entity, Constants.Entity);
                 element.Add(entityElement);
             }
 
             return element;
         }
 
-        private XElement SerializeEntity(Entity entity)
+        private XElement SerializeEntity(Entity entity, XName elementName)
         {
-            XElement element = new XElement(Constants.Entity);
+            XElement element = new XElement(elementName);
 
             if (null != entity.Name)
             {
@@ -392,8 +394,8 @@ namespace Kinectitude.Editor.Storage
 
             foreach (Attribute attribute in entity.Attributes)
             {
-                XElement attributeElement = SerializeAttribute(attribute);
-                element.Add(attributeElement);
+                XAttribute xmlAttribute = SerializeAttribute(attribute);
+                element.Add(xmlAttribute);
             }
 
             foreach (Component component in entity.Components)
@@ -410,15 +412,10 @@ namespace Kinectitude.Editor.Storage
             return element;
         }
 
-        private XElement SerializeAttribute(Attribute attribute)
+        private XAttribute SerializeAttribute(Attribute attribute)
         {
-            XElement element = new XElement
-            (
-                Constants.Attribute,
-                new XAttribute(Constants.Key, attribute.Key),
-                new XAttribute(Constants.Value, attribute.Value.ToString())
-            );
-            return element;
+            XAttribute xmlAttribute = new XAttribute(attribute.Key, attribute.Value.ToString());
+            return xmlAttribute;
         }
 
         private XElement SerializeComponent(Component component)

@@ -3,7 +3,7 @@ using Kinectitude.Editor.ViewModels;
 
 namespace Kinectitude.Editor.Commands.Game
 {
-    public class RenameGameCommand : IUndoableCommand
+    internal sealed class RenameGameCommand : IUndoableCommand
     {
         private readonly GameViewModel game;
         private readonly string newName;

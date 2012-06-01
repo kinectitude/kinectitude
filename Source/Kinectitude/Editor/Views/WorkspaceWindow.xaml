@@ -52,7 +52,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="256" />
+                <ColumnDefinition Width="300" />
             </Grid.ColumnDefinitions>
 
             <DockPanel Grid.Column="0">
@@ -64,26 +64,6 @@
                 <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Width="32">
 
                 </StackPanel>
-
-                <!--ContentPresenter DockPanel.Dock="Left" Content="{Binding}">
-                    <ContentPresenter.Resources>
-
-                        <DataTemplate DataType="{x:Type vm:GameViewModel}">
-                            <v:GameView />
-                        </DataTemplate>
-
-                        <DataTemplate DataType="{x:Type vm:SceneViewModel}">
-                            <v:SceneView />
-                        </DataTemplate>
-
-                        <DataTemplate DataType="{x:Type vm:EntityViewModel}">
-                            <ScrollViewer Background="Gray" HorizontalScrollBarVisibility="Visible">
-                                <v:EntityView />
-                            </ScrollViewer>
-                        </DataTemplate>
-
-                    </ContentPresenter.Resources>
-                </ContentPresenter-->
 
                 <TabControl ItemsSource="{Binding ActiveItems}" Name="tabItems" SelectedItem="{Binding CurrentItem}">
                     <TabControl.ItemTemplate>
@@ -122,8 +102,6 @@
 
             <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -207,64 +185,80 @@
 
                 <GridSplitter Height="4" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
 
-                <DockPanel Grid.Row="2" DataContext="{Binding CurrentItem}">
-
-                    <Border DockPanel.Dock="Top" Padding="0,4,4,0">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBox Text="{Binding StagedAttributeKey}" Width="80" />
-                            <TextBox Text="{Binding StagedAttributeValue}" Width="80" />
-                        </StackPanel>
-                    </Border>
+                <DockPanel x:Name="dockDetails" Grid.Row="2" DataContext="{Binding CurrentItem}">
+                    <DockPanel.Resources>
+                        <CompositeCollection x:Key="detailsCollection">
+                            <CollectionContainer Collection="{Binding DataContext.Components, Source={x:Reference dockDetails}}" />
+                            <Expander IsExpanded="True">
+                                <Expander.Header>
+                                    <Border Padding="8">
+                                        <TextBlock>Attributes</TextBlock>
+                                    </Border>
+                                </Expander.Header>
+                                <Expander.Content>
+                                    <DockPanel>
+                                        <Border DockPanel.Dock="Top" Padding="0,4,4,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBox Text="{Binding StagedAttributeKey}" Width="80" />
+                                                <TextBox Text="{Binding StagedAttributeValue}" Width="80" />
+                                            </StackPanel>
+                                        </Border>
                     
-                    <Border DockPanel.Dock="Bottom" Padding="0,4,4,0">
-                        <StackPanel Orientation="Horizontal">
-                            <Button Command="{Binding AddAttributeCommand}">Add Attribute</Button>
-                            <Button Command="{Binding RemoveAttributeCommand}" CommandParameter="{Binding ElementName=lstAttributes, Path=SelectedItem}">Delete Attribute</Button>
-                        </StackPanel>
-                    </Border>
+                                        <Border DockPanel.Dock="Bottom" Padding="0,4,4,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Command="{Binding AddAttributeCommand}">Add Attribute</Button>
+                                                <Button Command="{Binding RemoveAttributeCommand}" CommandParameter="{Binding ElementName=lstAttributes, Path=SelectedItem}">Delete Attribute</Button>
+                                            </StackPanel>
+                                        </Border>
 
+                                        <ListBox Name="lstAttributes" ItemsSource="{Binding Attributes}" HorizontalContentAlignment="Stretch">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid HorizontalAlignment="Stretch">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="90" />
+                                                            <ColumnDefinition Width="24" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBox IsEnabled="{Binding IsLocal}" Text="{Binding Key}" Grid.Column="0" />
+                                                        <CheckBox IsChecked="{Binding IsInherited}" IsEnabled="{Binding CanInherit}" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                                        <TextBox IsEnabled="{Binding IsLocal}" Text="{Binding Value}" Grid.Column="2" />
+                                        
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+
+                                    </DockPanel>
+                                </Expander.Content>
+                            </Expander>
+                        </CompositeCollection>
+                        <DataTemplate DataType="{x:Type vm:ComponentViewModel}">
+                            <Expander IsExpanded="True">
+                                <Expander.Header>
+                                    <Border Padding="8">
+                                        <TextBlock Text="{Binding Name}" />
+                                    </Border>
+                                </Expander.Header>
+                                <Expander.Content>
+                                    <ListBox ItemsSource="{Binding Properties}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Name}" />
+                                                    <TextBlock Text="{Binding Value}" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </Expander.Content>
+                            </Expander>
+                        </DataTemplate>
+                    </DockPanel.Resources>
+                    
                     <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
-
-                        <ListView FontWeight="Normal" Name="lstAttributes" ItemsSource="{Binding Attributes}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                            <ListView.View>
-                                <GridView>
-                                    <GridView.ColumnHeaderContainerStyle>
-                                        <Style TargetType="{x:Type GridViewColumnHeader}">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </Style>
-                                    </GridView.ColumnHeaderContainerStyle>
-                                    <GridViewColumn Width="Auto">
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <TextBox IsEnabled="{Binding IsLocal}" Text="{Binding Key}" Width="60" />
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
-                                    <GridViewColumn Width="Auto">
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <CheckBox IsChecked="{Binding IsInherited}" IsEnabled="{Binding CanInherit}" />
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
-                                    <GridViewColumn Width="Auto">
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <TextBox IsEnabled="{Binding IsLocal}" Text="{Binding Value}" Width="60" />
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
-
+                        <ItemsControl ItemsSource="{StaticResource detailsCollection}" />
                     </ScrollViewer>
-                </DockPanel>
-
-                <GridSplitter Height="4" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
-                
-                <DockPanel>
-                    <!-- Components -->
                 </DockPanel>
 
             </Grid>

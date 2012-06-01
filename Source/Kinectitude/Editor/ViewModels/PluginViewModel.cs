@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Plugins;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    public class PluginViewModel : BaseModel
+    internal sealed class PluginViewModel : BaseModel
     {
         private readonly PluginDescriptor descriptor;
 

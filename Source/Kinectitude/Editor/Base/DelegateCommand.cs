@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Input;
 
 namespace Kinectitude.Editor.Base
 {
-    public class DelegateCommand : ICommand
+    internal sealed class DelegateCommand : ICommand
     {
         private readonly Predicate<object> canExecuteDelegate;
         private readonly Action<object> executeDelegate;

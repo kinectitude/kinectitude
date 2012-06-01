@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Kinectitude.Editor.Commands.Base;
+﻿using Kinectitude.Editor.Commands.Base;
 using Kinectitude.Editor.ViewModels;
 
 namespace Kinectitude.Editor.Commands.Entity
 {
-    public class AddPrototypeCommand : IUndoableCommand
+    internal sealed class AddPrototypeCommand : IUndoableCommand
     {
         private readonly EntityViewModel entity;
         private readonly EntityViewModel prototype;

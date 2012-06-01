@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.ComponentModel;
+﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
 
 namespace Kinectitude.Editor.Base
 {
-    public class ObservableStack<T> : INotifyCollectionChanged, INotifyPropertyChanged
+    internal class ObservableStack<T> : INotifyCollectionChanged, INotifyPropertyChanged
     {
         private readonly ObservableCollection<T> collection;
 

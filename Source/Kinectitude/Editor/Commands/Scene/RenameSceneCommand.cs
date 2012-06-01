@@ -3,7 +3,7 @@ using Kinectitude.Editor.ViewModels;
 
 namespace Kinectitude.Editor.Commands.Scene
 {
-    public class RenameSceneCommand : IUndoableCommand
+    internal sealed class RenameSceneCommand : IUndoableCommand
     {
         private readonly SceneViewModel scene;
         private readonly string newName;

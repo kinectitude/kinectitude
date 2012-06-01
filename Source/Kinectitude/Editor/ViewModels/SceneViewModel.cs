@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Input;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Commands.Base;
 using Kinectitude.Editor.Commands.Scene;
 using Kinectitude.Editor.Models.Base;
-using System.Windows.Input;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    public class SceneViewModel : BaseModel
+    internal sealed class SceneViewModel : BaseModel
     {
         private static readonly Dictionary<Scene, SceneViewModel> sceneViewModels;
 

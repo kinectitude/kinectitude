@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace Kinectitude.Editor.ViewModels
 {
-    public class ResolutionPreset
+    internal sealed class ResolutionPreset
     {
         private readonly string name;
         private readonly int width;

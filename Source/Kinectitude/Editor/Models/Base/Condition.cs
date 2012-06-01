@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
-using Action = Kinectitude.Editor.Models.Plugins.Action;
+﻿using System.Collections.Generic;
 using Kinectitude.Editor.Models.Expressions;
-using Kinectitude.Editor.Models.Plugins;
 
 namespace Kinectitude.Editor.Models.Base
 {
-    public class Condition : IAction, IActionContainer
+    internal sealed class Condition : IAction, IActionContainer
     {
         private IActionContainer parent;
         private BooleanExpression when;

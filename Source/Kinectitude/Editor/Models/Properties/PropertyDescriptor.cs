@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Reflection;
 using Kinectitude.Core.Attributes;
 
 namespace Kinectitude.Editor.Models.Properties
 {
-    public class PropertyDescriptor
+    internal sealed class PropertyDescriptor
     {
         public enum PropertyType
         {

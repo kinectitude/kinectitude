@@ -55,7 +55,15 @@
   
   <xs:element name="Entity" type="EntityType" />
 
-  <xs:element name="Prototype" type="EntityType" />
+  <xs:element name="Prototype">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="EntityType">
+          <xs:attribute name="Name" type="xs:string" use="required" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
     
   <xs:element name="Component">
     <xs:complexType>

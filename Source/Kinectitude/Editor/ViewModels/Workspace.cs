@@ -1,23 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Storage;
-using System.Windows.Input;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Reflection;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Windows;
+using System.Windows.Input;
 using Kinectitude.Core.Attributes;
-using Kinectitude.Editor.Models.Plugins;
-using Kinectitude.Editor.Models;
-using Kinectitude.Editor.Models.Base;
+using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Commands.Base;
+using Kinectitude.Editor.Models.Base;
+using Kinectitude.Editor.Models.Plugins;
+using Kinectitude.Editor.Storage;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    public sealed class Workspace : BaseModel, IPluginNamespace
+    internal sealed class Workspace : BaseModel, IPluginNamespace
     {
         public const string PluginDirectory = "Plugins";
 
@@ -191,7 +189,7 @@ namespace Kinectitude.Editor.ViewModels
             PluginDescriptor ret = null;
             foreach (PluginDescriptor descriptor in descriptors)
             {
-                if (descriptor.Name == name)
+                if (descriptor.ClassName == name)
                 {
                     ret = descriptor;
                     break;
@@ -199,7 +197,7 @@ namespace Kinectitude.Editor.ViewModels
 
                 if (descriptor.File == "Kinectitude.Core.dll")
                 {
-                    string shortName = descriptor.Name.Substring(descriptor.Name.LastIndexOf('.') + 1);
+                    string shortName = descriptor.ClassName.Substring(descriptor.ClassName.LastIndexOf('.') + 1);
                     if (shortName == name)
                     {
                         ret = descriptor;

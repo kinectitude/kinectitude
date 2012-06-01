@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
-using Action = Kinectitude.Editor.Models.Plugins.Action;
+﻿using System.Collections.Generic;
 
 namespace Kinectitude.Editor.Models.Base
 {
-    public interface IActionContainer
+    internal interface IActionContainer
     {
         IEnumerable<IAction> Actions { get; }
 

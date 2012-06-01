@@ -1,46 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 
 namespace Kinectitude.Editor.Models.Base
 {
-    public class Using
+    internal sealed class Using
     {
-        private string path;
-        private readonly SortedDictionary<string, Alias> aliases;
+        private string file;
+        private readonly SortedDictionary<string, Define> defines;
 
-        public string Path
+        public string File
         {
-            get { return path; }
-            set { path = value; }
+            get { return file; }
+            set { file = value; }
         }
 
-        public IEnumerable<Alias> Aliases
+        public IEnumerable<Define> Defines
         {
-            get { return aliases.Values; }
+            get { return defines.Values; }
         }
 
         public Using()
         {
-            aliases = new SortedDictionary<string, Alias>();
+            defines = new SortedDictionary<string, Define>();
         }
 
-        public void AddAlias(Alias alias)
+        public void AddDefine(Define define)
         {
-            aliases.Add(alias.Name, alias);
+            defines.Add(define.Name, define);
         }
 
-        public void RemoveAlias(Alias alias)
+        public void RemoveDefine(Define define)
         {
-            aliases.Remove(alias.Name);
+            defines.Remove(define.Name);
         }
 
-        public Alias GetAlias(string name)
+        public Define GetDefine(string name)
         {
-            Alias ret = null;
-            aliases.TryGetValue(name, out ret);
+            Define ret = null;
+            defines.TryGetValue(name, out ret);
             return ret;
         }
     }

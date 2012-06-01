@@ -104,13 +104,15 @@
     <Compile Include="Commands\Game\SetFirstSceneCommand.cs" />
     <Compile Include="Commands\Game\SetFullScreenCommand.cs" />
     <Compile Include="Commands\Game\SetResolutionCommand.cs" />
+    <Compile Include="Commands\Property\SetPropertyInheritedCommand.cs" />
+    <Compile Include="Commands\Property\SetPropertyValueCommand.cs" />
     <Compile Include="Commands\Scene\AddAttributeCommand.cs" />
     <Compile Include="Commands\Scene\RemoveAttributeCommand.cs" />
     <Compile Include="Commands\Scene\RenameSceneCommand.cs" />
     <Compile Include="Commands\Scene\SelectEntityCommand.cs" />
     <Compile Include="Commands\Scene\SelectMultipleEntitiesCommand.cs" />
     <Compile Include="Base\ModelCollection.cs" />
-    <Compile Include="Models\Base\Alias.cs" />
+    <Compile Include="Models\Base\Define.cs" />
     <Compile Include="Models\Base\Attribute.cs" />
     <Compile Include="Models\Base\Condition.cs" />
     <Compile Include="Models\Expressions\BooleanExpression.cs" />
@@ -138,7 +140,7 @@
     <Compile Include="Storage\XmlGameStorage.cs" />
     <Compile Include="Storage\IGameStorage.cs" />
     <Compile Include="ViewModels\AttributeViewModel.cs" />
-    <Compile Include="ViewModels\BasePropertyViewModel.cs" />
+    <Compile Include="ViewModels\PropertyViewModel.cs" />
     <Compile Include="ViewModels\EntityAttributeViewModel.cs" />
     <Compile Include="ViewModels\IAttributeViewModel.cs" />
     <Compile Include="Views\DetailsConverter.cs" />

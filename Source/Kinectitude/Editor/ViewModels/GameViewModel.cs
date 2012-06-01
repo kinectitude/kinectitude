@@ -11,7 +11,7 @@ using Kinectitude.Editor.Views;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    public class GameViewModel : BaseModel
+    internal sealed class GameViewModel : BaseModel
     {
         public const string DefaultName = "Untitled Game";
 

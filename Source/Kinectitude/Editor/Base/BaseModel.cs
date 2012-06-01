@@ -2,7 +2,7 @@
 
 namespace Kinectitude.Editor.Base
 {
-    public class BaseModel : INotifyPropertyChanged
+    internal class BaseModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 

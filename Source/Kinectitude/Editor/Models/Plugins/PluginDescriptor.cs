@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Reflection;
 using Kinectitude.Core.Attributes;
 using Kinectitude.Editor.Models.Properties;
 
 namespace Kinectitude.Editor.Models.Plugins
 {
-    public class PluginDescriptor
+    internal sealed class PluginDescriptor
     {
         public enum PluginType
         {
@@ -17,16 +16,16 @@ namespace Kinectitude.Editor.Models.Plugins
             Action
         }
 
-        private readonly string name;
+        private readonly string className;
         private readonly string file;
         private readonly string displayName;
         private readonly PluginType type;
         private readonly string description;
         private readonly List<PropertyDescriptor> propertyDescriptors;
 
-        public string Name
+        public string ClassName
         {
-            get { return name; }
+            get { return className; }
         }
 
         public string File
@@ -56,7 +55,7 @@ namespace Kinectitude.Editor.Models.Plugins
 
         public PluginDescriptor(Type pluginType)
         {
-            name = pluginType.FullName;
+            className = pluginType.FullName;
             file = pluginType.Module.Name;
             displayName = pluginType.Name;
             

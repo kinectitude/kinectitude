@@ -38,15 +38,15 @@
             <ListBox ItemsSource="{Binding Events}" />
             <Separator /-->
             
-            <ItemsControl ItemsSource="{Binding Components}" Margin="8">
+            <!--ItemsControl ItemsSource="{Binding Components}" Margin="8">
                 <ItemsControl.Resources>
                     <DataTemplate DataType="{x:Type vm:ComponentViewModel}">
                         <StackPanel Orientation="Vertical">
                             <TextBlock Text="{Binding Name}" FontWeight="Bold" Padding="8" Background="DarkGray" />
                             <ItemsControl ItemsSource="{Binding Properties}">
                                 <ItemsControl.Resources>
-                                    <DataTemplate DataType="{x:Type vm:BasePropertyViewModel}">
-                                        <TextBlock Text="{Binding Key}" />
+                                    <DataTemplate DataType="{x:Type vm:PropertyViewModel}">
+                                        <TextBlock Text="{Binding Name}" />
                                     </DataTemplate>
                                 </ItemsControl.Resources>
                                 <ItemsControl.ItemsPanel>
@@ -63,7 +63,7 @@
                         <StackPanel Orientation="Vertical" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
-            </ItemsControl>
+            </ItemsControl-->
 
         </StackPanel>
     </ScrollViewer>

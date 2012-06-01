@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace Kinectitude.Editor.Models.Properties
 {
-    public class BooleanProperty : Property<bool>
+    internal sealed class BooleanProperty : Property<bool>
     {
         public BooleanProperty(PropertyDescriptor descriptor) : base(descriptor) { }
 

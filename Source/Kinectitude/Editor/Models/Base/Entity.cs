@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using Kinectitude.Editor.Base;
+﻿using System.Collections.Generic;
 using Kinectitude.Editor.Models.Plugins;
-using Kinectitude.Editor.Models.Properties;
-using Attribute = Kinectitude.Editor.Models.Base.Attribute;
 
 namespace Kinectitude.Editor.Models.Base
 {
-    public class Entity : AttributeContainer, IEventContainer
+    internal sealed class Entity : AttributeContainer, IEventContainer
     {
         private IEntityContainer parent;
         private string name;
@@ -67,13 +59,13 @@ namespace Kinectitude.Editor.Models.Base
         public void AddComponent(Component component)
         {
             component.Parent = this;
-            components.Add(component.Descriptor.Name, component);
+            components.Add(component.Descriptor.ClassName, component);
         }
 
         public void RemoveComponent(Component component)
         {
             component.Parent = null;
-            components.Remove(component.Descriptor.Name);
+            components.Remove(component.Descriptor.ClassName);
         }
 
         public void AddEvent(Event evt)

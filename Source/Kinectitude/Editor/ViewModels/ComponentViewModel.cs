@@ -1,42 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models.Base;
 using Kinectitude.Editor.Models.Plugins;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    public class ComponentViewModel
+    internal sealed class ComponentViewModel
     {
-        private readonly Component component;
-        private readonly List<BasePropertyViewModel> _properties;
-        private readonly ReadOnlyCollection<BasePropertyViewModel> properties;
-
-        public Component Component
-        {
-            get { return component; }
-        }
+        private readonly Entity entity;
+        private readonly PluginDescriptor descriptor;
+        private readonly ObservableCollection<PropertyViewModel> _properties;
+        private readonly ModelCollection<PropertyViewModel> properties;
+        private Component component;
 
         public string Name
         {
-            get { return component.Descriptor.DisplayName; }
+            get { return descriptor.DisplayName; }
         }
 
-        public IEnumerable<BasePropertyViewModel> Properties
+        public PluginDescriptor Descriptor
+        {
+            get { return descriptor; }
+        }
+
+        public IEnumerable<PropertyViewModel> Properties
         {
             get { return properties; }
         }
 
-        public ComponentViewModel(Component component)
+        public ComponentViewModel(Entity entity, PluginDescriptor descriptor)
         {
-            this.component = component;
+            this.entity = entity;
+            this.descriptor = descriptor;
 
-            /*var propertyViewModels = from property in component.Properties select BasePropertyViewModel.Create(property);
-            _properties = new List<BasePropertyViewModel>(propertyViewModels);
-            properties = new ReadOnlyCollection<BasePropertyViewModel>(_properties);*/
-
-            // TODO: Property inheritance and all that
+            var propertyViewModels = from propertyDescriptor in descriptor.PropertyDescriptors select new PropertyViewModel(entity, propertyDescriptor);
+            _properties = new ObservableCollection<PropertyViewModel>(propertyViewModels);
+            properties = new ModelCollection<PropertyViewModel>(_properties);
         }
     }
 }

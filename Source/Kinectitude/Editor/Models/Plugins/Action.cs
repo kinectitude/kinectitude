@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Kinectitude.Editor.Models.Base;
+﻿using Kinectitude.Editor.Models.Base;
 
 namespace Kinectitude.Editor.Models.Plugins
 {
-    public class Action : Plugin, IAction
+    internal sealed class Action : Plugin, IAction
     {
         private IActionContainer parent;
 

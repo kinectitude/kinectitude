@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinectitude.Attributes", "Kinectitude\Attributes\Kinectitude.Attributes.csproj", "{52A964EE-E3ED-4AC5-843F-9FAA26055B39}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinectitude.Editor", "Kinectitude\Editor\Kinectitude.Editor.csproj", "{541AF93B-398E-463E-9C11-BC957BE0DB19}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinectitude.Core", "Kinectitude\Core\Kinectitude.Core.csproj", "{AEAB17EC-574C-4177-9204-FE48F4C3F429}"
@@ -22,18 +20,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Release|Any CPU.Build.0 = Release|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Release|Win32.ActiveCfg = Release|Any CPU
-		{52A964EE-E3ED-4AC5-843F-9FAA26055B39}.Release|x86.ActiveCfg = Release|Any CPU
 		{541AF93B-398E-463E-9C11-BC957BE0DB19}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{541AF93B-398E-463E-9C11-BC957BE0DB19}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{541AF93B-398E-463E-9C11-BC957BE0DB19}.Debug|Mixed Platforms.Build.0 = Debug|x86

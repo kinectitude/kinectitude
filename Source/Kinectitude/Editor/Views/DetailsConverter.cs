@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Data;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.ViewModels;
 
 namespace Kinectitude.Editor.Views
 {
-    public class Detail
+    internal sealed class Detail
     {
         private readonly string name;
         private readonly object value;
@@ -30,7 +28,7 @@ namespace Kinectitude.Editor.Views
         }
     }
 
-    public class Details : BaseModel
+    internal sealed class Details : BaseModel
     {
         private readonly string header;
         private readonly IEnumerable<Detail> items;
@@ -52,7 +50,7 @@ namespace Kinectitude.Editor.Views
         }
     }
 
-    public class DetailsConverter : IMultiValueConverter
+    internal sealed class DetailsConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {

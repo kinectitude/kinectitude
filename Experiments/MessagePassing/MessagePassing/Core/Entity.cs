@@ -216,6 +216,11 @@ namespace MessagePassing.Core
             }
         }
 
+        public string Name
+        {
+            get { return "Hi"; }
+        }
+
         public Entity()
         {
             components = new List<Component>();

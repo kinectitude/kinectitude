@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace Kinectitude.Editor.Models.Properties
 {
-    public class RealProperty : Property<double>
+    internal sealed class RealProperty : Property<double>
     {
         public RealProperty(PropertyDescriptor descriptor) : base(descriptor) { }
 

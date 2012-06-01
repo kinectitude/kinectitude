@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Kinectitude.Editor.Models.Plugins;
-using Action = Kinectitude.Editor.Models.Plugins.Action;
+﻿using Kinectitude.Editor.Models.Plugins;
 
 namespace Kinectitude.Editor.Storage
 {
-    public interface IPluginNamespace
+    internal interface IPluginNamespace
     {
         PluginDescriptor GetPluginDescriptor(string name);
     }

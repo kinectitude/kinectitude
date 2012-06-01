@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace Kinectitude.Editor.Models.Properties
 {
-    public class TextProperty : Property<string>
+    internal sealed class TextProperty : Property<string>
     {
         public TextProperty(PropertyDescriptor descriptor) : base(descriptor) { }
 

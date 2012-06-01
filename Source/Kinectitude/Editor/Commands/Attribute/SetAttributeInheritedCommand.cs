@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Kinectitude.Editor.Commands.Base;
+﻿using Kinectitude.Editor.Commands.Base;
 using Kinectitude.Editor.ViewModels;
 
 namespace Kinectitude.Editor.Commands.Attribute
 {
-    public class SetAttributeInheritedCommand : IUndoableCommand
+    internal sealed class SetAttributeInheritedCommand : IUndoableCommand
     {
         private readonly IAttributeViewModel attribute;
         private readonly bool shouldInherit;
