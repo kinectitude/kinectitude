@@ -1,12 +1,13 @@
 ﻿using System;
-using Kinectitude.Core.Base;
-using SlimDX.Direct2D;
-using SlimDX;
-using SlimDX.Windows;
 using System.Collections.Generic;
 using System.Drawing;
-using ColorConverter = System.Windows.Media.ColorConverter;
+using System.IO;
+using Kinectitude.Core.Base;
+using SlimDX;
+using SlimDX.Direct2D;
+using Bitmap = SlimDX.Direct2D.Bitmap;
 using Color = System.Windows.Media.Color;
+using ColorConverter = System.Windows.Media.ColorConverter;
 
 namespace Kinectitude.Render
 {
@@ -22,8 +23,10 @@ namespace Kinectitude.Render
         private SlimDX.Direct2D.Factory drawFactory;
         private Action<RenderTarget> renderAction;
         private readonly Dictionary<Color4, SolidColorBrush> brushes;
+        private readonly Dictionary<string, Bitmap> bitmaps;
         private readonly SlimDX.DirectWrite.Factory writeFactory;
         private readonly Color4 clearColor;
+        private readonly BitmapProperties bitmapProperties;
 
         public RenderTarget RenderTarget
         {
@@ -56,9 +59,12 @@ namespace Kinectitude.Render
 
         public RenderService()
         {
+            bitmaps = new Dictionary<string, Bitmap>();
             brushes = new Dictionary<Color4, SolidColorBrush>();
             writeFactory = new SlimDX.DirectWrite.Factory(SlimDX.DirectWrite.FactoryType.Shared);
             clearColor = new Color4(0.30f, 0.30f, 0.80f);
+            PixelFormat pixelFormat = new PixelFormat(SlimDX.DXGI.Format.B8G8R8A8_UNorm, AlphaMode.Premultiplied);
+            bitmapProperties = new BitmapProperties() { PixelFormat = pixelFormat };
         }
 
         public override void OnStart() { }
@@ -70,7 +76,7 @@ namespace Kinectitude.Render
             return false;
         }
 
-        public SolidColorBrush CreateSolidColorBrush(Color4 color)
+        public SolidColorBrush GetSolidColorBrush(Color4 color)
         {
             SolidColorBrush brush;
             brushes.TryGetValue(color, out brush);
@@ -80,6 +86,32 @@ namespace Kinectitude.Render
                 brushes[color] = brush;
             }
             return brush;
+        }
+
+        public Bitmap GetBitmap(string image)
+        {
+            Bitmap bitmap;
+            bitmaps.TryGetValue(image, out bitmap);
+            if (null == bitmap)
+            {
+                using (System.Drawing.Bitmap source = new System.Drawing.Bitmap(Path.Combine("Assets", image)))
+                {
+                    System.Drawing.Imaging.BitmapData sourceData = source.LockBits(
+                        new Rectangle(0, 0, source.Width, source.Height),
+                        System.Drawing.Imaging.ImageLockMode.ReadOnly,
+                        System.Drawing.Imaging.PixelFormat.Format32bppArgb
+                    );
+
+                    using (DataStream dataStream = new DataStream(sourceData.Scan0, sourceData.Stride * sourceData.Height, true, false))
+                    {
+                        bitmap = new Bitmap(renderTarget, new Size(source.Width, source.Height), dataStream, sourceData.Stride, bitmapProperties);
+                        bitmaps[image] = bitmap;
+                    }
+
+                    source.UnlockBits(sourceData);
+                }
+            }
+            return bitmap;
         }
 
         public void Render()
@@ -105,6 +137,13 @@ namespace Kinectitude.Render
             {
                 brush.Dispose();
             }
+
+            foreach (Bitmap bitmap in bitmaps.Values)
+            {
+                bitmap.Dispose();
+            }
+
+            GC.SuppressFinalize(this);
         }
     }
 }

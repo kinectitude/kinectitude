@@ -13,7 +13,6 @@ namespace Kinectitude.Render
     [Plugin("Text Render Component", "")]
     public class TextRenderComponent : Component, IRender
     {
-        private Color4 renderColor;
         private SolidColorBrush brush;
         private TextFormat textFormat;
         private RectangleF layoutRectangle;
@@ -65,10 +64,88 @@ namespace Kinectitude.Render
         [Plugin("Font Color", "")]
         public string FontColor
         {
-            set { renderColor = RenderService.ColorFromString(value); }
+            get;
+            set;
         }
 
-        public TextRenderComponent() { }
+        [Plugin("Locale", "")]
+        public string Locale
+        {
+            get;
+            set;
+        }
+
+        [Plugin("Flow Direction", "")]
+        public FlowDirection FlowDirection
+        {
+            get;
+            set;
+        }
+
+        [Plugin("Tab Size", "")]
+        public int TabSize
+        {
+            get;
+            set;
+        }
+
+        [Plugin("Paragraph Alignment", "")]
+        public ParagraphAlignment ParagraphAlignment
+        {
+            get;
+            set;
+        }
+
+        [Plugin("Reading Direction", "")]
+        public ReadingDirection ReadingDirection
+        {
+            get;
+            set;
+        }
+
+        [Plugin("Text Alignment", "")]
+        public TextAlignment TextAlignment
+        {
+            get;
+            set;
+        }
+
+        [Plugin("Word Wrapping", "")]
+        public WordWrapping WordWrapping
+        {
+            get;
+            set;
+        }
+
+        [Plugin("Horizontal Offset", "")]
+        public float OffsetX
+        {
+            get;
+            set;
+        }
+
+        [Plugin("Vertical Offset", "")]
+        public float OffsetY
+        {
+            get;
+            set;
+        }
+
+        public TextRenderComponent()
+        {
+            FontFamily = "Arial";
+            FontWeight = FontWeight.Normal;
+            FontStyle = FontStyle.Normal;
+            FontStretch = FontStretch.Normal;
+            FontSize = 36.0f;
+            Locale = "en-us";
+            FlowDirection = FlowDirection.TopToBottom;
+            TabSize = 4;
+            ParagraphAlignment = ParagraphAlignment.Near;
+            ReadingDirection = ReadingDirection.LeftToRight;
+            TextAlignment = TextAlignment.Leading;
+            WordWrapping = WordWrapping.NoWrap;
+        }
 
         public void OnSetTextAction(SetTextAction action)
         {
@@ -85,35 +162,30 @@ namespace Kinectitude.Render
             renderManager = GetManager<RenderManager>();
             renderManager.Add(this);
 
-            textFormat = renderManager.DirectWriteFactory.CreateTextFormat(FontFamily, FontWeight, FontStyle, FontStretch, FontSize, "en-us");
-            textFormat.FlowDirection = FlowDirection.TopToBottom;
-            textFormat.IncrementalTabStop = textFormat.FontSize * 4.0f;
-            textFormat.ParagraphAlignment = ParagraphAlignment.Near;
-            textFormat.ReadingDirection = ReadingDirection.LeftToRight;
-            textFormat.TextAlignment = TextAlignment.Leading;
-            textFormat.WordWrapping = WordWrapping.NoWrap;
+            textFormat = renderManager.DirectWriteFactory.CreateTextFormat(FontFamily, FontWeight, FontStyle, FontStretch, FontSize, Locale);
+            textFormat.FlowDirection = FlowDirection;
+            textFormat.IncrementalTabStop = textFormat.FontSize * TabSize;
+            textFormat.ParagraphAlignment = ParagraphAlignment;
+            textFormat.ReadingDirection = ReadingDirection;
+            textFormat.TextAlignment = TextAlignment;
+            textFormat.WordWrapping = WordWrapping;
 
-            brush = renderManager.CreateSolidColorBrush(renderColor);
+            brush = renderManager.GetSolidColorBrush(FontColor);
 
             transformComponent = GetComponent<TransformComponent>();
-            transformComponent.SubscribeToX(this, OnTransformChanged);
-            transformComponent.SubscribeToY(this, OnTransformChanged);
-            transformComponent.SubscribeToWidth(this, OnTransformChanged);
-            transformComponent.SubscribeToHeight(this, OnTransformChanged);
+            transformComponent.SubscribeToX(this, UpdateTransform);
+            transformComponent.SubscribeToY(this, UpdateTransform);
+            transformComponent.SubscribeToWidth(this, UpdateTransform);
+            transformComponent.SubscribeToHeight(this, UpdateTransform);
 
-            layoutRectangle = new RectangleF()
-            {
-                X = transformComponent.X,
-                Y = transformComponent.Y,
-                Width = transformComponent.Width,
-                Height = transformComponent.Height
-            };
+            layoutRectangle = new RectangleF();
+            UpdateTransform();
         }
 
-        public void OnTransformChanged()
+        public void UpdateTransform()
         {
-            layoutRectangle.X = transformComponent.X;
-            layoutRectangle.Y = transformComponent.Y;
+            layoutRectangle.X = transformComponent.X + OffsetX;
+            layoutRectangle.Y = transformComponent.Y + OffsetY;
             layoutRectangle.Width = transformComponent.Width;
             layoutRectangle.Height = transformComponent.Height;
         }

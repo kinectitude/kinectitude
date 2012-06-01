@@ -18,6 +18,7 @@
     <Define Name="RenderManager" Class="Kinectitude.Render.RenderManager"/>
     <Define Name="RenderComponent" Class="Kinectitude.Render.RenderComponent"/>
     <Define Name="TextRenderComponent" Class="Kinectitude.Render.TextRenderComponent"/>
+    <Define Name="ImageRenderComponent" Class="Kinectitude.Render.ImageRenderComponent" />
     <Define Name="SetTextAction" Class="Kinectitude.Render.SetTextAction"/>
   </Using>
     
@@ -89,9 +90,14 @@
 
   <Scene Name="main" numReadY="0" ready1="" ready2="">
 
+    <Entity Name="tennis">
+      <Component Type="TransformComponent" X="400" Y="300" Width="263" Height="263" />
+      <Component Type="ImageRenderComponent" Image="tennisball.png" />
+    </Entity>
+    
     <Entity Name="topText" Prototype="text">
-      <Component Type="TransformComponent" X="250" Y="24"/>
-      <Component Type="TextRenderComponent" Value="Kinect Wimbledon Delux" FontColor="Yellow" />
+      <Component Type="TransformComponent" X="400" Y="24" />
+      <Component Type="TextRenderComponent" Value="Kinect Wimbledon Delux" FontColor="Yellow" TextAlignment="Center" />
     </Entity>
 
     <Entity Name="instructions" Prototype="text">

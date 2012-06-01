@@ -5,11 +5,9 @@ using System.Windows.Forms;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Loaders;
 using Kinectitude.Render;
-using SlimDX;
 using SlimDX.Direct2D;
-using SlimDX.DirectWrite;
 using SlimDX.Windows;
-using FontStyle = SlimDX.DirectWrite.FontStyle;
+using Factory = SlimDX.Direct2D.Factory;
 
 namespace Kinectitude.Player
 {
@@ -20,8 +18,6 @@ namespace Kinectitude.Player
         private readonly RenderService renderService;
         private readonly RenderForm form;
         private readonly Game game;
-        private readonly Clock clock;
-        private float accumulator;
 
         public Application()
         {
@@ -29,18 +25,18 @@ namespace Kinectitude.Player
             GameLoader gameLoader = GameLoader.GetGameLoader("game.xml", new Assembly[] { loaded });
             game = gameLoader.Game;
 
-            SlimDX.Direct2D.Factory drawFactory = new SlimDX.Direct2D.Factory();
+            Factory drawFactory = new SlimDX.Direct2D.Factory();
             SizeF dpi = drawFactory.DesktopDpi;
 
             Size size = new Size((int)(game.Width * dpi.Width / 96.0f), (int)(game.Height * dpi.Height / 96.0f));
 
-            form = new RenderForm(game.Name);
-            form.ClientSize = size;
-            form.FormBorderStyle = FormBorderStyle.FixedSingle;
-            form.MaximizeBox = false;
+            form = new RenderForm(game.Name)
+            {
+                ClientSize = size,
+                FormBorderStyle = FormBorderStyle.FixedSingle,
+                MaximizeBox = false
+            };
             
-            clock = new Clock();
-
             renderService = game.GetService<RenderService>();
             renderService.RenderTarget = new WindowRenderTarget(drawFactory, new WindowRenderTargetProperties()
             {
@@ -58,6 +54,9 @@ namespace Kinectitude.Player
 
         public void Run()
         {
+            Clock clock = new Clock();
+            float accumulator = 0.0f;
+
             clock.Start();
             game.Start();
 

@@ -17,7 +17,6 @@ namespace Kinectitude.Render
             Ellipse
         }
 
-        private Color4 renderColor;
         private SolidColorBrush brush;
         private TransformComponent transformComponent;
         private RenderManager renderManager;
@@ -34,7 +33,8 @@ namespace Kinectitude.Render
         [Plugin("Fill Color", "")]
         public string FillColor
         {
-            set { renderColor = RenderService.ColorFromString(value); } 
+            get;
+            set;
         }
 
         public RenderComponent() { }
@@ -56,36 +56,27 @@ namespace Kinectitude.Render
             renderManager = GetManager<RenderManager>();
             renderManager.Add(this);
 
-            brush = renderManager.CreateSolidColorBrush(renderColor);
+            brush = renderManager.GetSolidColorBrush(FillColor);
 
             transformComponent = GetComponent<TransformComponent>();
-            transformComponent.SubscribeToX(this, OnTransformChanged);
-            transformComponent.SubscribeToY(this, OnTransformChanged);
-            transformComponent.SubscribeToWidth(this, OnTransformChanged);
-            transformComponent.SubscribeToHeight(this, OnTransformChanged);
+            transformComponent.SubscribeToX(this, UpdateTransform);
+            transformComponent.SubscribeToY(this, UpdateTransform);
+            transformComponent.SubscribeToWidth(this, UpdateTransform);
+            transformComponent.SubscribeToHeight(this, UpdateTransform);
 
             if (Shape == ShapeType.Ellipse)
             {
-                ellipse = new Ellipse()
-                {
-                    Center = new PointF(transformComponent.X, transformComponent.Y),
-                    RadiusX = transformComponent.Width / 2.0f,
-                    RadiusY = transformComponent.Height / 2.0f
-                };
+                ellipse = new Ellipse();
             }
             else if (Shape == ShapeType.Rectangle)
             {
-                rectangle = new RectangleF()
-                {
-                    X = transformComponent.X - transformComponent.Width / 2.0f,
-                    Y = transformComponent.Y - transformComponent.Height / 2.0f,
-                    Width = transformComponent.Width,
-                    Height = transformComponent.Height
-                };
+                rectangle = new RectangleF();
             }
+
+            UpdateTransform();
         }
 
-        public void OnTransformChanged()
+        public void UpdateTransform()
         {
             if (Shape == ShapeType.Ellipse)
             {
