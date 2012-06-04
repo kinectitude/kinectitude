@@ -5,36 +5,31 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Kinectitude.Core.Base;
 using Action = Kinectitude.Core.Base.Action;
+using Kinectitude.Tests.Core.TestMocks;
 
 namespace Kinectitude.Tests.Core.Base
 {
-
-    public class TestEvent : Event
-    {
-        public bool hasInit = false;
-        public override void OnInitialize() { hasInit = true; }
-    }
 
     [TestClass]
     public class EventTests
     {
 
-        public List<TestAction> actionList = new List<TestAction>();
+        public List<ActionMock> actionList = new List<ActionMock>();
 
         [TestMethod]
         public void TestAllActionsExecuted()
         {
-            Event evt = new TestEvent();
+            Event evt = new EventMock();
             for (int i = 0; i < 10; i++)
             {
-                TestAction action = new TestAction();
+                ActionMock action = new ActionMock();
                 actionList.Add(action);
                 evt.AddAction(action);
             }
 
             evt.DoActions();
 
-            foreach (TestAction action in actionList)
+            foreach (ActionMock action in actionList)
             {
                 Assert.IsTrue(action.hasRun);
             }
@@ -43,7 +38,7 @@ namespace Kinectitude.Tests.Core.Base
         [TestMethod]
         public void TestOnInitialize()
         {
-            TestEvent test = new TestEvent();
+            EventMock test = new EventMock();
             test.Initialize();
             Assert.IsTrue(test.hasInit);
         }

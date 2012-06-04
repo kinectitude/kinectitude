@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Base
 {

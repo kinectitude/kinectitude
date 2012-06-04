@@ -76,6 +76,11 @@ namespace Kinectitude.Core.Data
                 {
                     expressions.Add(CreateExpressionReader(nonmatch, evt, entity));
                 }
+                //no need for extra ovehead
+                if (expressions.Count == 1)
+                {
+                    return expressions[0];
+                }
                 return new MultiValueReader(expressions);
             }
 
