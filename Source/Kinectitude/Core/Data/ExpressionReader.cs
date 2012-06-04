@@ -19,6 +19,7 @@ namespace Kinectitude.Core.Data
              * Also, this may be more effecient because longer regexs are bad to use
              * A second variable is used, so taht I don't need to replace it again*/
             string str = value.Replace(@"\\", "\f").Replace(@"\{", "\a").Replace(@"\}", "\v");
+
             MatchCollection matches = innerBrackets.Matches(str);
             if (matches.Count != 0)
             {
@@ -26,6 +27,7 @@ namespace Kinectitude.Core.Data
                 throw new ArgumentException("{} cannot be nesteded in other {}");
             }
             matches = bracketMatch.Matches(str);
+
             string nonmatch;
 
             if (matches.Count != 0)
@@ -34,14 +36,40 @@ namespace Kinectitude.Core.Data
                 int last = 0;
                 foreach (Match match in matches)
                 {
-                    string matchVal = match.ToString().Substring(1, match.Length - 2);
-                    nonmatch = str.Substring(last, match.Index - last);
+                    nonmatch = str.Substring(last, match.Index - last).Replace("\a", "{")
+                        .Replace("\v", "}").Replace("\f", @"\");
                     if("" != nonmatch)
                     {
-                        expressions.Add(CreateExpressionReader(nonmatch, evt, entity));
+                        expressions.Add(new ConstantExpressionReader(nonmatch));
                     }
                     last = match.Index + match.Length;
-                    expressions.Add(CreateExpressionReader(matchVal, evt, entity));
+                    string matchStr = match.ToString().Substring(1, match.ToString().Length - 2);
+                    string[] vals = matchStr.Split('.');
+                    if ('!' == value[0])
+                    {
+                        if (evt == null)
+                        {
+                            throw new IllegalPlacementException("!", "events or actions");
+                        }
+                    }
+                    switch (vals.Length)
+                    {
+                        case 1:
+                            expressions.Add(new ParameterValueReader(evt, matchStr.Substring(1)));
+                            break;
+                        case 2:
+                            expressions.Add(new EntityValueReader
+                                (vals[1], TypeMatcher.CreateTypeMatcher(vals[0], evt, entity), entity));
+                            break;
+                        case 3:
+                            string[] part = new string[] { vals[1], vals[2] };
+                            expressions.Add(new ComponentValueReader
+                                (part, TypeMatcher.CreateTypeMatcher(vals[0], evt, entity)));
+                            break;
+                        default:
+                            //TODO make this a better exception
+                            throw new ArgumentException("Invalid reader");
+                    }
                 }
                 nonmatch = str.Substring(last);
                 if ("" != nonmatch)
@@ -50,35 +78,9 @@ namespace Kinectitude.Core.Data
                 }
                 return new MultiValueReader(expressions);
             }
-            double d;
-            if (value.Contains('\\') || '!' != value[0] && !value.Contains('.') || double.TryParse(value, out d))
-            {
-                value = value.Replace(@"\!", "!").Replace(@"\.", ".").Replace("\a", "{")
-                    .Replace("\v", "}").Replace("\f", @"\");
-                return new ConstantExpressionReader(value);
-            }
-            string[] vals = value.Split('.');
-            if ('!' == value[0])
-            {
-                if (evt == null)
-                {
-                    throw new IllegalPlacementException("!", "events or actions");
-                }
-            }
-            switch(vals.Length)
-            {
-                case 1:
-                    return new ParameterValueReader(evt, value.Substring(1));
-                case 2:
-                    return new EntityValueReader(vals[1], TypeMatcher.CreateTypeMatcher(vals[0], evt, entity), entity);
-                case 3:
-                    string[] part = new string [] { vals[1], vals[2] };
-                    return new ComponentValueReader(part, TypeMatcher.CreateTypeMatcher(vals[0], evt, entity));
-                default:
-                    //TODO make this a better exception
-                    throw new ArgumentException("Invalid reader");
-            }
 
+            value = value.Replace("\a", "{").Replace("\v", "}").Replace("\f", @"\");
+            return new ConstantExpressionReader(value);
         }
 
         public abstract string GetValue();
