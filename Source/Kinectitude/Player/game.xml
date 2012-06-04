@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!--Game Name="pong" Width="800" Height="600" FirstScene="main" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1"-->
-<Game Name="pong" Width="800" Height="600" FirstScene="game" IsFullScreen="false">
+<Game Name="pong" Width="800" Height="600" FirstScene="Main Menu" IsFullScreen="false">
 
   <Using File="Kinectitude.Kinect.dll">
     <Define Name="KinectFollowComponent" Class="Kinectitude.Kinect.KinectFollowComponent"/>
@@ -132,7 +132,7 @@
       <Event Type="CrossesLineEvent" Line="Y" Location="350"  Direction="Positive">
         <Action Type="SetAttributeAction" Target="scene.ready1" Value="player 1 is ready!"/>
         <Condition If="scene.ready2 and scene.ready1 or scene.ready1 and scene.ready2">
-          <Action Type="ChangeSceneAction" Target="Game"/>
+          <Action Type="ChangeSceneAction" Target="game"/>
         </Condition>
       </Event>
     </Entity>
@@ -194,11 +194,11 @@
       <Event Type="TriggerOccursEvent" Trigger="player1Scores">
         <Action Type="SetTextAction" Value="{scene.player1Score}" />
       </Event>
-      <Event Type="AttributeEqualsEvent" Target="scene.player1Score" Value="15">
+      <Event Type="AttributeEqualsEvent" Target="{scene.player1Score}" Value="15">
         <Action Type="SetAttributeAction" Target="game.winner" Value="player 1 wins"/>
         <Action Type="ChangeSceneAction" Target="Game Over"/>
       </Event>
-      <Event Type="AttributeEqualsEvent" Target="scene.player1Score" Value="10">
+      <Event Type="AttributeEqualsEvent" Target="{scene.player1Score}" Value="10">
         <Action Type="CreateEntityAction" Prototype="leftBall"/>
       </Event>
     </Entity>
@@ -208,11 +208,11 @@
       <Event Type="AttributeChangesEvent" Target="{scene.player2Score}">
         <Action Type="SetTextAction" Value="{scene.player2Score}" />
       </Event>
-      <Event Type="AttributeEqualsEvent" Target="scene.player2Score" Value="15">
+      <Event Type="AttributeEqualsEvent" Target="{scene.player2Score}" Value="15">
         <Action Type="SetAttributeAction" Target="game.winner" Value="player 2 wins"/>
-        <Action Type="ChangeSceneAction" Target="gameOver"/>
+        <Action Type="ChangeSceneAction" Target="Game Over"/>
       </Event>
-      <Event Type="AttributeEqualsEvent" Target="scene.player2Score" Value="10">
+      <Event Type="AttributeEqualsEvent" Target="{scene.player2Score}" Value="10">
         <Action Type="CreateEntityAction" Prototype="rightBall"/>
       </Event>
     </Entity>

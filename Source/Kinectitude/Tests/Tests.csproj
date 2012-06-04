@@ -54,6 +54,7 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Compile Include="Core\Data\StringDataTests.cs" />
     <Compile Include="Core\Loaders\GameLoaderTests.cs" />
     <Compile Include="Core\Loaders\XMLGameLoaderTests.cs" />
     <Compile Include="Editor\EntityAttributeViewModelTests.cs" />
