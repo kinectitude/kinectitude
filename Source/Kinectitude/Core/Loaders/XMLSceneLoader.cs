@@ -9,6 +9,10 @@ namespace Kinectitude.Core.Loaders
     internal class XMLSceneLoader : SceneLoader
     {
 
+        internal const string EntityName = "Entity";
+        internal const string ActionName = "Action";
+        internal const string ConditionName = "Condition";
+
         private int onid = 0;
         XMLGameLoader xmlGameLoader;
 
@@ -25,7 +29,7 @@ namespace Kinectitude.Core.Loaders
                 }
                 Scene[attribName] = attrib.Value;
             }
-            foreach (XElement e in scene.Elements().Where(input => "Entity" == input.Name))
+            foreach (XElement e in scene.Elements().Where(input => EntityName == input.Name))
             {
                 //so that I don't mess the original up when I merge;
                 XElement parsedNode = new XElement(e);
@@ -77,7 +81,7 @@ namespace Kinectitude.Core.Loaders
         {
             foreach (XElement action in node.Elements())
             {
-                if (action.Name == "Action")
+                if (action.Name == ActionName)
                 {
 
                     List<Tuple<string, string>> values = new List<Tuple<string,string>>();
@@ -92,7 +96,7 @@ namespace Kinectitude.Core.Loaders
                     }
                     Scene.CreateAction(evt, action.Attribute("Type").Value, values, cond);
                 }
-                else if (action.Name == "Condition")
+                else if (action.Name == ConditionName)
                 {
                     evt.AddAction(createCondition(game, evt, action));
                 }
@@ -192,11 +196,11 @@ namespace Kinectitude.Core.Loaders
                 {
                     case "#comment":
                         continue;
-                    case "Event":
+                    case XMLGameLoader.EventName:
                         Event evt = createEvent(Game, node, entity);
                         evt.Initialize();
                         break;
-                    case "Component":
+                    case XMLGameLoader.ComponentName:
                         string stringType = (string)node.Attribute("Type");
 
                         List<Tuple<string, string>> values = new List<Tuple<string, string>>();

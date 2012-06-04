@@ -1,5 +1,6 @@
 ﻿using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Base;
+using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Actions
 {
@@ -7,14 +8,14 @@ namespace Kinectitude.Core.Actions
     public sealed class PushSceneAction : Action
     {
         [Plugin("Scene", "")]
-        public string Target { get; set; }
+        public IExpressionReader Target { get; set; }
 
         public PushSceneAction() { }
 
         public override void Run()
         {
             Game game = Event.Entity.Scene.Game;
-            game.PushScene(Target);
+            game.PushScene(Target.GetValue());
         }
     }
 }

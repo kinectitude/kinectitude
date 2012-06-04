@@ -5,21 +5,25 @@
     <Event Type="SomeEvent">
       <Action Type="SomeAction"/>
     </Event>
-    <Component Type="SomeComponent" Property1="1000"/>
+    <Component Type="SomeComponent" Property1="1000" Property2="2000"/>
   </Prototype>
 
-  <Prototype Name="prototype2" score="50">
+  <Prototype Name="prototype2" score="50" Prototype="prototype1">
     <Event Type="SomeEvent">
       <Action Type="SomeAction"/>
     </Event>
     <Component Type="SomeComponent" Property2="5000" Property3="5900"/>
   </Prototype>
 
-  <Prototype Name="prototype3" score="50" Prototype="prototype1 prototype2">
+  <Prototype Name="prototype3" Prototype="prototype2">
     <Component Type="SomeComponent" Property3="10"/>
   </Prototype>
 
-  <Scene score="0">
+  <Prototype Name="prototype4" Prototype="prototype1 prototype2">
+    <Component Type="SomeComponent" />
+  </Prototype>
+
+  <Scene Name="this scene" score="0">
     <Entity Name="myName" Prototype="prototype2 prototype3">
       <Component Type="lol"/>
       <Component Type="SomeComponent" Property1="15"/>

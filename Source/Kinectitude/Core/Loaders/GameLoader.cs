@@ -8,12 +8,13 @@ namespace Kinectitude.Core.Loaders
 {
     public abstract class GameLoader
     {
-        protected static Dictionary<string, Assembly> loadedFiles = new Dictionary<string, Assembly>();
 
-        internal Dictionary<string, MethodInfo> MemberSetters { get; private set; }
-        internal Dictionary<string, Type> MemberType { get; private set; }
+        public string FirstScene { get; protected set; }
+
+        protected static Dictionary<string, Assembly> LoadedFiles = new Dictionary<string, Assembly>();
         internal readonly HashSet<string> AvaliblePrototypes = new HashSet<string>();
-        public Game Game { get; protected set; }
+        internal readonly Dictionary<string, List<string>> PrototypeIs = new Dictionary<string, List<string>>();
+        public Game Game { get; private set; }
 
         /**
          * Factory method for loading files.  We don't need to expose XMLGameLoader this way 
@@ -33,9 +34,9 @@ namespace Kinectitude.Core.Loaders
             foreach (Assembly loaded in preloads)
             {
                 string name = Path.GetFileName(loaded.Location);
-                if (!loadedFiles.ContainsKey(name))
+                if (!LoadedFiles.ContainsKey(name))
                 {
-                    loadedFiles.Add(name, loaded);
+                    LoadedFiles.Add(name, loaded);
                     ClassFactory.LoadServices(loaded);
                 }
             }
@@ -44,8 +45,6 @@ namespace Kinectitude.Core.Loaders
 
         protected GameLoader()
         {
-            MemberType = new Dictionary<string, Type>();
-            MemberSetters = new Dictionary<string, MethodInfo>();
             Game = new Game(this);
         }
 
@@ -54,15 +53,15 @@ namespace Kinectitude.Core.Loaders
         protected void LoadReflection(string file, string named, string fullName)
         {
             Assembly assembly = null;
-            if (!loadedFiles.ContainsKey(file))
+            if (!LoadedFiles.ContainsKey(file))
             {
                 assembly = Assembly.LoadFrom(Path.Combine(Environment.CurrentDirectory, "Plugins", file));
                 ClassFactory.LoadServices(assembly);
-                loadedFiles.Add(file, assembly);
+                LoadedFiles.Add(file, assembly);
             }
             else
             {
-                assembly = loadedFiles[file];
+                assembly = LoadedFiles[file];
             }
             ClassFactory.RegisterType(named, assembly.GetType(fullName));
         }

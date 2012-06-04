@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!--Game Name="pong" Width="800" Height="600" FirstScene="main" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1"-->
-<Game Name="pong" Width="800" Height="600" FirstScene="main" IsFullScreen="false">
+<Game Name="pong" Width="800" Height="600" FirstScene="game" IsFullScreen="false">
 
   <Using File="Kinectitude.Kinect.dll">
     <Define Name="KinectFollowComponent" Class="Kinectitude.Kinect.KinectFollowComponent"/>
@@ -60,6 +60,7 @@
       <Action Type="SetAttributeAction" Target="scene.lastHit" Value="!CollidesWith"/>
       <Action Type="SetAttributeAction" Target="scene.lastX" Value="!CollidesWith.TransformComponent.X"/>
       <Action Type="SetAttributeAction" Target="scene.lastY" Value="!CollidesWith.TransformComponent.Y"/>
+      <Action Type="FireTriggerAction" Name="changeInfo"/>
     </Event>
   </Prototype>
 
@@ -84,7 +85,7 @@
       <Action Type="PopSceneAction"/>
     </Event>
     <Event Type="CrossesLineEvent" Line="Y" Location="150"  Direction="Negative">
-      <Action Type="ChangeSceneAction" Target="main"/>
+      <Action Type="ChangeSceneAction" Target="Main Menu"/>
     </Event>
   </Prototype>
 
@@ -93,7 +94,7 @@
     <Component Type="TransformComponent" Y="100"/>
   </Prototype>
 
-  <Scene Name="main" numReadY="0" ready1="" ready2="">
+  <Scene Name="Main Menu" numReadY="0" ready1="" ready2="">
 
     <Entity Name="tennis">
       <Component Type="TransformComponent" X="400.5" Y="300.5" Width="263" Height="263" />
@@ -101,12 +102,12 @@
     </Entity>
     
     <Entity Name="topText" Prototype="text">
-      <Component Type="TransformComponent" X="400" Y="24" />
+      <Component Type="TransformComponent" X="0" Y="24" Width="800"/>
       <Component Type="TextRenderComponent" Value="Kinect Wimbledon Deluxe" FontColor="Yellow" TextAlignment="Center" FontWeight="Bold" />
     </Entity>
 
     <Entity Name="instructions" Prototype="text">
-      <Component Type="TransformComponent" X="400" Y="80"/>
+      <Component Type="TransformComponent" X="0" Y="80" Width="800"/>
       <Component Type="TextRenderComponent" Value="Move below the line to start" FontColor="White" TextAlignment="Center" FontSize="24" />
     </Entity>
 
@@ -195,7 +196,7 @@
       </Event>
       <Event Type="AttributeEqualsEvent" Target="scene.player1Score" Value="15">
         <Action Type="SetAttributeAction" Target="game.winner" Value="player 1 wins"/>
-        <Action Type="ChangeSceneAction" Target="gameOver"/>
+        <Action Type="ChangeSceneAction" Target="Game Over"/>
       </Event>
       <Event Type="AttributeEqualsEvent" Target="scene.player1Score" Value="10">
         <Action Type="CreateEntityAction" Prototype="leftBall"/>
@@ -217,47 +218,15 @@
     </Entity>
 
     <Entity Prototype="text">
-      <Component Type="TransformComponent" X="150" Y="75"/>
-      <Component Type="TextRenderComponent" Value="Last hit by" FontSize="25"/>
-    </Entity>
-
-    <Entity Prototype="text">
-      <Component Type="TransformComponent" X="270" Y="75"/>
-      <Component Type="TextRenderComponent" Value="Nobody!" FontSize="25"/>
-      <Event Type="AttributeChangesEvent" Target="scene.lastHit">
-        <Action Type="SetTextAction" Value="scene.lastHit"/>
+      <Component Type="TransformComponent" X="0" Y="75" Width="800"/>
+      <Component Type="TextRenderComponent" Value="" FontSize="25" TextAlignment="Center"/>
+      <Event Type="TriggerOccursEvent" Trigger="changeInfo">
+        <Action Type="SetTextAction" Value="Last hit by {scene.lastHit} At \{X,Y\} \{{scene.lastX},{scene.lastY}\}"/>
       </Event>
     </Entity>
-
-    <Entity Prototype="text">
-      <Component Type="TransformComponent" X="370" Y="75"/>
-      <Component Type="TextRenderComponent" Value="At X =" FontSize="25"/>
-    </Entity>
-
-    <Entity Prototype="text">
-      <Component Type="TransformComponent" X="445" Y="75"/>
-      <Component Type="TextRenderComponent" Value="N/A" FontSize="25"/>
-      <Event Type="AttributeChangesEvent" Target="scene.lastX">
-        <Action Type="SetTextAction" Value="scene.lastX"/>
-      </Event>
-    </Entity>
-
-    <Entity Prototype="text">
-      <Component Type="TransformComponent" X="500" Y="75"/>
-      <Component Type="TextRenderComponent" Value="Y =" FontSize="25"/>
-    </Entity>
-
-    <Entity Prototype="text">
-      <Component Type="TransformComponent" X="550" Y="75"/>
-      <Component Type="TextRenderComponent" Value="N/A" FontSize="25"/>
-      <Event Type="AttributeChangesEvent" Target="scene.lastY">
-        <Action Type="SetTextAction" Value="scene.lastY"/>
-      </Event>
-    </Entity>
-    
   </Scene>
 
-  <Scene Name="gameOver">
+  <Scene Name="Game Over">
     
     <Entity Name="gameOver" Prototype="text">
       <Component Type="TransformComponent" X="300" Y="20"/>

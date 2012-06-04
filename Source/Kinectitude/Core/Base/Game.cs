@@ -37,7 +37,7 @@ namespace Kinectitude.Core.Base
 
         public void Start()
         {
-            Scene main = GameLoader.GetSceneLoader("main").Scene;
+            Scene main = GameLoader.GetSceneLoader(GameLoader.FirstScene).Scene;
             currentScenes.Push(main);
             main.Running = true;
         }

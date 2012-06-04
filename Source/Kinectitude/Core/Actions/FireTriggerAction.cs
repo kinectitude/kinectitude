@@ -1,5 +1,6 @@
 ﻿using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Base;
+using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Actions
 {
@@ -7,13 +8,13 @@ namespace Kinectitude.Core.Actions
     internal sealed class FireTriggerAction : Action
     {
         [Plugin("Trigger", "")]
-        public string Name { get; set; }
+        public IExpressionReader Name { get; set; }
 
         public FireTriggerAction() { }
 
         public override void Run()
         {
-            Event.Entity.Scene.FireTrigger(Name);
+            Event.Entity.Scene.FireTrigger(Name.GetValue());
         }
     }
 }

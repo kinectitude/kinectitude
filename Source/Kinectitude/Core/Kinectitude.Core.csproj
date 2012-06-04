@@ -90,6 +90,7 @@
     <Compile Include="Data\ConstantExpressionReader.cs" />
     <Compile Include="Data\EntityValueReader.cs" />
     <Compile Include="Data\MultiTypeMatcher.cs" />
+    <Compile Include="Data\MultiValueReader.cs" />
     <Compile Include="Data\ParameterValueReader.cs" />
     <Compile Include="Data\SingleTypeMatcher.cs" />
     <Compile Include="Data\IExpressionReader.cs" />
