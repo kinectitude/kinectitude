@@ -159,6 +159,32 @@ namespace Kinectitude.Core.Base
             seceneLoader.CreateEntity(prototype);
         }
 
+        internal void CreateManager(string registeredName, List<Tuple<string, string>> values)
+        {
+            IManager manager = GetManager(registeredName);
+            foreach (Tuple<string, string> value in values)
+            {
+                ClassFactory.SetParam(manager, value.Item1, value.Item2, null, null);
+            }
+        }
+
+        internal IManager GetManager(string registeredName)
+        {
+            Type managerType = ClassFactory.TypesDict[registeredName];
+            IManager manager;
+            if (managersDictionary.ContainsKey(managerType))
+            {
+                manager = managersDictionary[managerType];
+            }
+            else
+            {
+                manager = ClassFactory.Create<IManager>(registeredName);
+                managersDictionary.Add(managerType, manager);
+                managers.Add(manager);
+            }
+            return manager;
+        }
+
         internal T GetManager<T>() where T : class, IManager
         {
             if (!managersDictionary.ContainsKey(typeof(T)))

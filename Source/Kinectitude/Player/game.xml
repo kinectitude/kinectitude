@@ -153,7 +153,7 @@
   </Scene>
 
   <Scene Name="game" player1Score="0" player2Score="0">
-
+    
     <Entity Name="player1" Prototype="paddle">
       <Component Type="TransformComponent" X="17" Y="250"/>
       <Event Type="CollisionEvent" CollidesWith="$ball">
@@ -221,7 +221,7 @@
       <Component Type="TransformComponent" X="0" Y="75" Width="800"/>
       <Component Type="TextRenderComponent" Value="" FontSize="25" TextAlignment="Center"/>
       <Event Type="TriggerOccursEvent" Trigger="changeInfo">
-        <Action Type="SetTextAction" Value="Last hit by {scene.lastHit} At \{X,Y\} \{{scene.lastX},{scene.lastY}\}"/>
+        <Action Type="SetTextAction" Value="Last hit by {scene.lastHit} At \{X,Y\} \{{scene.lastX},{scene.lastY}\} gravity was ({scene.PhysicsManager.XGravity},{scene.PhysicsManager.YGravity})"/>
       </Event>
     </Entity>
   </Scene>

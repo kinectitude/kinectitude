@@ -1,11 +1,36 @@
 ﻿using FarseerPhysics.Dynamics;
 using Kinectitude.Core.Base;
 using Microsoft.Xna.Framework;
+using Kinectitude.Core.Attributes;
 
 namespace Kinectitude.Physics
 {
     public class PhysicsManager : Manager<PhysicsComponent>
     {
+
+        private float yGravity;
+        [Plugin("Y gravity", "How fast things are pulled down")]
+        public float YGravity 
+        {
+            get { return yGravity; }
+            set
+            {
+                yGravity = value;
+                PhysicsWorld.Gravity = new Vector2(xGravity, yGravity);
+            }
+        }
+
+        private float xGravity;
+        [Plugin("X gravity", "How fast things are pulled to the left")]
+        public float XGravity 
+        {
+            get { return xGravity; }
+            set
+            {
+                xGravity = value;
+                PhysicsWorld.Gravity = new Vector2(xGravity, yGravity);
+            }
+        }
 
         public World PhysicsWorld { get; private set; }
 

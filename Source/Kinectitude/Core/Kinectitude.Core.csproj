@@ -88,6 +88,7 @@
     <Compile Include="Conditions\SimpleCondition.cs" />
     <Compile Include="Data\ComponentValueReader.cs" />
     <Compile Include="Data\ConstantExpressionReader.cs" />
+    <Compile Include="Data\ManagerValueReader.cs" />
     <Compile Include="Data\EntityValueReader.cs" />
     <Compile Include="Data\MultiTypeMatcher.cs" />
     <Compile Include="Data\MultiValueReader.cs" />

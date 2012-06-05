@@ -12,6 +12,7 @@ namespace Kinectitude.Core.Loaders
         internal const string EntityName = "Entity";
         internal const string ActionName = "Action";
         internal const string ConditionName = "Condition";
+        internal const string ManagerName = "Manager";
 
         private int onid = 0;
         XMLGameLoader xmlGameLoader;
@@ -29,6 +30,26 @@ namespace Kinectitude.Core.Loaders
                 }
                 Scene[attribName] = attrib.Value;
             }
+
+            foreach (XElement e in scene.Elements().Where(input => ManagerName == input.Name))
+            {
+                List<Tuple<string, string>> values = new List<Tuple<string, string>>();
+
+                foreach (XAttribute attrib in e.Attributes())
+                {
+                    if ("Type" == attrib.Name)
+                    {
+                        continue;
+                    }
+                    string value = attrib.Value;
+                    string param = attrib.Name.ToString();
+                    Tuple<string, string> t = new Tuple<string, string>(param, value);
+                    values.Add(t);
+                }
+
+                Scene.CreateManager((string)e.Attribute("Type"), values);
+            }
+
             foreach (XElement e in scene.Elements().Where(input => EntityName == input.Name))
             {
                 //so that I don't mess the original up when I merge;

@@ -63,8 +63,15 @@ namespace Kinectitude.Core.Data
                             break;
                         case 3:
                             string[] part = new string[] { vals[1], vals[2] };
-                            expressions.Add(new ComponentValueReader
-                                (part, TypeMatcher.CreateTypeMatcher(vals[0], evt, entity)));
+                            if ("scene" == vals[0])
+                            {
+                                expressions.Add(new ManagerValueReader(part, entity.Scene));
+                            }
+                            else
+                            {
+                                expressions.Add(new ComponentValueReader
+                                    (part, TypeMatcher.CreateTypeMatcher(vals[0], evt, entity)));
+                            }
                             break;
                         default:
                             //TODO make this a better exception
