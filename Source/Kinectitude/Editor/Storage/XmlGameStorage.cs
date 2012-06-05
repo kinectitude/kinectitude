@@ -422,12 +422,12 @@ namespace Kinectitude.Editor.Storage
         {
             XElement element = new XElement(
                 Constants.Component,
-                new XAttribute(Constants.Type, component.Descriptor.DisplayName)
+                new XAttribute(Constants.Type, component.Descriptor.ClassName)
             );
 
             foreach (Property property in component.Properties)
             {
-                XAttribute propertyAttribute = new XAttribute(property.Descriptor.DisplayName, property.ToString());
+                XAttribute propertyAttribute = new XAttribute(property.Descriptor.Name, property.ToString());
                 element.Add(propertyAttribute);
             }
             return element;

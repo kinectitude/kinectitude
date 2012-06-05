@@ -1,14 +1,15 @@
 ﻿using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Base;
 using Kinectitude.Editor.Models.Properties;
+using Kinectitude.Editor.Models.Plugins;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    internal sealed class PropertyViewModel : BaseModel
+    internal sealed class ComponentPropertyViewModel : BaseModel
     {
         private readonly Entity entity;
-        private readonly PropertyDescriptor descriptor;
-        private PropertyViewModel inheritedViewModel;
+        private readonly PluginDescriptor descriptor;
+        private ComponentPropertyViewModel inheritedViewModel;
         private Property property;
 
         public Property Property
@@ -21,6 +22,16 @@ namespace Kinectitude.Editor.ViewModels
             get { return descriptor.DisplayName; }
         }
 
+        public bool CanInherit
+        {
+            get { return true; }
+        }
+
+        public bool IsLocal
+        {
+            get { return !IsInherited; }
+        }
+
         public bool IsInherited
         {
             get { return null != inheritedViewModel && property == inheritedViewModel.Property; }
@@ -30,21 +41,23 @@ namespace Kinectitude.Editor.ViewModels
             }
         }
 
-        public object Value
+        public string Value
         {
-            get { return property; }
+            get { return property.ToString(); }
             set
             {
-                /*if (property.
-                bool success = property.TryParse(value);
-                if (success)
+                if (!IsInherited)
                 {
-                    RaisePropertyChanged("Value");
-                }*/
+                    bool success = property.TryParse(value);
+                    if (success)
+                    {
+                        RaisePropertyChanged("Value");
+                    }
+                }
             }
         }
 
-        public PropertyViewModel(Entity entity, PropertyDescriptor descriptor)
+        public ComponentPropertyViewModel(Entity entity, string name, PluginDescriptor descriptor)
         {
             this.entity = entity;
             this.descriptor = descriptor;

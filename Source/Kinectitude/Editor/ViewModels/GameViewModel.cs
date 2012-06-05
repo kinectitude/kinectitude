@@ -15,9 +15,8 @@ namespace Kinectitude.Editor.ViewModels
     {
         public const string DefaultName = "Untitled Game";
 
+        private int autoIncrement;
         private string fileName;
-        private string stagedAttributeKey;
-        private string stagedAttributeValue;
         private readonly Game game;
         private readonly ObservableCollection<AttributeViewModel> _attributes;
         private readonly ObservableCollection<EntityViewModel> _prototypes;
@@ -147,32 +146,6 @@ namespace Kinectitude.Editor.ViewModels
             get { return scenes; }
         }
 
-        public string StagedAttributeKey
-        {
-            get { return stagedAttributeKey; }
-            set
-            {
-                if (stagedAttributeKey != value)
-                {
-                    stagedAttributeKey = value;
-                    RaisePropertyChanged("StagedAttributeKey");
-                }
-            }
-        }
-
-        public string StagedAttributeValue
-        {
-            get { return stagedAttributeValue; }
-            set
-            {
-                if (stagedAttributeValue != value)
-                {
-                    stagedAttributeValue = value;
-                    RaisePropertyChanged("StagedAttributeValue");
-                }
-            }
-        }
-
         public ICommand AddAttributeCommand
         {
             get { return new DelegateCommand(null, ExecuteAddAttributeCommand); }
@@ -248,13 +221,8 @@ namespace Kinectitude.Editor.ViewModels
 
         public void ExecuteAddAttributeCommand(object parameter)
         {
-            AttributeViewModel attribute = AttributeViewModel.GetViewModel(game, stagedAttributeKey);
-            attribute.Value = stagedAttributeValue;
-
+            AttributeViewModel attribute = AttributeViewModel.GetViewModel(game, string.Format("attribute{0}", autoIncrement++));
             AddAttribute(attribute);
-
-            StagedAttributeKey = null;
-            StagedAttributeValue = null;
         }
 
         public void ExecuteRemoveAttributeCommand(object parameter)

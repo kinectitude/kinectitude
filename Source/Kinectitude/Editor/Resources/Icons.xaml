@@ -11,6 +11,7 @@
     <ImageSource x:Key="icoPaste">..\Icons\page_paste.png</ImageSource>
     <ImageSource x:Key="icoUndo">..\Icons\arrow_undo.png</ImageSource>
     <ImageSource x:Key="icoRedo">..\Icons\arrow_redo.png</ImageSource>
+    <ImageSource x:Key="icoClose">..\Icons\bullet_toggle_minus.png</ImageSource>
     
     <!-- Library Icons -->
     
@@ -22,7 +23,7 @@
     
     <!-- Library Commands -->
     
-    <ImageSource x:Key="icoDelete">..\Icons\delete.png</ImageSource>
+    <ImageSource x:Key="icoDelete">..\Icons\bin_closed.png</ImageSource>
     <ImageSource x:Key="icoNewScene">..\Icons\film_add.png</ImageSource>
     
     <!-- Plugins -->
@@ -34,5 +35,7 @@
     <!-- Details Viewer -->
     
     <ImageSource x:Key="icoLocked">..\Icons\lock.png</ImageSource>
+    <ImageSource x:Key="icoAddComponent">..\Icons\cog_add.png</ImageSource>
+    <ImageSource x:Key="icoAddAttribute">..\Icons\tag.png</ImageSource>
     
 </ResourceDictionary>

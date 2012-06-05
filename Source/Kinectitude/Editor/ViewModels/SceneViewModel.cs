@@ -30,8 +30,7 @@ namespace Kinectitude.Editor.ViewModels
             return sceneViewModel;
         }
 
-        private string stagedAttributeKey;
-        private string stagedAttributeValue;
+        private int autoIncrement;
         private EntityViewModel currentEntity;
         private readonly Scene scene;
         private readonly ObservableCollection<AttributeViewModel> _attributes;
@@ -75,32 +74,6 @@ namespace Kinectitude.Editor.ViewModels
             get { return entities; }
         }
 
-        public string StagedAttributeKey
-        {
-            get { return stagedAttributeKey; }
-            set
-            {
-                if (stagedAttributeKey != value)
-                {
-                    stagedAttributeKey = value;
-                    RaisePropertyChanged("StagedAttributeKey");
-                }
-            }
-        }
-
-        public string StagedAttributeValue
-        {
-            get { return stagedAttributeValue; }
-            set
-            {
-                if (stagedAttributeValue != value)
-                {
-                    stagedAttributeValue = value;
-                    RaisePropertyChanged("StagedAttributeValue");
-                }
-            }
-        }
-
         public ICommand AddAttributeCommand
         {
             get { return new DelegateCommand(null, ExecuteAddAttributeCommand); }
@@ -127,13 +100,8 @@ namespace Kinectitude.Editor.ViewModels
 
         public void ExecuteAddAttributeCommand(object parameter)
         {
-            AttributeViewModel attribute = AttributeViewModel.GetViewModel(scene, stagedAttributeKey);
-            attribute.Value = stagedAttributeValue;
-
+            AttributeViewModel attribute = AttributeViewModel.GetViewModel(scene, string.Format("attribute{0}", autoIncrement++));
             AddAttribute(attribute);
-
-            StagedAttributeKey = null;
-            StagedAttributeValue = null;
         }
 
         public void ExecuteRemoveAttributeCommand(object parameter)

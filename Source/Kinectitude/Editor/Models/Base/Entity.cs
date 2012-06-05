@@ -80,25 +80,20 @@ namespace Kinectitude.Editor.Models.Base
             events.Remove(evt);
         }
 
-        public Component GetComponent(string name)
+        public Component GetComponent(PluginDescriptor descriptor)
         {
-            Component component = null;
-            if (components.ContainsKey(name))
+            Component ret = null;
+
+            foreach (Component component in components.Values)
             {
-                component = components[name];
-            }
-            else
-            {
-                foreach (Entity prototype in Prototypes)
+                if (component.Descriptor == descriptor)
                 {
-                    component = prototype.GetComponent(name);
-                    if (null != component)
-                    {
-                        break;
-                    }
+                    ret = component;
+                    break;
                 }
             }
-            return component;
+
+            return ret;
         }
     }
 }

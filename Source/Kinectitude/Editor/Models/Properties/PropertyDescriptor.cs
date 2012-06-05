@@ -9,12 +9,17 @@ namespace Kinectitude.Editor.Models.Properties
     {
         public enum PropertyType
         {
-            Text,
+            String,
             Integer,
-            Real,
+            Double,
+            Long,
             Boolean,
+            Color,
+            Range,
             Enumeration,
             Expression,
+            Writer,
+            Selector,
             Asset
         }
 
@@ -69,7 +74,7 @@ namespace Kinectitude.Editor.Models.Properties
 
             if (propertyType == typeof(string))
             {
-                type = PropertyType.Text;
+                type = PropertyType.String;
             }
             else if (propertyType == typeof(int))
             {
@@ -77,7 +82,7 @@ namespace Kinectitude.Editor.Models.Properties
             }
             else if (propertyType == typeof(double))
             {
-                type = PropertyType.Real;
+                type = PropertyType.Double;
             }
             else if (propertyType == typeof(bool))
             {

@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Kinectitude\Tests\Tests.csproj", "{A9460993-CBC4-4A42-A124-AE59AE3AD9FD}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BE25F5D8-951B-4B28-B691-16EFA14B2EC8}"
 	ProjectSection(SolutionItems) = preProject
 		Kinectitude.Test.vsmdi = Kinectitude.Test.vsmdi
@@ -14,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinectitude.Editor", "Kinec
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinectitude.Core", "Kinectitude\Core\Kinectitude.Core.csproj", "{AEAB17EC-574C-4177-9204-FE48F4C3F429}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Kinectitude\Tests\Tests.csproj", "{DC554843-9746-4806-B8AC-8DE3C1474320}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Kinectitude.Test.vsmdi
@@ -24,12 +24,8 @@ Global
 		Test|x86 = Test|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A9460993-CBC4-4A42-A124-AE59AE3AD9FD}.Test|Any CPU.ActiveCfg = Test|Any CPU
-		{A9460993-CBC4-4A42-A124-AE59AE3AD9FD}.Test|Any CPU.Build.0 = Test|Any CPU
-		{A9460993-CBC4-4A42-A124-AE59AE3AD9FD}.Test|Mixed Platforms.ActiveCfg = Test|Any CPU
-		{A9460993-CBC4-4A42-A124-AE59AE3AD9FD}.Test|Mixed Platforms.Build.0 = Test|Any CPU
-		{A9460993-CBC4-4A42-A124-AE59AE3AD9FD}.Test|x86.ActiveCfg = Test|Any CPU
 		{541AF93B-398E-463E-9C11-BC957BE0DB19}.Test|Any CPU.ActiveCfg = Test|x86
+		{541AF93B-398E-463E-9C11-BC957BE0DB19}.Test|Any CPU.Build.0 = Test|x86
 		{541AF93B-398E-463E-9C11-BC957BE0DB19}.Test|Mixed Platforms.ActiveCfg = Test|x86
 		{541AF93B-398E-463E-9C11-BC957BE0DB19}.Test|Mixed Platforms.Build.0 = Test|x86
 		{541AF93B-398E-463E-9C11-BC957BE0DB19}.Test|x86.ActiveCfg = Test|x86
@@ -39,6 +35,11 @@ Global
 		{AEAB17EC-574C-4177-9204-FE48F4C3F429}.Test|Mixed Platforms.ActiveCfg = Test|Any CPU
 		{AEAB17EC-574C-4177-9204-FE48F4C3F429}.Test|Mixed Platforms.Build.0 = Test|Any CPU
 		{AEAB17EC-574C-4177-9204-FE48F4C3F429}.Test|x86.ActiveCfg = Test|Any CPU
+		{DC554843-9746-4806-B8AC-8DE3C1474320}.Test|Any CPU.ActiveCfg = Test|Any CPU
+		{DC554843-9746-4806-B8AC-8DE3C1474320}.Test|Any CPU.Build.0 = Test|Any CPU
+		{DC554843-9746-4806-B8AC-8DE3C1474320}.Test|Mixed Platforms.ActiveCfg = Test|Any CPU
+		{DC554843-9746-4806-B8AC-8DE3C1474320}.Test|Mixed Platforms.Build.0 = Test|Any CPU
+		{DC554843-9746-4806-B8AC-8DE3C1474320}.Test|x86.ActiveCfg = Test|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

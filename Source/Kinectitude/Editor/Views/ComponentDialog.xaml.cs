@@ -15,11 +15,11 @@ using Kinectitude.Editor.ViewModels;
 namespace Kinectitude.Editor.Views
 {
     /// <summary>
-    /// Interaction logic for EntityDialog.xaml
+    /// Interaction logic for ComponentDialog.xaml
     /// </summary>
-    public partial class EntityDialog : Window
+    public partial class ComponentDialog : Window
     {
-        public EntityDialog()
+        public ComponentDialog()
         {
             InitializeComponent();
         }

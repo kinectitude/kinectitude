@@ -24,25 +24,29 @@ namespace Kinectitude.Editor.Models.Plugins
             properties = new SortedDictionary<string, Property>();
         }
 
-        public virtual T GetProperty<T>(string name) where T : Property
+        public T GetProperty<T>(string name) where T : Property
         {
-            return properties.ContainsKey(name) ? properties[name] as T : null;
+            Property ret;
+            properties.TryGetValue(name, out ret);
+            return ret as T;
         }
 
         public void SetProperty(string name, string value)
         {
-            if (!properties.ContainsKey(name))
+            Property property;
+            properties.TryGetValue(name, out property);
+
+            if (null == property)
             {
-                Property property = Property.CreateProperty(descriptor.GetPropertyDescriptor(name));
+                property = Property.CreateProperty(descriptor.GetPropertyDescriptor(name));
                 if (null != property)
                 {
                     properties[name] = property;
                 }
             }
 
-            if (properties.ContainsKey(name))
+            if (null != property)
             {
-                Property property = properties[name];
                 property.TryParse(value);
             }
         }

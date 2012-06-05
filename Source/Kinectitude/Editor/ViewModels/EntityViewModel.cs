@@ -8,6 +8,8 @@ using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Commands.Base;
 using Kinectitude.Editor.Commands.Entity;
 using Kinectitude.Editor.Models.Base;
+using Kinectitude.Editor.Models.Plugins;
+using Kinectitude.Editor.Views;
 
 namespace Kinectitude.Editor.ViewModels
 {
@@ -58,6 +60,8 @@ namespace Kinectitude.Editor.ViewModels
             return viewModel;
         }
 
+        private int autoIncrement;
+        private PluginViewModel selectedComponent;
         private readonly Entity entity;
         private readonly ObservableCollection<EntityViewModel> _prototypes;
         private readonly ObservableCollection<EntityAttributeViewModel> _attributes;
@@ -67,8 +71,6 @@ namespace Kinectitude.Editor.ViewModels
         private readonly ModelCollection<EntityAttributeViewModel> attributes;
         private readonly ModelCollection<ComponentViewModel> components;
         private readonly ModelCollection<EventViewModel> events;
-        private string stagedAttributeKey;
-        private string stagedAttributeValue;
 
         public event EventHandler<AttributeAvailableEventArgs> AttributeAvailable = delegate { };
 
@@ -104,6 +106,19 @@ namespace Kinectitude.Editor.ViewModels
         public ModelCollection<EventViewModel> Events
         {
             get { return events; }
+        }
+
+        public PluginViewModel SelectedComponent
+        {
+            get { return selectedComponent; }
+            set
+            {
+                if (selectedComponent != value)
+                {
+                    selectedComponent = value;
+                    RaisePropertyChanged("SelectedComponent");
+                }
+            }
         }
 
         /*public int X
@@ -248,32 +263,6 @@ namespace Kinectitude.Editor.ViewModels
             get { return prototypes; }
         }
 
-        public string StagedAttributeKey
-        {
-            get { return stagedAttributeKey; }
-            set
-            {
-                if (stagedAttributeKey != value)
-                {
-                    stagedAttributeKey = value;
-                    RaisePropertyChanged("StagedAttributeKey");
-                }
-            }
-        }
-
-        public string StagedAttributeValue
-        {
-            get { return stagedAttributeValue; }
-            set
-            {
-                if (stagedAttributeValue != value)
-                {
-                    stagedAttributeValue = value;
-                    RaisePropertyChanged("StagedAttributeValue");
-                }
-            }
-        }
-
         public ICommand AddAttributeCommand
         {
             get { return new DelegateCommand(null, ExecuteAddAttributeCommand); }
@@ -346,13 +335,8 @@ namespace Kinectitude.Editor.ViewModels
 
         public void ExecuteAddAttributeCommand(object parameter)
         {
-            EntityAttributeViewModel attribute = new EntityAttributeViewModel(entity, stagedAttributeKey);
-            attribute.Value = stagedAttributeValue;
-
+            EntityAttributeViewModel attribute = new EntityAttributeViewModel(entity, string.Format("attribute{0}", autoIncrement++));
             AddAttribute(attribute);
-
-            StagedAttributeKey = null;
-            StagedAttributeValue = null;
         }
 
         public void ExecuteRemoveAttributeCommand(object parameter)
@@ -366,7 +350,15 @@ namespace Kinectitude.Editor.ViewModels
 
         public void ExecuteAddComponentCommand(object parameter)
         {
-
+            ModalDialogService.ShowDialog<EntityViewModel>(ModalDialogService.Constants.ComponentDialog, this, (result, viewModel) =>
+            {
+                if (true == result)
+                {
+                    PluginDescriptor descriptor = selectedComponent.Descriptor;
+                    ComponentViewModel componentViewModel = new ComponentViewModel(entity, descriptor);
+                    viewModel.AddComponent(componentViewModel);
+                }
+            });
         }
 
         public void ExecuteRemoveComponentCommand(object parameter)
@@ -435,9 +427,28 @@ namespace Kinectitude.Editor.ViewModels
             PrivateRemovePrototype(entityViewModel);
         }
 
+        public void AddComponent(ComponentViewModel componentViewModel)
+        {
+            //CommandHistory.LogCommand(new AddComponentCommand(this, componentViewModel));
+            componentViewModel.AddComponent();
+            _components.Add(componentViewModel);
+        }
+
+        public void RemoveComponent(ComponentViewModel componentViewModel)
+        {
+            //CommandHistory.LogCommand(new RemoveComponentCommand(this, componentViewModel));
+            componentViewModel.RemoveComponent();
+            _components.Remove(componentViewModel);
+        }
+
         public EntityAttributeViewModel GetEntityAttributeViewModel(string key)
         {
             return attributes.FirstOrDefault(x => x.Key == key);
+        }
+
+        public ComponentViewModel GetComponentViewModel(PluginDescriptor descriptor)
+        {
+            return components.FirstOrDefault(x => x.Descriptor == descriptor);
         }
 
         private void PrivateAddPrototype(EntityViewModel prototype)
@@ -550,17 +561,32 @@ namespace Kinectitude.Editor.ViewModels
                 foreach (ComponentViewModel inheritedComponent in args.NewItems)
                 {
                     ComponentViewModel localComponent = _components.FirstOrDefault(x => x.Descriptor == inheritedComponent.Descriptor);
-                    if (null != localComponent)
+                    if (null == localComponent)
                     {
-                        _components.Remove(localComponent);
+                        _components.Add(new ComponentViewModel(entity, inheritedComponent.Descriptor));
+                    }
+                    else
+                    {
+                        // TODO: Tell component to resolve properties
                     }
                 }
             }
             else if (args.Action == NotifyCollectionChangedAction.Remove)
             {
-                foreach (ComponentViewModel component in args.OldItems)
+                foreach (ComponentViewModel inheritedComponent in args.OldItems)
                 {
-
+                    ComponentViewModel localComponent = _components.FirstOrDefault(x => x.Descriptor == inheritedComponent.Descriptor);
+                    if (null != localComponent)
+                    {
+                        if (localComponent.IsInherited)
+                        {
+                            _components.Remove(localComponent);
+                        }
+                        else
+                        {
+                            // TODO: Tell component to resolve properties
+                        }
+                    }
                 }
             }
         }

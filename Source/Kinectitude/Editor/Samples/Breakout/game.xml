@@ -1,67 +1,55 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Game xmlns="http://www.kinectitude.com" Name="Breakout" Width="800" Height="600" FirstScene="Game" IsFullScreen="false">
+<Game xmlns="http://www.kinectitude.com/2012/v1" Name="Breakout" Width="800" Height="600" FirstScene="Game" IsFullScreen="false">
 
-  <Using Path="Kinect.dll">
-    <Alias Name="KinectComponent" Class="Kinectitude.Kinect.KinectComponent" />
-    <Alias Name="KinectFollowComponent" Class="Kinectitude.Kinect.KinectFollowComponent" />
-    <Alias Name="KinectManager" Class="Kinectitude.Kinect.KinectManager" />
+  <Using File="Kinect.dll">
+    <Define Name="KinectComponent" Class="Kinectitude.Kinect.KinectComponent" />
+    <Define Name="KinectFollowComponent" Class="Kinectitude.Kinect.KinectFollowComponent" />
+    <Define Name="KinectManager" Class="Kinectitude.Kinect.KinectManager" />
   </Using>
 
-  <Using Path="Physics.dll">
-    <Alias Name="PhysicsComponent" Class="Kinectitude.Physics.PhysicsComponent" />
-    <Alias Name="PhysicsManager" Class="Kinectitude.Physics.PhysicsManager" />
-    <Alias Name="CrossesLineEvent" Class="Kinectitude.Physics.CrossesLineEvent" />
-    <Alias Name="ExitsLeftEvent" Class="Kinectitude.Physics.ExitsLeftEvent" />
-    <Alias Name="ExitsRightEvent" Class="Kinectitude.Physics.ExitsRightEvent" />
-    <Alias Name="SetPositionAction" Class="Kinectitude.Physics.SetPositionAction" />
+  <Using File="Physics.dll">
+    <Define Name="PhysicsComponent" Class="Kinectitude.Physics.PhysicsComponent" />
+    <Define Name="PhysicsManager" Class="Kinectitude.Physics.PhysicsManager" />
+    <Define Name="CrossesLineEvent" Class="Kinectitude.Physics.CrossesLineEvent" />
+    <Define Name="CollisionEvent" Class="Kinectitude.Physics.CollisionEvent" />
   </Using>
 
-  <Using Path="Render.dll">
-    <Alias Name="RenderComponent" Class="Kinectitude.Render.RenderComponent" />
-    <Alias Name="RenderManager" Class="Kinectitude.Render.RenderManager" />
-    <Alias Name="TextRenderComponent" Class="Kinectitude.Render.TextRenderComponent" />
-    <Alias Name="SetTextAction" Class="Kinectitude.Render.SetTextAction" />
+  <Using File="Render.dll">
+    <Define Name="RenderComponent" Class="Kinectitude.Render.RenderComponent" />
+    <Define Name="RenderManager" Class="Kinectitude.Render.RenderManager" />
+    <Define Name="TextRenderComponent" Class="Kinectitude.Render.TextRenderComponent" />
+    <Define Name="SetTextAction" Class="Kinectitude.Render.SetTextAction" />
   </Using>
 
-  <Entity Name="Background">
-    <Component Type="SpatialComponent" X="400" Y="300" Width="800" Height="600" />
+  <Prototype Name="Background">
+    <Component Type="TransformComponent" X="400" Y="300" Width="800" Height="600" />
     <Component Type="RenderComponent" FillColor="Black" Shape="Rectangle" />
-  </Entity>
+  </Prototype>
   
-  <Entity Name="Brick">
-    
-    <Component Type="SpatialComponent" Width="50" Height="16" />
+  <Prototype Name="Brick">
+    <Component Type="TransformComponent" Width="50" Height="16" />
     <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Rectangle" />
     <Component Type="PhysicsComponent" Dx="0" Dy="0" />
-    
-    <Event Type="CollidesEvent" Other="!Ball">
+    <Event Type="CollisionEvent" Other="!Ball">
       <Action Type="DestroyAction" />
       <Action Type="FireTriggerAction" Trigger="BrickDestroyed" />
     </Event>
-    
-  </Entity>
+  </Prototype>
 
-  <Entity Name="Paddle">
-
-    <Attribute Key="score" Value="0" />
-    
-    <Component Type="SpatialComponent" X="400" Y="775" Width="50" Height="16" />
+  <Prototype Name="Paddle" score="0">
+    <Component Type="TransformComponent" X="400" Y="775" Width="50" Height="16" />
     <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Rectangle" />
     <Component Type="PhysicsComponent" Dx="0" Dy="0" />
-
-    <Event Type="TriggerOccursAction" Trigger="BrickDestroyed">
+    <Event Type="TriggerOccursEvent" Trigger="BrickDestroyed">
       <Action Type="IncrementAction" Key="score" />
     </Event>
-    
-  </Entity>
+  </Prototype>
 
-  <Entity Name="Ball">
-    
-    <Component Type="SpatialComponent" X="400" Y="750" Width="16" Height="16" />
+  <Prototype Name="Ball">
+    <Component Type="TransformComponent" X="400" Y="750" Width="16" Height="16" />
     <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Ellipse" />
     <Component Type="PhysicsComponent" Dx="6" Dy="-6" />
-    
-  </Entity>
+  </Prototype>
 
   <Scene Name="Game">
 
@@ -70,7 +58,7 @@
     </Entity>
     
     <Entity Prototype="Brick">
-      <Component Type="SpatialComponent" X="50" Y="50" />
+      <Component Type="TransformComponent" X="50" Y="50" />
     </Entity>
 
     <Entity Prototype="Ball" />

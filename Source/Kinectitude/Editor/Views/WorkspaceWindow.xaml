@@ -6,7 +6,7 @@
         Title="Kinectitude Editor v1.0 Beta"
         Name="window"
         WindowState="Maximized"
-        DataContext="{StaticResource workspace}"
+        DataContext="{Binding Source={x:Static vm:Workspace.Instance}}"
         UseLayoutRounding="True">
 
     <Window.InputBindings>
@@ -16,6 +16,10 @@
     
     <DockPanel>
 
+        <StatusBar DockPanel.Dock="Bottom" Padding="4,0,4,4">
+            <TextBlock Text="{Binding Game.FileName}" />
+        </StatusBar>
+        
         <Menu DockPanel.Dock="Top" Background="Transparent">
             <MenuItem Header="_File">
                 <MenuItem Header="_New Game" Command="{Binding NewCommand, Mode=OneWay}" InputGestureText="Ctrl+N" />
@@ -70,7 +74,9 @@
                         <DataTemplate>
                             <DockPanel MinWidth="64">
                                 <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
-                                <Button HorizontalAlignment="Right" Margin="3" Width="16" Height="16" Command="{Binding ElementName=window, Path=DataContext.CloseItemCommand}" CommandParameter="{Binding}">x</Button>
+                                <Button HorizontalAlignment="Right" Margin="8,4,0,2" Width="16" Height="16" Command="{Binding ElementName=window, Path=DataContext.CloseItemCommand}" CommandParameter="{Binding}">
+                                    <Image Source="{StaticResource icoClose}" />
+                                </Button>
                             </DockPanel>
                         </DataTemplate>
                     </TabControl.ItemTemplate>
@@ -107,7 +113,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <DockPanel>
+                <DockPanel Grid.Row="0">
                     <Border DockPanel.Dock="Bottom" Padding="0,4,4,0">
                         <StackPanel Orientation="Horizontal">
                             <Button ToolTip="Delete" Margin="0,0,4,0" Command="{Binding Game.DeleteItemCommand, Mode=OneWay}" CommandParameter="{Binding ElementName=treGame, Path=SelectedItem}">
@@ -188,7 +194,6 @@
                 <DockPanel x:Name="dockDetails" Grid.Row="2" DataContext="{Binding CurrentItem}">
                     <DockPanel.Resources>
                         <CompositeCollection x:Key="detailsCollection">
-                            <CollectionContainer Collection="{Binding DataContext.Components, Source={x:Reference dockDetails}}" />
                             <Expander IsExpanded="True">
                                 <Expander.Header>
                                     <Border Padding="8">
@@ -197,26 +202,13 @@
                                 </Expander.Header>
                                 <Expander.Content>
                                     <DockPanel>
-                                        <Border DockPanel.Dock="Top" Padding="0,4,4,0">
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBox Text="{Binding StagedAttributeKey}" Width="80" />
-                                                <TextBox Text="{Binding StagedAttributeValue}" Width="80" />
-                                            </StackPanel>
-                                        </Border>
-                    
-                                        <Border DockPanel.Dock="Bottom" Padding="0,4,4,0">
-                                            <StackPanel Orientation="Horizontal">
-                                                <Button Command="{Binding AddAttributeCommand}">Add Attribute</Button>
-                                                <Button Command="{Binding RemoveAttributeCommand}" CommandParameter="{Binding ElementName=lstAttributes, Path=SelectedItem}">Delete Attribute</Button>
-                                            </StackPanel>
-                                        </Border>
 
                                         <ListBox Name="lstAttributes" ItemsSource="{Binding Attributes}" HorizontalContentAlignment="Stretch">
                                             <ListBox.ItemTemplate>
                                                 <DataTemplate>
                                                     <Grid HorizontalAlignment="Stretch">
                                                         <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="90" />
+                                                            <ColumnDefinition Width="0.5*" />
                                                             <ColumnDefinition Width="24" />
                                                             <ColumnDefinition Width="*" />
                                                         </Grid.ColumnDefinitions>
@@ -232,6 +224,7 @@
                                     </DockPanel>
                                 </Expander.Content>
                             </Expander>
+                            <CollectionContainer Collection="{Binding DataContext.Components, Source={x:Reference dockDetails}}" />
                         </CompositeCollection>
                         <DataTemplate DataType="{x:Type vm:ComponentViewModel}">
                             <Expander IsExpanded="True">
@@ -241,13 +234,19 @@
                                     </Border>
                                 </Expander.Header>
                                 <Expander.Content>
-                                    <ListBox ItemsSource="{Binding Properties}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <ListBox ItemsSource="{Binding Properties}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="{Binding Name}" />
-                                                    <TextBlock Text="{Binding Value}" />
-                                                </StackPanel>
+                                                <Grid HorizontalAlignment="Stretch">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="0.5*" />
+                                                        <ColumnDefinition Width="24" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding Name}" Grid.Column="0" />
+                                                    <CheckBox IsChecked="{Binding IsInherited}" IsEnabled="{Binding CanInherit}" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                                    <TextBox IsEnabled="{Binding IsLocal}" Text="{Binding Value}" Grid.Column="2" />
+                                                </Grid>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
                                     </ListBox>
@@ -255,7 +254,21 @@
                             </Expander>
                         </DataTemplate>
                     </DockPanel.Resources>
-                    
+
+                    <Border DockPanel.Dock="Bottom" Padding="0,4,4,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Button ToolTip="Delete" Margin="0,0,4,0">
+                                <Image Source="{StaticResource icoDelete}" Stretch="None" />
+                            </Button>
+                            <Button ToolTip="Add Component" Margin="0,0,4,0" Command="{Binding AddComponentCommand, Mode=OneWay}">
+                                <Image Source="{StaticResource icoAddComponent}" Stretch="None" />
+                            </Button>
+                            <Button ToolTip="Add Attribute" Margin="0,0,4,0" Command="{Binding AddAttributeCommand, Mode=OneWay}">
+                                <Image Source="{StaticResource icoAddAttribute}" Stretch="None" />
+                            </Button>
+                        </StackPanel>
+                    </Border>
+
                     <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
                         <ItemsControl ItemsSource="{StaticResource detailsCollection}" />
                     </ScrollViewer>

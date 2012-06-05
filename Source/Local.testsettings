@@ -25,7 +25,8 @@
           <Configuration>
             <CodeCoverage xmlns="">
               <Regular>
-                <CodeCoverageItem binaryFile="C:\Users\Brandon\Development\Kinectitude\Build\Debug\Kinectitude.Editor.exe" pdbFile="C:\Users\Brandon\Development\Kinectitude\Build\Debug\Kinectitude.Editor.pdb" instrumentInPlace="true" />
+                <CodeCoverageItem binaryFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Editor.exe" pdbFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Editor.instr.pdb" instrumentInPlace="true" />
+                <CodeCoverageItem binaryFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Core.dll" pdbFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Core.instr.pdb" instrumentInPlace="true" />
               </Regular>
             </CodeCoverage>
           </Configuration>

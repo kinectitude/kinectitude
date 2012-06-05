@@ -5,7 +5,7 @@ namespace Kinectitude.Editor.Commands.Property
 {
     internal sealed class SetPropertyValueCommand : IUndoableCommand
     {
-        private readonly PropertyViewModel property;
+        private readonly ComponentPropertyViewModel property;
         private readonly object newValue;
         private readonly object oldValue;
 
@@ -14,7 +14,7 @@ namespace Kinectitude.Editor.Commands.Property
             get { return string.Format("Set '{0}' Value", property.Name); }
         }
 
-        public SetPropertyValueCommand(PropertyViewModel property, object newValue)
+        public SetPropertyValueCommand(ComponentPropertyViewModel property, object newValue)
         {
             this.property = property;
             this.newValue = newValue;
@@ -23,12 +23,12 @@ namespace Kinectitude.Editor.Commands.Property
 
         public void Execute()
         {
-            property.Value = newValue;
+            //property.Value = newValue;
         }
 
         public void Unexecute()
         {
-            property.Value = oldValue;
+            //property.Value = oldValue;
         }
     }
 }

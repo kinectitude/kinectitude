@@ -175,9 +175,6 @@ namespace Kinectitude.Editor.ViewModels
                     {
                         FindInheritedViewModel();
                         RaisePropertyChanged("IsInherited");
-                        //RaisePropertyChanged("CanInherit");
-                        //RaisePropertyChanged("Key");
-                        //RaisePropertyChanged("Value");
                     }
                 }
                 else
@@ -202,13 +199,5 @@ namespace Kinectitude.Editor.ViewModels
                 entity.RemoveAttribute(attribute);
             }
         }
-
-        /*public void OnAttributeAvailable(object sender, EventArgs<string> args)
-        {
-            if (args.Value == Key)
-            {
-                FindInheritedViewModel();
-            }
-        }*/
     }
 }

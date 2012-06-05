@@ -15,10 +15,6 @@
 
             <v:FolderConverter x:Key="folderConverter" />
             
-            <v:DetailsConverter x:Key="detailsConverter" />
-            
-            <vm:Workspace x:Key="workspace" />
-            
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -31,7 +31,7 @@ namespace Kinectitude.Editor.Models.Properties
 
             if (null != descriptor)
             {
-                if (descriptor.Type == PropertyDescriptor.PropertyType.Text)
+                if (descriptor.Type == PropertyDescriptor.PropertyType.String)
                 {
                     property = new TextProperty(descriptor);
                 }
@@ -39,7 +39,7 @@ namespace Kinectitude.Editor.Models.Properties
                 {
                     property = new IntegerProperty(descriptor);
                 }
-                else if (descriptor.Type == PropertyDescriptor.PropertyType.Real)
+                else if (descriptor.Type == PropertyDescriptor.PropertyType.Double)
                 {
                     property = new RealProperty(descriptor);
                 }

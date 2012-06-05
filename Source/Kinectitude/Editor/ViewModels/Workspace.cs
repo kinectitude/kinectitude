@@ -17,6 +17,20 @@ namespace Kinectitude.Editor.ViewModels
 {
     internal sealed class Workspace : BaseModel, IPluginNamespace
     {
+        private static Workspace instance;
+
+        public static Workspace Instance
+        {
+            get
+            {
+                if (null == instance)
+                {
+                    instance = new Workspace();
+                }
+                return instance;
+            }
+        }
+        
         public const string PluginDirectory = "Plugins";
 
         private readonly List<PluginViewModel> plugins;
@@ -85,6 +99,11 @@ namespace Kinectitude.Editor.ViewModels
             get { return plugins; }
         }
 
+        public IEnumerable<PluginViewModel> ComponentPlugins
+        {
+            get { return plugins.Where(x => x.Descriptor.Type == PluginDescriptor.PluginType.Component); }
+        }
+
         public BaseModel CurrentItem
         {
             get { return currentItem; }
@@ -128,7 +147,7 @@ namespace Kinectitude.Editor.ViewModels
             get { return CommandHistory.RedoableCommands; }
         }
 
-        public Workspace()
+        private Workspace()
         {
             plugins = new List<PluginViewModel>();
 

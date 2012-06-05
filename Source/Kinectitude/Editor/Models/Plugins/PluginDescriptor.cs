@@ -16,11 +16,11 @@ namespace Kinectitude.Editor.Models.Plugins
             Action
         }
 
-        private readonly string className;
         private readonly string file;
+        private readonly string className;
         private readonly string displayName;
-        private readonly PluginType type;
         private readonly string description;
+        private readonly PluginType type;
         private readonly List<PropertyDescriptor> propertyDescriptors;
 
         public string ClassName

@@ -11,9 +11,15 @@ namespace Kinectitude.Editor.ViewModels
     {
         private readonly Entity entity;
         private readonly PluginDescriptor descriptor;
-        private readonly ObservableCollection<PropertyViewModel> _properties;
-        private readonly ModelCollection<PropertyViewModel> properties;
+        private readonly ObservableCollection<ComponentPropertyViewModel> _properties;
+        private readonly ModelCollection<ComponentPropertyViewModel> properties;
+        private ComponentViewModel inheritedViewModel;
         private Component component;
+
+        public Component Component
+        {
+            get { return component; }
+        }
 
         public string Name
         {
@@ -25,9 +31,19 @@ namespace Kinectitude.Editor.ViewModels
             get { return descriptor; }
         }
 
-        public IEnumerable<PropertyViewModel> Properties
+        public IEnumerable<ComponentPropertyViewModel> Properties
         {
             get { return properties; }
+        }
+
+        public bool IsInherited
+        {
+            get { return null != inheritedViewModel && inheritedViewModel.Component == component; }
+        }
+
+        public bool IsLocal
+        {
+            get { return !IsInherited; }
         }
 
         public ComponentViewModel(Entity entity, PluginDescriptor descriptor)
@@ -35,9 +51,48 @@ namespace Kinectitude.Editor.ViewModels
             this.entity = entity;
             this.descriptor = descriptor;
 
-            var propertyViewModels = from propertyDescriptor in descriptor.PropertyDescriptors select new PropertyViewModel(entity, propertyDescriptor);
-            _properties = new ObservableCollection<PropertyViewModel>(propertyViewModels);
-            properties = new ModelCollection<PropertyViewModel>(_properties);
+            component = entity.GetComponent(descriptor);
+
+            if (null == component)
+            {
+                foreach (Entity prototype in entity.Prototypes)
+                {
+                    EntityViewModel prototypeViewModel = EntityViewModel.GetViewModel(prototype);
+                    ComponentViewModel inheritedComponentViewModel = prototypeViewModel.GetComponentViewModel(descriptor);
+
+                    if (null != inheritedComponentViewModel)
+                    {
+                        inheritedViewModel = inheritedComponentViewModel;
+                        component = inheritedViewModel.Component;
+                        break;
+                    }
+                }
+            }
+
+            if (null == component)
+            {
+                component = new Component(descriptor);
+            }
+
+            //var propertyViewModels = from propertyDescriptor in descriptor.PropertyDescriptors select new ComponentPropertyViewModel(entity, propertyDescriptor);
+            //_properties = new ObservableCollection<ComponentPropertyViewModel>(propertyViewModels);
+            //properties = new ModelCollection<ComponentPropertyViewModel>(_properties);
+        }
+
+        public void AddComponent()
+        {
+            if (IsLocal)
+            {
+                entity.AddComponent(component);
+            }
+        }
+
+        public void RemoveComponent()
+        {
+            if (IsLocal)
+            {
+                entity.RemoveComponent(component);
+            }
         }
     }
 }
