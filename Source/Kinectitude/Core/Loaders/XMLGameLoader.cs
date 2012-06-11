@@ -2,19 +2,34 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
+using System.Xml.Schema;
 
 namespace Kinectitude.Core.Loaders
 {
     internal class XMLGameLoader : GameLoader
     {
-        internal const string EventName = "Event";
-        internal const string TriggerName = "Trigger";
-        internal const string ComponentName = "Component";
-        internal const string UsingName = "Using";
-        internal const string DefineName = "Define";
-        internal const string PrototypeName = "Prototype";
-        internal const string SceneName = "Scene";
+
+        internal static readonly XNamespace Namespace = "http://www.kinectitude.com/2012/v1";
+
+        internal static readonly XName EventName = Namespace + "Event";
+        internal static readonly XName TriggerName = Namespace + "Trigger";
+        internal static readonly XName ComponentName = Namespace + "Component";
+        internal static readonly XName UsingName = Namespace +  "Using";
+        internal static readonly XName DefineName = Namespace + "Define";
+        internal static readonly XName PrototypeName = Namespace + "Prototype";
+        internal static readonly XName SceneName = Namespace + "Scene";
+
+        private static readonly XmlSchemaSet schemas = new XmlSchemaSet();
+
+
+        static XMLGameLoader()
+        {
+            Stream schemaStream =
+                typeof(XMLGameLoader).Assembly.GetManifestResourceStream("Kinectitude.Core.Loaders.schema.xsd");
+            schemas.Add(null, new XmlTextReader(schemaStream));
+        }
 
         internal Dictionary<string, XElement> Prototypes { get; private set; }
         
@@ -36,15 +51,27 @@ namespace Kinectitude.Core.Loaders
         internal XMLGameLoader(string fileName)
         {
             Prototypes = new Dictionary<string, XElement>();
-            XElement root = XElement.Load(Path.Combine(Environment.CurrentDirectory, fileName));
+
+            XDocument document = XDocument.Load(Path.Combine(Environment.CurrentDirectory, fileName));
+            XElement root = document.Root;
+            
+            document.Validate(schemas, (o, e) => { throw new ArgumentException("Invalid Kinectitude XML file."); });
+
             IEnumerable<XAttribute> rootAttribs = root.Attributes();
             foreach (XAttribute attrib in rootAttribs)
             {
-                if (attrib.Name.ToString() == "FirstScene")
+                switch (attrib.Name.ToString())
                 {
-                    FirstScene = attrib.Value;
+                    case "FirstScene":
+                        FirstScene = attrib.Value;
+                        break;
+                    case "Name":
+                        Game.Name = attrib.Value;
+                        break;
+                    default:
+                        Game[attrib.Name.ToString()] = attrib.Value;
+                        break;
                 }
-                Game[attrib.Name.ToString()] = attrib.Value;
             }
 
             foreach (XElement node in root.Elements().Where(input => UsingName == input.Name))

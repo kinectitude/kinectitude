@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using Kinectitude.Core.Base;
+using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Loaders
 {
     internal class XMLSceneLoader : SceneLoader
-    {
-
-        internal const string EntityName = "Entity";
-        internal const string ActionName = "Action";
-        internal const string ConditionName = "Condition";
-        internal const string ManagerName = "Manager";
+    {        
+        internal static readonly XName EntityName = XMLGameLoader.Namespace + "Entity";
+        internal static readonly XName ActionName = XMLGameLoader.Namespace + "Action";
+        internal static readonly XName ConditionName = XMLGameLoader.Namespace + "Condition";
+        internal static readonly XName ManagerName = XMLGameLoader.Namespace + "Manager";
 
         private int onid = 0;
         XMLGameLoader xmlGameLoader;
@@ -24,11 +24,14 @@ namespace Kinectitude.Core.Loaders
             foreach (XAttribute attrib in scene.Attributes())
             {
                 string attribName = attrib.Name.ToString();
-                if("Name" == attribName)
+                if ("Name" == attribName)
                 {
                     Scene.Name = attrib.Value;
                 }
-                Scene[attribName] = attrib.Value;
+                else
+                {
+                    Scene[attribName] = attrib.Value;
+                }
             }
 
             foreach (XElement e in scene.Elements().Where(input => ManagerName == input.Name))
@@ -149,8 +152,8 @@ namespace Kinectitude.Core.Loaders
                 }
                 else if ("Name" == attrib.Name)
                 {
-                    entity.Name = attrib.Value;
-                    EntityByName.Add(attrib.Value, entity);
+                    entity.Name = "";
+                    continue;
                 }
                 else
                 {
@@ -211,37 +214,33 @@ namespace Kinectitude.Core.Loaders
 
         private void entityParse(XElement e, Entity entity)
         {
-            foreach (XElement node in e.Elements())
+
+
+
+            foreach (XElement node in e.Elements().Where(element => element.Name == XMLGameLoader.ComponentName))
             {
-                switch (node.Name.ToString())
+                string stringType = (string)node.Attribute("Type");
+
+                List<Tuple<string, string>> values = new List<Tuple<string, string>>();
+
+                foreach (XAttribute attrib in node.Attributes())
                 {
-                    case "#comment":
+                    if ("Type" == attrib.Name)
+                    {
                         continue;
-                    case XMLGameLoader.EventName:
-                        Event evt = createEvent(Game, node, entity);
-                        evt.Initialize();
-                        break;
-                    case XMLGameLoader.ComponentName:
-                        string stringType = (string)node.Attribute("Type");
-
-                        List<Tuple<string, string>> values = new List<Tuple<string, string>>();
-
-                        foreach (XAttribute attrib in node.Attributes())
-                        {
-                            if ("Type" == attrib.Name)
-                            {
-                                continue;
-                            }
-                            string value = attrib.Value;
-                            string param = attrib.Name.ToString();
-                            Tuple<string, string> t = new Tuple<string, string>(param, value);
-                            values.Add(t);
-                        }
-                        Scene.CreateComponent(entity, stringType, values);
-                        break;
-                    default:
-                        throw new Exception("Unknown type");
+                    }
+                    string value = attrib.Value;
+                    string param = attrib.Name.ToString();
+                    Tuple<string, string> t = new Tuple<string, string>(param, value);
+                    values.Add(t);
                 }
+                Scene.CreateComponent(entity, stringType, values);
+            }
+
+            foreach (XElement node in e.Elements().Where(element => element.Name == XMLGameLoader.EventName))
+            {
+                Event evt = createEvent(Game, node, entity);
+                evt.Initialize();
             }
         }
 
@@ -266,7 +265,8 @@ namespace Kinectitude.Core.Loaders
 
         private Condition createCondition(Game game, Event e, XElement node)
         {
-            Condition c = Condition.CreateCondition((string)node.Attribute("If"), e, e.Entity);
+            BoolExpressionReader br = new BoolExpressionReader((string)node.Attribute("If"), e, e.Entity);
+            Condition c = new Condition(br);
             AddActions(game, node, e, c);
             return c;
         }

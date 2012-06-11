@@ -13,11 +13,16 @@ namespace Kinectitude.Core.Data
         /// </summary>
         /// <param name="entity">The entity to check</param>
         /// <returns>If the entity matches the type that ITypeMatcher holds</returns>
-        bool MatchAndSet(IDataContainer entity);
+        bool MatchAndSet(IEntity entity);
 
         /// <summary>
-        /// Returns the name of the last matched IDataContainer
+        /// Returns the name of the last matched IEntity
         /// </summary>
         string NameOfLastMatch { get; }
+
+        /// <summary>
+        /// Returns the unique id of the last matched IEntity
+        /// </summary>
+        int IdOfLastMatch { get; }
     }
 }

@@ -13,11 +13,6 @@ namespace Kinectitude.Core.Base
         private readonly Dictionary<Type, Service> services = new Dictionary<Type, Service>();
 
         internal static Game CurrentGame { get; private set; }
-
-        public new string Name
-        {
-            get { return this["name"] ?? string.Empty; }
-        }
         
         public int Width
         {

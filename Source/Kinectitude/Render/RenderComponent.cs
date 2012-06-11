@@ -2,7 +2,6 @@
 using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Components;
-using SlimDX;
 using SlimDX.Direct2D;
 using RenderTarget = SlimDX.Direct2D.RenderTarget;
 

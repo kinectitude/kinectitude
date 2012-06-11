@@ -1,7 +1,7 @@
 ﻿using FarseerPhysics.Dynamics;
+using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Base;
 using Microsoft.Xna.Framework;
-using Kinectitude.Core.Attributes;
 
 namespace Kinectitude.Physics
 {

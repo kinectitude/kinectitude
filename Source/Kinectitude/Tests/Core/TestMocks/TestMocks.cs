@@ -79,4 +79,9 @@ namespace Kinectitude.Tests.Core.TestMocks
         }
     }
 
+    public class ManagerMock : Manager<Component>
+    {
+        [Plugin("", "")]
+        public string Value { get; set; }
+    }
 }

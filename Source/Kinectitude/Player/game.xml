@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<!--Game Name="pong" Width="800" Height="600" FirstScene="main" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1"-->
-<Game Name="pong" Width="800" Height="600" FirstScene="Main Menu" IsFullScreen="false">
+<Game Name="pong" Width="800" Height="600" FirstScene="Main Menu" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1">
 
   <Using File="Kinectitude.Kinect.dll">
     <Define Name="KinectFollowComponent" Class="Kinectitude.Kinect.KinectFollowComponent"/>
@@ -13,8 +12,8 @@
     <Define Name="CrossesLineEvent" Class="Kinectitude.Physics.CrossesLineEvent"/>
     <Define Name="CollisionEvent" Class="Kinectitude.Physics.CollisionEvent"/>
   </Using>
-
   <Using File="Kinectitude.Render.dll">
+
     <Define Name="RenderManager" Class="Kinectitude.Render.RenderManager"/>
     <Define Name="RenderComponent" Class="Kinectitude.Render.RenderComponent"/>
     <Define Name="TextRenderComponent" Class="Kinectitude.Render.TextRenderComponent"/>
@@ -39,7 +38,7 @@
 
   <Prototype Name="bar">
     <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Rectangle"/>
-    <Component Type="TransformComponent" Width="800" Height="10" X="400" Y="340"/>
+    <Component Type="TransformComponent" Width="800" Height="10" X="400" Y="440"/>
   </Prototype>
   
   <Prototype Name="ball" Value="0">
@@ -94,7 +93,7 @@
     <Component Type="TransformComponent" Y="100"/>
   </Prototype>
 
-  <Scene Name="Main Menu" numReadY="0" ready1="" ready2="">
+  <Scene Name="Main Menu" numReadY="0">
 
     <Entity Name="tennis">
       <Component Type="TransformComponent" X="400.5" Y="300.5" Width="263" Height="263" />
@@ -114,23 +113,24 @@
     <Entity Name="ready1" Prototype="text">
       <Component Type="TransformComponent" X="200" Y="500" />
       <Component Type="TextRenderComponent" Value="Player 1 Not ready!" TextAlignment="Center" FontColor="White" />
-      <Event Type="AttributeChangesEvent" Target="{scene.ready1}">
-        <Action Type="SetTextAction" Value="{scene.ready1}" />
+      <Event Type="AttributeChangesEvent" Target="{scene.ready1txt}">
+        <Action Type="SetTextAction" Value="{scene.ready1txt}" />
       </Event>
     </Entity>
 
     <Entity Name="ready2" Prototype="text">
       <Component Type="TransformComponent" X="600" Y="500" />
       <Component Type="TextRenderComponent" Value="Player 2 Not ready!" TextAlignment="Center" FontColor="White" />
-      <Event Type="AttributeChangesEvent" Target="{scene.ready2}">
-        <Action Type="SetTextAction" Value="{scene.ready2}" />
+      <Event Type="AttributeChangesEvent" Target="{scene.ready2txt}">
+        <Action Type="SetTextAction" Value="{scene.ready2txt}" />
       </Event>
     </Entity>
 
     <Entity Name="player1" Prototype="paddle">
       <Component Type="TransformComponent" X="17" Y="250"/>
-      <Event Type="CrossesLineEvent" Line="Y" Location="350"  Direction="Positive">
-        <Action Type="SetAttributeAction" Target="scene.ready1" Value="player 1 is ready!"/>
+      <Event Type="CrossesLineEvent" Line="Y" Location="450"  Direction="Positive">
+        <Action Type="SetAttributeAction" Target="scene.ready1txt" Value="player 1 is ready!"/>
+        <Action Type="SetAttributeAction" Target="scene.ready1" Value="True"/>
         <Condition If="scene.ready2 and scene.ready1 or scene.ready1 and scene.ready2">
           <Action Type="ChangeSceneAction" Target="game"/>
         </Condition>
@@ -141,8 +141,9 @@
       <Component Type="TransformComponent" X="782" Y="250"/>
       <!--this is testing to see that I can ovrride things in a Prototype-->
       <Component Type="KinectFollowComponent" Player="P1" Joint="HandRight" />
-      <Event Type="CrossesLineEvent" Line="Y" Location="350"  Direction="Positive">
-        <Action Type="SetAttributeAction" Target="scene.ready2" Value="player 2 is ready!"/>
+      <Event Type="CrossesLineEvent" Line="Y" Location="450"  Direction="Positive">
+        <Action Type="SetAttributeAction" Target="scene.ready2txt" Value="player 2 is ready!"/>
+        <Action Type="SetAttributeAction" Target="scene.ready2" Value="true"/>
         <Condition If="scene.ready1">
           <Action Type="ChangeSceneAction" Target="game"/>
         </Condition>
@@ -219,9 +220,9 @@
 
     <Entity Prototype="text">
       <Component Type="TransformComponent" X="0" Y="75" Width="800"/>
-      <Component Type="TextRenderComponent" Value="" FontSize="25" TextAlignment="Center"/>
+      <Component Type="TextRenderComponent" Value="" FontSize="12" TextAlignment="Center"/>
       <Event Type="TriggerOccursEvent" Trigger="changeInfo">
-        <Action Type="SetTextAction" Value="Last hit by {scene.lastHit} At \{X,Y\} \{{scene.lastX},{scene.lastY}\} gravity was ({scene.PhysicsManager.XGravity},{scene.PhysicsManager.YGravity})"/>
+        <Action Type="SetTextAction" Value="Last hit by {scene.lastHit} At \{X,Y\} \{{scene.lastX},{scene.lastY}\} gravity was ({scene.PhysicsManager.XGravity},{scene.PhysicsManager.YGravity}) total score was [scene.player1Score + scene.player2Score] and player 1 was winning by at least 3 is [3 * scene.player1Score >= scene.player2Score]"/>
       </Event>
     </Entity>
   </Scene>

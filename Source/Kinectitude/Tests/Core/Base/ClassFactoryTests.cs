@@ -16,7 +16,6 @@ namespace Kinectitude.Tests.Core.Base
         private EventMock evt = new EventMock();
         private ActionMock action = new ActionMock();
 
-
         static ClassFactoryTests()
         {
             ClassFactory.RegisterType("component", typeof(ComponentMock));

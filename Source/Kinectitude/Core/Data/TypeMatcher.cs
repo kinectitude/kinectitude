@@ -15,7 +15,7 @@ namespace Kinectitude.Core.Data
         //used to see if an expression has changed when the data container changes
         internal DataContainer OldDataContainer { get; set; }
 
-        public abstract bool MatchAndSet(IDataContainer entity);
+        public abstract bool MatchAndSet(IEntity entity);
 
         internal static TypeMatcher CreationHelper(string value, Dictionary<string,HashSet<int>> from, GameLoader loader)
         {
@@ -110,6 +110,12 @@ namespace Kinectitude.Core.Data
                 }
                 return DataContainer.Name; 
             }
+        }
+
+
+        public int IdOfLastMatch
+        {
+            get { return DataContainer.Id; }
         }
     }
 }

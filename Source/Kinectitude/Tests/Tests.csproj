@@ -49,11 +49,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Base\ClassFactoryTests.cs" />
+    <Compile Include="Core\Base\ConditionTests.cs" />
     <Compile Include="Core\Base\EventTests.cs" />
     <Content Include="Core\sample.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Compile Include="Core\Data\MathDataTests.cs" />
     <Compile Include="Core\Data\StringDataTests.cs" />
     <Compile Include="Core\Loaders\GameLoaderTests.cs" />
     <Compile Include="Core\Loaders\XMLGameLoaderTests.cs" />

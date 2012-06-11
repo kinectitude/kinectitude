@@ -8,7 +8,7 @@ namespace Kinectitude.Core.Exceptions
     internal sealed class MissingRequirementsException : Exception
     {
 
-        private static string creationHelper(string name, IDataContainer entity, List<Type> missingTypes)
+        private static string creationHelper(string name, IEntity entity, List<Type> missingTypes)
         {
             string identity = null != entity.Name ? entity.Name : "Entity " + entity.Id.ToString();
             StringBuilder sb = new StringBuilder();

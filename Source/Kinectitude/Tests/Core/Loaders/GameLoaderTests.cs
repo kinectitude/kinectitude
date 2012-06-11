@@ -11,14 +11,14 @@ namespace Kinectitude.Tests.Core.Loaders
     [TestClass]
     public class GameLoaderTests
     {
-        private const string sampleFile = "sample.xml";
+        private const string xmlFile = "sample.xml";
 
-        private static readonly GameLoader xmlGameLoader = GameLoader.GetGameLoader(sampleFile, new Assembly[] { });
+        private static readonly GameLoader xmlGameLoader = GameLoader.GetGameLoader(xmlFile, new Assembly[] { });
 
         private static readonly GameLoader[] gameLoaders = { xmlGameLoader };
 
         [TestMethod]
-        [DeploymentItem("Core\\" + sampleFile)]
+        [DeploymentItem("Core\\" + xmlFile)]
         public void TestPrototypeIs()
         {
             foreach (GameLoader gameLoader in gameLoaders)
@@ -44,7 +44,7 @@ namespace Kinectitude.Tests.Core.Loaders
         }
 
         [TestMethod]
-        [DeploymentItem("Core\\" + sampleFile)]
+        [DeploymentItem("Core\\" + xmlFile)]
         public void TestAvaliblePrototypes()
         {
             foreach (GameLoader gameLoader in gameLoaders)

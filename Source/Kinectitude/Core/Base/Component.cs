@@ -10,7 +10,7 @@ namespace Kinectitude.Core.Base
         /// <summary>
         /// The IEntity that this component belongs to
         /// </summary>
-        public IDataContainer IEntity
+        public IEntity IEntity
         {
             get { return Entity; }
         }

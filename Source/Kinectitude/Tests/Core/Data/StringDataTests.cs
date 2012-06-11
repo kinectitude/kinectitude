@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Kinectitude.Core.Base;
 using Kinectitude.Tests.Core.TestMocks;
 using System;
+using System.Collections.Generic;
 
 namespace Kinectitude.Tests.Core.Data
 {
@@ -13,22 +14,31 @@ namespace Kinectitude.Tests.Core.Data
         private const string entityTest = "entity test";
         private const string sceneTest = "scene test";
         private const string gameTest = "game test";
+        private const string managerTest = "manager test";
 
-        static Game game = new Game(new GameLoaderMock());
-        static Scene scene = new Scene(new SceneLoaderMock(new GameLoaderMock()), game);
-        static Entity entity = new Entity(0);
-        static ComponentMock component = new ComponentMock();
-        static Event evt = new EventMock();
+        Game game = new Game(new GameLoaderMock());
+        Scene scene;
+        Entity entity = new Entity(0);
+        ComponentMock component = new ComponentMock();
+        Event evt = new EventMock();
+        ManagerMock manager = new ManagerMock();
 
-        static StringDataTests()
+        public StringDataTests()
         {
+            scene = new Scene(new SceneLoaderMock(new GameLoaderMock()), game);
             game["gtest"] = gameTest;
             scene["stest"] = sceneTest;
             entity["etest"] = entityTest;
+            entity["one"] = "1";
             entity.Scene = scene;
             entity.AddComponent(component, "component");
             ClassFactory.RegisterType("component", typeof(ComponentMock));
             evt.Entity = entity;
+            ClassFactory.RegisterType("manager", typeof(ManagerMock));
+            Tuple<string, string> values = new Tuple<string, string>("Value", managerTest);
+            List<Tuple<string, string>> list = new List<Tuple<string,string>>();
+            list.Add(values);
+            scene.CreateManager("manager", list);
         }
 
         [TestMethod]
@@ -60,8 +70,8 @@ namespace Kinectitude.Tests.Core.Data
         public void MixedReader()
         {
             ExpressionReader reader = 
-                ExpressionReader.CreateExpressionReader("Entity {this.etest} scene {scene.stest} lol", evt, entity);
-            Assert.IsTrue(reader.GetValue() == "Entity " + entityTest + " scene " + sceneTest + " lol");
+                ExpressionReader.CreateExpressionReader("Entity {this.etest} scene {scene.stest}{scene.manager.Value} [this.one + this.one] lol", evt, entity);
+            Assert.IsTrue(reader.GetValue() == "Entity " + entityTest + " scene " + sceneTest + managerTest + " 2 lol");
         }
 
     }

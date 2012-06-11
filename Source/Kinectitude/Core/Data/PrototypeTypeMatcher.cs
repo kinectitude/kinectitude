@@ -13,7 +13,7 @@ namespace Kinectitude.Core.Data
             this.prototype = prototype;
         }
 
-        public override bool MatchAndSet(IDataContainer dataContainer)
+        public override bool MatchAndSet(IEntity dataContainer)
         {
             if (prototype.Contains(dataContainer.Id))
             {

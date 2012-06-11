@@ -13,7 +13,7 @@ namespace Kinectitude.Core.Data
             this.readables = readables;
         }
 
-        public override bool MatchAndSet(IDataContainer DataContainer)
+        public override bool MatchAndSet(IEntity DataContainer)
         {
             foreach (TypeMatcher r in readables)
             {

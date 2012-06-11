@@ -1,7 +1,6 @@
 ﻿using Kinectitude.Core.Base;
-using SlimDX.Direct2D;
-using SlimDX.DirectWrite;
 using SlimDX;
+using SlimDX.Direct2D;
 
 namespace Kinectitude.Render
 {    

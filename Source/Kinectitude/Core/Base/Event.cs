@@ -20,8 +20,6 @@ namespace Kinectitude.Core.Base
 
         public void AddAction(Action action)
         {
-            //TODO check assembly
-            action.Event = this;
             actions.Add(action);
         }
 

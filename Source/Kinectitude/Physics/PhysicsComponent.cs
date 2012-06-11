@@ -225,10 +225,10 @@ namespace Kinectitude.Physics
                 Body bodyA = fixtureA.Body;
                 Body bodyB = fixtureB.Body;
 
-                IDataContainer entityA = bodyA.UserData as IDataContainer;
-                IDataContainer entityB = bodyB.UserData as IDataContainer;
+                IEntity entityA = bodyA.UserData as IEntity;
+                IEntity entityB = bodyB.UserData as IEntity;
 
-                IDataContainer collidedWith = (entityA == IEntity) ? entityB : entityA;
+                IEntity collidedWith = (entityA == IEntity) ? entityB : entityA;
 
                 foreach (CollisionEvent ce in collisionEvents)
                 {

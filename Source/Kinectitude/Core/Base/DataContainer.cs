@@ -3,16 +3,32 @@ using System.Collections.Generic;
 
 namespace Kinectitude.Core.Base
 {
-    public class DataContainer : IDataContainer
+    public class DataContainer : IEntity
     {
         private readonly Dictionary<string, string> attributes = new Dictionary<string,string>();
 
         private readonly Dictionary<string, List<Action<string>>> callbacks = 
             new Dictionary<string,List<Action<string>>>();
-        
-        public int Id { get; private set; }
-        
-        public string Name { get; set; }
+
+        private int id;
+        public int Id {
+            get { return id; }
+            private set
+            {
+                id = value;
+                attributes["Id"] = id.ToString();
+            }
+        }
+
+        private string name;
+        public string Name {
+            get { return name; }
+            set
+            {
+                name = value;
+                attributes["Name"] = value;
+            }
+        }
 
         public string this[string key]
         {
@@ -27,8 +43,10 @@ namespace Kinectitude.Core.Base
 
             set
             {
-                string old = null;
-                attributes.TryGetValue(value, out old);
+                if ("Name" == key || "Id" == key)
+                {
+                    throw new ArgumentException("Name and Id can't be changed");
+                }
                 attributes[key] = value;
                 if (callbacks.ContainsKey(key))
                 {

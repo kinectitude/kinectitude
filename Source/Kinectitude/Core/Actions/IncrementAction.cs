@@ -11,7 +11,7 @@ namespace Kinectitude.Core.Actions
         public IValueWriter Target { get; set; }
 
         [Plugin("Amount", "")]
-        public IExpressionReader IncrementBy { get; set; }
+        public IDoubleExpressionReader IncrementBy { get; set; }
 
         public IncrementAction() { }
 
@@ -19,9 +19,9 @@ namespace Kinectitude.Core.Actions
         {
             if (null == IncrementBy)
             {
-                IncrementBy = ExpressionReader.CreateExpressionReader("1", Event, Event.Entity);
+                IncrementBy = new DoubleExpressionReader("1", Event, Event.Entity);
             }
-            Target.Value = (double.Parse(Target.Value) + double.Parse(IncrementBy.GetValue())).ToString();
+            Target.Value = (double.Parse(Target.Value) + IncrementBy.GetValue()).ToString();
         }
     }
 }

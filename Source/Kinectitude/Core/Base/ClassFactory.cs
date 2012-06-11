@@ -33,6 +33,18 @@ namespace Kinectitude.Core.Base
         private static readonly MethodInfo CreateExpressionReader = typeof(ExpressionReader).GetMethod
             ("CreateExpressionReader", BindingFlags.Static | BindingFlags.NonPublic);
 
+        //used for creating BoolExpressionReader
+        private static readonly ConstructorInfo CreateBoolExpressionReader = 
+            typeof(BoolExpressionReader).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance).Single();
+
+        //used for creating IntExpressionReader
+        private static readonly ConstructorInfo CreateIntExpressionReader =
+            typeof(IntExpressionReader).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance).Single();
+
+        //used for creating DoubleExpressionReader
+        private static readonly ConstructorInfo CreateDoubleExpressionReader =
+            typeof(DoubleExpressionReader).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance).Single();
+
         //used for creating TypeMatcher
         private static readonly MethodInfo CreateTypeMatcher = typeof(TypeMatcher).GetMethod
             ("CreateTypeMatcher", BindingFlags.Static | BindingFlags.NonPublic);
@@ -63,6 +75,15 @@ namespace Kinectitude.Core.Base
         //used to get the type that the setter is for casting the object in the setter's dictionary.
         private static Dictionary<Type, Dictionary<string, Type>> ParamType =
             new Dictionary<Type, Dictionary<string, Type>>();
+
+        private static readonly HashSet<Type> stringEventEntityConstruct = new HashSet<Type>()
+        {
+            typeof(ITypeMatcher),
+            typeof(IExpressionReader),
+            typeof(IBoolExpressionReader),
+            typeof(IDoubleExpressionReader),
+            typeof(IIntExpressionReader)
+        };
 
         static ClassFactory()
         {
@@ -115,7 +136,7 @@ namespace Kinectitude.Core.Base
                 {
                     createIValueWriter(type, pi, out setter, out getter, out stringGetter);
                 }
-                else if (typeof(ITypeMatcher) == pi.PropertyType || typeof(IExpressionReader) == pi.PropertyType)
+                else if (stringEventEntityConstruct.Contains(pi.PropertyType))
                 {
                     createReaderDelegate(type, pi, out setter, out getter, out stringGetter);
                 }
@@ -177,7 +198,7 @@ namespace Kinectitude.Core.Base
                     setters[param] as Action<object, string, Entity>;
                 action(obj, val, entity);
             }
-            else if (typeof(IExpressionReader) == setType || typeof(ITypeMatcher) == setType)
+            else if (stringEventEntityConstruct.Contains(setType))
             {
                 Action<object, string, Event, Entity> action =
                     setters[param] as Action<object, string, Event, Entity>;
@@ -210,7 +231,6 @@ namespace Kinectitude.Core.Base
                 )
             ).Compile();
         }
-
 
         private static Func<object, T> createGetter<T>(PropertyInfo pi)
         {
@@ -265,33 +285,69 @@ namespace Kinectitude.Core.Base
             MethodInfo setMethod = pi.GetSetMethod();
             Type propertyType = setMethod.GetParameters().Single().ParameterType;
 
-            MethodInfo mi;
+            Expression expr;
 
             if (typeof(IExpressionReader) == propertyType)
             {
-                mi = CreateExpressionReader;
+                expr = Expression.Call(
+                            CreateExpressionReader,
+                            value,
+                            evt,
+                            entity
+                        );
                 Func<object, IExpressionReader> expressionGetter = createGetter<IExpressionReader>(pi);
                 getter = expressionGetter;
                 stringGetter = new Func<object, string>(input => expressionGetter(input).GetValue());
             }
+            else if (typeof(IBoolExpressionReader) == propertyType)
+            {
+                expr =  Expression.New(CreateBoolExpressionReader,
+                                value,
+                                evt,
+                                entity);
+                Func<object, IBoolExpressionReader> expressionGetter = createGetter<IBoolExpressionReader>(pi);
+                getter = expressionGetter;
+                stringGetter = new Func<object, string>(input => expressionGetter(input).GetValue().ToString());
+            }
+            else if (typeof(IIntExpressionReader) == propertyType)
+            {
+                expr =  Expression.New(CreateIntExpressionReader,
+                                value,
+                                evt,
+                                entity);
+                Func<object, IIntExpressionReader> expressionGetter = createGetter<IIntExpressionReader>(pi);
+                getter = expressionGetter;
+                stringGetter = new Func<object, string>(input => expressionGetter(input).GetValue().ToString());
+            }
+            else if (typeof(IDoubleExpressionReader) == propertyType)
+            {
+                expr = Expression.New(CreateDoubleExpressionReader,
+                                value,
+                                evt,
+                                entity);
+                Func<object, IDoubleExpressionReader> expressionGetter = createGetter<IDoubleExpressionReader>(pi);
+                getter = expressionGetter;
+                stringGetter = new Func<object, string>(input => expressionGetter(input).GetValue().ToString());
+            }
             else
             {
-                mi = CreateTypeMatcher;
+                expr = Expression.Call(
+                            CreateTypeMatcher,
+                            value,
+                            evt,
+                            entity
+                        );
+
                 Func<object, ITypeMatcher> typeGetter = createGetter<ITypeMatcher>(pi);
                 getter = typeGetter;
                 stringGetter = new Func<object, string>(input => typeGetter(input).NameOfLastMatch);
             }
-
+            
             setter = Expression.Lambda<Action<object, string, Event, Entity>>(
                         Expression.Call(
                             Expression.Convert(target, type),
                             setMethod,
-                            Expression.Call(
-                                mi,
-                                value,
-                                evt,
-                                entity
-                            )
+                            expr
                         ),
                         target,
                         value,

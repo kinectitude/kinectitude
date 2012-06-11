@@ -10,7 +10,7 @@ namespace Kinectitude.Core.Data
             DataContainer = dataContainer;
         }
 
-        public override bool MatchAndSet(IDataContainer dataContainer)
+        public override bool MatchAndSet(IEntity dataContainer)
         {
             //no need to set, it already is
             return dataContainer == DataContainer;

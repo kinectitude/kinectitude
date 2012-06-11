@@ -1,18 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Game Name="pong" Width="800" Height="600">
+<Game Name="pong" Width="800" Height="600" FirstScene="Main Menu" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1">
   
   <Prototype Name="prototype1" score="100">
+    <Component Type="SomeComponent" Property1="1000" Property2="2000"/>
     <Event Type="SomeEvent">
       <Action Type="SomeAction"/>
     </Event>
-    <Component Type="SomeComponent" Property1="1000" Property2="2000"/>
   </Prototype>
 
   <Prototype Name="prototype2" score="50" Prototype="prototype1">
+    <Component Type="SomeComponent" Property2="5000" Property3="5900"/>
     <Event Type="SomeEvent">
       <Action Type="SomeAction"/>
     </Event>
-    <Component Type="SomeComponent" Property2="5000" Property3="5900"/>
   </Prototype>
 
   <Prototype Name="prototype3" Prototype="prototype2">

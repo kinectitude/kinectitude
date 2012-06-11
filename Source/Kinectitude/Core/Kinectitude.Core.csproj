@@ -46,6 +46,9 @@
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NCalc">
+      <HintPath>..\..\..\Libraries\NCalc.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xaml" />
@@ -75,7 +78,7 @@
     <Compile Include="Base\DataContainer.cs" />
     <Compile Include="Base\Entity.cs" />
     <Compile Include="Base\Game.cs" />
-    <Compile Include="Base\IDataContainer.cs" />
+    <Compile Include="Base\IEntity.cs" />
     <Compile Include="Base\Component.cs" />
     <Compile Include="Base\Service.cs" />
     <Compile Include="Base\Scene.cs" />
@@ -83,11 +86,17 @@
     <Compile Include="Base\IUpdateable.cs" />
     <Compile Include="Base\Manager.cs" />
     <Compile Include="Components\TransformComponent.cs" />
-    <Compile Include="Conditions\AndCondition.cs" />
-    <Compile Include="Conditions\OrCondition.cs" />
-    <Compile Include="Conditions\SimpleCondition.cs" />
+    <Compile Include="Data\BoolExpressionReader.cs" />
     <Compile Include="Data\ComponentValueReader.cs" />
     <Compile Include="Data\ConstantExpressionReader.cs" />
+    <Compile Include="Data\DoubleExpressionReader.cs" />
+    <Compile Include="Data\EvalExpressionReader.cs" />
+    <Compile Include="Data\ExpressionEval.cs" />
+    <Compile Include="Data\IBoolExpressionReader.cs" />
+    <Compile Include="Data\IChangeNotify.cs" />
+    <Compile Include="Data\IDoubleExpressionReader.cs" />
+    <Compile Include="Data\IIntExpressionReader.cs" />
+    <Compile Include="Data\IntExpressionReader.cs" />
     <Compile Include="Data\ManagerValueReader.cs" />
     <Compile Include="Data\EntityValueReader.cs" />
     <Compile Include="Data\MultiTypeMatcher.cs" />
