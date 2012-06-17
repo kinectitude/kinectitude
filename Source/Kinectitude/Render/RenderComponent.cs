@@ -69,11 +69,20 @@ namespace Kinectitude.Render
         {
             if (Shape == ShapeType.Ellipse)
             {
+                ellipse.Center = new PointF(transformComponent.X, transformComponent.Y);
+                ellipse.RadiusX = transformComponent.Width / 2.0f;
+                ellipse.RadiusY = transformComponent.Height / 2.0f;
+
                 renderTarget.FillEllipse(fillBrush, ellipse);
                 renderTarget.DrawEllipse(lineBrush, ellipse, LineThickness);
             }
             else if (Shape == ShapeType.Rectangle)
             {
+                rectangle.X = transformComponent.X - transformComponent.Width / 2.0f;
+                rectangle.Y = transformComponent.Y - transformComponent.Height / 2.0f;
+                rectangle.Width = transformComponent.Width;
+                rectangle.Height = transformComponent.Height;
+
                 renderTarget.FillRectangle(fillBrush, rectangle);
                 renderTarget.DrawRectangle(lineBrush, rectangle, LineThickness);
             }
@@ -88,11 +97,7 @@ namespace Kinectitude.Render
             lineBrush = renderManager.GetSolidColorBrush(LineColor, 1.0f);
 
             transformComponent = GetComponent<TransformComponent>();
-            transformComponent.SubscribeToX(this, UpdateTransform);
-            transformComponent.SubscribeToY(this, UpdateTransform);
-            transformComponent.SubscribeToWidth(this, UpdateTransform);
-            transformComponent.SubscribeToHeight(this, UpdateTransform);
-
+            
             if (Shape == ShapeType.Ellipse)
             {
                 ellipse = new Ellipse();
@@ -100,25 +105,6 @@ namespace Kinectitude.Render
             else if (Shape == ShapeType.Rectangle)
             {
                 rectangle = new RectangleF();
-            }
-
-            UpdateTransform();
-        }
-
-        public void UpdateTransform()
-        {
-            if (Shape == ShapeType.Ellipse)
-            {
-                ellipse.Center = new PointF(transformComponent.X, transformComponent.Y);
-                ellipse.RadiusX = transformComponent.Width / 2.0f;
-                ellipse.RadiusY = transformComponent.Height / 2.0f;
-            }
-            else if (Shape == ShapeType.Rectangle)
-            {
-                rectangle.X = transformComponent.X - transformComponent.Width / 2.0f;
-                rectangle.Y = transformComponent.Y - transformComponent.Height / 2.0f;
-                rectangle.Width = transformComponent.Width;
-                rectangle.Height = transformComponent.Height;
             }
         }
 

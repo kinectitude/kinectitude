@@ -161,6 +161,11 @@ namespace Kinectitude.Render
 
         public void Render(RenderTarget renderTarget)
         {
+            layoutRectangle.X = transformComponent.X + OffsetX;
+            layoutRectangle.Y = transformComponent.Y + OffsetY;
+            layoutRectangle.Width = transformComponent.Width;
+            layoutRectangle.Height = transformComponent.Height;
+
             renderTarget.DrawText(Value, textFormat, layoutRectangle, brush);
         }
 
@@ -180,21 +185,8 @@ namespace Kinectitude.Render
             brush = renderManager.GetSolidColorBrush(FontColor, Opacity);
 
             transformComponent = GetComponent<TransformComponent>();
-            transformComponent.SubscribeToX(this, UpdateTransform);
-            transformComponent.SubscribeToY(this, UpdateTransform);
-            transformComponent.SubscribeToWidth(this, UpdateTransform);
-            transformComponent.SubscribeToHeight(this, UpdateTransform);
-
+            
             layoutRectangle = new RectangleF();
-            UpdateTransform();
-        }
-
-        public void UpdateTransform()
-        {
-            layoutRectangle.X = transformComponent.X + OffsetX;
-            layoutRectangle.Y = transformComponent.Y + OffsetY;
-            layoutRectangle.Width = transformComponent.Width;
-            layoutRectangle.Height = transformComponent.Height;
         }
 
         public override void Destroy()
