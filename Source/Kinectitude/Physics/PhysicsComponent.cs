@@ -59,7 +59,7 @@ namespace Kinectitude.Physics
         [Plugin("Linear Damping", "")]
         public float LinearDamping { get; set; }
 
-        private bool hasMaximum = false;
+        private bool hasMaximumVelocity = false;
         private float maximumVelocity = float.PositiveInfinity;
         [Plugin("Maximum velocity", "")]
         public float MaximumVelocity
@@ -67,8 +67,21 @@ namespace Kinectitude.Physics
             get { return maximumVelocity; }
             set
             {
-                hasMaximum = true;
+                hasMaximumVelocity = true;
                 maximumVelocity = value;
+            }
+        }
+
+        private bool hasMinimumVelocity = false;
+        private float minimumVelocity = 0;
+        [Plugin("Minimum velocity", "")]
+        public float MinimumVelocity
+        {
+            get { return minimumVelocity; }
+            set
+            {
+                hasMinimumVelocity = true;
+                minimumVelocity = value;
             }
         }
 
@@ -117,6 +130,18 @@ namespace Kinectitude.Physics
 
             xVelocity = body.LinearVelocity.X / speedRatio;
             yVelocity = body.LinearVelocity.Y / speedRatio;
+			
+			float speed = body.LinearVelocity.Length();
+
+            if (speed > maximumVelocity)
+            {
+                body.LinearVelocity = body.LinearVelocity / speed * maximumVelocity;
+            }
+
+            if (speed < minimumVelocity)
+            {
+                body.LinearVelocity = body.LinearVelocity / speed * minimumVelocity;
+            }
 
             //TODO make this done in farseer somehow
             if (crossesLineEvents.Count != 0)
@@ -172,6 +197,7 @@ namespace Kinectitude.Physics
 
         public void SetPosition()
         {
+			body.Awake = true;
             body.Position = new Vector2(tc.X * sizeRatio, tc.Y * sizeRatio);
         }
 
@@ -186,10 +212,6 @@ namespace Kinectitude.Physics
             pm.Add(this);
 
             tc = GetComponent<TransformComponent>();
-            tc.SubscribeToX(this, SetPosition);
-            tc.SubscribeToY(this, SetPosition);
-            tc.SubscribeToHeight(this, SetSize);
-            tc.SubscribeToWidth(this, SetSize);
 
             if ("circle" == Shape)
             {
@@ -202,14 +224,23 @@ namespace Kinectitude.Physics
                 body = BodyFactory.CreateRectangle(pm.PhysicsWorld, width, height, 1f);
             }
 
-            //Set fields on the body
-            body.UserData = IEntity;
-            body.BodyType = BodyType;
+            body.BodyType = BodyType.Dynamic;
             body.Restitution = Restitution;
-            body.Mass = Mass;
             body.Friction = Friction;
             body.LinearDamping = LinearDamping;
-            //TODO Add maximum velocity to body, if applicable
+            body.UserData = IEntity;
+
+            if (BodyType == BodyType.Kinematic || BodyType == BodyType.Static)
+            {
+                body.Mass = (float)int.MaxValue;
+            }
+            else
+            {
+                body.Mass = Mass;
+            }
+
+            body.IsStatic = (BodyType == BodyType.Static);
+            body.Awake = false;
 
             //Add a listener for collisions
             body.OnCollision += OnCollision;
@@ -220,16 +251,16 @@ namespace Kinectitude.Physics
 
         private bool OnCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
         {
-            if (crossesLineEvents.Count != 0)
+            Body bodyA = fixtureA.Body;
+            Body bodyB = fixtureB.Body;
+
+            IEntity entityA = bodyA.UserData as IEntity;
+            IEntity entityB = bodyB.UserData as IEntity;
+
+            IEntity collidedWith = (entityA == IEntity) ? entityB : entityA;
+
+            if (collisionEvents.Count != 0)
             {
-                Body bodyA = fixtureA.Body;
-                Body bodyB = fixtureB.Body;
-
-                IEntity entityA = bodyA.UserData as IEntity;
-                IEntity entityB = bodyB.UserData as IEntity;
-
-                IEntity collidedWith = (entityA == IEntity) ? entityB : entityA;
-
                 foreach (CollisionEvent ce in collisionEvents)
                 {
                     if (ce.CollidesWith.MatchAndSet(collidedWith))

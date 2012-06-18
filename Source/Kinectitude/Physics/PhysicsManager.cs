@@ -42,7 +42,13 @@ namespace Kinectitude.Physics
 
         public override void OnUpdate(float t)
         {
+			foreach (PhysicsComponent pc in Children)
+            {
+                pc.SetPosition();
+            }
+		
             PhysicsWorld.Step(t);
+			
             foreach (PhysicsComponent pc in Children)
             {
                 pc.OnUpdate(t);
