@@ -2,14 +2,14 @@
 
 namespace Kinectitude.Core.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true, Inherited = true)]
     public class RequiresAttribute : Attribute
     {
-        private readonly Type type;
+        internal readonly Type Type;
 
         public RequiresAttribute(Type type)
         {
-            this.type = type;
+            Type = type;
         }
     }
 }

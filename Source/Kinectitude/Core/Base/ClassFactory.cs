@@ -73,8 +73,14 @@ namespace Kinectitude.Core.Base
         private static readonly Dictionary<Type, string> ReferedDictionary = new Dictionary<Type, string>();
 
         //used to get the type that the setter is for casting the object in the setter's dictionary.
-        private static Dictionary<Type, Dictionary<string, Type>> ParamType =
+        private static readonly Dictionary<Type, Dictionary<string, Type>> ParamType =
             new Dictionary<Type, Dictionary<string, Type>>();
+
+        //used to get the required types of a component
+        private static readonly Dictionary<Type, List<Type>> componentNeeds = new Dictionary<Type, List<Type>>();
+
+        //used to get the provided types of a component
+        private static readonly Dictionary<Type, List<Type>> componentProvides = new Dictionary<Type, List<Type>>();
 
         private static readonly HashSet<Type> stringEventEntityConstruct = new HashSet<Type>()
         {
@@ -102,6 +108,9 @@ namespace Kinectitude.Core.Base
             RegisterType("TimeManager", typeof(TimeManager));
             RegisterType("CreateEntityAction", typeof(CreateEntityAction));
             RegisterType("DestroyAction", typeof(DestroyAction));
+            RegisterType("CreateTimerAction", typeof(CreateTimerAction));
+            RegisterType("PauseTimersAction", typeof(PauseTimersAction));
+            RegisterType("ResumeTimersAction", typeof(ResumeTimersAction));
         }
 
         internal static void LoadServices(Assembly assembly)
@@ -110,11 +119,39 @@ namespace Kinectitude.Core.Base
             {
                 Service service = Activator.CreateInstance(type) as Service;
                 Game.CurrentGame.SetService(service);
+                if (service.AutoStart())
+                {
+                    service.Start();
+                }
             }
         }
 
         internal static void RegisterType(string registeredName, Type type)
         {
+
+            if (typeof(Component).IsAssignableFrom(type))
+            {
+                List<Type> provides = new List<Type>();
+                foreach (ProvidesAttribute provided in type.GetCustomAttributes(true).
+                    Where(input => input.GetType() == typeof(ProvidesAttribute)))
+                {
+                    if (!provided.Type.IsAssignableFrom(type))
+                    {
+                        throw new ArgumentException(type.FullName + " can't provide " + provided.Type.FullName);
+                    }
+                    provides.Add(provided.Type);
+                }
+                componentProvides.Add(type, provides);
+
+                List<Type> needs = new List<Type>();
+                foreach (RequiresAttribute requires in type.GetCustomAttributes(true).
+                    Where(input => input.GetType() == typeof(RequiresAttribute)))
+                {
+                    needs.Add(requires.Type);
+                }
+                componentNeeds[type] = needs;
+            }
+
             constructors[registeredName] = ConstructorTypes[type] = createConstructorDelegate(type);
             SettersByType[type] = new Dictionary<string, object>();
             ReferedDictionary[type] = registeredName;
@@ -435,6 +472,16 @@ namespace Kinectitude.Core.Base
                         target,
                         stringParameter
                     ).Compile();
+        }
+
+        internal static List<Type> GetRequirements(Type component)
+        {
+            return componentNeeds[component];
+        }
+
+        internal static List<Type> GetProvided(Type component)
+        {
+            return componentProvides[component];
         }
     }
 }

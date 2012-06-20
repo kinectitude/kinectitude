@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace Kinectitude.Core.Base
 {
 
@@ -29,21 +28,11 @@ namespace Kinectitude.Core.Base
         public virtual void Ready() { }
 
         /// <summary>
-        /// Returns the type of component that is being implemented.
-        /// For most Components, this.getType() will surfice, but abstract classes can be used instead.
-        /// Using an abstract class would allow for replaceable components
-        /// </summary>
-        public virtual Type ImplementationType
-        {
-            get { return this.GetType(); }
-        }
-
-        /// <summary>
         /// Allows a Component to get another Component form the entity it belongs to
         /// </summary>
         /// <typeparam name="T">The type of the component</typeparam>
         /// <returns>The component in the entity, or null if none of type T exists</returns>
-        public T GetComponent<T>() where T : Component
+        public T GetComponent<T>() where T : class
         {
             return Entity.GetComponent<T>();
         }

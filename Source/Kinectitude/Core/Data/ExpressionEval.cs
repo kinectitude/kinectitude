@@ -1,6 +1,7 @@
 ﻿using System;
 using Kinectitude.Core.Base;
 using NCalc;
+using System.Collections.Generic;
 
 namespace Kinectitude.Core.Data
 {
@@ -8,9 +9,14 @@ namespace Kinectitude.Core.Data
     {
         private Expression expression;
 
+        private readonly List<Action<string>> callbacks = new List<Action<string>>();
+        private readonly Dictionary<string, ExpressionReader> expressions = new Dictionary<string, ExpressionReader>();
+        private bool isUpdateReady = false;
+
         internal ExpressionEval(string expressionStr, Event evt, Entity entity)
         {
-            expressionStr = expressionStr.Replace('.', '_').Replace("b:", "_");
+
+            expressionStr = expressionStr.Replace('.', '_').Replace("s:", "_").Replace("!","__").Replace("$","___");
             Expression expression = new Expression(expressionStr);
 
             //TODO check if sin and stuff is already in expression, if not put it there.
@@ -34,6 +40,15 @@ namespace Kinectitude.Core.Data
                         return;
                 }
 
+                if(name.StartsWith("__"))
+                {
+                    name = "!" + name.Substring(2);
+                }
+                else if (name.StartsWith("___"))
+                {
+                    name = "$" + name.Substring(3);
+                }
+
                 bool stringLookup = false;
                 if (name[0] == '_')
                 {
@@ -41,7 +56,17 @@ namespace Kinectitude.Core.Data
                     stringLookup = true;
                 }
                 name = name.Replace('_', '.');
-                string value = ExpressionReader.CreateExpressionReader("{" + name + "}", evt, entity).GetValue();
+                string value;
+                if (expressions.ContainsKey(name))
+                {
+                    value = expressions[name].GetValue();
+                }
+                else
+                {
+                    ExpressionReader reader = ExpressionReader.CreateExpressionReader("{" + name + "}", evt, entity);
+                    expressions.Add(name, reader);
+                    value = reader.GetValue();
+                }
                 if(stringLookup)
                 {
                     args.Result = value;
@@ -68,6 +93,7 @@ namespace Kinectitude.Core.Data
         internal T ToNumber<T>() where T : struct
         {
             object result = expression.Evaluate();
+            isUpdateReady = true;
             if (typeof(string) == result.GetType())
             {
                 int i = 0;
@@ -85,6 +111,7 @@ namespace Kinectitude.Core.Data
         internal bool ToBool()
         {
             object result = expression.Evaluate();
+            isUpdateReady = true;
             Type type = result.GetType();
             if (typeof(bool) == type)
             {
@@ -101,13 +128,30 @@ namespace Kinectitude.Core.Data
         internal string ToStr()
         {
             object result = expression.Evaluate();
+            isUpdateReady = true;
             return (string)Convert.ChangeType(result, typeof(string));
+        }
+
+        private void changeOccured(string change)
+        {
+            foreach (Action<string> callback in callbacks)
+            {
+                callback(change);
+            }
         }
 
         public void notifyOfChange(Action<string> callback)
         {
-            //TODO
-            throw new NotImplementedException();
+            callbacks.Add(callback);
+            if (!isUpdateReady)
+            {
+                expression.Evaluate();
+                isUpdateReady = true;
+            }
+            foreach(KeyValuePair<string, ExpressionReader> expressionPair in expressions)
+            {
+                expressionPair.Value.notifyOfChange(changeOccured);
+            }
         }
     }
 }

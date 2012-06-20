@@ -1,10 +1,14 @@
 ﻿using System;
 using Kinectitude.Core.Base;
+using System.Collections.Generic;
 
 namespace Kinectitude.Core.Data
 {
     internal class BoolExpressionReader : IBoolExpressionReader
     {
+        private readonly List<Action<string>> callbacks = new List<Action<string>>();
+        private bool isnNotified = false;
+        private bool oldVal;
 
         private readonly ExpressionEval expression;
 
@@ -17,11 +21,27 @@ namespace Kinectitude.Core.Data
         {
             return expression.ToBool();
         }
+        public void changeOccured(string change)
+        {
+            bool result = expression.ToBool();
+            if (oldVal != result)
+            {
+                foreach (Action<string> callback in callbacks)
+                {
+                    callback(change);
+                }
+            }
+        }
 
         public void notifyOfChange(Action<string> callback)
         {
-            //TODO
-            throw new NotImplementedException();
+            callbacks.Add(callback);
+            if (!isnNotified)
+            {
+                isnNotified = true;
+                expression.notifyOfChange(changeOccured);
+                oldVal = expression.ToBool();
+            }
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Kinectitude.Kinect
         private float nextDy = 0;
 
         private TransformComponent transform;
-        private APhysicsComponent physics = null;
+        private IPhysics physics = null;
 
         private KinectManager manager;
 
@@ -81,7 +81,7 @@ namespace Kinectitude.Kinect
             manager.Add(this);
 
             transform = GetComponent<TransformComponent>();
-            physics = GetComponent<APhysicsComponent>();
+            physics = GetComponent<IPhysics>();
         }
 
 

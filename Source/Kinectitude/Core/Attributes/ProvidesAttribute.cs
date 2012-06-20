@@ -2,14 +2,14 @@
 
 namespace Kinectitude.Core.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
     public class ProvidesAttribute : Attribute
     {
-        private readonly Type type;
+        internal readonly Type Type;
 
         public ProvidesAttribute(Type type)
         {
-            this.type = type;
+            Type = type;
         }
     }
 }

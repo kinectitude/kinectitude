@@ -1,16 +1,16 @@
-﻿using System;
+﻿using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Base;
+using Kinectitude.Core.Components;
+using Kinectitude.Core.Data;
 using Kinectitude.Core.Loaders;
 using Action = Kinectitude.Core.Base.Action;
-using Kinectitude.Core.Attributes;
-using Kinectitude.Core.Data;
 
 namespace Kinectitude.Tests.Core.TestMocks
 {
 
     public class GameLoaderMock : GameLoader
     {
-        internal SceneLoader mockScene;
+        internal SceneLoader mockScene = null;
 
         internal override SceneLoader GetSceneLoader(string name)
         {
@@ -20,13 +20,13 @@ namespace Kinectitude.Tests.Core.TestMocks
 
     internal class SceneLoaderMock : SceneLoader
     {
-        public bool entityCreated = false;
+        public string EntityCreated = "";
 
         public SceneLoaderMock(GameLoader gameLoader) : base(gameLoader) { }
 
         internal override void CreateEntity(string name)
         {
-            entityCreated = true;
+            EntityCreated = name;
         }
     }
 
@@ -42,7 +42,6 @@ namespace Kinectitude.Tests.Core.TestMocks
         public override void Run() { hasRun = true; }
     }
 
-
     public class EventMock : Event
     {
         [Plugin("", "")]
@@ -55,7 +54,7 @@ namespace Kinectitude.Tests.Core.TestMocks
 
     public class ComponentMock : Component
     {
-        public bool destroyed = false;
+        public bool Destroyed = false;
         [Plugin("", "")]
         public int I { get; set; }
         [Plugin("", "")]
@@ -75,7 +74,7 @@ namespace Kinectitude.Tests.Core.TestMocks
 
         public override void Destroy()
         {
-            destroyed = true;
+            Destroyed = true;
         }
     }
 
@@ -84,4 +83,96 @@ namespace Kinectitude.Tests.Core.TestMocks
         [Plugin("", "")]
         public string Value { get; set; }
     }
+
+    [Requires(typeof(TransformComponent))]
+    public class RequiresTransformComponent : Component
+    {
+        public bool Destroyed = false;
+        public override void Destroy()
+        {
+            Destroyed = true;
+        }
+    }
+
+    [Provides(typeof(TransformComponent))]
+    public class IllegalProvidesComponent : Component
+    {
+        public override void Destroy() { }
+    }
+
+    [Provides(typeof(TransformComponent))]
+    public class GoodProvidesComponent : TransformComponent
+    {
+        public override void Destroy() { }
+    }
+
+    public class MockServiceToRun : Service
+    {
+        public bool Started = false;
+        public bool Stopped = false;
+
+        public override void OnStart()
+        {
+            Started = true;
+        }
+
+        public override void OnStop()
+        {
+            Stopped = true;
+        }
+
+        public override bool AutoStart()
+        {
+            return true;
+        }
+    }
+
+    public class MockServiceNotToRun : MockServiceToRun
+    {
+        public override bool AutoStart()
+        {
+            return false;
+        }
+    }
+
+    public class ExpressionMock : IExpressionReader
+    {
+        public int NumNotified = 0;
+
+        private string value;
+
+        public ExpressionMock(string value)
+        {
+            this.value = value;
+        }
+
+        public string GetValue()
+        {
+            return value;
+        }
+
+        public void notifyOfChange(System.Action<string> callback)
+        {
+            NumNotified++;
+        }
+    }
+
+    public class WriterMock : IValueWriter
+    {
+        public string Value { get; set; }
+    }
+
+    public class DoubleMock : IDoubleExpressionReader
+    {
+        private readonly double val;
+        public DoubleMock(double value)
+        {
+            val = value;
+        }
+        public double GetValue()
+        {
+            return val;
+        }
+    }
+
 }

@@ -1,11 +1,7 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Kinectitude.Core.Base;
-using Kinectitude.Tests.Core.TestMocks;
+﻿using Kinectitude.Core.Base;
 using Kinectitude.Core.Data;
+using Kinectitude.Tests.Core.TestMocks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Kinectitude.Tests.Core.Base
 {

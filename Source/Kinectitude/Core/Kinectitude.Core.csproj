@@ -60,6 +60,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\ChangeSceneAction.cs" />
+    <Compile Include="Actions\ResumeTimersAction.cs" />
+    <Compile Include="Actions\PauseTimersAction.cs" />
     <Compile Include="Actions\CreateEntityAction.cs" />
     <Compile Include="Actions\DestroyAction.cs" />
     <Compile Include="Actions\FireTriggerAction.cs" />
@@ -68,6 +70,7 @@
     <Compile Include="Actions\PushSceneAction.cs" />
     <Compile Include="Actions\SetAttributeAction.cs" />
     <Compile Include="Actions\SetPositionAction.cs" />
+    <Compile Include="Actions\CreateTimerAction.cs" />
     <Compile Include="Attributes\PluginAttribute.cs" />
     <Compile Include="Attributes\PresetAttribute.cs" />
     <Compile Include="Attributes\ProvidesAttribute.cs" />
@@ -82,7 +85,8 @@
     <Compile Include="Base\Component.cs" />
     <Compile Include="Base\Service.cs" />
     <Compile Include="Base\Scene.cs" />
-    <Compile Include="AbstractComponents\APhysicsComponent.cs" />
+    <Compile Include="Base\Timer.cs" />
+    <Compile Include="ComponentInterfaces\IPhysicsComponent.cs" />
     <Compile Include="Base\IUpdateable.cs" />
     <Compile Include="Base\Manager.cs" />
     <Compile Include="Components\TransformComponent.cs" />
@@ -122,6 +126,14 @@
     <Compile Include="Exceptions\MissingRequirementsException.cs" />
     <Compile Include="Exceptions\NoSuchPrototypeException.cs" />
     <Compile Include="Loaders\GameLoader.cs" />
+    <Compile Include="Loaders\LoadedAction.cs" />
+    <Compile Include="Loaders\LoadedBaseAction.cs" />
+    <Compile Include="Loaders\LoadedComponent.cs" />
+    <Compile Include="Loaders\LoadedCondition.cs" />
+    <Compile Include="Loaders\LoadedEntity.cs" />
+    <Compile Include="Loaders\LoadedEvent.cs" />
+    <Compile Include="Loaders\LoadedObject.cs" />
+    <Compile Include="Loaders\LoadedScene.cs" />
     <Compile Include="Loaders\SceneLoader.cs" />
     <Compile Include="Loaders\XMLGameLoader.cs" />
     <Compile Include="Loaders\XMLSceneLoader.cs" />

@@ -214,9 +214,6 @@ namespace Kinectitude.Core.Loaders
 
         private void entityParse(XElement e, Entity entity)
         {
-
-
-
             foreach (XElement node in e.Elements().Where(element => element.Name == XMLGameLoader.ComponentName))
             {
                 string stringType = (string)node.Attribute("Type");

@@ -38,7 +38,7 @@ namespace Kinectitude.Physics
 
         public override void OnInitialize()
         {
-            PhysicsComponent pc = GetComponent<APhysicsComponent>() as PhysicsComponent;
+            PhysicsComponent pc = GetComponent<PhysicsComponent>();
             if (null == pc)
             {
                 List<Type> missing = new List<Type>();

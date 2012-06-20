@@ -1,5 +1,6 @@
 ﻿using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Base;
+using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Events
 {
@@ -12,12 +13,12 @@ namespace Kinectitude.Core.Events
         public TriggerOccursEvent() { }
 
         [Plugin("Trigger", "")]
-        public string Trigger { get; set; }
+        public IExpressionReader Trigger { get; set; }
 
         public override void OnInitialize()
         {
             Scene scene = Entity.Scene;
-            scene.RegisterTrigger(Trigger, this);
+            scene.RegisterTrigger(Trigger.GetValue(), this);
         }
     }
 }

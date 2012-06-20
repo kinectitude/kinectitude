@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Kinectitude.Core.Events;
 using Kinectitude.Core.Loaders;
+using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Base
 {    
@@ -13,6 +14,9 @@ namespace Kinectitude.Core.Base
         private readonly Dictionary<string, List<TriggerOccursEvent>> triggers;
         private readonly SceneLoader seceneLoader;
         private readonly Dictionary<string, Entity> entityByName;
+
+        private readonly Dictionary<string, List<Timer>> runningTimers = new Dictionary<string, List<Timer>>();
+        private readonly Dictionary<string, List<Timer>> pausedTimers = new Dictionary<string, List<Timer>>();
 
         private bool started = false;
 
@@ -92,6 +96,26 @@ namespace Kinectitude.Core.Base
             foreach (IManager m in managers)
             {
                 m.OnUpdate(frameDelta);
+            }
+            foreach (KeyValuePair<string, List<Timer>> pair in runningTimers)
+            {
+                List<Timer> timers = pair.Value;
+                List<Timer> remove = new List<Timer>();
+                foreach (Timer timer in timers)
+                {
+                    if (timer.tick(frameDelta))
+                    {
+                        FireTrigger(timer.ExpressionReader.GetValue());
+                        if (!timer.Recurring)
+                        {
+                            remove.Add(timer);
+                        }
+                    }
+                }
+                foreach (Timer timer in remove)
+                {
+                    timers.Remove(timer);
+                }
             }
         }
 
@@ -197,6 +221,44 @@ namespace Kinectitude.Core.Base
             else
             {
                 return managersDictionary[typeof(T)] as T;
+            }
+        }
+        internal void AddTimer(string name, float time, IExpressionReader expressionReader, bool recurring)
+        {
+            Timer t = new Timer(expressionReader, time, recurring);
+            List<Timer> timerList;
+            if (!runningTimers.TryGetValue(name, out timerList))
+            {
+                if (!pausedTimers.TryGetValue(name, out timerList))
+                {
+                    timerList = new List<Timer>();
+                }
+                else
+                {
+                    pausedTimers.Remove(name);
+                }
+            }
+            timerList.Add(t);
+            runningTimers.Add(name, timerList);
+        }
+
+        internal void ResumeTimers(string name)
+        {
+            List<Timer> timerList;
+            if (pausedTimers.TryGetValue(name, out timerList))
+            {
+                pausedTimers.Remove(name);
+                runningTimers.Add(name, timerList);
+            }
+        }
+
+        internal void PauseTimers(string name)
+        {
+            List<Timer> timerList;
+            if (runningTimers.TryGetValue(name, out timerList))
+            {
+                runningTimers.Remove(name);
+                pausedTimers.Add(name, timerList);
             }
         }
 

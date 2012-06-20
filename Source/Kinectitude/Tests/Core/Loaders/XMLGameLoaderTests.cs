@@ -1,10 +1,7 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Kinectitude.Core.Loaders;
+﻿using System.Linq;
 using System.Xml.Linq;
+using Kinectitude.Core.Loaders;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Kinectitude.Tests.Core.Loaders
 {

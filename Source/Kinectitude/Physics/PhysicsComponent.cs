@@ -13,7 +13,9 @@ namespace Kinectitude.Physics
 {
 
     [Plugin("Physics Component", "")]
-    public class PhysicsComponent : APhysicsComponent
+    [Provides(typeof(IPhysics))]
+    [Requires(typeof(TransformComponent))]
+    public class PhysicsComponent : Component, IPhysics
     {
         private const float sizeRatio = 1f / 100f;
         private const float speedRatio = 1f / 10f;
@@ -86,7 +88,8 @@ namespace Kinectitude.Physics
         }
 
         private float xVelocity;
-        public override float XVelocity
+        [Plugin("X Velocity", "")]
+        public float XVelocity
         {
             get { return xVelocity; }
             set 
@@ -100,8 +103,8 @@ namespace Kinectitude.Physics
         }
 
         private float yVelocity;
-
-        public override float YVelocity
+        [Plugin("Y Velocity", "")]
+        public float YVelocity
         {
             get { return yVelocity; }
             set
@@ -114,7 +117,8 @@ namespace Kinectitude.Physics
             }
         }
 
-        public override float AngularVelocity { get; set; }
+        [Plugin("AngularVelocity Velocity", "")]
+        public float AngularVelocity { get; set; }
 
         public PhysicsComponent() : base() { }
 

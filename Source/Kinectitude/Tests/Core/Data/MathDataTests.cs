@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Kinectitude.Core.Base;
-using Kinectitude.Tests.Core.TestMocks;
 using Kinectitude.Core.Data;
+using Kinectitude.Tests.Core.TestMocks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Kinectitude.Tests.Core.Data
 {
@@ -29,8 +26,15 @@ namespace Kinectitude.Tests.Core.Data
             entity["lol"] = "lol";
             entity["fales"] = "false";
             entity.Scene = scene;
+            try
+            {
+                ClassFactory.RegisterType("component", typeof(ComponentMock));
+            }
+            catch (ArgumentException)
+            {
+                //this is incase another test case registered this type already
+            }
             entity.AddComponent(component, "component");
-            ClassFactory.RegisterType("component", typeof(ComponentMock));
             evt.Entity = entity;
         }
 

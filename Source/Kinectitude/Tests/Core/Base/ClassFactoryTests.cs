@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Text;
 using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Kinectitude.Core.Base;
 using Kinectitude.Tests.Core.TestMocks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Reflection;
+using Kinectitude.Core.Components;
 
 namespace Kinectitude.Tests.Core.Base
 {
@@ -18,9 +18,31 @@ namespace Kinectitude.Tests.Core.Base
 
         static ClassFactoryTests()
         {
-            ClassFactory.RegisterType("component", typeof(ComponentMock));
-            ClassFactory.RegisterType("evt", typeof(EventMock));
-            ClassFactory.RegisterType("act", typeof(ActionMock));
+            try
+            {
+                ClassFactory.RegisterType("component", typeof(ComponentMock));
+            }
+            catch (ArgumentException)
+            {
+                //this is incase another test case registered this type already
+            }
+            try
+            {
+                ClassFactory.RegisterType("event", typeof(EventMock));
+            }
+            catch (ArgumentException)
+            {
+                //this is incase another test case registered this type already
+            }
+            try
+            {
+
+                ClassFactory.RegisterType("action", typeof(ActionMock));
+            }
+            catch (ArgumentException)
+            {
+                //this is incase another test case registered this type already
+            }
         }
 
         public ClassFactoryTests()
@@ -92,5 +114,30 @@ namespace Kinectitude.Tests.Core.Base
             Assert.IsTrue(entity["health"] == "100");
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void IllegalProvidesComponent()
+        {
+            ClassFactory.RegisterType("IllegalProvidesComponent", typeof(IllegalProvidesComponent));
+        }
+
+        [TestMethod]
+        public void LoadServices()
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            Game game = new Game(new GameLoaderMock());
+            ClassFactory.LoadServices(assembly);
+            Assert.IsTrue(game.GetService<MockServiceToRun>().Started);
+            Assert.IsFalse(game.GetService<MockServiceNotToRun>().Started);
+        }
+
+        [TestMethod]
+        public void TestGoodProvide()
+        {
+            ClassFactory.RegisterType("GoodProvidesComponent", typeof(GoodProvidesComponent));
+            Component component = ClassFactory.Create<Component>("GoodProvidesComponent");
+            Assert.IsNotNull(component);
+            Assert.IsTrue(ClassFactory.GetProvided(typeof(GoodProvidesComponent)).Contains(typeof(TransformComponent)));
+        }
     }
 }

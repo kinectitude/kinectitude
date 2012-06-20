@@ -1,9 +1,9 @@
-﻿using Kinectitude.Core.Data;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Kinectitude.Core.Base;
-using Kinectitude.Tests.Core.TestMocks;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Kinectitude.Core.Base;
+using Kinectitude.Core.Data;
+using Kinectitude.Tests.Core.TestMocks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Kinectitude.Tests.Core.Data
 {
@@ -32,9 +32,25 @@ namespace Kinectitude.Tests.Core.Data
             entity["one"] = "1";
             entity.Scene = scene;
             entity.AddComponent(component, "component");
-            ClassFactory.RegisterType("component", typeof(ComponentMock));
+            try
+            {
+                ClassFactory.RegisterType("component", typeof(ComponentMock));
+            }
+            catch (ArgumentException)
+            {
+                //this is incase another test case registered this type already
+            }
+
+            try
+            {
+                ClassFactory.RegisterType("manager", typeof(ManagerMock));
+            }
+            catch (ArgumentException)
+            {
+                //this is incase another test case registered this type already
+            }
+
             evt.Entity = entity;
-            ClassFactory.RegisterType("manager", typeof(ManagerMock));
             Tuple<string, string> values = new Tuple<string, string>("Value", managerTest);
             List<Tuple<string, string>> list = new List<Tuple<string,string>>();
             list.Add(values);
