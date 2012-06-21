@@ -22,9 +22,9 @@
   </Using>
     
   <Prototype Name="paddle">
-    <Component Type="KinectFollowComponent" Direction="Y" Player="P1" Joint="HandLeft"/>
+    <Component Type="KinectFollowComponent" Direction="Y" Player="1" Joint="HandLeft"/>
     <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Rectangle"/>
-    <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" BodyType="Kinematic"/>
+    <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false"/>
     <Component Type="TransformComponent" Width="24" Height="128"/>
   </Prototype>
 
@@ -44,10 +44,10 @@
   <Prototype Name="ball" Value="0">
     <Component Type="RenderComponent" FillColor="Red" Shape="Ellipse" />
     <Component Type="TransformComponent" X="250" Y="250" Width="24" Height="24"/>
-    <Component Type="PhysicsComponent" XVelocity="40" YVelocity="20" Shape="Ellipse" Restitution="1" Mass="1" Friction="0" LinearDamping="0" BodyType="Dynamic"/>
+    <Component Type="PhysicsComponent" XVelocity="40" YVelocity="20" Shape="Ellipse" Restitution="1" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="true"/>
     <Event Type="CollisionEvent" CollidesWith="left_wall">
       <Action Type="SetPositionAction" X="400" Y="300" />
-      <Action Type="IncrementAction" Target="scene.player2Score"/>
+      <Action Type="IncrementAction" Target="scene.player2Score" IncrementBy="scene.scoreValue"/>
     </Event>
     <!-- this is done differently then the other one to test both methods-->
     <Event Type="CrossesLineEvent" Location="800" Line="X" Direction="Positive">
@@ -140,7 +140,7 @@
     <Entity Name="player2" Prototype="paddle">
       <Component Type="TransformComponent" X="782" Y="250"/>
       <!--this is testing to see that I can ovrride things in a Prototype-->
-      <Component Type="KinectFollowComponent" Player="P1" Joint="HandRight" />
+      <Component Type="KinectFollowComponent" Player="1" Joint="HandRight" />
       <Event Type="CrossesLineEvent" Line="Y" Location="450"  Direction="Positive">
         <Action Type="SetAttributeAction" Target="scene.ready2txt" Value="player 2 is ready!"/>
         <Action Type="SetAttributeAction" Target="scene.ready2" Value="true"/>
@@ -163,7 +163,7 @@
     </Entity>
 
     <Entity Name="player2" Prototype="paddle">
-      <Component Type="KinectFollowComponent" Player="P1" Joint="HandRight" />
+      <Component Type="KinectFollowComponent" Player="1" Joint="HandRight" />
       <Component Type="TransformComponent" X="782" Y="250"/>
       <Event Type="CollisionEvent" CollidesWith="$ball">
         <Action Type="IncrementAction" Target="scene.player2Score" IncrementBy="!CollidesWith.Value"/>
@@ -172,18 +172,18 @@
 
     <Entity Name="top_wall">
       <Component Type="TransformComponent" X="400" Y="0" Width="800" Height="2"/>
-      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" BodyType="Kinematic"/>
+      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false"/>
       <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Rectangle" />
     </Entity>
 
     <Entity Name="bottom_wall">
       <Component Type="TransformComponent" X="400" Y="600" Width="800" Height="2"/>
-      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" BodyType="Kinematic"/>
+      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false"/>
     </Entity>
 
     <Entity Name="left_wall">
       <Component Type="TransformComponent" X="0" Y="300" Width="2" Height="600"/>
-      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" BodyType="Kinematic"/>
+      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false"/>
     </Entity>
 
     <Entity Name="mainBall" Prototype="ball">
@@ -201,9 +201,11 @@
       <Event Type="TriggerOccursEvent" Trigger="player1Scores">
         <Action Type="SetTextAction" Value="{scene.player1Score}" />
       </Event>
-      <Event Type="AttributeEqualsEvent" Target="{scene.player1Score}" Value="15">
-        <Action Type="SetAttributeAction" Target="game.winner" Value="player 1 wins"/>
-        <Action Type="ChangeSceneAction" Target="Game Over"/>
+      <Event Type="AttributeChangesEvent" Target="{scene.player1Score}">
+        <Condition If="scene.player1Score >= 20">
+          <Action Type="SetAttributeAction" Target="game.winner" Value="player 1 wins"/>
+          <Action Type="ChangeSceneAction" Target="Game Over"/>
+        </Condition>
       </Event>
       <Event Type="AttributeEqualsEvent" Target="{scene.player1Score}" Value="10">
         <Action Type="CreateEntityAction" Prototype="leftBall"/>
@@ -215,9 +217,11 @@
       <Event Type="AttributeChangesEvent" Target="{scene.player2Score}">
         <Action Type="SetTextAction" Value="{scene.player2Score}" />
       </Event>
-      <Event Type="AttributeEqualsEvent" Target="{scene.player2Score}" Value="15">
-        <Action Type="SetAttributeAction" Target="game.winner" Value="player 2 wins"/>
-        <Action Type="ChangeSceneAction" Target="Game Over"/>
+      <Event Type="AttributeChangesEvent" Target="{scene.player2Score}">
+        <Condition If="scene.player2Score >= 20">
+          <Action Type="SetAttributeAction" Target="game.winner" Value="player 1 wins"/>
+          <Action Type="ChangeSceneAction" Target="Game Over"/>
+        </Condition>
       </Event>
       <Event Type="AttributeEqualsEvent" Target="{scene.player2Score}" Value="10">
         <Action Type="CreateEntityAction" Prototype="rightBall"/>
@@ -228,7 +232,7 @@
       <Component Type="TransformComponent" X="0" Y="75" Width="800"/>
       <Component Type="TextRenderComponent" Value="" FontSize="12" TextAlignment="Center"/>
       <Event Type="TriggerOccursEvent" Trigger="changeInfo">
-        <Action Type="SetTextAction" Value="Last hit by {scene.lastHit} At \{X,Y\} \{{scene.lastX},{scene.lastY}\} gravity was ({scene.PhysicsManager.XGravity},{scene.PhysicsManager.YGravity}) total score was [scene.player1Score + scene.player2Score] and player 1 was winning by at least 3 is [3 * scene.player1Score >= scene.player2Score]"/>
+        <Action Type="SetTextAction" Value="Last hit by {scene.lastHit} At \{X,Y\} \{{scene.lastX},{scene.lastY}\} gravity was ({scene.PhysicsManager.XGravity},{scene.PhysicsManager.YGravity}) total score was [scene.player1Score + scene.player2Score] and player 1 was winning by at least 3 is [3 + scene.player1Score >= scene.player2Score]"/>
       </Event>
     </Entity>
 

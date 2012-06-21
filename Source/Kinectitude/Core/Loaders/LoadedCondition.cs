@@ -13,7 +13,7 @@ namespace Kinectitude.Core.Loaders
         private readonly string ifValue;
         private readonly List<LoadedBaseAction> actions = new List<LoadedBaseAction>();
 
-        internal LoadedCondition(string ifVal, List<Tuple<string, string>> values) : base(values)
+        internal LoadedCondition(string ifVal) : base(null)
         {
             ifValue = ifVal;
         }

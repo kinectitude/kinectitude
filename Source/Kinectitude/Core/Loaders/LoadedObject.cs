@@ -21,7 +21,7 @@ namespace Kinectitude.Core.Loaders
             {
                 string param = val.Item1;
                 string value = val.Item2;
-                ClassFactory.SetParam(evt, param, value, evt, evt.Entity);
+                ClassFactory.SetParam(obj, param, value, evt, evt.Entity);
             }
         }
     }

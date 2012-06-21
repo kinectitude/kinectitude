@@ -39,14 +39,7 @@ namespace Kinectitude.Render
             renderManager.Add(this);
 
             transformComponent = GetComponent<TransformComponent>();
-            transformComponent.SubscribeToX(this, UpdateTransform);
-            transformComponent.SubscribeToY(this, UpdateTransform);
-            transformComponent.SubscribeToWidth(this, UpdateTransform);
-            transformComponent.SubscribeToHeight(this, UpdateTransform);
-
             rectangle = new RectangleF();
-            UpdateTransform();
-
             bitmap = renderManager.GetBitmap(Image);
         }
 
@@ -65,6 +58,7 @@ namespace Kinectitude.Render
 
         public void Render(RenderTarget renderTarget)
         {
+            UpdateTransform();
             renderTarget.DrawBitmap(bitmap, rectangle, Opacity);
         }
     }

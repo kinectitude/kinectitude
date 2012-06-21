@@ -11,8 +11,7 @@ namespace Kinectitude.Core.Loaders
     {
         private readonly string type;
 
-        internal LoadedAction(string type, List<Tuple<string, string>> values)
-            : base(values)
+        internal LoadedAction(string type, List<Tuple<string, string>> values): base(values)
         {
             this.type = type;
         }

@@ -31,12 +31,6 @@ namespace Kinectitude.Physics
         [Plugin("Shape", "")]
         public string Shape { get; set; }
 
-        [Preset("Bouncy Ball", BodyType.Dynamic)]
-        [Preset("Collision Event Line", BodyType.Kinematic)]
-        [Preset("Wall", BodyType.Kinematic)]
-        [Plugin("Body Type", "")]
-        public BodyType BodyType { get; set; }
-
         [Preset("Bouncy Ball", 1.0)]
         [Preset("Collision Event Line", 0.0)]
         [Preset("Wall", 0.0)]
@@ -99,6 +93,7 @@ namespace Kinectitude.Physics
                     body.LinearVelocity = new Vector2(value * speedRatio, YVelocity * speedRatio);
                 }
                 xVelocity = value;
+                hasPotentialVelocity = true;
             }
         }
 
@@ -113,40 +108,43 @@ namespace Kinectitude.Physics
                 {
                     body.LinearVelocity = new Vector2(xVelocity * speedRatio, value * speedRatio);
                 }
-                yVelocity = value; 
+                yVelocity = value;
+                hasPotentialVelocity = true;
             }
         }
 
-        [Plugin("AngularVelocity Velocity", "")]
-        public float AngularVelocity { get; set; }
-
-        public PhysicsComponent() : base() { }
-
-        public override void OnUpdate(float t)
+        private float angularVelocity;
+        [Plugin("Angular Velocity Velocity", "")]
+        public float AngularVelocity
         {
-            float prevX = tc.X;
-            float prevY = tc.Y;
-            float x = body.Position.X / sizeRatio;
-            float y = body.Position.Y / sizeRatio;
-
-            tc.setX(this, x);
-            tc.setY(this, y);
-
-            xVelocity = body.LinearVelocity.X / speedRatio;
-            yVelocity = body.LinearVelocity.Y / speedRatio;
-			
-			float speed = body.LinearVelocity.Length();
-
-            if (speed > maximumVelocity)
+            get { return angularVelocity; }
+            set
             {
-                body.LinearVelocity = body.LinearVelocity / speed * maximumVelocity;
+                angularVelocity = value;
+                hasPotentialVelocity = true;
             }
+        }
 
-            if (speed < minimumVelocity)
-            {
-                body.LinearVelocity = body.LinearVelocity / speed * minimumVelocity;
-            }
 
+        [Preset("Bouncy Ball", true)]
+        [Preset("Collision Event Line", false)]
+        [Preset("Wall", false)]
+        [Plugin("Object moves when hit", "")]
+        public bool MovesWhenHit { get; set; }
+
+        private bool hasCollisions = false;
+        private bool hasPotentialVelocity = false;
+        private float prevX;
+        private float prevY;
+
+        public PhysicsComponent()
+        {
+            MovesWhenHit = true;
+        }
+
+
+        private void checkCrossesLine(float x, float y)
+        {
             //TODO make this done in farseer somehow
             if (crossesLineEvents.Count != 0)
             {
@@ -189,6 +187,39 @@ namespace Kinectitude.Physics
             }
         }
 
+        public override void OnUpdate(float t)
+        {
+            //the body needs to be moved because of a set position that was triggered
+            if (prevX != tc.X || prevY != tc.Y)
+            {
+
+            }
+            else
+            {
+                float x = body.Position.X / sizeRatio;
+                float y = body.Position.Y / sizeRatio;
+                tc.X = x;
+                tc.Y = y;
+                checkCrossesLine(x, y);
+
+            }
+
+            xVelocity = body.LinearVelocity.X / speedRatio;
+            yVelocity = body.LinearVelocity.Y / speedRatio;
+			
+			float speed = body.LinearVelocity.Length();
+
+            if (speed > maximumVelocity)
+            {
+                body.LinearVelocity = body.LinearVelocity / speed * maximumVelocity;
+            }
+
+            if (speed < minimumVelocity)
+            {
+                body.LinearVelocity = body.LinearVelocity / speed * minimumVelocity;
+            }
+        }
+
         public void AddCrossLineEvent(CrossesLineEvent evt)
         {
             crossesLineEvents.Add(evt);
@@ -196,13 +227,16 @@ namespace Kinectitude.Physics
 
         public void AddCollisionEvent(CollisionEvent evt)
         {
+            hasCollisions = true;
             collisionEvents.Add(evt);
         }
 
         public void SetPosition()
         {
-			body.Awake = true;
-            body.Position = new Vector2(tc.X * sizeRatio, tc.Y * sizeRatio);
+            body.Awake = true;
+            prevX = tc.X;
+            prevY = tc.Y;
+            body.Position = new Vector2(prevX * sizeRatio, prevY * sizeRatio);
         }
 
         public void SetSize()
@@ -228,23 +262,24 @@ namespace Kinectitude.Physics
                 body = BodyFactory.CreateRectangle(pm.PhysicsWorld, width, height, 1f);
             }
 
-            body.BodyType = BodyType.Dynamic;
-            body.Restitution = Restitution;
-            body.Friction = Friction;
-            body.LinearDamping = LinearDamping;
-            body.UserData = IEntity;
-
-            if (BodyType == BodyType.Kinematic || BodyType == BodyType.Static)
+            if (hasCollisions)
             {
-                body.Mass = (float)int.MaxValue;
+                body.BodyType = BodyType.Dynamic;
+                body.Mass = MovesWhenHit? body.Mass = Mass: (float)int.MaxValue;
+                body.Restitution = Restitution;
+            }
+            else if (hasPotentialVelocity)
+            {
+                body.BodyType = BodyType.Kinematic;
             }
             else
             {
-                body.Mass = Mass;
+                body.BodyType = BodyType.Static;
             }
-
-            body.IsStatic = (BodyType == BodyType.Static);
-            body.Awake = false;
+            
+            body.Friction = Friction;
+            body.LinearDamping = LinearDamping;
+            body.UserData = IEntity;
 
             //Add a listener for collisions
             body.OnCollision += OnCollision;

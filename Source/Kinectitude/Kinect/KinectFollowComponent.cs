@@ -8,7 +8,6 @@ namespace Kinectitude.Kinect
     [Plugin("Kinect Motion Component", "")]
     public class KinectFollowComponent : KinectComponent
     {
-        public enum PlayerType { P1, P2 };
         public enum FollowType { X, Y, Both };
 
         private float nextDx = 0;
@@ -23,12 +22,10 @@ namespace Kinectitude.Kinect
         public JointType Joint { get; set; }
 
         [Plugin("Player", "")]
-        public PlayerType Player { get; set; }
+        public int Player { get; set; }
 
         [Plugin("Axis", "")]
         public FollowType Direction { get; set; }
-
-        public KinectFollowComponent() : base() { }
 
         public void UpdatePosition(float x, float y)
         {
@@ -83,7 +80,6 @@ namespace Kinectitude.Kinect
             transform = GetComponent<TransformComponent>();
             physics = GetComponent<IPhysics>();
         }
-
 
         public override void Destroy()
         {

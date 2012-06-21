@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Base;
-using Kinectitude.Core.ComponentInterfaces;
 
 namespace Kinectitude.Physics
 {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Data;
+using Action = Kinectitude.Core.Base.Action;
 
 namespace Kinectitude.Core.Loaders
 {
@@ -118,7 +119,16 @@ namespace Kinectitude.Core.Loaders
                         }
                         values.Add(new Tuple<string, string>(attrib.Name.ToString(), attrib.Value));
                     }
-                    Scene.CreateAction(evt, action.Attribute("Type").Value, values, cond);
+                    LoadedAction loadedAction = new LoadedAction(action.Attribute("Type").Value, values);
+                    Action created = loadedAction.Create(evt);
+                    if (null != cond)
+                    {
+                        cond.AddAction(created);
+                    }
+                    else
+                    {
+                        evt.AddAction(created);
+                    }
                 }
                 else if (action.Name == ConditionName)
                 {
@@ -262,8 +272,9 @@ namespace Kinectitude.Core.Loaders
 
         private Condition createCondition(Game game, Event e, XElement node)
         {
-            BoolExpressionReader br = new BoolExpressionReader((string)node.Attribute("If"), e, e.Entity);
-            Condition c = new Condition(br);
+
+            LoadedCondition lc = new LoadedCondition((string)node.Attribute("If"));
+            Condition c = lc.Create(e) as Condition;
             AddActions(game, node, e, c);
             return c;
         }

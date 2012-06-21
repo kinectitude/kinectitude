@@ -46,6 +46,7 @@
     <Compile Include="KinectComponent.cs" />
     <Compile Include="KinectFollowComponent.cs" />
     <Compile Include="KinectManager.cs" />
+    <Compile Include="KinectService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

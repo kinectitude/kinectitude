@@ -130,7 +130,7 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        internal void CreateAction(Event evt, string type, List<Tuple<string, string>> attribs, Condition cond = null)
+        /*internal void CreateAction(Event evt, string type, List<Tuple<string, string>> attribs, Condition cond = null)
         {
             Action action = ClassFactory.Create<Action>(type);
             action.Event = evt;
@@ -146,7 +146,7 @@ namespace Kinectitude.Core.Base
             {
                 cond.AddAction(action);
             }
-        }
+        }*/
 
         internal void FireTrigger(string triggerName)
         {

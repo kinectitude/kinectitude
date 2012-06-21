@@ -23,5 +23,7 @@ namespace Kinectitude.Core.ComponentInterfaces
         float MaximumVelocity { get; set; }
 
         float MinimumVelocity { get; set; }
+
+        bool MovesWhenHit { get; set; }
     }
 }

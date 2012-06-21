@@ -21,16 +21,14 @@ namespace Kinectitude.Core.Loaders
 
         private readonly List<LoadedEvent> events = new List<LoadedEvent>();
 
-        private readonly int id;
 
         private readonly string name;
 
         private bool firstCreate = true;
 
-        internal LoadedEntity(string name, int id, List<Tuple<string, string>> values): base(values)
+        internal LoadedEntity(string name, List<Tuple<string, string>> values): base(values)
         {
             this.name = name;
-            this.id = id;
         }
 
         internal void AddLoadedComponent(LoadedComponent component)
@@ -48,7 +46,7 @@ namespace Kinectitude.Core.Loaders
             }
         }
 
-        internal Entity Create()
+        internal Entity Create(int id)
         {
 
             if (firstCreate)
@@ -75,16 +73,14 @@ namespace Kinectitude.Core.Loaders
 
             Entity entity = new Entity(id);
 
+            setValues(entity, null);
+
             foreach (LoadedEvent loadedEvent in events)
             {
                 Event evt = loadedEvent.Create(entity);
+                evt.Initialize();
             }
-
-            //return entity;
-
-            //TODO
-            throw new Exception("LOL");
+            return entity;
         }
-
     }
 }
