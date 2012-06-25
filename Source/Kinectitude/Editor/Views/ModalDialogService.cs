@@ -22,14 +22,14 @@ namespace Kinectitude.Editor.Views
             views = new Dictionary<string, Type>();
         }
 
-        public static void ShowDialog<TViewModel>(string name, TViewModel viewModel, Action<bool?, TViewModel> onDialogClose)
+        public static void ShowDialog<TViewModel>(string name, TViewModel viewModel, Action<bool?> onDialogClose)
         {
             Window view = GetWindow(name);
             view.DataContext = viewModel;
 
             if (null != onDialogClose)
             {
-                view.Closed += (sender, args) => onDialogClose(view.DialogResult, viewModel);
+                view.Closed += (sender, args) => onDialogClose(view.DialogResult);
             }
             view.ShowDialog();
         }

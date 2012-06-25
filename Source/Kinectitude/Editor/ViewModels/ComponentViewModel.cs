@@ -31,7 +31,7 @@ namespace Kinectitude.Editor.ViewModels
             get { return descriptor; }
         }
 
-        public IEnumerable<ComponentPropertyViewModel> Properties
+        public ModelCollection<ComponentPropertyViewModel> Properties
         {
             get { return properties; }
         }
@@ -74,9 +74,9 @@ namespace Kinectitude.Editor.ViewModels
                 component = new Component(descriptor);
             }
 
-            //var propertyViewModels = from propertyDescriptor in descriptor.PropertyDescriptors select new ComponentPropertyViewModel(entity, propertyDescriptor);
-            //_properties = new ObservableCollection<ComponentPropertyViewModel>(propertyViewModels);
-            //properties = new ModelCollection<ComponentPropertyViewModel>(_properties);
+            var propertyViewModels = from propertyDescriptor in descriptor.PropertyDescriptors select new ComponentPropertyViewModel(entity, descriptor, propertyDescriptor);
+            _properties = new ObservableCollection<ComponentPropertyViewModel>(propertyViewModels);
+            properties = new ModelCollection<ComponentPropertyViewModel>(_properties);
         }
 
         public void AddComponent()
@@ -93,6 +93,11 @@ namespace Kinectitude.Editor.ViewModels
             {
                 entity.RemoveComponent(component);
             }
+        }
+
+        public ComponentPropertyViewModel GetPropertyViewModel(string name)
+        {
+            return _properties.FirstOrDefault(x => x.Name == name);
         }
     }
 }

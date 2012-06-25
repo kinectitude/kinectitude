@@ -252,16 +252,16 @@ namespace Kinectitude.Editor.ViewModels
         public void ExecuteCreatePrototypeCommand(object parameter)
         {
             Entity entity = new Entity();
-            EntityViewModel viewModel = EntityViewModel.GetViewModel(entity);
+            EntityViewModel entityViewModel = EntityViewModel.GetViewModel(entity);
 
-            EntityDialog dialog = new EntityDialog();
-            dialog.DataContext = viewModel;
-            dialog.ShowDialog();
-
-            if (dialog.DialogResult == true)
-            {
-                AddPrototype(viewModel);
-            }
+            ModalDialogService.ShowDialog<EntityViewModel>(ModalDialogService.Constants.EntityDialog, entityViewModel, (result) =>
+                {
+                    if (true == result)
+                    {
+                        AddPrototype(entityViewModel);
+                    }
+                }
+            );
         }
 
         public void ExecuteDeleteItemCommand(object parameter)

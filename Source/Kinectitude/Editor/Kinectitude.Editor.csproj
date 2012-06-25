@@ -142,7 +142,7 @@
     <Compile Include="ViewModels\ActionViewModel.cs" />
     <Compile Include="ViewModels\AttributeViewModel.cs" />
     <Compile Include="ViewModels\IModalWindow.cs" />
-    <Compile Include="ViewModels\PropertyViewModel.cs" />
+    <Compile Include="ViewModels\ComponentPropertyViewModel.cs" />
     <Compile Include="ViewModels\EntityAttributeViewModel.cs" />
     <Compile Include="ViewModels\IAttributeViewModel.cs" />
     <Compile Include="Views\ComponentDialog.xaml.cs">
@@ -262,10 +262,9 @@
     <Resource Include="Icons\cog_add.png" />
     <Resource Include="Icons\tag.png" />
     <Resource Include="Icons\bullet_toggle_minus.png" />
-    <Content Include="Storage\schema.xsd">
+    <EmbeddedResource Include="Storage\schema.xsd">
       <SubType>Designer</SubType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\disk.png" />

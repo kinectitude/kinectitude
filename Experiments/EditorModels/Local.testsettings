@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<TestSettings name="Local" id="b72a577d-fe44-42f8-8c14-62d9179b77d3" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestSettings name="Local" id="70d21846-fbcb-4a89-9945-6a41c7dd1b30" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Description>These are default test settings for a local test run.</Description>
   <Execution>
     <TestTypeSpecific>
@@ -25,13 +25,7 @@
           <Configuration>
             <CodeCoverage xmlns="">
               <Regular>
-<<<<<<< Updated upstream
-                <CodeCoverageItem binaryFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Editor.exe" pdbFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Editor.instr.pdb" instrumentInPlace="true" />
-                <CodeCoverageItem binaryFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Core.dll" pdbFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Core.instr.pdb" instrumentInPlace="true" />
-=======
-                <CodeCoverageItem binaryFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Editor.exe" pdbFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Editor.pdb" instrumentInPlace="true" />
-                <CodeCoverageItem binaryFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Core.dll" pdbFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Core.pdb" instrumentInPlace="true" />
->>>>>>> Stashed changes
+                <CodeCoverageItem binaryFile="EditorModels\bin\Test\EditorModels.exe" pdbFile="EditorModels\bin\Test\EditorModels.pdb" instrumentInPlace="true" />
               </Regular>
             </CodeCoverage>
           </Configuration>

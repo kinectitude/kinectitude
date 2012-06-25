@@ -54,6 +54,11 @@ namespace Kinectitude.Editor.Models.Properties
             get { return enumeration; }
         }
 
+        public string DefaultValue
+        {
+            get { return "Default Value"; }
+        }
+
         public PropertyDescriptor(PropertyInfo propertyInfo)
         {
             name = propertyInfo.Name;

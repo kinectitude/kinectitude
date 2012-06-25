@@ -350,13 +350,13 @@ namespace Kinectitude.Editor.ViewModels
 
         public void ExecuteAddComponentCommand(object parameter)
         {
-            ModalDialogService.ShowDialog<EntityViewModel>(ModalDialogService.Constants.ComponentDialog, this, (result, viewModel) =>
+            ModalDialogService.ShowDialog<EntityViewModel>(ModalDialogService.Constants.ComponentDialog, this, (result) =>
             {
                 if (true == result)
                 {
                     PluginDescriptor descriptor = selectedComponent.Descriptor;
                     ComponentViewModel componentViewModel = new ComponentViewModel(entity, descriptor);
-                    viewModel.AddComponent(componentViewModel);
+                    AddComponent(componentViewModel);
                 }
             });
         }

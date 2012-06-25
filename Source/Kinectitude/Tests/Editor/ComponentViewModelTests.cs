@@ -14,6 +14,25 @@ namespace Kinectitude.Tests.Editor
     public class ComponentViewModelTests
     {
         [TestMethod]
+        public void ComponentHasDefaultInheritedProperties()
+        {
+            PluginDescriptor descriptor = new PluginDescriptor(typeof(TransformComponent));
+            Entity entity = new Entity();
+
+            ComponentViewModel componentViewModel = new ComponentViewModel(entity, descriptor);
+
+            Assert.AreNotEqual(componentViewModel.Properties.Count(), 0);
+
+            foreach (ComponentPropertyViewModel propertyViewModel in componentViewModel.Properties)
+            {
+                if (propertyViewModel.IsLocal)
+                {
+                    Assert.Fail();
+                }
+            }
+        }
+
+        [TestMethod]
         public void AddNewComponentToEntity()
         {
             PluginDescriptor descriptor = new PluginDescriptor(typeof(TransformComponent));
