@@ -36,6 +36,7 @@
   <xs:element name="Scene">
     <xs:complexType>
       <xs:sequence>
+        <xs:element ref="Manager" minOccurs="0" maxOccurs="unbounded" />
         <xs:element ref="Entity" minOccurs="0" maxOccurs="unbounded" />
       </xs:sequence>
       <xs:attribute name="Name" type="xs:string" use="required" />
@@ -43,6 +44,13 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:element name="Manager">
+    <xs:complexType>
+      <xs:attribute name="Type" type="xs:string" use="required" />
+      <xs:anyAttribute processContents="lax" />
+    </xs:complexType>
+  </xs:element>
+  
   <xs:complexType name="EntityType">
     <xs:sequence>
       <xs:element ref="Component" minOccurs="0" maxOccurs="unbounded" />
