@@ -17,7 +17,7 @@ namespace Kinectitude.Core.Data
         {
             foreach (TypeMatcher r in readables)
             {
-                if (MatchAndSet(DataContainer))
+                if (r.MatchAndSet(DataContainer))
                 {
                     OldDataContainer = this.DataContainer;
                     this.DataContainer = DataContainer as DataContainer;

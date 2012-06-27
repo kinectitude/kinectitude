@@ -189,7 +189,7 @@ namespace Kinectitude.Physics
             }
         }
 
-        public override void OnUpdate(float t)
+        private void setVelocity()
         {
             //the body needs to be moved because of a set position that was triggered
             if (prevX != tc.X || prevY != tc.Y)
@@ -207,6 +207,9 @@ namespace Kinectitude.Physics
 			
 			float speed = body.LinearVelocity.Length();
 
+            xVelocity = body.LinearVelocity.X / speedRatio;
+            yVelocity = body.LinearVelocity.Y / speedRatio;
+
             if (speed > maximumVelocity)
             {
                 body.LinearVelocity = body.LinearVelocity / speed * maximumVelocity;
@@ -219,6 +222,21 @@ namespace Kinectitude.Physics
 
             xVelocity = body.LinearVelocity.X / speedRatio;
             yVelocity = body.LinearVelocity.Y / speedRatio;
+        }
+
+        public override void OnUpdate(float t)
+        {
+            //the body needs to be moved because of a set position that was triggered
+            if (prevX == tc.X && prevY == tc.Y)
+            {
+                float x = body.Position.X / sizeRatio;
+                float y = body.Position.Y / sizeRatio;
+                tc.X = x;
+                tc.Y = y;
+                checkCrossesLine(x, y);
+            }
+
+            setVelocity();
         }
 
         public void AddCrossLineEvent(CrossesLineEvent evt)

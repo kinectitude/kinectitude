@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Game Name="pong" Width="800" Height="600" FirstScene="game" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1">
+<Game Name="pong" Width="800" Height="600" FirstScene="Main Menu" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1">
 
   <Using File="Kinectitude.Kinect.dll">
     <Define Name="KinectFollowComponent" Class="Kinectitude.Kinect.KinectFollowComponent"/>
@@ -49,11 +49,9 @@
       <Action Type="SetPositionAction" X="400" Y="300" />
       <Action Type="IncrementAction" Target="scene.player2Score" IncrementBy="scene.scoreValue"/>
     </Event>
-    <!-- this is done differently then the other one to test both methods-->
-    <Event Type="CrossesLineEvent" Location="800" Line="X" Direction="Positive">
+    <Event Type="CollisionEvent" CollidesWith="right_wall">
       <Action Type="SetPositionAction" X="400" Y="300" />
-      <Action Type="IncrementAction" Target="scene.player1Score" IncrementBy="scene.scoreValue" />
-      <Action Type="FireTriggerAction" Name="player1Scores"/>
+      <Action Type="IncrementAction" Target="scene.player1Score" IncrementBy="scene.scoreValue"/>
     </Event>
     <Event Type="CollisionEvent" CollidesWith="$paddle">
       <Action Type="SetAttributeAction" Target="scene.lastHit" Value="{!CollidesWith}"/>
@@ -64,12 +62,8 @@
   </Prototype>
 
   <Prototype Name="rightBall" Prototype="ball" Value="0.1">
-    <Event Type="CollisionEvent" CollidesWith="left_wall">
+    <Event Type="CollisionEvent" CollidesWith="left_wall right_wall">
       <Action Type="IncrementAction" Target="scene.player2Score" />
-      <Action Type="DestroyAction"/>
-    </Event>
-    <Event Type="CrossesLineEvent" Location="800" Line="X" Direction="Positive">
-      <Action Type="IncrementAction" Target="scene.player1Score" />
       <Action Type="DestroyAction"/>
     </Event>
   </Prototype>
@@ -185,6 +179,11 @@
       <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false" FixedRotation="true"/>
     </Entity>
 
+    <Entity Name="right_wall">
+      <Component Type="TransformComponent" X="800" Y="300" Width="2" Height="600"/>
+      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false"/>
+    </Entity>
+
     <Entity Name="mainBall" Prototype="ball">
       <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Ellipse" />
     </Entity>
@@ -197,17 +196,16 @@
 
     <Entity Prototype="score">
       <Component Type="TransformComponent" X="56" Y="24"/>
-      <Event Type="TriggerOccursEvent" Trigger="player1Scores">
-        <Action Type="SetTextAction" Value="{scene.player1Score}" />
-      </Event>
       <Event Type="AttributeChangesEvent" Target="{scene.player1Score}">
+        <Action Type="SetTextAction" Value="{scene.player1Score}" />
         <Condition If="scene.player1Score >= 20">
           <Action Type="SetAttributeAction" Target="game.winner" Value="player 1 wins"/>
           <Action Type="ChangeSceneAction" Target="Game Over"/>
         </Condition>
-      </Event>
-      <Event Type="AttributeEqualsEvent" Target="{scene.player1Score}" Value="10">
-        <Action Type="CreateEntityAction" Prototype="leftBall"/>
+        <Condition If="scene.player1Score >= 10 and not scene.ball1">
+          <Action Type="CreateEntityAction" Prototype="leftBall"/>
+          <Action Type="SetAttributeAction" Target="scene.ball1" Value="true"/>
+        </Condition>
       </Event>
     </Entity>
 
@@ -215,15 +213,14 @@
       <Component Type="TransformComponent"  X="724" Y="24"/>
       <Event Type="AttributeChangesEvent" Target="{scene.player2Score}">
         <Action Type="SetTextAction" Value="{scene.player2Score}" />
-      </Event>
-      <Event Type="AttributeChangesEvent" Target="{scene.player2Score}">
         <Condition If="scene.player2Score >= 20">
-          <Action Type="SetAttributeAction" Target="game.winner" Value="player 1 wins"/>
+          <Action Type="SetAttributeAction" Target="game.winner" Value="player 2 wins"/>
           <Action Type="ChangeSceneAction" Target="Game Over"/>
         </Condition>
-      </Event>
-      <Event Type="AttributeEqualsEvent" Target="{scene.player2Score}" Value="10">
-        <Action Type="CreateEntityAction" Prototype="rightBall"/>
+        <Condition If="scene.player2Score >= 10 and not scene.ball2">
+          <Action Type="CreateEntityAction" Prototype="rightBall"/>
+          <Action Type="SetAttributeAction" Target="scene.ball2" Value="true"/>
+        </Condition>
       </Event>
     </Entity>
 
