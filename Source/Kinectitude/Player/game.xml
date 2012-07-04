@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Game Name="pong" Width="800" Height="600" FirstScene="Main Menu" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1">
+<Game Name="pong" Width="800" Height="600" FirstScene="game" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1">
 
   <Using File="Kinectitude.Kinect.dll">
     <Define Name="KinectFollowComponent" Class="Kinectitude.Kinect.KinectFollowComponent"/>
@@ -24,7 +24,7 @@
   <Prototype Name="paddle">
     <Component Type="KinectFollowComponent" Direction="Y" Player="1" Joint="HandLeft"/>
     <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Rectangle"/>
-    <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false"/>
+    <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false" FixedRotation="true"/>
     <Component Type="TransformComponent" Width="24" Height="128"/>
   </Prototype>
 
@@ -44,7 +44,7 @@
   <Prototype Name="ball" Value="0">
     <Component Type="RenderComponent" FillColor="Red" Shape="Ellipse" />
     <Component Type="TransformComponent" X="250" Y="250" Width="24" Height="24"/>
-    <Component Type="PhysicsComponent" XVelocity="40" YVelocity="20" Shape="Ellipse" Restitution="1" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="true"/>
+    <Component Type="PhysicsComponent" MinimumVelocity="5" MaximumVelocity="5" XVelocity="40" YVelocity="20" Shape="Ellipse" Restitution="1" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="true" FixedRotation="true"/>
     <Event Type="CollisionEvent" CollidesWith="left_wall">
       <Action Type="SetPositionAction" X="400" Y="300" />
       <Action Type="IncrementAction" Target="scene.player2Score" IncrementBy="scene.scoreValue"/>
@@ -172,18 +172,17 @@
 
     <Entity Name="top_wall">
       <Component Type="TransformComponent" X="400" Y="0" Width="800" Height="2"/>
-      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false"/>
-      <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Rectangle" />
+      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false" FixedRotation="true"/>
     </Entity>
 
     <Entity Name="bottom_wall">
       <Component Type="TransformComponent" X="400" Y="600" Width="800" Height="2"/>
-      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false"/>
+      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false" FixedRotation="true"/>
     </Entity>
 
     <Entity Name="left_wall">
       <Component Type="TransformComponent" X="0" Y="300" Width="2" Height="600"/>
-      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false"/>
+      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false" FixedRotation="true"/>
     </Entity>
 
     <Entity Name="mainBall" Prototype="ball">

@@ -8,6 +8,7 @@ using Kinectitude.Core.Base;
 using Kinectitude.Core.ComponentInterfaces;
 using Kinectitude.Core.Components;
 using Microsoft.Xna.Framework;
+using FarseerPhysics.Common;
 
 namespace Kinectitude.Physics
 {
@@ -55,7 +56,6 @@ namespace Kinectitude.Physics
         [Plugin("Linear Damping", "")]
         public float LinearDamping { get; set; }
 
-        private bool hasMaximumVelocity = false;
         private float maximumVelocity = float.PositiveInfinity;
         [Plugin("Maximum velocity", "")]
         public float MaximumVelocity
@@ -63,12 +63,10 @@ namespace Kinectitude.Physics
             get { return maximumVelocity; }
             set
             {
-                hasMaximumVelocity = true;
                 maximumVelocity = value;
             }
         }
 
-        private bool hasMinimumVelocity = false;
         private float minimumVelocity = 0;
         [Plugin("Minimum velocity", "")]
         public float MinimumVelocity
@@ -76,7 +74,6 @@ namespace Kinectitude.Physics
             get { return minimumVelocity; }
             set
             {
-                hasMinimumVelocity = true;
                 minimumVelocity = value;
             }
         }
@@ -125,12 +122,17 @@ namespace Kinectitude.Physics
             }
         }
 
-
         [Preset("Bouncy Ball", true)]
         [Preset("Collision Event Line", false)]
         [Preset("Wall", false)]
         [Plugin("Object moves when hit", "")]
         public bool MovesWhenHit { get; set; }
+
+        [Preset("Bouncy Ball", false)]
+        [Preset("Collision Event Line", false)]
+        [Preset("Wall", false)]
+        [Plugin("Object can rotate as it moves", "")]
+        public bool FixedRotation { get; set; }
 
         private bool hasCollisions = false;
         private bool hasPotentialVelocity = false;
@@ -140,8 +142,8 @@ namespace Kinectitude.Physics
         public PhysicsComponent()
         {
             MovesWhenHit = true;
+            FixedRotation = true;
         }
-
 
         private void checkCrossesLine(float x, float y)
         {
@@ -201,11 +203,7 @@ namespace Kinectitude.Physics
                 tc.X = x;
                 tc.Y = y;
                 checkCrossesLine(x, y);
-
             }
-
-            xVelocity = body.LinearVelocity.X / speedRatio;
-            yVelocity = body.LinearVelocity.Y / speedRatio;
 			
 			float speed = body.LinearVelocity.Length();
 
@@ -218,6 +216,9 @@ namespace Kinectitude.Physics
             {
                 body.LinearVelocity = body.LinearVelocity / speed * minimumVelocity;
             }
+
+            xVelocity = body.LinearVelocity.X / speedRatio;
+            yVelocity = body.LinearVelocity.Y / speedRatio;
         }
 
         public void AddCrossLineEvent(CrossesLineEvent evt)
@@ -241,6 +242,7 @@ namespace Kinectitude.Physics
 
         public void SetSize()
         {
+            //Vertices vertices =
             throw new NotImplementedException("THE PHYSICS COMPONENT WON'T SET THE SIZE CURRENTLY");
         }
 
@@ -265,8 +267,6 @@ namespace Kinectitude.Physics
             if (hasCollisions)
             {
                 body.BodyType = BodyType.Dynamic;
-                body.Mass = MovesWhenHit? body.Mass = Mass: (float)int.MaxValue;
-                body.Restitution = Restitution;
             }
             else if (hasPotentialVelocity)
             {
@@ -276,11 +276,15 @@ namespace Kinectitude.Physics
             {
                 body.BodyType = BodyType.Static;
             }
-            
+
+            body.FixedRotation = FixedRotation;
+            body.AngularVelocity = AngularVelocity;
+            body.Mass = MovesWhenHit ? body.Mass = Mass : (float)int.MaxValue;
+            body.Restitution = Restitution;
             body.Friction = Friction;
             body.LinearDamping = LinearDamping;
             body.UserData = IEntity;
-
+            
             //Add a listener for collisions
             body.OnCollision += OnCollision;
 

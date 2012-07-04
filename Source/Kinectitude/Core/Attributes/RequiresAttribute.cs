@@ -14,7 +14,7 @@ namespace Kinectitude.Core.Attributes
 
         public RequiresAttribute(Type type)
         {
-            Type = type;
+            this.type = type;
         }
     }
 }
