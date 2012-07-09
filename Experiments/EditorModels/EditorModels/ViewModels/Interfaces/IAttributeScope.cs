@@ -1,14 +1,14 @@
-﻿
-using System;
-namespace EditorModels.ViewModels
-{
-    internal delegate void KeyEventHandler(string key);
+﻿using System;
 
-    internal interface IAttributeScope
+namespace EditorModels.ViewModels.Interfaces
+{
+    internal delegate void AttributeEventHandler(string key);
+
+    internal interface IAttributeScope : IScope
     {
-        event KeyEventHandler InheritedAttributeAdded;
-        event KeyEventHandler InheritedAttributeRemoved;
-        event KeyEventHandler InheritedAttributeChanged;
+        event AttributeEventHandler InheritedAttributeAdded;
+        event AttributeEventHandler InheritedAttributeRemoved;
+        event AttributeEventHandler InheritedAttributeChanged;
 
         string GetInheritedValue(string key);
         bool HasInheritedAttribute(string key);

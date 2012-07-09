@@ -5,5 +5,5 @@ using System.Text;
 
 namespace EditorModels.ViewModels.Interfaces
 {
-    interface ISceneScope : IEntityNamespace, IPluginNamespace { }
+    interface ISceneScope : IScope, IEntityNamespace, IPluginNamespace { }
 }

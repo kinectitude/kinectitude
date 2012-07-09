@@ -27,13 +27,13 @@ namespace EditorModels.ViewModels
 #endif
 
         public event DefineAddedEventHandler DefineAdded;
-        public event DefinedNameChangedEventHandler DefinedNameChanged;
+        public event DefinedNameChangedEventHandler DefineChanged;
         public event ScopeChangedEventHandler ScopeChanged;
         public event PluginAddedEventHandler PluginAdded;
 
-        public event KeyEventHandler InheritedAttributeAdded { add { } remove { } }
-        public event KeyEventHandler InheritedAttributeRemoved { add { } remove { } }
-        public event KeyEventHandler InheritedAttributeChanged { add { } remove { } }
+        public event AttributeEventHandler InheritedAttributeAdded { add { } remove { } }
+        public event AttributeEventHandler InheritedAttributeRemoved { add { } remove { } }
+        public event AttributeEventHandler InheritedAttributeChanged { add { } remove { } }
 
         public string Name
         {
@@ -140,7 +140,7 @@ namespace EditorModels.ViewModels
             if (null != this.scope)
             {
                 this.scope.DefineAdded -= OnDefineAdded;
-                this.scope.DefinedNameChanged -= OnDefinedNameChanged;
+                this.scope.DefineChanged -= OnDefinedNameChanged;
                 this.scope.ScopeChanged -= OnScopeChanged;
             }
 
@@ -160,24 +160,22 @@ namespace EditorModels.ViewModels
             if (null != this.scope)
             {
                 this.scope.DefineAdded += OnDefineAdded;
-                this.scope.DefinedNameChanged += OnDefinedNameChanged;
+                this.scope.DefineChanged += OnDefinedNameChanged;
                 this.scope.ScopeChanged += OnScopeChanged;
             }
 
-            RaiseScopeChanged();
+            NotifyScopeChanged();
         }
 
         public void AddAttribute(AttributeViewModel attribute)
         {
             attribute.SetScope(scene, this);
-            //attribute.PropertyChanged += OnAttributePropertyChanged;
             Attributes.Add(attribute);
         }
 
         public void RemoveAttribute(AttributeViewModel attribute)
         {
             attribute.SetScope(null, null);
-            //attribute.PropertyChanged -= OnAttributePropertyChanged;
             Attributes.Remove(attribute);
         }
 
@@ -199,7 +197,13 @@ namespace EditorModels.ViewModels
             {
                 entity.SetScope(scene, this);
                 Entities.Add(entity);
+
                 entity.Components.CollectionChanged += OnEntityComponentChanged;
+                foreach (ComponentViewModel component in entity.Components)
+                {
+                    ResolveComponentDependencies(component);
+                }
+
                 entity.PluginAdded += OnEntityPluginAdded;
             }
         }
@@ -217,14 +221,18 @@ namespace EditorModels.ViewModels
             return string.Format("attribute{0}", nextAttribute++);
         }
 
-        /*private void OnAttributePropertyChanged(object sender, PropertyChangedEventArgs args)
+        private void ResolveComponentDependencies(ComponentViewModel component)
         {
-            if (args.PropertyName == "Value" && null != AttributeChanged)
+            foreach (string require in component.Requires)
             {
-                AttributeViewModel attribute = sender as AttributeViewModel;
-                AttributeChanged(attribute.Key);
+                PluginViewModel plugin = GetPlugin(require);
+                if (plugin.Type == PluginType.Manager)
+                {
+                    ManagerViewModel manager = new ManagerViewModel(plugin);
+                    AddManager(manager);
+                }
             }
-        }*/
+        }
 
         private void OnEntityComponentChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
@@ -232,15 +240,7 @@ namespace EditorModels.ViewModels
             {
                 foreach (ComponentViewModel component in args.NewItems)
                 {
-                    foreach (string require in component.Requires)
-                    {
-                        PluginViewModel plugin = GetPlugin(require);
-                        if (plugin.Type == PluginType.Manager)
-                        {
-                            ManagerViewModel manager = new ManagerViewModel(plugin);
-                            AddManager(manager);
-                        }
-                    }
+                    ResolveComponentDependencies(component);
                 }
             }
         }
@@ -258,7 +258,7 @@ namespace EditorModels.ViewModels
             }
         }
 
-        private void RaiseScopeChanged()
+        private void NotifyScopeChanged()
         {
             if (null != ScopeChanged)
             {
@@ -268,7 +268,7 @@ namespace EditorModels.ViewModels
 
         private void OnScopeChanged()
         {
-
+            NotifyScopeChanged();
         }
 
         private void OnDefineAdded(DefineViewModel define)
@@ -281,9 +281,9 @@ namespace EditorModels.ViewModels
 
         private void OnDefinedNameChanged(PluginViewModel plugin, string newName)
         {
-            if (null != DefinedNameChanged)
+            if (null != DefineChanged)
             {
-                DefinedNameChanged(plugin, newName);
+                DefineChanged(plugin, newName);
             }
         }
 

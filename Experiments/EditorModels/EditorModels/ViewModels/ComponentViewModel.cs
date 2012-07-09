@@ -10,7 +10,6 @@ namespace EditorModels.ViewModels
         private readonly PluginViewModel plugin;
         private readonly Component component;
         private readonly List<PropertyViewModel> properties;
-        private ComponentViewModel inheritedComponent;
         private Entity entity;
         private IComponentScope scope;
 
@@ -50,19 +49,19 @@ namespace EditorModels.ViewModels
             get { return plugin.Requires; }
         }
 
-        public bool IsLocal
+        public bool HasLocalProperties
         {
             get { return Properties.Any(x => x.IsLocal); }
         }
 
         public bool IsInherited
         {
-            get { return !IsLocal; }
+            get { return !IsRoot; }
         }
 
-        public bool CanInherit
+        public bool IsRoot
         {
-            get { return null != inheritedComponent; }
+            get { return null != scope ? !scope.HasInheritedComponent(plugin) : true; }
         }
 
         public IEnumerable<PropertyViewModel> Properties
@@ -94,12 +93,12 @@ namespace EditorModels.ViewModels
             {
                 this.scope.ScopeChanged -= OnScopeChanged;
                 this.scope.DefineAdded -= OnDefineAdded;
-                this.scope.DefinedNameChanged -= OnDefinedNameChanged;
+                this.scope.DefineChanged -= OnDefinedNameChanged;
             }
 
             if (null != this.entity)
             {
-                if (IsLocal || !CanInherit)
+                if (IsRoot)
                 {
                     this.entity.RemoveComponent(component);
                 }
@@ -112,43 +111,19 @@ namespace EditorModels.ViewModels
             {
                 this.scope.ScopeChanged += OnScopeChanged;
                 this.scope.DefineAdded += OnDefineAdded;
-                this.scope.DefinedNameChanged += OnDefinedNameChanged;
+                this.scope.DefineChanged += OnDefinedNameChanged;
                 component.Type = Type;
             }
 
             if (null != this.entity)
             {
-                if (IsLocal || !CanInherit)
+                if (IsRoot)
                 {
                     this.entity.AddComponent(component);
                 }
             }
 
-            RaiseScopeChanged();
-        }
-
-        public void SetInheritedComponent(ComponentViewModel component)
-        {
-            if (null != inheritedComponent)
-            {
-                foreach (PropertyViewModel property in Properties)
-                {
-                    property.SetInheritedProperty(null);
-                }
-            }
-
-            inheritedComponent = component;
-
-            if (null != inheritedComponent)
-            {
-                foreach (PropertyViewModel property in Properties)
-                {
-                    PropertyViewModel inheritedProperty = inheritedComponent.GetProperty(property.Name);
-                    property.SetInheritedProperty(inheritedProperty);
-                }
-            }
-
-            NotifyPropertyChanged("CanInherit");
+            NotifyScopeChanged();
         }
 
         public bool DependsOn(ComponentViewModel requiredComponent)
@@ -180,7 +155,7 @@ namespace EditorModels.ViewModels
             NotifyPropertyChanged("Type");
         }
 
-        private void RaiseScopeChanged()
+        private void NotifyScopeChanged()
         {
             if (null != ScopeChanged)
             {

@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using EditorModels.Base;
 using EditorModels.Models;
 using EditorModels.ViewModels.Interfaces;
-using System;
-using System.ComponentModel;
 
 namespace EditorModels.ViewModels
 {
@@ -30,15 +29,12 @@ namespace EditorModels.ViewModels
 
         public event ScopeChangedEventHandler ScopeChanged;
         public event NameChangedEventHandler NameChanged;
-        
-        public event DefineAddedEventHandler DefineAdded;
-        public event DefinedNameChangedEventHandler DefinedNameChanged;
-        
         public event PluginAddedEventHandler PluginAdded;
-
-        public event KeyEventHandler InheritedAttributeAdded;
-        public event KeyEventHandler InheritedAttributeRemoved;
-        public event KeyEventHandler InheritedAttributeChanged;
+        public event DefineAddedEventHandler DefineAdded;
+        public event DefinedNameChangedEventHandler DefineChanged;
+        public event AttributeEventHandler InheritedAttributeAdded;
+        public event AttributeEventHandler InheritedAttributeRemoved;
+        public event AttributeEventHandler InheritedAttributeChanged;
 
         public string Name
         {
@@ -238,7 +234,7 @@ namespace EditorModels.ViewModels
             if (null != this.scope)
             {
                 this.scope.DefineAdded -= OnDefineAdded;
-                this.scope.DefinedNameChanged -= OnDefinedNameChanged;
+                this.scope.DefineChanged -= OnDefinedNameChanged;
                 this.scope.ScopeChanged -= OnScopeChanged;
             }
 
@@ -258,7 +254,7 @@ namespace EditorModels.ViewModels
             if (null != this.scope)
             {
                 this.scope.DefineAdded += OnDefineAdded;
-                this.scope.DefinedNameChanged += OnDefinedNameChanged;
+                this.scope.DefineChanged += OnDefinedNameChanged;
                 this.scope.ScopeChanged += OnScopeChanged;
             }
 
@@ -455,15 +451,14 @@ namespace EditorModels.ViewModels
                 localComponent = new ComponentViewModel(inheritedComponent.Plugin);
                 AddComponent(localComponent);
             }
-            UpdateComponentInheritance(localComponent);
         }
 
         private void DisinheritComponent(ComponentViewModel inheritedComponent)
         {
             ComponentViewModel localComponent = GetComponentByRole(inheritedComponent.Provides);
-            if (null != localComponent)
+            if (null != localComponent && !localComponent.HasLocalProperties)
             {
-                UpdateComponentInheritance(localComponent);
+                RemoveComponent(localComponent);
             }
         }
 
@@ -485,25 +480,6 @@ namespace EditorModels.ViewModels
             }
         }
 
-        private void UpdateComponentInheritance(ComponentViewModel component)
-        {
-            foreach (EntityViewModel prototype in Prototypes)
-            {
-                ComponentViewModel inheritedComponent = prototype.GetComponentByType(component.Type);
-                if (null != inheritedComponent)
-                {
-                    component.SetInheritedComponent(inheritedComponent);
-                    return;
-                }
-            }
-
-            component.SetInheritedComponent(null);
-            if (!component.CanInherit && component.IsInherited)
-            {
-                RemoveComponent(component);
-            }
-        }
-
         public void AddComponent(ComponentViewModel component)
         {
             if (!HasComponentWithRole(component.Provides))
@@ -514,8 +490,6 @@ namespace EditorModels.ViewModels
                     AddComponent(requiredComponent);
                 }
 
-                UpdateComponentInheritance(component);
-
                 component.SetScope(entity, this);
                 Components.Add(component);
 
@@ -525,7 +499,7 @@ namespace EditorModels.ViewModels
 
         public void RemoveComponent(ComponentViewModel component)
         {
-            if (component.IsLocal || component.IsInherited && !component.CanInherit)
+            if (component.IsRoot)
             {
                 if (!Components.Any(x => x.DependsOn(component)))
                 {
@@ -625,9 +599,9 @@ namespace EditorModels.ViewModels
 
         private void OnDefinedNameChanged(PluginViewModel plugin, string newName)
         {
-            if (null != DefinedNameChanged)
+            if (null != DefineChanged)
             {
-                DefinedNameChanged(plugin, newName);
+                DefineChanged(plugin, newName);
             }
         }
 
@@ -661,12 +635,22 @@ namespace EditorModels.ViewModels
 
         public bool HasInheritedAttribute(string key)
         {
-            return Prototypes.Any(x => x.HasLocalAttribute(key));
+            return Prototypes.Any(x => x.HasLocalAttribute(key));   // TODO: Check this logic for 3-level inheritance
         }
 
         public bool HasLocalAttribute(string key)
         {
             return Attributes.Any(x => x.Key == key);
+        }
+
+        public bool HasRootComponent(PluginViewModel plugin)
+        {
+            return Components.Any(x => x.Plugin == plugin);
+        }
+
+        public bool HasInheritedComponent(PluginViewModel plugin)
+        {
+            return Prototypes.SelectMany(x => x.Components).Any(x => x.Plugin == plugin);
         }
     }
 }

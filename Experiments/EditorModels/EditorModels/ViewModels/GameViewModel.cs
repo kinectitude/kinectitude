@@ -9,7 +9,6 @@ using System.ComponentModel;
 
 namespace EditorModels.ViewModels
 {
-    internal delegate void ScopeChangedEventHandler();
     internal delegate void DefineAddedEventHandler(DefineViewModel define);
     internal delegate void PluginAddedEventHandler(PluginViewModel plugin);
     internal delegate void DefinedNameChangedEventHandler(PluginViewModel plugin, string newName);
@@ -33,11 +32,11 @@ namespace EditorModels.ViewModels
         public event ScopeChangedEventHandler ScopeChanged { add { } remove { } }
 
         public event DefineAddedEventHandler DefineAdded;
-        public event DefinedNameChangedEventHandler DefinedNameChanged;
+        public event DefinedNameChangedEventHandler DefineChanged;
 
-        public event KeyEventHandler InheritedAttributeAdded { add { } remove { } }
-        public event KeyEventHandler InheritedAttributeRemoved { add { } remove { } }
-        public event KeyEventHandler InheritedAttributeChanged { add { } remove { } }
+        public event AttributeEventHandler InheritedAttributeAdded { add { } remove { } }
+        public event AttributeEventHandler InheritedAttributeRemoved { add { } remove { } }
+        public event AttributeEventHandler InheritedAttributeChanged { add { } remove { } }
 
         public string FileName
         {
@@ -285,7 +284,7 @@ namespace EditorModels.ViewModels
         public void AddUsing(UsingViewModel use)
         {
             use.SetGame(game);
-            use.DefineAdded += OnUsingAddedDefine;
+            use.DefineAdded += OnUsingDefineAdded;
             use.DefineChanged += OnDefineChanged;
             Usings.Add(use);
         }
@@ -293,7 +292,7 @@ namespace EditorModels.ViewModels
         public void RemoveUsing(UsingViewModel use)
         {
             use.SetGame(null);
-            use.DefineAdded -= OnUsingAddedDefine;
+            use.DefineAdded -= OnUsingDefineAdded;
             use.DefineChanged -= OnDefineChanged;
             Usings.Remove(use);
         }
@@ -374,8 +373,7 @@ namespace EditorModels.ViewModels
 
         public void SaveGame(string file)
         {
-            //IGameStorage storage = new XmlGameStorage(FileName);
-            IGameStorage storage = new XmlGameStorage(file);
+            IGameStorage storage = new XmlGameStorage(FileName);
             storage.SaveGame(game);
         }
 
@@ -451,7 +449,7 @@ namespace EditorModels.ViewModels
             }
         }
 
-        private void OnUsingAddedDefine(DefineViewModel define)
+        private void OnUsingDefineAdded(DefineViewModel define)
         {
             if (null != DefineAdded)
             {
@@ -461,10 +459,10 @@ namespace EditorModels.ViewModels
 
         private void OnDefineChanged(DefineViewModel define)
         {
-            if (null != DefinedNameChanged)
+            if (null != DefineChanged)
             {
                 PluginViewModel plugin = GetPlugin(define.Class);
-                DefinedNameChanged(plugin, define.Name);
+                DefineChanged(plugin, define.Name);
             }
         }
 

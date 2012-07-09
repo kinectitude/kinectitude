@@ -5,5 +5,9 @@ using System.Text;
 
 namespace EditorModels.ViewModels.Interfaces
 {
-    interface IComponentScope : IPluginNamespace { }
+    interface IComponentScope : IScope, IPluginNamespace
+    {
+        bool HasInheritedComponent(PluginViewModel plugin);
+        bool HasRootComponent(PluginViewModel plugin);
+    }
 }

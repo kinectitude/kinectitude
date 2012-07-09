@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using EditorModels.Models;
 using Attribute = EditorModels.Models.Attribute;
+using EditorModels.ViewModels.Interfaces;
 
 namespace EditorModels.ViewModels
 {
@@ -110,8 +111,8 @@ namespace EditorModels.ViewModels
         {
             if (null != this.scope)
             {
-                this.scope.InheritedAttributeAdded -= OnInheritedAttributeAdded;
-                this.scope.InheritedAttributeRemoved -= OnInheritedAttributeRemoved;
+                this.scope.InheritedAttributeAdded -= OnInheritedAttributeChanged;
+                this.scope.InheritedAttributeRemoved -= OnInheritedAttributeChanged;
                 this.scope.InheritedAttributeChanged -= OnInheritedAttributeChanged;
             }
 
@@ -128,8 +129,8 @@ namespace EditorModels.ViewModels
 
             if (null != this.scope)
             {
-                this.scope.InheritedAttributeAdded += OnInheritedAttributeAdded;
-                this.scope.InheritedAttributeRemoved += OnInheritedAttributeRemoved;
+                this.scope.InheritedAttributeAdded += OnInheritedAttributeChanged;
+                this.scope.InheritedAttributeRemoved += OnInheritedAttributeChanged;
                 this.scope.InheritedAttributeChanged += OnInheritedAttributeChanged;
             }
 
@@ -144,38 +145,23 @@ namespace EditorModels.ViewModels
 
         private bool KeyExists(string key)
         {
-            return null != scope ? scope.HasInheritedAttribute(key) || scope.HasLocalAttribute(key) : false;
-        }
-
-        private void OnInheritedAttributeAdded(string key)
-        {
-            if (key == Key)
+            if (null == scope)
             {
-                NotifyPropertyChanged("CanInherit");
-                if (IsInherited)
-                {
-                    NotifyPropertyChanged("Value");
-                }
+                return false;
             }
-        }
 
-        private void OnInheritedAttributeRemoved(string key)
-        {
-            if (key == Key)
-            {
-                NotifyPropertyChanged("CanInherit");
-                if (IsInherited)
-                {
-                    NotifyPropertyChanged("Value");
-                }
-            }
+            return scope.HasInheritedAttribute(key) || scope.HasLocalAttribute(key);
         }
 
         private void OnInheritedAttributeChanged(string key)
         {
-            if (key == Key && IsInherited)
+            if (key == Key)
             {
-                NotifyPropertyChanged("Value");
+                NotifyPropertyChanged("CanInherit");
+                if (IsInherited)
+                {
+                    NotifyPropertyChanged("Value");
+                }
             }
         }
 

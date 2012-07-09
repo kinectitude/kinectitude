@@ -1,12 +1,11 @@
 ﻿using System;
 
-namespace EditorModels.ViewModels
+namespace EditorModels.ViewModels.Interfaces
 {
     internal interface IPluginNamespace
     {
-        event ScopeChangedEventHandler ScopeChanged;
         event DefineAddedEventHandler DefineAdded;
-        event DefinedNameChangedEventHandler DefinedNameChanged;
+        event DefinedNameChangedEventHandler DefineChanged;
 
         string GetDefinedName(PluginViewModel plugin);
         PluginViewModel GetPlugin(string name);

@@ -143,6 +143,7 @@
     <Compile Include="ViewModels\Interfaces\IAttributeScope.cs" />
     <Compile Include="ViewModels\Interfaces\IEntityNamespace.cs" />
     <Compile Include="ViewModels\Interfaces\ISceneScope.cs" />
+    <Compile Include="ViewModels\Interfaces\IScope.cs" />
     <Compile Include="ViewModels\ManagerViewModel.cs" />
     <Compile Include="ViewModels\PluginViewModel.cs" />
     <Compile Include="ViewModels\PropertyViewModel.cs" />

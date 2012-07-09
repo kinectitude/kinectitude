@@ -75,6 +75,30 @@ namespace EditorModels.Tests
         }
 
         [TestMethod]
+        public void RemoveRootComponentWhenInheritedComponentHasProperties()
+        {
+            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            
+            ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            parent.AddComponent(component);
+
+            EntityViewModel child = new EntityViewModel();
+            child.AddPrototype(parent);
+
+            ComponentViewModel childComponent = child.GetComponentByType(TransformComponentType);
+            PropertyViewModel childProperty = childComponent.GetProperty("X");
+            childProperty.Value = 500;
+
+            parent.RemoveComponent(component);
+
+            Assert.AreEqual(0, parent.Components.Count(x => x.Type == TransformComponentType));
+            Assert.AreEqual(0, parent.Entity.Components.Count(x => x.Type == TransformComponentType));
+            Assert.AreEqual(1, child.Components.Count(x => x.IsRoot));
+            Assert.AreEqual(0, child.Components.Count(x => x.Type == TransformComponentType));
+            Assert.AreEqual(0, child.Entity.Components.Count(x => x.Type == TransformComponentType));
+        }
+
+        [TestMethod]
         public void CannotRemoveInheritedComponent()
         {
             EntityViewModel parent = new EntityViewModel() { Name = "parent" };
@@ -189,10 +213,11 @@ namespace EditorModels.Tests
             GameViewModel game = new GameViewModel("Test Game");
 
             UsingViewModel use = new UsingViewModel() { File = "Kinectitude.Core.dll" };
-            game.AddUsing(use);
 
             DefineViewModel define = new DefineViewModel(TransformComponentShort, TransformComponentType);
             use.AddDefine(define);
+            
+            game.AddUsing(use);
 
             EntityViewModel entity = new EntityViewModel() { Name = "parent" };
             game.AddPrototype(entity);
@@ -209,8 +234,8 @@ namespace EditorModels.Tests
             Assert.AreEqual("tc", component.Component.Type);
         }
 
-        [TestMethod]
-        public void ComponentIsLocalIfPropertyDefined()
+        /*[TestMethod]
+        public void ComponentIsRootIfNotInAnyPrototype()
         {
             EntityViewModel entity = new EntityViewModel();
             
@@ -233,9 +258,9 @@ namespace EditorModels.Tests
             ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
 
             Assert.IsTrue(component.IsInherited);   // TODO: Maybe not?
-        }
+        }*/
 
-        [TestMethod]
+        /*[TestMethod]
         public void ComponentBecomesInheritableAfterAddToParent()
         {
             EntityViewModel parent = new EntityViewModel() { Name = "parent" };
@@ -315,7 +340,7 @@ namespace EditorModels.Tests
             child.RemovePrototype(parent);
 
             Assert.IsFalse(component.CanInherit);
-        }
+        }*/
 
         [TestMethod]
         public void AddingComponentAddsRequiredComponent()

@@ -1,5 +1,5 @@
 ﻿
-namespace EditorModels.ViewModels
+namespace EditorModels.ViewModels.Interfaces
 {
     internal interface IEntityNamespace
     {
