@@ -95,5 +95,10 @@ namespace Kinectitude.Core.Base
             return services[typeof(T)] as T;
         }
 
+
+        internal override Changeable GetComponentOrManager(string name)
+        {
+            return null;
+        }
     }
 }

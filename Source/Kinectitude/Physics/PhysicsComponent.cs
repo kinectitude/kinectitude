@@ -25,36 +25,96 @@ namespace Kinectitude.Physics
         private Body body;
         private PhysicsManager pm;
         private TransformComponent tc;
- 
+
+        private string shape;
         [Preset("Bouncy Ball", "circle")]
         [Preset("Collision Event Line", "rectangle")]
         [Preset("Wall", "rectangle")]
         [Plugin("Shape", "")]
-        public string Shape { get; set; }
+        public string Shape
+        {
+            get { return shape; }
+            set
+            {
+                if (shape != value)
+                {
+                    shape = value;
+                    Change("Shape");
+                }
+            }
+        }
 
+        private float restitution;
         [Preset("Bouncy Ball", 1.0)]
         [Preset("Collision Event Line", 0.0)]
         [Preset("Wall", 0.0)]
         [Plugin("Restitution", "")]
-        public float Restitution { get; set; }
+        public float Restitution
+        {
+            get { return restitution; }
+            set
+            {
+                if (restitution != value)
+                {
+                    restitution = value;
+                    Change("Restitution");
+                }
+            }
+        }
 
+        private float mass;
         [Preset("Bouncy Ball", 1.0)]
         [Preset("Collision Event Line", 1.0)]
         [Preset("Wall", 1.0)]
         [Plugin("Mass", "")]
-        public float Mass { get; set; }
+        public float Mass
+        {
+            get { return mass; }
+            set
+            {
+                if (mass != value)
+                {
+                    mass = value;
+                    Change("Mass");
+                }
+            }
+        }
 
+        private float friction;
         [Preset("Bouncy Ball", 0.0)]
         [Preset("Collision Event Line", 0.0)]
         [Preset("Wall", 0.0)]
         [Plugin("Friction", "")]
-        public float Friction { get; set; }
+        public float Friction
+        {
+            get { return friction; }
+            set
+            {
+                if (friction != value)
+                {
+                    friction = value;
+                    Change("Friction");
+                }
+            }
+        }
 
+        private float linearDamping;
         [Preset("Bouncy Ball", 0.0)]
         [Preset("Collision Event Line", 0.0)]
         [Preset("Wall", 0.0)]
         [Plugin("Linear Damping", "")]
-        public float LinearDamping { get; set; }
+        public float LinearDamping
+        {
+            get { return linearDamping; }
+            set
+            {
+                if (linearDamping != value)
+                {
+                    linearDamping = value;
+                    Change("LinearDamping");
+                }
+            }
+        }
 
         private float maximumVelocity = float.PositiveInfinity;
         [Plugin("Maximum velocity", "")]
@@ -63,7 +123,11 @@ namespace Kinectitude.Physics
             get { return maximumVelocity; }
             set
             {
-                maximumVelocity = value;
+                if (maximumVelocity != value)
+                {
+                    maximumVelocity = value;
+                    Change("MaximumVelocity");
+                }
             }
         }
 
@@ -74,7 +138,11 @@ namespace Kinectitude.Physics
             get { return minimumVelocity; }
             set
             {
-                minimumVelocity = value;
+                if (minimumVelocity != value)
+                {
+                    minimumVelocity = value;
+                    Change("MinimumVelocity");
+                }
             }
         }
 
@@ -88,8 +156,12 @@ namespace Kinectitude.Physics
                 if (null != body)
                 {
                     body.LinearVelocity = new Vector2(value * speedRatio, YVelocity * speedRatio);
+                    if (xVelocity != value)
+                    {
+                        xVelocity = value;
+                        Change("XVelocity");
+                    }
                 }
-                xVelocity = value;
                 hasPotentialVelocity = true;
             }
         }
@@ -104,8 +176,12 @@ namespace Kinectitude.Physics
                 if (null != body)
                 {
                     body.LinearVelocity = new Vector2(xVelocity * speedRatio, value * speedRatio);
+                    if (yVelocity != value)
+                    {
+                        yVelocity = value;
+                        Change("YVelocity");
+                    }
                 }
-                yVelocity = value;
                 hasPotentialVelocity = true;
             }
         }
@@ -117,22 +193,50 @@ namespace Kinectitude.Physics
             get { return angularVelocity; }
             set
             {
-                angularVelocity = value;
+                if (angularVelocity != value)
+                {
+                    angularVelocity = value;
+                    Change("AngularVelocity");
+                }
                 hasPotentialVelocity = true;
             }
         }
 
+        private bool movesWhenHit;
         [Preset("Bouncy Ball", true)]
         [Preset("Collision Event Line", false)]
         [Preset("Wall", false)]
         [Plugin("Object moves when hit", "")]
-        public bool MovesWhenHit { get; set; }
+        public bool MovesWhenHit
+        {
+            get { return movesWhenHit; }
+            set
+            {
+                if (movesWhenHit != value)
+                {
+                    movesWhenHit = value;
+                    Change("MovesWhenHit");
+                }
+            }
+        }
 
+        private bool fixedRotation;
         [Preset("Bouncy Ball", false)]
         [Preset("Collision Event Line", false)]
         [Preset("Wall", false)]
         [Plugin("Object can rotate as it moves", "")]
-        public bool FixedRotation { get; set; }
+        public bool FixedRotation
+        {
+            get { return fixedRotation; }
+            set
+            {
+                if (fixedRotation != value)
+                {
+                    fixedRotation = value;
+                    Change("FixedRotation");
+                }
+            }
+        }
 
         private bool hasCollisions = false;
         private bool hasPotentialVelocity = false;

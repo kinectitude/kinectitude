@@ -13,12 +13,10 @@
     <Define Name="CollisionEvent" Class="Kinectitude.Physics.CollisionEvent"/>
   </Using>
   <Using File="Kinectitude.Render.dll">
-
     <Define Name="RenderManager" Class="Kinectitude.Render.RenderManager"/>
     <Define Name="RenderComponent" Class="Kinectitude.Render.RenderComponent"/>
     <Define Name="TextRenderComponent" Class="Kinectitude.Render.TextRenderComponent"/>
     <Define Name="ImageRenderComponent" Class="Kinectitude.Render.ImageRenderComponent" />
-    <Define Name="SetTextAction" Class="Kinectitude.Render.SetTextAction"/>
   </Using>
     
   <Prototype Name="paddle">
@@ -54,9 +52,9 @@
       <Action Type="IncrementAction" Target="scene.player1Score" IncrementBy="scene.scoreValue"/>
     </Event>
     <Event Type="CollisionEvent" CollidesWith="$paddle">
-      <Action Type="SetAttributeAction" Target="scene.lastHit" Value="{!CollidesWith}"/>
-      <Action Type="SetAttributeAction" Target="scene.lastX" Value="{!CollidesWith.TransformComponent.X}"/>
-      <Action Type="SetAttributeAction" Target="scene.lastY" Value="{!CollidesWith.TransformComponent.Y}"/>
+      <Action Type="SetAction" Target="scene.lastHit" Value="{!CollidesWith}"/>
+      <Action Type="SetAction" Target="scene.lastX" Value="{!CollidesWith.TransformComponent.X}"/>
+      <Action Type="SetAction" Target="scene.lastY" Value="{!CollidesWith.TransformComponent.Y}"/>
       <Action Type="FireTriggerAction" Name="changeInfo"/>
     </Event>
   </Prototype>
@@ -108,7 +106,7 @@
       <Component Type="TransformComponent" X="200" Y="500" />
       <Component Type="TextRenderComponent" Value="Player 1 Not ready!" TextAlignment="Center" FontColor="White" />
       <Event Type="AttributeChangesEvent" Target="{scene.ready1txt}">
-        <Action Type="SetTextAction" Value="{scene.ready1txt}" />
+        <Action Type="SetAction" Target="this.TextRenderComponent.Value" Value="{scene.ready1txt}"/>
       </Event>
     </Entity>
 
@@ -116,15 +114,15 @@
       <Component Type="TransformComponent" X="600" Y="500" />
       <Component Type="TextRenderComponent" Value="Player 2 Not ready!" TextAlignment="Center" FontColor="White" />
       <Event Type="AttributeChangesEvent" Target="{scene.ready2txt}">
-        <Action Type="SetTextAction" Value="{scene.ready2txt}" />
+        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="{scene.ready1txt}"/>
       </Event>
     </Entity>
 
     <Entity Name="player1" Prototype="paddle">
       <Component Type="TransformComponent" X="17" Y="250"/>
       <Event Type="CrossesLineEvent" Line="Y" Location="450"  Direction="Positive">
-        <Action Type="SetAttributeAction" Target="scene.ready1txt" Value="player 1 is ready!"/>
-        <Action Type="SetAttributeAction" Target="scene.ready1" Value="True"/>
+        <Action Type="SetAction" Target="scene.ready1txt" Value="player 1 is ready!"/>
+        <Action Type="SetAction" Target="scene.ready1" Value="True"/>
         <Condition If="scene.ready2 and scene.ready1 or scene.ready1 and scene.ready2">
           <Action Type="ChangeSceneAction" Target="game"/>
         </Condition>
@@ -136,8 +134,8 @@
       <!--this is testing to see that I can ovrride things in a Prototype-->
       <Component Type="KinectFollowComponent" Player="1" Joint="HandRight" />
       <Event Type="CrossesLineEvent" Line="Y" Location="450"  Direction="Positive">
-        <Action Type="SetAttributeAction" Target="scene.ready2txt" Value="player 2 is ready!"/>
-        <Action Type="SetAttributeAction" Target="scene.ready2" Value="true"/>
+        <Action Type="SetAction" Target="scene.ready2txt" Value="player 2 is ready!"/>
+        <Action Type="SetAction" Target="scene.ready2" Value="true"/>
         <Condition If="scene.ready1">
           <Action Type="ChangeSceneAction" Target="game"/>
         </Condition>
@@ -197,14 +195,14 @@
     <Entity Prototype="score">
       <Component Type="TransformComponent" X="56" Y="24"/>
       <Event Type="AttributeChangesEvent" Target="{scene.player1Score}">
-        <Action Type="SetTextAction" Value="{scene.player1Score}" />
+        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="{scene.player1Score}"/>
         <Condition If="scene.player1Score >= 20">
-          <Action Type="SetAttributeAction" Target="game.winner" Value="player 1 wins"/>
+          <Action Type="SetAction" Target="game.winner" Value="player 1 wins"/>
           <Action Type="ChangeSceneAction" Target="Game Over"/>
         </Condition>
         <Condition If="scene.player1Score >= 10 and not scene.ball1">
           <Action Type="CreateEntityAction" Prototype="leftBall"/>
-          <Action Type="SetAttributeAction" Target="scene.ball1" Value="true"/>
+          <Action Type="SetAction" Target="scene.ball1" Value="true"/>
         </Condition>
       </Event>
     </Entity>
@@ -212,14 +210,14 @@
     <Entity Prototype="score">
       <Component Type="TransformComponent"  X="724" Y="24"/>
       <Event Type="AttributeChangesEvent" Target="{scene.player2Score}">
-        <Action Type="SetTextAction" Value="{scene.player2Score}" />
+        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="{scene.player2Score}"/>
         <Condition If="scene.player2Score >= 20">
-          <Action Type="SetAttributeAction" Target="game.winner" Value="player 2 wins"/>
+          <Action Type="SetAction" Target="game.winner" Value="player 2 wins"/>
           <Action Type="ChangeSceneAction" Target="Game Over"/>
         </Condition>
         <Condition If="scene.player2Score >= 10 and not scene.ball2">
           <Action Type="CreateEntityAction" Prototype="rightBall"/>
-          <Action Type="SetAttributeAction" Target="scene.ball2" Value="true"/>
+          <Action Type="SetAction" Target="scene.ball2" Value="true"/>
         </Condition>
       </Event>
     </Entity>
@@ -228,7 +226,7 @@
       <Component Type="TransformComponent" X="0" Y="75" Width="800"/>
       <Component Type="TextRenderComponent" Value="" FontSize="12" TextAlignment="Center"/>
       <Event Type="TriggerOccursEvent" Trigger="changeInfo">
-        <Action Type="SetTextAction" Value="Last hit by {scene.lastHit} At \{X,Y\} \{{scene.lastX},{scene.lastY}\} gravity was ({scene.PhysicsManager.XGravity},{scene.PhysicsManager.YGravity}) total score was [scene.player1Score + scene.player2Score] and player 1 was winning by at least 3 is [3 + scene.player1Score >= scene.player2Score]"/>
+        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="Last hit by {scene.lastHit} At \{X,Y\} \{{scene.lastX},{scene.lastY}\} gravity was ({scene.PhysicsManager.XGravity},{scene.PhysicsManager.YGravity}) total score was [scene.player1Score + scene.player2Score] and player 1 was winning by at least 3 is [3 + scene.player1Score >= scene.player2Score]"/>
       </Event>
     </Entity>
 
@@ -237,9 +235,27 @@
       <Component Type="TextRenderComponent" Value="" FontSize="12" TextAlignment="Center"/>
       <Event Type="TriggerOccursEvent" Trigger="moreScore">
         <Action Type="IncrementAction" Target="scene.scoreValue"/>
-        <Action Type="SetTextAction" Value="{scene.scoreValue}"/>
+        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="Next goal is worth {scene.scoreValue}"/>
       </Event>
     </Entity>
+
+    <!--<Entity Prototype="text">
+      <Component Type="TransformComponent" X="0" Y="300" Width="800"/>
+      <Component Type="TextRenderComponent" Value="" FontSize="12" TextAlignment="Center"/>
+      <Event Type="AttributeChangesEvent" Target="{player1.TransformComponent.Y}">
+        <Action Type="IncrementAction" Target="scene.scoreValue"/>
+        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="Player 1 y is {player1.TransformComponent.Y}"/>
+      </Event>
+    </Entity>
+
+    <Entity Prototype="text">
+      <Component Type="TransformComponent" X="0" Y="325" Width="800"/>
+      <Component Type="TextRenderComponent" Value="" FontSize="12" TextAlignment="Center"/>
+      <Event Type="AttributeChangesEvent" Target="{player2.TransformComponent.Y}">
+        <Action Type="IncrementAction" Target="scene.scoreValue"/>
+        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="Player 2 y is {player2.TransformComponent.Y}"/>
+      </Event>
+    </Entity>-->
 
   </Scene>
 
@@ -252,7 +268,7 @@
       <!--This can simply have Value=game.winner, since it won't change, but I needed somewhere to test Scene StartEvent-->
       <Component Type="TextRenderComponent" Value="" FontColor="White" />
       <Event Type="SceneStartsEvent">
-        <Action Type="SetTextAction" Value="{game.winner}" />
+        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="{game.winner}"/>
       </Event>
     </Entity>
 

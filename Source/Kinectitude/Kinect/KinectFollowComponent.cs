@@ -18,14 +18,50 @@ namespace Kinectitude.Kinect
 
         private KinectManager manager;
 
+        private JointType joint;
         [Plugin("Joint", "")]
-        public JointType Joint { get; set; }
+        public JointType Joint 
+        {
+            get { return joint; }
+            set
+            {
+                if (joint != value)
+                {
+                    Change("Joint");
+                    joint = value;
+                }
+            }
+        }
 
+        private int player;
         [Plugin("Player", "")]
-        public int Player { get; set; }
+        public int Player
+        {
+            get { return player; }
+            set
+            {
+                if (player != value)
+                {
+                    Change("Player");
+                    player = value;
+                }
+            }
+        }
 
+        private FollowType direction;
         [Plugin("Axis", "")]
-        public FollowType Direction { get; set; }
+        public FollowType Direction
+        {
+            get { return direction; }
+            set
+            {
+                if (direction != value)
+                {
+                    Change("Direction");
+                    direction = value;
+                }
+            }
+        }
 
         public void UpdatePosition(float x, float y)
         {

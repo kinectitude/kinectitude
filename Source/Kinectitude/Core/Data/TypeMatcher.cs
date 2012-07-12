@@ -93,6 +93,10 @@ namespace Kinectitude.Core.Data
         {
             get
             {
+                if (DataContainer.deleted)
+                {
+                    return "";
+                }
                 return DataContainer[key];
             }
         }

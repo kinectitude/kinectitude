@@ -65,7 +65,7 @@ namespace Kinectitude.Core.Loaders
 
                 if (missing.Count != 0)
                 {
-                    string identity = null != name ? name : "Entity " + id.ToString();
+                    string identity = null != name ? name : "entity " + id.ToString();
                     throw MissingRequirementsException.MissingRequirement(identity, missing);
                 }
                 firstCreate = false;

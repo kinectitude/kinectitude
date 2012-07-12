@@ -14,18 +14,34 @@ namespace Kinectitude.Render
         private Bitmap bitmap;
         private RectangleF rectangle;
 
+        private string image;
         [Plugin("Image", "")]
         public string Image
         {
-            get;
-            set;
+            get { return image; }
+            set
+            {
+                if (image != value)
+                {
+                    image = value;
+                    Change("Image");
+                }
+            }
         }
 
+        private float opacity;
         [Plugin("Opacity", "")]
         public float Opacity
         {
-            get;
-            set;
+            get { return opacity; }
+            set
+            {
+                if (opacity != value)
+                {
+                    opacity = value;
+                    Change("Opacity");
+                }
+            }
         }
 
         public ImageRenderComponent()

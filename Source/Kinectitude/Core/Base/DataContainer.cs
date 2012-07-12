@@ -3,12 +3,19 @@ using System.Collections.Generic;
 
 namespace Kinectitude.Core.Base
 {
-    public class DataContainer : IEntity
+    public abstract class DataContainer : IEntity
     {
         private readonly Dictionary<string, string> attributes = new Dictionary<string,string>();
 
         private readonly Dictionary<string, List<Action<string>>> callbacks = 
             new Dictionary<string,List<Action<string>>>();
+
+        internal readonly Dictionary<string, List<Action<string>>> CheckProperties =
+            new Dictionary<string, List<Action<string>>>();
+        protected readonly List<Tuple<DataContainer, string, Action<string>>> PropertyChanges =
+            new List<Tuple<DataContainer, string, Action<string>>>();
+
+        public bool deleted { get; protected set; }
 
         private int id;
         public int Id {
@@ -61,6 +68,7 @@ namespace Kinectitude.Core.Base
         internal DataContainer(int id) 
         {
             this.Id = id;
+            deleted = false;
         }
 
         internal void NotifyOfChange(string key, Action<string> callback)
@@ -84,5 +92,50 @@ namespace Kinectitude.Core.Base
             List<Action<string>> removeFrom = callbacks[key];
             removeFrom.Remove(callback);
         }
+
+
+        internal void NotifyOfComponentChange(string what, Action<string> callback)
+        {
+            List<Action<string>> callbacks;
+            if (CheckProperties.TryGetValue(what, out callbacks))
+            {
+                callbacks.Add(callback);
+            }
+            else
+            {
+                callbacks = new List<Action<string>>();
+                callbacks.Add(callback);
+                CheckProperties[what] = callbacks;
+                string[] parts = what.Split('.');
+                Changeable ch = GetComponentOrManager(parts[0]);
+                if(null != ch) ch.ShouldCheck = true;
+            }
+        }
+
+        internal void UnnotifyOfComponentChange(string what, Action<string> callback)
+        {
+            List<Action<string>> callbacks;
+            if (CheckProperties.TryGetValue(what, out callbacks))
+            {
+                callbacks.Remove(callback);
+                if (callbacks.Count == 0)
+                {
+                    Changeable ch = GetComponentOrManager(what.Split('.')[0]);
+                    if(null != ch) ch.ShouldCheck = false;
+                }
+            }
+        }
+
+        internal void ChangedProperty(string what, string value)
+        {
+            List<Action<string>> callbacks;
+            if (CheckProperties.TryGetValue(what, out callbacks))
+            {
+                foreach (Action<string> callback in callbacks) callback(value);
+            }
+        }
+
+        internal abstract Changeable GetComponentOrManager(string name);
+
     }
 }

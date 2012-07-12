@@ -70,7 +70,7 @@
     <Compile Include="Actions\IncrementAction.cs" />
     <Compile Include="Actions\PopSceneAction.cs" />
     <Compile Include="Actions\PushSceneAction.cs" />
-    <Compile Include="Actions\SetAttributeAction.cs" />
+    <Compile Include="Actions\SetAction.cs" />
     <Compile Include="Actions\SetPositionAction.cs" />
     <Compile Include="Actions\CreateTimerAction.cs" />
     <Compile Include="Attributes\PluginAttribute.cs" />
@@ -78,6 +78,7 @@
     <Compile Include="Attributes\ProvidesAttribute.cs" />
     <Compile Include="Attributes\RequiresAttribute.cs" />
     <Compile Include="Base\Action.cs" />
+    <Compile Include="Base\Changeable.cs" />
     <Compile Include="Base\ClassFactory.cs" />
     <Compile Include="Base\Condition.cs" />
     <Compile Include="Base\DataContainer.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="Base\IUpdateable.cs" />
     <Compile Include="Base\Manager.cs" />
     <Compile Include="Components\TransformComponent.cs" />
+    <Compile Include="Data\AttributeWriter.cs" />
     <Compile Include="Data\BoolExpressionReader.cs" />
     <Compile Include="Data\ComponentValueReader.cs" />
     <Compile Include="Data\ConstantExpressionReader.cs" />
@@ -108,6 +110,7 @@
     <Compile Include="Data\MultiTypeMatcher.cs" />
     <Compile Include="Data\MultiValueReader.cs" />
     <Compile Include="Data\ParameterValueReader.cs" />
+    <Compile Include="Data\PropertyWriter.cs" />
     <Compile Include="Data\SingleTypeMatcher.cs" />
     <Compile Include="Data\IExpressionReader.cs" />
     <Compile Include="Data\ITypeMatcher.cs" />

@@ -15,7 +15,11 @@ namespace Kinectitude.Physics
             get { return yGravity; }
             set
             {
-                yGravity = value;
+                if (yGravity != value)
+                {
+                    yGravity = value;
+                    Change("YGravity");
+                }
                 PhysicsWorld.Gravity = new Vector2(xGravity, yGravity);
             }
         }
@@ -27,7 +31,11 @@ namespace Kinectitude.Physics
             get { return xGravity; }
             set
             {
-                xGravity = value;
+                if (xGravity != value)
+                {
+                    xGravity = value;
+                    Change("XGravity");
+                }
                 PhysicsWorld.Gravity = new Vector2(xGravity, yGravity);
             }
         }

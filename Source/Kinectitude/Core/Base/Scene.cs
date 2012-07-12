@@ -97,6 +97,7 @@ namespace Kinectitude.Core.Base
             {
                 m.OnUpdate(frameDelta);
             }
+
             foreach (KeyValuePair<string, List<Timer>> pair in runningTimers)
             {
                 List<Timer> timers = pair.Value;
@@ -122,7 +123,7 @@ namespace Kinectitude.Core.Base
         internal void CreateComponent(Entity entity, string stringType, List<Tuple<string, string>> values)
         {
             Component created = ClassFactory.Create<Component>(stringType);
-            created.Entity = entity;
+            created.entity = entity;
             entity.AddComponent(created, stringType);
             foreach (Tuple<string, string> tuple in values)
             {
@@ -262,5 +263,13 @@ namespace Kinectitude.Core.Base
             }
         }
 
+
+        internal override Changeable GetComponentOrManager(string name)
+        {
+            Type managerType = ClassFactory.TypesDict[name];
+            IManager manager = null;
+            managersDictionary.TryGetValue(managerType, out manager);
+            return manager as Changeable;
+        }
     }
 }

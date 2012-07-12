@@ -1,15 +1,21 @@
 ﻿using System;
 using Kinectitude.Core.Base;
+using System.Collections.Generic;
 
 namespace Kinectitude.Core.Data
 {
     internal sealed class ManagerValueReader : ExpressionReader
     {
         private readonly Func<string> getValue;
+        private readonly Scene scene;
+        private List<Action<string>> callbacks = new List<Action<string>>();
+        string value;
 
         internal ManagerValueReader(string[] values, Scene scene)
         {
+            value = values[0] + '.' + values[1];
             IManager manager = scene.GetManager(values[0]);
+            this.scene = scene;
             getValue = () => ClassFactory.GetStringParam(manager, values[1]);
         }
 
@@ -21,7 +27,8 @@ namespace Kinectitude.Core.Data
 
         public override void notifyOfChange(Action<string> callback)
         {
-            throw new NotImplementedException();
+            scene.NotifyOfComponentChange(value, callback);
+            callbacks.Add(callback);
         }
     }
 }

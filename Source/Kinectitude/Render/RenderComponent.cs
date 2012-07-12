@@ -23,39 +23,80 @@ namespace Kinectitude.Render
         private Ellipse ellipse;
         private RectangleF rectangle;
 
+        
+        private ShapeType shape;
         [Plugin("Shape", "")]
         public ShapeType Shape
         {
-            get;
-            set;
+            get { return shape; }
+            set
+            {
+                if (shape != value)
+                {
+                    shape = value;
+                    Change("Shape");
+                }
+            }
         }
 
+        private string fillColor;
         [Plugin("Fill Color", "")]
         public string FillColor
         {
-            get;
-            set;
+            get { return fillColor; }
+            set
+            {
+                if (fillColor != value)
+                {
+                    fillColor = value;
+                    Change("FillColor");
+                }
+            }
         }
 
+        private float lineThickness;
         [Plugin("Line Thickness", "")]
         public float LineThickness
         {
-            get;
-            set;
+            get { return lineThickness; }
+            set
+            {
+                if (lineThickness != value)
+                {
+                    lineThickness = value;
+                    Change("LineThickness");
+                }
+            }
         }
 
+        private string linecolor;
         [Plugin("Line Color", "")]
         public string LineColor
         {
-            get;
-            set;
+            get { return linecolor; }
+            set
+            {
+                if (linecolor != value)
+                {
+                    linecolor = value;
+                    Change("Linecolor");
+                }
+            }
         }
 
+        private float opacity;
         [Plugin("Opacity", "")]
         public float Opacity
         {
-            get;
-            set;
+            get { return opacity; }
+            set
+            {
+                if (opacity != value)
+                {
+                    opacity = value;
+                    Change("Opacity");
+                }
+            }
         }
 
         public RenderComponent()

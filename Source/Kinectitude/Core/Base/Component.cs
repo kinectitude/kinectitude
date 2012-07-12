@@ -2,16 +2,17 @@
 namespace Kinectitude.Core.Base
 {
 
-    public abstract class Component : IUpdateable
+    public abstract class Component : Changeable,  IUpdateable
     {
-        internal Entity Entity;
+        //private Entity entity;
+        internal Entity entity { get; set; }
 
         /// <summary>
         /// The IEntity that this component belongs to
         /// </summary>
         public IEntity IEntity
         {
-            get { return Entity; }
+            get { return entity; }
         }
 
         public Component() { }
@@ -34,7 +35,7 @@ namespace Kinectitude.Core.Base
         /// <returns>The component in the entity, or null if none of type T exists</returns>
         public T GetComponent<T>() where T : class
         {
-            return Entity.GetComponent<T>();
+            return entity.GetComponent<T>();
         }
 
         /// <summary>
@@ -46,7 +47,7 @@ namespace Kinectitude.Core.Base
         /// <returns>The scene's manager of type T</returns>
         public T GetManager<T>() where T : class, IManager
         {
-            return Entity.Scene.GetManager<T>();
+            return entity.Scene.GetManager<T>();
         }
 
         /// <summary>

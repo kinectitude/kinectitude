@@ -11,7 +11,7 @@ namespace Kinectitude.Core.Exceptions
         private static string creationHelper(string identity, List<Type> missingTypes)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append(identity).Append(" is missing the following component(s)");
+            sb.Append(identity).Append(" is missing the following what(s)");
             foreach (Type missingType in missingTypes)
             {
                 sb.Append(missingType.FullName).Append("\n");
