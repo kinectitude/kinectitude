@@ -96,7 +96,7 @@ namespace Kinectitude.Core.Base
             RegisterType("IncrementAction", typeof(IncrementAction));
             RegisterType("AttributeChangesEvent", typeof(AttributeChangesEvent));
             RegisterType("AttributeEqualsEvent", typeof(AttributeEqualsEvent));
-            RegisterType("SetAttributeAction", typeof(SetAttributeAction));
+            RegisterType("SetAction", typeof(SetAction));
             RegisterType("PushSceneAction", typeof(PushSceneAction));
             RegisterType("PopSceneAction", typeof(PopSceneAction));
             RegisterType("ChangeSceneAction", typeof(ChangeSceneAction));

@@ -4,47 +4,60 @@ using Kinectitude.Core.Exceptions;
 
 namespace Kinectitude.Core.Data
 {
-    internal sealed class ValueWriter : IValueWriter
+    internal abstract class ValueWriter : IValueWriter
     {
-        private readonly string key;
-        private readonly DataContainer dataContainer;
-
+        protected readonly DataContainer DataContainer;
+        
         internal static ValueWriter CreateValueWriter(string key, Entity entity)
         {
             if (key.Contains('.'))
             {
+                bool isDef = true;
                 string [] keyParts = key.Split('.');
+                DataContainer dc;
                 switch (keyParts[0])
                 {
-                    case "this":
-                        return new ValueWriter(keyParts[1], entity);
                     case "scene":
-                        return new ValueWriter(keyParts[1], entity.Scene);
+                        dc = entity.Scene;
+                        break;
                     case "game":
-                        return new ValueWriter(keyParts[1], entity.Scene.Game);
+                        dc = entity.Scene.Game;
+                        break;
+                    case "this":
+                        dc = entity;
+                        break;
                     default:
-                        throw new InvalidValueWriterException();
+                        if (keyParts.Length != 2) throw new InvalidValueWriterException();
+                        dc = entity;
+                        isDef = false;
+                        break;
+                }
+                if (isDef)
+                {
+                    switch (keyParts.Length)
+                    {
+                        case 2:
+                            return new AttributeWriter(keyParts[1], dc);
+                        case 3:
+                            return new PropertyWriter(keyParts[1], keyParts[2], dc);
+                        default:
+                            throw new InvalidValueWriterException();
+                    }
+                }
+                else
+                {
+                    return new PropertyWriter(keyParts[0], keyParts[1], dc);
                 }
             }
-            return new ValueWriter(key, entity);
+            return new AttributeWriter(key, entity);
         }
 
-        private ValueWriter(string key, DataContainer dataContainer)
+        protected ValueWriter(DataContainer dc)
         {
-            this.dataContainer = dataContainer;
-            this.key = key;
+            DataContainer = dc;
         }
 
-        public string Value
-        {
-            get
-            {
-                return dataContainer[key];
-            }
-            set
-            {
-                dataContainer[key] = value;
-            }
-        }
+
+        public abstract string Value { get; set; }
     }
 }

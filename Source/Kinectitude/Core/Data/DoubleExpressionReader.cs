@@ -31,6 +31,7 @@ namespace Kinectitude.Core.Data
                 {
                     callback(change);
                 }
+                oldVal = result;
             }
         }
 

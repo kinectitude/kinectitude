@@ -152,6 +152,7 @@ namespace Kinectitude.Render
             TextAlignment = TextAlignment.Leading;
             WordWrapping = WordWrapping.NoWrap;
             Opacity = 1.0f;
+            Value = "";
         }
 
         public void OnSetTextAction(SetTextAction action)

@@ -96,7 +96,15 @@ namespace Kinectitude.Core.Base
             foreach (IManager m in managers)
             {
                 m.OnUpdate(frameDelta);
+                foreach (KeyValuePair<int,Entity> entityPair in entityById)
+                {
+                    entityPair.Value.CheckForChanges();
+                }
+                CheckForChanges();
             }
+
+            
+
             foreach (KeyValuePair<string, List<Timer>> pair in runningTimers)
             {
                 List<Timer> timers = pair.Value;
@@ -262,5 +270,13 @@ namespace Kinectitude.Core.Base
             }
         }
 
+
+        internal override object GetComponentOrManager(string name)
+        {
+            Type managerType = ClassFactory.TypesDict[name];
+            IManager manager = null;
+            managersDictionary.TryGetValue(managerType, out manager);
+            return manager;
+        }
     }
 }
