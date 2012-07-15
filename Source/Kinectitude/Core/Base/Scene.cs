@@ -138,24 +138,6 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        /*internal void CreateAction(Event evt, string type, List<Tuple<string, string>> attribs, Condition cond = null)
-        {
-            Action action = ClassFactory.Create<Action>(type);
-            action.Event = evt;
-            foreach (Tuple<string, string> attrib in attribs)
-            {
-                ClassFactory.SetParam(action, attrib.Item1, attrib.Item2, evt, evt.Entity);
-            }
-            if (null == cond)
-            {
-                evt.AddAction(action);
-            }
-            else
-            {
-                cond.AddAction(action);
-            }
-        }*/
-
         internal void FireTrigger(string triggerName)
         {
             if (!triggers.ContainsKey(triggerName))
@@ -278,5 +260,16 @@ namespace Kinectitude.Core.Base
             managersDictionary.TryGetValue(managerType, out manager);
             return manager;
         }
+
+        internal void DeleteEntity(Entity delete)
+        {
+            if (delete.Name != null)
+            {
+                entityByName.Remove(delete.Name);
+            }
+            entityById.Remove(delete.Id);
+            //I don't think I need to remove the entity from each type matcher, since it won't be refered to by anything.
+        }
+
     }
 }

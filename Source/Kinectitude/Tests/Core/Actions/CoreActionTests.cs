@@ -37,11 +37,11 @@ namespace Kinectitude.Tests.Core.Actions
         [TestMethod]
         public void SetAttribute()
         {
-            SetAttributeAction setAttributeAction = new SetAttributeAction();
-            setAttributeAction.Value = new ExpressionMock("100");
+            SetAction setAction = new SetAction();
+            setAction.Value = new ExpressionMock("100");
             WriterMock mock = new WriterMock();
-            setAttributeAction.Target = mock;
-            setAttributeAction.Run();
+            setAction.Target = mock;
+            setAction.Run();
             Assert.IsTrue(mock.Value == "100");
         }
 

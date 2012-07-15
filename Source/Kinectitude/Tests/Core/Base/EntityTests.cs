@@ -53,11 +53,21 @@ namespace Kinectitude.Tests.Core.Base
         public void DestroyEntity()
         {
             Entity e = new Entity(0);
+            string name = "name";
+            e.Name = name;
+            GameLoaderMock glm = new GameLoaderMock();
+            SceneLoaderMock slm = new SceneLoaderMock(glm);
+            slm.EntityById[0] = e;
+            slm.EntityByName[name] = e;
+            Scene s = new Scene(slm, new Game(glm));
+            e.Scene = s;
             ComponentMock cm = new ComponentMock();
             e.AddComponent(cm, "component");
             e.Ready();
             e.Destroy();
             Assert.IsTrue(cm.Destroyed);
+            Assert.IsFalse(slm.EntityById.ContainsKey(0));
+            Assert.IsFalse(slm.EntityByName.ContainsKey(name));
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Kinectitude.Core.Base
             new List<Tuple<DataContainer, string, Action<string>>>();
         protected readonly Dictionary<string, string> oldValues = new Dictionary<string, string>();
 
-        public bool deleted { get; protected set; }
+        public bool Deleted { get; protected set; }
 
         private int id;
         public int Id {
@@ -69,7 +69,7 @@ namespace Kinectitude.Core.Base
         internal DataContainer(int id) 
         {
             this.Id = id;
-            deleted = false;
+            Deleted = false;
         }
 
         internal void NotifyOfChange(string key, Action<string> callback)

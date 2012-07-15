@@ -100,6 +100,8 @@ namespace Kinectitude.Core.Base
             {
                 component.Destroy();
             }
+            Scene.DeleteEntity(this);
+            Deleted = true;
         }
 
         internal override object GetComponentOrManager(string name)
