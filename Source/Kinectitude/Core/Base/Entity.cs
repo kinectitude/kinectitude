@@ -61,6 +61,7 @@ namespace Kinectitude.Core.Base
             {
                 componentDictionary[type] = component;
             }
+            component.DataContainer = this;
         }
 
         internal void Ready()

@@ -64,7 +64,6 @@ namespace Kinectitude.Player
                 {
                     float frameDelta = clock.Update();
                     accumulator += frameDelta;
-
                     while (accumulator > TimeStep)
                     {
                         game.OnUpdate(TimeStep);

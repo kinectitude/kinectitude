@@ -198,7 +198,7 @@
         <Action Type="SetAction" Target="TextRenderComponent.Value" Value="{scene.player1Score}"/>
         <Condition If="scene.player1Score >= 20">
           <Action Type="SetAction" Target="game.winner" Value="player 1 wins"/>
-          <Action Type="ChangeSceneAction" Target="Game Over"/>
+          <!--<Action Type="ChangeSceneAction" Target="Game Over"/>-->
         </Condition>
         <Condition If="scene.player1Score >= 10 and not scene.ball1">
           <Action Type="CreateEntityAction" Prototype="leftBall"/>
@@ -213,7 +213,7 @@
         <Action Type="SetAction" Target="TextRenderComponent.Value" Value="{scene.player2Score}"/>
         <Condition If="scene.player2Score >= 20">
           <Action Type="SetAction" Target="game.winner" Value="player 2 wins"/>
-          <Action Type="ChangeSceneAction" Target="Game Over"/>
+          <!--<Action Type="ChangeSceneAction" Target="Game Over"/>-->
         </Condition>
         <Condition If="scene.player2Score >= 10 and not scene.ball2">
           <Action Type="CreateEntityAction" Prototype="rightBall"/>
@@ -239,11 +239,10 @@
       </Event>
     </Entity>
 
-    <!--<Entity Prototype="text">
+    <Entity Prototype="text">
       <Component Type="TransformComponent" X="0" Y="300" Width="800"/>
       <Component Type="TextRenderComponent" Value="" FontSize="12" TextAlignment="Center"/>
       <Event Type="AttributeChangesEvent" Target="{player1.TransformComponent.Y}">
-        <Action Type="IncrementAction" Target="scene.scoreValue"/>
         <Action Type="SetAction" Target="TextRenderComponent.Value" Value="Player 1 y is {player1.TransformComponent.Y}"/>
       </Event>
     </Entity>
@@ -252,10 +251,9 @@
       <Component Type="TransformComponent" X="0" Y="325" Width="800"/>
       <Component Type="TextRenderComponent" Value="" FontSize="12" TextAlignment="Center"/>
       <Event Type="AttributeChangesEvent" Target="{player2.TransformComponent.Y}">
-        <Action Type="IncrementAction" Target="scene.scoreValue"/>
         <Action Type="SetAction" Target="TextRenderComponent.Value" Value="Player 2 y is {player2.TransformComponent.Y}"/>
       </Event>
-    </Entity>-->
+    </Entity>
 
   </Scene>
 
