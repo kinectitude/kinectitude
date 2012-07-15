@@ -14,7 +14,6 @@ namespace Kinectitude.Core.Base
             new Dictionary<string, List<Action<string>>>();
         protected readonly List<Tuple<DataContainer, string, Action<string>>> PropertyChanges =
             new List<Tuple<DataContainer, string, Action<string>>>();
-        protected readonly Dictionary<string, string> oldValues = new Dictionary<string, string>();
 
         public bool Deleted { get; protected set; }
 
@@ -107,9 +106,9 @@ namespace Kinectitude.Core.Base
                 callbacks = new List<Action<string>>();
                 callbacks.Add(callback);
                 CheckProperties[what] = callbacks;
-                string [] parts = what.Split('.');
-                object obj = GetComponentOrManager(parts[0]);
-                oldValues[what] = ClassFactory.GetStringParam(obj, parts[1]);
+                string[] parts = what.Split('.');
+                Changeable ch = GetComponentOrManager(parts[0]);
+                if(null != ch) ch.ShouldCheck = true;
             }
         }
 
@@ -119,27 +118,24 @@ namespace Kinectitude.Core.Base
             if (CheckProperties.TryGetValue(what, out callbacks))
             {
                 callbacks.Remove(callback);
-                if (callbacks.Count == 0) CheckProperties.Remove(what);
-            }
-        }
-
-        internal void CheckForChanges()
-        {
-            foreach (KeyValuePair<string, List<Action<string>>> keyValue in CheckProperties)
-            {
-                string [] parts = keyValue.Key.Split('.');
-                object obj = GetComponentOrManager(parts[0]);
-                if (null == obj) continue;
-                string newVal = ClassFactory.GetStringParam(obj, parts[1]);
-                if (oldValues[keyValue.Key] != newVal)
+                if (callbacks.Count == 0)
                 {
-                    foreach (Action<string> action in keyValue.Value) action(newVal);
-                    oldValues[keyValue.Key] = newVal;
+                    Changeable ch = GetComponentOrManager(what.Split('.')[0]);
+                    if(null != ch) ch.ShouldCheck = false;
                 }
             }
         }
 
-        internal abstract object GetComponentOrManager(string name);
+        internal void ChangedProperty(string what, string value)
+        {
+            List<Action<string>> callbacks;
+            if (CheckProperties.TryGetValue(what, out callbacks))
+            {
+                foreach (Action<string> callback in callbacks) callback(value);
+            }
+        }
+
+        internal abstract Changeable GetComponentOrManager(string name);
 
     }
 }

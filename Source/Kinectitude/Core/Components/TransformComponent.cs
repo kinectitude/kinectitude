@@ -11,20 +11,77 @@ namespace Kinectitude.Core.Components
     {
         private float x;
         [Plugin("X Position", "")]
-        public float X { get; set; }
+        public float X {
+            get { return x; }
+            set
+            {
+                if (x != value)
+                {
+                    x = value;
+                    Change("X");
+                }
+            }
+        }
 
+        private float y;
         [Plugin("Y Position", "")]
-        public float Y { get; set; }
+        public float Y 
+        {
+            get { return y; }
+            set
+            {
+                if (y != value)
+                {
+                    y = value;
+                    Change("Y");
+                }
+            }
+        }
 
         private int width;
         [Plugin("Width", "")]
-        public int Width { get; set; }
+        public int Width 
+        {
+            get { return width; }
+            set
+            {
+                if (width != value)
+                {
+                    width = value;
+                    Change("Width");
+                }
+            }
+        }
 
+        private int height;
         [Plugin("Height", "")]
-        public int Height { get; set; }
+        public int Height
+        {
+            get { return height; }
+            set
+            {
+                if (height != value)
+                {
+                    height = value;
+                    Change("Height");
+                }
+            }
+        }
 
+        private float rotation;
         [Plugin("Rotation", "")]
-        public float Rotation { get; set; }
+        public float Rotation 
+        {
+            get { return rotation; }
+            set
+            {
+                if (rotation != value)
+                {
+                    rotation = value;
+                    Change("Rotation");
+                }
+            }
+        }
 
         public override void Destroy() { }
     }

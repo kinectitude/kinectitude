@@ -39,6 +39,11 @@ namespace Kinectitude.Core.Base
             return component;
         }
 
+        internal override Changeable GetComponentOrManager(string name)
+        {
+            return GetComponent(name);
+        }
+
         internal Entity(int id) : base(id) { }
 
         internal void AddComponent(Component component, string name)
@@ -56,6 +61,7 @@ namespace Kinectitude.Core.Base
             {
                 componentDictionary[type] = component;
             }
+            component.DataContainer = this;
         }
 
         internal void Ready()
@@ -74,7 +80,7 @@ namespace Kinectitude.Core.Base
 
             if (missing.Count != 0)
             {
-                string identity = null != Name ? Name : "Entity " + Id.ToString();
+                string identity = null != Name ? Name : "entity " + Id.ToString();
                 throw MissingRequirementsException.MissingRequirement(identity, missing);
             }
 
@@ -82,7 +88,7 @@ namespace Kinectitude.Core.Base
             {
                 component.Ready();
             }
-        }
+        } 
 
         internal void Destroy()
         {
@@ -102,11 +108,6 @@ namespace Kinectitude.Core.Base
             }
             Scene.DeleteEntity(this);
             Deleted = true;
-        }
-
-        internal override object GetComponentOrManager(string name)
-        {
-            return GetComponent(name);
         }
     }
 }

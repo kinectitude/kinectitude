@@ -98,6 +98,7 @@ namespace Kinectitude.Core.Loaders
                 EntityById[onid] = entity;
                 entity.Scene = Scene;
                 entityParse(parsedNode, entity);
+                EntityById[onid] = entity;
                 entity.Ready();
             }            
         }

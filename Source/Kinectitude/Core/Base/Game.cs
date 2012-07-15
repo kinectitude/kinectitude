@@ -96,7 +96,7 @@ namespace Kinectitude.Core.Base
         }
 
 
-        internal override object GetComponentOrManager(string name)
+        internal override Changeable GetComponentOrManager(string name)
         {
             return null;
         }

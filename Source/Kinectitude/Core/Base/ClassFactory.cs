@@ -58,22 +58,22 @@ namespace Kinectitude.Core.Base
             new Dictionary<Type, Func<object>>();
 
         //stores setters that are used by the user
-        private static readonly Dictionary<Type, Dictionary<string, object>> SettersByType =
+        private static readonly Dictionary<Type, Dictionary<string, object>> settersByType =
             new Dictionary<Type, Dictionary<string, object>>();
 
         //stores getters for components, and actions of primatives
-        private static readonly Dictionary<Type, Dictionary<string, object>> GettersByType =
+        private static readonly Dictionary<Type, Dictionary<string, object>> gettersByType =
             new Dictionary<Type, Dictionary<string, object>>();
 
         //stores getters for components, and actions of primatives
-        private static readonly Dictionary<Type, Dictionary<string, Func<object, string>>> GettersByName =
+        private static readonly Dictionary<Type, Dictionary<string, Func<object, string>>> gettersByName =
             new Dictionary<Type, Dictionary<string, Func<object, string>>>();
 
         //stores the names set in define in case they are different
-        private static readonly Dictionary<Type, string> ReferedDictionary = new Dictionary<Type, string>();
+        private static readonly Dictionary<Type, string> referedDictionary = new Dictionary<Type, string>();
 
         //used to get the type that the setter is for casting the object in the setter's dictionary.
-        private static readonly Dictionary<Type, Dictionary<string, Type>> ParamType =
+        private static readonly Dictionary<Type, Dictionary<string, Type>> paramType =
             new Dictionary<Type, Dictionary<string, Type>>();
 
         //used to get the required types of a component
@@ -153,17 +153,17 @@ namespace Kinectitude.Core.Base
             }
 
             constructors[registeredName] = ConstructorTypes[type] = createConstructorDelegate(type);
-            SettersByType[type] = new Dictionary<string, object>();
-            ReferedDictionary[type] = registeredName;
-            ParamType[type] = new Dictionary<string, Type>();
-            GettersByType[type] = new Dictionary<string, object>();
-            GettersByName[type] = new Dictionary<string, Func<object, string>>();
+            settersByType[type] = new Dictionary<string, object>();
+            referedDictionary[type] = registeredName;
+            paramType[type] = new Dictionary<string, Type>();
+            gettersByType[type] = new Dictionary<string, object>();
+            gettersByName[type] = new Dictionary<string, Func<object, string>>();
             TypesDict[registeredName] = type;
 
             foreach (PropertyInfo pi in type.GetProperties().Where(item => Attribute.IsDefined(item, typeof(PluginAttribute))))
             {
 
-                ParamType[type][pi.Name] = pi.PropertyType;
+                paramType[type][pi.Name] = pi.PropertyType;
 
                 object setter;
                 object getter;
@@ -184,7 +184,7 @@ namespace Kinectitude.Core.Base
 
                 if (null != setter)
                 {
-                    SettersByType[type][pi.Name] = setter;
+                    settersByType[type][pi.Name] = setter;
                 }
                 else
                 {
@@ -193,9 +193,9 @@ namespace Kinectitude.Core.Base
 
                 if(null != getter)
                 {
-                    GettersByType[type][pi.Name] = getter;
+                    gettersByType[type][pi.Name] = getter;
                     //if it has a getter, it should have a string representation
-                    GettersByName[type][pi.Name] = stringGetter;
+                    gettersByName[type][pi.Name] = stringGetter;
                 }
             }
         }
@@ -220,14 +220,14 @@ namespace Kinectitude.Core.Base
         internal static void SetParam(object obj, string param, string val, Event evt, Entity entity)
         {
             Type setType = null;
-            ParamType[obj.GetType()].TryGetValue(param, out setType);
+            paramType[obj.GetType()].TryGetValue(param, out setType);
 
             if (null == setType)
             {
-                throw new InvalidAttributeException(param, ReferedDictionary[obj.GetType()]);
+                throw new InvalidAttributeException(param, referedDictionary[obj.GetType()]);
             }
 
-            Dictionary<string, object> setters = SettersByType[obj.GetType()];
+            Dictionary<string, object> setters = settersByType[obj.GetType()];
 
             if (typeof(IValueWriter) == setType)
             {
@@ -251,13 +251,13 @@ namespace Kinectitude.Core.Base
 
         internal static T GetParam<T>(object obj, string param) where T : class
         {
-            Func<object, T> getter = GettersByType[obj.GetType()][param] as Func<object, T>;
+            Func<object, T> getter = gettersByType[obj.GetType()][param] as Func<object, T>;
             return getter(obj);
         }
 
         internal static string GetStringParam(object obj, string param)
         {
-            return GettersByName[obj.GetType()][param](obj);
+            return gettersByName[obj.GetType()][param](obj);
         }
 
         private static Func<object> createConstructorDelegate(Type type)
@@ -483,5 +483,11 @@ namespace Kinectitude.Core.Base
         {
             return componentProvides[component];
         }
+
+        internal static string GetReferedName(Type t)
+        {
+            return referedDictionary[t];
+        }
+
     }
 }

@@ -18,123 +18,260 @@ namespace Kinectitude.Render
         private TransformComponent transformComponent;
         private RenderManager renderManager;
 
+
+        private string _value = "";
         [Plugin("Value", "")]
         public string Value
         {
-            get;
-            set;
+            get { return _value; }
+            set
+            {
+                if (value != _value)
+                {
+                    _value = value;
+                    Change("Value");
+                }
+            }
         }
 
+        private string fontFamily;
         [Plugin("Font Family", "")]
         public string FontFamily
         {
-            get;
-            set;
+            get { return fontFamily; }
+            set
+            {
+                if (value != fontFamily)
+                {
+                    fontFamily = value;
+                    Change("FontFamily");
+                }
+            }
         }
 
+        private FontWeight fontWeight;
         [Plugin("Font Weight", "")]
         public FontWeight FontWeight
         {
-            get;
-            set;
+            get { return fontWeight; }
+            set
+            {
+                if (value != fontWeight)
+                {
+                    fontWeight = value;
+                    Change("FontWeight");
+                }
+            }
         }
 
+        public FontStyle fontStyle;
         [Plugin("Font Style", "")]
         public FontStyle FontStyle
         {
-            get;
-            set;
+            get { return fontStyle; }
+            set
+            {
+                if (value != fontStyle)
+                {
+                    fontStyle = value;
+                    Change("FontStyle");
+                }
+            }
         }
 
+        private FontStretch fontStretch;
         [Plugin("Font Stretch", "")]
         public FontStretch FontStretch
         {
-            get;
-            set;
+            get { return fontStretch; }
+            set
+            {
+                if (value != fontStretch)
+                {
+                    fontStretch = value;
+                    Change("FontStretch");
+                }
+            }
         }
 
+        private float fontSize;
         [Plugin("Font Size", "")]
         public float FontSize
         {
-            get;
-            set;
+            get { return fontSize; }
+            set
+            {
+                if (value != fontSize)
+                {
+                    fontSize = value;
+                    Change("FontSize");
+                }
+            }
         }
 
+        private string fontColor;
         [Plugin("Font Color", "")]
         public string FontColor
         {
-            get;
-            set;
+            get { return fontColor; }
+            set
+            {
+                if (value != fontColor)
+                {
+                    fontColor = value;
+                    Change("FontColor");
+                }
+            }
         }
 
+        private string locale;
         [Plugin("Locale", "")]
         public string Locale
         {
-            get;
-            set;
+            get { return locale; }
+            set
+            {
+                if (value != locale)
+                {
+                    locale = value;
+                    Change("Locale");
+                }
+            }
         }
 
+        private FlowDirection flowDirection;
         [Plugin("Flow Direction", "")]
         public FlowDirection FlowDirection
         {
-            get;
-            set;
+            get { return flowDirection; }
+            set
+            {
+                if (value != flowDirection)
+                {
+                    flowDirection = value;
+                    Change("FlowDirection");
+                }
+            }
         }
 
+        private int tabSize;
         [Plugin("Tab Size", "")]
         public int TabSize
         {
-            get;
-            set;
+            get { return tabSize; }
+            set
+            {
+                if (value != tabSize)
+                {
+                    tabSize = value;
+                    Change("TabSize");
+                }
+            }
         }
 
+        private ParagraphAlignment paragraphAlignment;
         [Plugin("Paragraph Alignment", "")]
         public ParagraphAlignment ParagraphAlignment
         {
-            get;
-            set;
+            get { return paragraphAlignment; }
+            set
+            {
+                if (value != paragraphAlignment)
+                {
+                    paragraphAlignment = value;
+                    Change("ParagraphAlignment");
+                }
+            }
         }
 
+        private ReadingDirection readingDirection;
         [Plugin("Reading Direction", "")]
         public ReadingDirection ReadingDirection
         {
-            get;
-            set;
+            get { return readingDirection; }
+            set
+            {
+                if (value != readingDirection)
+                {
+                    readingDirection = value;
+                    Change("ReadingDirection");
+                }
+            }
         }
 
+        private TextAlignment textAlignment;
         [Plugin("Text Alignment", "")]
         public TextAlignment TextAlignment
         {
-            get;
-            set;
+            get { return textAlignment; }
+            set
+            {
+                if (value != textAlignment)
+                {
+                    textAlignment = value;
+                    Change("TextAlignment");
+                }
+            }
         }
 
+        private WordWrapping wordWrapping;
         [Plugin("Word Wrapping", "")]
         public WordWrapping WordWrapping
         {
-            get;
-            set;
+            get { return wordWrapping; }
+            set
+            {
+                if (value != wordWrapping)
+                {
+                    wordWrapping = value;
+                    Change("WordWrapping");
+                }
+            }
         }
 
+        private float offsetX;
         [Plugin("Horizontal Offset", "")]
         public float OffsetX
         {
-            get;
-            set;
+            get { return offsetX; }
+            set
+            {
+                if (value != offsetX)
+                {
+                    offsetX = value;
+                    Change("OffsetX");
+                }
+            }
         }
 
+        private float offsetY;
         [Plugin("Vertical Offset", "")]
         public float OffsetY
         {
-            get;
-            set;
+            get { return offsetY; }
+            set
+            {
+                if (value != offsetY)
+                {
+                    offsetY = value;
+                    Change("OffsetY");
+                }
+            }
         }
 
+        private float opacity;
         [Plugin("Opacity", "")]
         public float Opacity
         {
-            get;
-            set;
+            get { return opacity; }
+            set
+            {
+                if (value != opacity)
+                {
+                    opacity = value;
+                    Change("Opacity");
+                }
+            }
         }
 
         public TextRenderComponent()
@@ -153,11 +290,6 @@ namespace Kinectitude.Render
             WordWrapping = WordWrapping.NoWrap;
             Opacity = 1.0f;
             Value = "";
-        }
-
-        public void OnSetTextAction(SetTextAction action)
-        {
-            Value = action.Value.GetValue();
         }
 
         public void Render(RenderTarget renderTarget)

@@ -243,7 +243,6 @@
       <Component Type="TransformComponent" X="0" Y="300" Width="800"/>
       <Component Type="TextRenderComponent" Value="" FontSize="12" TextAlignment="Center"/>
       <Event Type="AttributeChangesEvent" Target="{player1.TransformComponent.Y}">
-        <Action Type="IncrementAction" Target="scene.scoreValue"/>
         <Action Type="SetAction" Target="TextRenderComponent.Value" Value="Player 1 y is {player1.TransformComponent.Y}"/>
       </Event>
     </Entity>
@@ -252,7 +251,6 @@
       <Component Type="TransformComponent" X="0" Y="325" Width="800"/>
       <Component Type="TextRenderComponent" Value="" FontSize="12" TextAlignment="Center"/>
       <Event Type="AttributeChangesEvent" Target="{player2.TransformComponent.Y}">
-        <Action Type="IncrementAction" Target="scene.scoreValue"/>
         <Action Type="SetAction" Target="TextRenderComponent.Value" Value="Player 2 y is {player2.TransformComponent.Y}"/>
       </Event>
     </Entity>

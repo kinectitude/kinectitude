@@ -16,7 +16,7 @@ namespace Kinectitude.Core.Base
         void Start();
     }
 
-    public class Manager<T> : IManager where T : IUpdateable
+    public class Manager<T> : Changeable, IManager where T : IUpdateable
     {
 
         private List<T> children;
@@ -83,6 +83,7 @@ namespace Kinectitude.Core.Base
         /// </summary>
         public void Start()
         {
+
             if (!Running)
             {
                 Running = true;
@@ -123,5 +124,8 @@ namespace Kinectitude.Core.Base
         {
             return Game.CurrentGame.GetService<U>();
         }
+
+
+
     }
 }

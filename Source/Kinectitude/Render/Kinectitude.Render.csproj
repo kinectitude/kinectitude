@@ -52,7 +52,6 @@
     <Compile Include="RenderComponent.cs" />
     <Compile Include="RenderManager.cs" />
     <Compile Include="RenderService.cs" />
-    <Compile Include="SetTextAction.cs" />
     <Compile Include="TextRenderComponent.cs" />
   </ItemGroup>
   <ItemGroup>

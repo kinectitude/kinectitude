@@ -96,15 +96,9 @@ namespace Kinectitude.Core.Base
             foreach (IManager m in managers)
             {
                 m.OnUpdate(frameDelta);
-                foreach (KeyValuePair<int,Entity> entityPair in entityById)
-                {
-                    entityPair.Value.CheckForChanges();
-                }
-                CheckForChanges();
+
             }
-
             
-
             foreach (KeyValuePair<string, List<Timer>> pair in runningTimers)
             {
                 List<Timer> timers = pair.Value;
@@ -130,7 +124,7 @@ namespace Kinectitude.Core.Base
         internal void CreateComponent(Entity entity, string stringType, List<Tuple<string, string>> values)
         {
             Component created = ClassFactory.Create<Component>(stringType);
-            created.Entity = entity;
+            created.entity = entity;
             entity.AddComponent(created, stringType);
             foreach (Tuple<string, string> tuple in values)
             {
@@ -252,15 +246,6 @@ namespace Kinectitude.Core.Base
             }
         }
 
-
-        internal override object GetComponentOrManager(string name)
-        {
-            Type managerType = ClassFactory.TypesDict[name];
-            IManager manager = null;
-            managersDictionary.TryGetValue(managerType, out manager);
-            return manager;
-        }
-
         internal void DeleteEntity(Entity delete)
         {
             if (delete.Name != null)
@@ -271,5 +256,13 @@ namespace Kinectitude.Core.Base
             //I don't think I need to remove the entity from each type matcher, since it won't be refered to by anything.
         }
 
+
+        internal override Changeable GetComponentOrManager(string name)
+        {
+            Type managerType = ClassFactory.TypesDict[name];
+            IManager manager = null;
+            managersDictionary.TryGetValue(managerType, out manager);
+            return manager as Changeable;
+        }
     }
 }

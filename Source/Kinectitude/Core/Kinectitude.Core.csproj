@@ -78,6 +78,7 @@
     <Compile Include="Attributes\ProvidesAttribute.cs" />
     <Compile Include="Attributes\RequiresAttribute.cs" />
     <Compile Include="Base\Action.cs" />
+    <Compile Include="Base\Changeable.cs" />
     <Compile Include="Base\ClassFactory.cs" />
     <Compile Include="Base\Condition.cs" />
     <Compile Include="Base\DataContainer.cs" />
