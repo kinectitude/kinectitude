@@ -78,6 +78,21 @@ namespace Kinectitude.Physics
             }
         }
 
+        private void setBodyVelocity(float velocity)
+        {
+            hasVelocity |= velocity != 0;
+            if (null != body)
+            {
+                if (velocity != 0 && body.BodyType == BodyType.Static)
+                {
+                    pm.PhysicsWorld.RemoveBody(body);
+                    createBody();
+                }
+                body.LinearVelocity = new Vector2(XVelocity * speedRatio, YVelocity * speedRatio);
+                body.AngularVelocity = AngularVelocity;
+            }
+        }
+
         private float xVelocity;
         [Plugin("X Velocity", "")]
         public float XVelocity
@@ -85,12 +100,8 @@ namespace Kinectitude.Physics
             get { return xVelocity; }
             set 
             {
-                if (null != body)
-                {
-                    body.LinearVelocity = new Vector2(value * speedRatio, YVelocity * speedRatio);
-                }
                 xVelocity = value;
-                hasPotentialVelocity = true;
+                setBodyVelocity(value);
             }
         }
 
@@ -101,12 +112,8 @@ namespace Kinectitude.Physics
             get { return yVelocity; }
             set
             {
-                if (null != body)
-                {
-                    body.LinearVelocity = new Vector2(xVelocity * speedRatio, value * speedRatio);
-                }
                 yVelocity = value;
-                hasPotentialVelocity = true;
+                setBodyVelocity(value);
             }
         }
 
@@ -118,7 +125,7 @@ namespace Kinectitude.Physics
             set
             {
                 angularVelocity = value;
-                hasPotentialVelocity = true;
+                setBodyVelocity(value);
             }
         }
 
@@ -135,7 +142,7 @@ namespace Kinectitude.Physics
         public bool FixedRotation { get; set; }
 
         private bool hasCollisions = false;
-        private bool hasPotentialVelocity = false;
+        private bool hasVelocity = false;
         private float prevX;
         private float prevY;
 
@@ -192,11 +199,7 @@ namespace Kinectitude.Physics
         private void setVelocity()
         {
             //the body needs to be moved because of a set position that was triggered
-            if (prevX != tc.X || prevY != tc.Y)
-            {
-
-            }
-            else
+            if (prevX == tc.X && prevY == tc.Y)
             {
                 float x = body.Position.X / sizeRatio;
                 float y = body.Position.Y / sizeRatio;
@@ -220,8 +223,10 @@ namespace Kinectitude.Physics
                 body.LinearVelocity = body.LinearVelocity / speed * minimumVelocity;
             }
 
+            //no need to use the setters here, they will add extra overhead to things that don't need to be checked
             xVelocity = body.LinearVelocity.X / speedRatio;
             yVelocity = body.LinearVelocity.Y / speedRatio;
+            angularVelocity = body.AngularVelocity;
         }
 
         public override void OnUpdate(float t)
@@ -271,6 +276,17 @@ namespace Kinectitude.Physics
 
             tc = GetComponent<TransformComponent>();
 
+            createBody();
+            
+            //Add a listener for collisions
+            body.OnCollision += OnCollision;
+
+            SetPosition();
+            body.LinearVelocity = new Vector2(xVelocity * speedRatio, yVelocity * speedRatio);
+        }
+
+        private void createBody()
+        {
             if ("circle" == Shape)
             {
                 body = BodyFactory.CreateCircle(pm.PhysicsWorld, tc.Width * sizeRatio, 1f);
@@ -286,7 +302,7 @@ namespace Kinectitude.Physics
             {
                 body.BodyType = BodyType.Dynamic;
             }
-            else if (hasPotentialVelocity)
+            else if (hasVelocity)
             {
                 body.BodyType = BodyType.Kinematic;
             }
@@ -302,12 +318,6 @@ namespace Kinectitude.Physics
             body.Friction = Friction;
             body.LinearDamping = LinearDamping;
             body.UserData = IEntity;
-            
-            //Add a listener for collisions
-            body.OnCollision += OnCollision;
-
-            SetPosition();
-            body.LinearVelocity = new Vector2(xVelocity * speedRatio, yVelocity * speedRatio);
         }
 
         private bool OnCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)

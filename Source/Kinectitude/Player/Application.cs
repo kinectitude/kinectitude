@@ -8,6 +8,7 @@ using Kinectitude.Render;
 using SlimDX.Direct2D;
 using SlimDX.Windows;
 using Factory = SlimDX.Direct2D.Factory;
+using Kinectitude.DirectInput;
 
 namespace Kinectitude.Player
 {
@@ -18,11 +19,13 @@ namespace Kinectitude.Player
         private readonly RenderService renderService;
         private readonly RenderForm form;
         private readonly Game game;
+        private readonly DirectInputService directInputService;
 
         public Application()
         {
-            Assembly loaded = Assembly.GetAssembly(typeof(RenderService));
-            GameLoader gameLoader = GameLoader.GetGameLoader("game.xml", new Assembly[] { loaded });
+            Assembly renderAssembly = Assembly.GetAssembly(typeof(RenderService));
+            Assembly directAssemdly = Assembly.GetAssembly(typeof(DirectInputService));
+            GameLoader gameLoader = GameLoader.GetGameLoader("game.xml", new Assembly[] { renderAssembly, directAssemdly });
             game = gameLoader.Game;
 
             Factory drawFactory = new SlimDX.Direct2D.Factory();
@@ -43,6 +46,10 @@ namespace Kinectitude.Player
                 Handle = form.Handle,
                 PixelSize = size
             });
+
+            directInputService = game.GetService<DirectInputService>();
+            directInputService.Control = form;
+
         }
 
         public void Dispose()

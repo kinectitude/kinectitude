@@ -103,6 +103,10 @@
       <Name>Kinectitude.Core</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\DirectInput\Kinectitude.DirectInput.csproj">
+      <Project>{6F23FA79-3A6F-4D54-A099-336F90A719E7}</Project>
+      <Name>Kinectitude.DirectInput</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Render\Kinectitude.Render.csproj">
       <Project>{E6DD6F76-999C-4B56-887C-347FAF50DAB3}</Project>
       <Name>Kinectitude.Render</Name>
