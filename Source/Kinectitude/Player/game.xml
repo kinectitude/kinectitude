@@ -22,10 +22,19 @@
   <Using File="Kinectitude.DirectInput.dll">
     <Define Name="KeyEvent" Class="Kinectitude.DirectInput.KeyEvent"/>
     <Define Name="KeyboardManager" Class="Kinectitude.DirectInput.KeyboardManager"/>
+    <Define Name="MouseManager" Class="Kinectitude.DirectInput.MouseManager"/>
+    <Define Name="MouseFollowComponent" Class="Kinectitude.DirectInput.MouseFollowComponent"/>
   </Using>
   
   <Prototype Name="paddle">
     <Component Type="KinectFollowComponent" Direction="Y" Player="1" Joint="HandLeft"/>
+    <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Rectangle"/>
+    <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false" FixedRotation="true"/>
+    <Component Type="TransformComponent" Width="24" Height="128"/>
+  </Prototype>
+
+  <Prototype Name="paddle2">
+    <Component Type="MouseFollowComponent" Direction="Y"/>
     <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Rectangle"/>
     <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false" FixedRotation="true"/>
     <Component Type="TransformComponent" Width="24" Height="128"/>
@@ -119,7 +128,7 @@
       <Component Type="TransformComponent" X="600" Y="500" />
       <Component Type="TextRenderComponent" Value="Player 2 Not ready!" TextAlignment="Center" FontColor="White" />
       <Event Type="AttributeChangesEvent" Target="{scene.ready2txt}">
-        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="{scene.ready1txt}"/>
+        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="{scene.ready2txt}"/>
       </Event>
     </Entity>
 
@@ -134,10 +143,10 @@
       </Event>
     </Entity>
 
-    <Entity Name="player2" Prototype="paddle">
+    <Entity Name="player2" Prototype="paddle2">
       <Component Type="TransformComponent" X="782" Y="250"/>
       <!--this is testing to see that I can ovrride things in a Prototype-->
-      <Component Type="KinectFollowComponent" Player="1" Joint="HandRight" />
+      <!--<Component Type="KinectFollowComponent" Player="1" Joint="HandRight" />-->
       <Event Type="CrossesLineEvent" Line="Y" Location="450"  Direction="Positive">
         <Action Type="SetAction" Target="scene.ready2txt" Value="player 2 is ready!"/>
         <Action Type="SetAction" Target="scene.ready2" Value="true"/>

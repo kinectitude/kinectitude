@@ -4,6 +4,7 @@ using Kinectitude.Core.Base;
 using Kinectitude.Core.Components;
 using SlimDX.Direct2D;
 using RenderTarget = SlimDX.Direct2D.RenderTarget;
+using Kinectitude.Core.ComponentInterfaces;
 
 namespace Kinectitude.Render
 {

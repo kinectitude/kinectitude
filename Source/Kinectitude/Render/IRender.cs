@@ -2,6 +2,7 @@
 using SlimDX.Direct2D;
 using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Components;
+using Kinectitude.Core.ComponentInterfaces;
 
 namespace Kinectitude.Render
 {

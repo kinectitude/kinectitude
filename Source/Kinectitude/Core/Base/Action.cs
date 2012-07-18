@@ -15,7 +15,7 @@
         /// <typeparam name="T">The type of the component.
         /// NOTE This must be the same as ImplementationType in the component</typeparam>
         /// <returns>The component of type T or null if none exists in the entity</returns>
-        public T GetComponent<T>() where T : Component
+        public T GetComponent<T>() where T : class
         {
             return Event.Entity.GetComponent<T>();
         }

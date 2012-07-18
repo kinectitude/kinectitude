@@ -4,9 +4,11 @@ using Kinectitude.Core.Base;
 using Kinectitude.Core.Components;
 using Bitmap = SlimDX.Direct2D.Bitmap;
 using RenderTarget = SlimDX.Direct2D.RenderTarget;
+using Kinectitude.Core.ComponentInterfaces;
 
 namespace Kinectitude.Render
 {
+    [Plugin("Makes an image for the entity", "")]
     public class ImageRenderComponent : Component, IRender
     {
         private RenderManager renderManager;

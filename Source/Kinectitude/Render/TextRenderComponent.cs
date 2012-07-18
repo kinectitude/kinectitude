@@ -6,6 +6,7 @@ using SlimDX.Direct2D;
 using SlimDX.DirectWrite;
 using FontStyle = SlimDX.DirectWrite.FontStyle;
 using RenderTarget = SlimDX.Direct2D.RenderTarget;
+using Kinectitude.Core.ComponentInterfaces;
 
 namespace Kinectitude.Render
 {
@@ -23,7 +24,7 @@ namespace Kinectitude.Render
         [Plugin("Value", "")]
         public string Value
         {
-            get { return _value; }
+            get { return _value == null ? "" : _value; }
             set
             {
                 if (value != _value)

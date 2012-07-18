@@ -52,5 +52,7 @@ namespace Kinectitude.Render
         {
             return renderService.GetBitmap(image);
         }
+
+        public override void OnUpdate(float frameDelta) { }
     }
 }

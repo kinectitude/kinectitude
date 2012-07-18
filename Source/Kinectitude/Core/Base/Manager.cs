@@ -16,7 +16,7 @@ namespace Kinectitude.Core.Base
         void Start();
     }
 
-    public class Manager<T> : Changeable, IManager where T : IUpdateable
+    public abstract class Manager<T> : Changeable, IManager where T : IUpdateable
     {
 
         private List<T> children;
@@ -76,7 +76,7 @@ namespace Kinectitude.Core.Base
         /// Called to notify the manager that the game has continued
         /// </summary>
         /// <param name="frameDelta">The amount of time in seconds that has passed since last update</param>
-        public virtual void OnUpdate(float frameDelta) { }
+        public abstract void OnUpdate(float frameDelta);
 
         /// <summary>
         /// Used to start a manager

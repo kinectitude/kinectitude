@@ -3,7 +3,7 @@ using Microsoft.Kinect;
 
 namespace Kinectitude.Kinect
 {
-    public class KinectManager : Manager<KinectComponent>
+    public class KinectManager : Manager<KinectFollowComponent>
     {
         private static KinectService service;
         private Skeleton[] latestSkeletons = null;
@@ -13,7 +13,7 @@ namespace Kinectitude.Kinect
             latestSkeletons = skeletons;
         }
 
-        public override void OnUpdate(float t)
+        public override void OnUpdate(float frameDelta)
         {
             if (null == latestSkeletons)
             {
@@ -43,7 +43,7 @@ namespace Kinectitude.Kinect
                 }
 
                 kfc.UpdatePosition(x * 800, y * 600);
-                kfc.OnUpdate(t);
+                kfc.OnUpdate(frameDelta);
             }
 
             latestSkeletons = null;

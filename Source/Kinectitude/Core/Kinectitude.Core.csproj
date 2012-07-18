@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractComponents\BasicFollowComponent.cs" />
     <Compile Include="Actions\ChangeSceneAction.cs" />
     <Compile Include="Actions\ResumeTimersAction.cs" />
     <Compile Include="Actions\PauseTimersAction.cs" />
