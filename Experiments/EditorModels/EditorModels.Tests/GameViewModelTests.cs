@@ -246,5 +246,24 @@ namespace EditorModels.Tests
             Assert.IsNotNull(plugin);
             Assert.AreEqual(TransformComponentType, plugin.ClassName);
         }
+
+        [TestMethod]
+        public void PrototypeMustHaveName()
+        {
+            GameViewModel game = new GameViewModel("Test Game");
+            game.AddPrototype(new EntityViewModel());
+
+            Assert.AreEqual(0, game.Prototypes.Count);
+        }
+
+        [TestMethod]
+        public void CannotAddDuplicatePrototypeName()
+        {
+            GameViewModel game = new GameViewModel("Test Game");
+            game.AddPrototype(new EntityViewModel() { Name = "prototype" });
+            game.AddPrototype(new EntityViewModel() { Name = "prototype" });
+
+            Assert.AreEqual(1, game.Prototypes.Count(x => x.Name == "prototype" ));
+        }
     }
 }

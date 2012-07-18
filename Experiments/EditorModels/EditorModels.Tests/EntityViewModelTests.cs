@@ -381,6 +381,16 @@ namespace EditorModels.Tests
         }
 
         [TestMethod]
+        public void AnonymousEntitiesDoNotHaveEqualNames()
+        {
+            SceneViewModel scene = new SceneViewModel("Test Scene");
+            scene.AddEntity(new EntityViewModel());
+            scene.AddEntity(new EntityViewModel());
+
+            Assert.AreEqual(2, scene.Entities.Count);
+        }
+
+        [TestMethod]
         public void CannotRenameToDuplicateNameInSameScope()
         {
             GameViewModel game = new GameViewModel("Test Game");

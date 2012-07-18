@@ -161,7 +161,14 @@ namespace EditorModels.ViewModels
 
         public PluginViewModel GetPlugin(string name)
         {
-            return Plugins.FirstOrDefault(x => x.ClassName == name);
+            PluginViewModel plugin = Plugins.FirstOrDefault(x => x.ClassName == name);
+            
+            if (null == plugin)
+            {
+                plugin = Plugins.FirstOrDefault(x => x.File == typeof(Kinectitude.Core.Base.Component).Module.Name && x.ShortName == name);
+            }
+            
+            return plugin;
         }
     }
 }

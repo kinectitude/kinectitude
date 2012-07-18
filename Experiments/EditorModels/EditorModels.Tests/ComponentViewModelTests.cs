@@ -11,7 +11,10 @@ namespace EditorModels.Tests
     public class ComponentViewModelTests
     {
         [Plugin("Dependent Manager", "")]
-        private class DependentManager : Manager<DependentComponent> { }
+        private class DependentManager : Manager<DependentComponent>
+        {
+            public override void OnUpdate(float frameDelta) { }
+        }
 
         [Plugin("Dependent Component", "")]
         [Requires(typeof(TransformComponent))]

@@ -263,7 +263,7 @@ namespace EditorModels.ViewModels
 
         public bool EntityNameExists(string name)
         {
-            return Entities.Any(x => x.Name == name) || null != scope && scope.EntityNameExists(name);
+            return Entities.Any(x => x.Name != null && x.Name == name) || null != scope && scope.EntityNameExists(name);
         }
 
         string IPluginNamespace.GetDefinedName(PluginViewModel plugin)

@@ -285,17 +285,25 @@ namespace EditorModels.ViewModels
             Usings.Remove(use);
         }
 
+        private bool HasPrototypeWithName(string name)
+        {
+            return Prototypes.Any(x => x.Name == name);
+        }
+
         public void AddPrototype(EntityViewModel prototype)
         {
-            prototype.SetScope(this);
-            
-            prototype.PluginAdded += OnPluginAdded;
-            foreach (PluginViewModel plugin in prototype.Plugins)
+            if (null != prototype.Name && !HasPrototypeWithName(prototype.Name))
             {
-                DefinePlugin(plugin);
-            }
+                prototype.SetScope(this);
 
-            Prototypes.Add(prototype);
+                prototype.PluginAdded += OnPluginAdded;
+                foreach (PluginViewModel plugin in prototype.Plugins)
+                {
+                    DefinePlugin(plugin);
+                }
+
+                Prototypes.Add(prototype);
+            }
         }
 
         public void RemovePrototype(EntityViewModel prototype)
@@ -454,7 +462,7 @@ namespace EditorModels.ViewModels
 
         bool IEntityNamespace.EntityNameExists(string name)
         {
-            return Prototypes.Any(x => x.Name == name);
+            return HasPrototypeWithName(name);
         }
 
         string IAttributeScope.GetInheritedValue(string key)
