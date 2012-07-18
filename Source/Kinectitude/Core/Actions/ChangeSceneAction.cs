@@ -7,7 +7,7 @@ namespace Kinectitude.Core.Actions
     [Plugin("Change the scene", "")]
     internal sealed class ChangeSceneAction : Action
     {
-        [Plugin("Scene", "")]
+        [Plugin("LoadedScene", "")]
         public IExpressionReader Target { get; set; }
 
         public ChangeSceneAction() { }

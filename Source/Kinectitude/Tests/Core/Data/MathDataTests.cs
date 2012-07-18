@@ -16,6 +16,27 @@ namespace Kinectitude.Tests.Core.Data
         Event evt = new EventMock();
         ManagerMock manager = new ManagerMock();
 
+        static MathDataTests()
+        {
+            try
+            {
+                ClassFactory.RegisterType("component", typeof(ComponentMock));
+            }
+            catch (ArgumentException)
+            {
+                //this is incase another test case registered this type already
+            }
+
+            try
+            {
+                ClassFactory.RegisterType("manager", typeof(ManagerMock));
+            }
+            catch (ArgumentException)
+            {
+                //this is incase another test case registered this type already
+            }
+        }
+
         public MathDataTests()
         {
             scene = new Scene(new SceneLoaderMock(new GameLoaderMock()), game);

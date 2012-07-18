@@ -7,7 +7,7 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Actions
 {
-    [Plugin("Resume timers with a given name", "")]
+    [Plugin("Resume timers with a given Name", "")]
     internal class ResumeTimersAction : Action
     {
         [Plugin("Name of the timers to resume", "")]

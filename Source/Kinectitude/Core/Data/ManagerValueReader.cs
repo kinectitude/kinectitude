@@ -21,7 +21,6 @@ namespace Kinectitude.Core.Data
 
         public override string GetValue()
         {
-
             return getValue();
         }
 

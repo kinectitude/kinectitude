@@ -4,6 +4,7 @@ using Kinectitude.Core.Components;
 using Kinectitude.Core.Data;
 using Kinectitude.Core.Loaders;
 using Action = Kinectitude.Core.Base.Action;
+using System.Collections.Generic;
 
 namespace Kinectitude.Tests.Core.TestMocks
 {
@@ -12,22 +13,43 @@ namespace Kinectitude.Tests.Core.TestMocks
     {
         internal SceneLoader mockScene = null;
 
-        internal override SceneLoader GetSceneLoader(string name)
+        public GameLoaderMock() : base("test") { }
+
+        internal override SceneLoader GetSceneLoader(string name) 
         {
             return mockScene;
         }
+
+        public void addType(string name)
+        {
+            PrototypeIs.Add(name, new List<string>() { name });
+        }
+
     }
 
     internal class SceneLoaderMock : SceneLoader
     {
         public string EntityCreated = "";
 
-        public SceneLoaderMock(GameLoader gameLoader) : base(gameLoader) { }
+        GameLoaderMock glm;
 
-        internal override void CreateEntity(string name)
+        public SceneLoaderMock(GameLoader gameLoader) : base(gameLoader) 
+        {
+            glm = gameLoader as GameLoaderMock;
+        }
+
+        protected override LoadedEntity PrototypeMaker(string name)
         {
             EntityCreated = name;
+            return new LoadedEntity(name, new List<System.Tuple<string, string>>(), 0);
         }
+
+        public void callPrototypeMaker(string name)
+        {
+            if (glm != null) glm.addType(name);
+            PrototypeMaker(name);
+        }
+
     }
 
     public class ActionMock : Action
@@ -82,6 +104,10 @@ namespace Kinectitude.Tests.Core.TestMocks
     {
         [Plugin("", "")]
         public string Value { get; set; }
+
+        public bool Updated = false;
+
+        public override void OnUpdate(float frameDelta) { Updated = true; }
     }
 
     [Requires(typeof(TransformComponent))]

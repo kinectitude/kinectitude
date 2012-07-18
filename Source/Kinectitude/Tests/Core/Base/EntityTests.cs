@@ -4,6 +4,8 @@ using Kinectitude.Core.Components;
 using Kinectitude.Core.Exceptions;
 using Kinectitude.Tests.Core.TestMocks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Kinectitude.Core.Loaders;
+using System.Collections.Generic;
 
 namespace Kinectitude.Tests.Core.Base
 {
@@ -35,18 +37,22 @@ namespace Kinectitude.Tests.Core.Base
         [ExpectedException(typeof(MissingRequirementsException))]
         public void MissingComponent()
         {
-            Entity e = new Entity(0);
-            e.AddComponent(new RequiresTransformComponent(), "RequiresTransformComponent");
-            e.Ready();
+            LoadedEntity e = new LoadedEntity("", new System.Collections.Generic.List<Tuple<string, string>>(), 0);
+            e.AddLoadedComponent(new LoadedComponent("RequiresTransformComponent", new List<Tuple<string,string>>()));
+            GameLoaderMock glm = new GameLoaderMock();
+            Scene s = new Scene(new SceneLoaderMock(glm), glm.Game);
+            e.Create(s);
         }
 
         [TestMethod]
         public void HasComponent()
         {
-            Entity e = new Entity(0);
-            e.AddComponent(new RequiresTransformComponent(), "RequiresTransformComponent");
-            e.AddComponent(new TransformComponent(), "TransformComponent");
-            e.Ready();
+            LoadedEntity e = new LoadedEntity("", new System.Collections.Generic.List<Tuple<string, string>>(), 0);
+            e.AddLoadedComponent(new LoadedComponent("RequiresTransformComponent", new List<Tuple<string,string>>()));
+            e.AddLoadedComponent(new LoadedComponent("TransformComponent", new List<Tuple<string, string>>()));
+            GameLoaderMock glm = new GameLoaderMock();
+            Scene s = new Scene(new SceneLoaderMock(glm), glm.Game);
+            e.Create(s);
         }
 
         [TestMethod]

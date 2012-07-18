@@ -8,7 +8,7 @@ using Kinectitude.Core.ComponentInterfaces;
 
 namespace Kinectitude.Render
 {
-    [Plugin("Makes an image for the entity", "")]
+    [Plugin("Makes an image for the loadedEntity", "")]
     public class ImageRenderComponent : Component, IRender
     {
         private RenderManager renderManager;

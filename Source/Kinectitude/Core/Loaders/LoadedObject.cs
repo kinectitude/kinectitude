@@ -15,14 +15,25 @@ namespace Kinectitude.Core.Loaders
             Values = values;
         }
 
-        protected void setValues(object obj, Event evt)
+        protected void setValues(object obj, Event evt, Entity entity)
         {
             foreach (Tuple<string, string> val in Values)
             {
                 string param = val.Item1;
                 string value = val.Item2;
-                ClassFactory.SetParam(obj, param, value, evt, evt.Entity);
+                ClassFactory.SetParam(obj, param, value, evt, entity);
             }
         }
+
+        protected void setValues(DataContainer dc)
+        {
+            foreach (Tuple<string, string> val in Values)
+            {
+                string param = val.Item1;
+                string value = val.Item2;
+                dc[param] = value;
+            }
+        }
+
     }
 }

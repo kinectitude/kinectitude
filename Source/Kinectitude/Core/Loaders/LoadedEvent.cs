@@ -11,10 +11,11 @@ namespace Kinectitude.Core.Loaders
         private readonly string type;
         private readonly List<LoadedBaseAction> actions = new List<LoadedBaseAction>();
 
-        internal LoadedEvent(string type, List<Tuple<string, string>> values)
+        internal LoadedEvent(string type, List<Tuple<string, string>> values, LoadedEntity entity)
             : base(values)
         {
             this.type = type;
+            entity.AddLoadedEvent(this);
         }
 
 
@@ -22,12 +23,17 @@ namespace Kinectitude.Core.Loaders
         {
             Event evt = ClassFactory.Create<Event>(type);
             evt.Entity = entity;
-            setValues(evt, evt);
+            setValues(evt, evt, entity);
             foreach (LoadedBaseAction action in actions)
             {
                 evt.AddAction(action.Create(evt));
             }
             return evt;
+        }
+
+        internal void AddAction(LoadedBaseAction action)
+        {
+            actions.Add(action);
         }
 
     }

@@ -16,6 +16,9 @@ namespace Kinectitude.Tests.Core.Loaders
         [TestMethod]
         public void TestMethod1()
         {
+
+            xmlGameLoader.CreateGame();
+
             //first prototype
             XElement prototype = xmlGameLoader.Prototypes["prototype1"];
             Assert.IsTrue("100" == (string)prototype.Attribute("score"));

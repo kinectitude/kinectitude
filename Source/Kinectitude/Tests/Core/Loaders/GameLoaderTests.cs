@@ -13,6 +13,11 @@ namespace Kinectitude.Tests.Core.Loaders
 
         private static readonly GameLoader[] gameLoaders = { xmlGameLoader };
 
+        static GameLoaderTests()
+        {
+            foreach (GameLoader gameLoader in gameLoaders) gameLoader.CreateGame();
+        }
+
         [TestMethod]
         [DeploymentItem("Core\\" + xmlFile)]
         public void TestPrototypeIs()
@@ -45,7 +50,7 @@ namespace Kinectitude.Tests.Core.Loaders
         {
             foreach (GameLoader gameLoader in gameLoaders)
             {
-                Assert.IsTrue(gameLoader.AvaliblePrototypes.Count == 4, gameLoader.GetType().Name);
+                Assert.IsTrue(gameLoader.AvaliblePrototypes.Count == 4, gameLoader.GetType().Name + " " + gameLoader.AvaliblePrototypes.Count);
             }
         }
     }

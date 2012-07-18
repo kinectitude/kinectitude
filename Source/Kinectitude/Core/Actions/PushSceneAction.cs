@@ -7,7 +7,7 @@ namespace Kinectitude.Core.Actions
     [Plugin("Push a scene", "")]
     public sealed class PushSceneAction : Action
     {
-        [Plugin("Scene", "")]
+        [Plugin("LoadedScene", "")]
         public IExpressionReader Target { get; set; }
 
         public PushSceneAction() { }

@@ -29,5 +29,12 @@ namespace Kinectitude.Core.Loaders
             }
             return condition;
         }
+
+
+        internal void AddAction(LoadedAction action)
+        {
+            actions.Add(action);
+        }
+
     }
 }

@@ -139,6 +139,7 @@
     <Compile Include="Loaders\LoadedCondition.cs" />
     <Compile Include="Loaders\LoadedEntity.cs" />
     <Compile Include="Loaders\LoadedEvent.cs" />
+    <Compile Include="Loaders\LoadedManager.cs" />
     <Compile Include="Loaders\LoadedObject.cs" />
     <Compile Include="Loaders\LoadedScene.cs" />
     <Compile Include="Loaders\SceneLoader.cs" />

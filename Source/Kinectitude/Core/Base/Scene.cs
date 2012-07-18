@@ -8,8 +8,8 @@ namespace Kinectitude.Core.Base
 {    
     internal class Scene : DataContainer
     {
-        private readonly Dictionary<Type, IManager> managersDictionary;
-        private readonly List<IManager> managers;
+        internal readonly Dictionary<Type, IManager> ManagersDictionary;
+        internal readonly List<IManager> Managers;
         private readonly Dictionary<int, Entity> entityById;
         private readonly Dictionary<string, List<TriggerOccursEvent>> triggers;
         private readonly SceneLoader seceneLoader;
@@ -60,14 +60,14 @@ namespace Kinectitude.Core.Base
                             e.DoActions();
                         }
                     }
-                    foreach (IManager m in managers)
+                    foreach (IManager m in Managers)
                     {
                         m.Start();
                     }
                 }
                 else
                 {
-                    foreach (IManager m in managers)
+                    foreach (IManager m in Managers)
                     {
                         m.Stop();
                     }
@@ -78,8 +78,8 @@ namespace Kinectitude.Core.Base
 
         internal Scene(SceneLoader sceneLoader, Game game) : base(-1)
         {
-            managersDictionary = new Dictionary<Type, IManager>();
-            managers = new List<IManager>();
+            ManagersDictionary = new Dictionary<Type, IManager>();
+            Managers = new List<IManager>();
             Game = game;
             OnStart = new List<SceneStartsEvent>();
             IsType = sceneLoader.IsType;
@@ -93,7 +93,7 @@ namespace Kinectitude.Core.Base
         internal void OnUpdate(float frameDelta)
         {
             //should not be updated if not running
-            foreach (IManager m in managers)
+            foreach (IManager m in Managers)
             {
                 m.OnUpdate(frameDelta);
 
@@ -118,17 +118,6 @@ namespace Kinectitude.Core.Base
                 {
                     timers.Remove(timer);
                 }
-            }
-        }
-
-        internal void CreateComponent(Entity entity, string stringType, List<Tuple<string, string>> values)
-        {
-            Component created = ClassFactory.Create<Component>(stringType);
-            created.Entity = entity;
-            entity.AddComponent(created, stringType);
-            foreach (Tuple<string, string> tuple in values)
-            {
-                ClassFactory.SetParam(created, tuple.Item1, tuple.Item2, null, entity);
             }
         }
 
@@ -164,47 +153,38 @@ namespace Kinectitude.Core.Base
 
         internal void CreateEntity(string prototype)
         {
-            seceneLoader.CreateEntity(prototype);
-        }
-
-        internal void CreateManager(string registeredName, List<Tuple<string, string>> values)
-        {
-            IManager manager = GetManager(registeredName);
-            foreach (Tuple<string, string> value in values)
-            {
-                ClassFactory.SetParam(manager, value.Item1, value.Item2, null, null);
-            }
+            seceneLoader.CreateEntity(prototype, this);
         }
 
         internal IManager GetManager(string registeredName)
         {
             Type managerType = ClassFactory.TypesDict[registeredName];
             IManager manager;
-            if (managersDictionary.ContainsKey(managerType))
+            if (ManagersDictionary.ContainsKey(managerType))
             {
-                manager = managersDictionary[managerType];
+                manager = ManagersDictionary[managerType];
             }
             else
             {
                 manager = ClassFactory.Create<IManager>(registeredName);
-                managersDictionary.Add(managerType, manager);
-                managers.Add(manager);
+                ManagersDictionary.Add(managerType, manager);
+                Managers.Add(manager);
             }
             return manager;
         }
 
         internal T GetManager<T>() where T : class, IManager
         {
-            if (!managersDictionary.ContainsKey(typeof(T)))
+            if (!ManagersDictionary.ContainsKey(typeof(T)))
             {
                 T manager = ClassFactory.Create<T>(typeof(T));
-                managers.Add(manager);
-                managersDictionary.Add(typeof(T), manager);
+                Managers.Add(manager);
+                ManagersDictionary.Add(typeof(T), manager);
                 return manager;
             }
             else
             {
-                return managersDictionary[typeof(T)] as T;
+                return ManagersDictionary[typeof(T)] as T;
             }
         }
         internal void AddTimer(string name, float time, IExpressionReader expressionReader, bool recurring)
@@ -261,7 +241,7 @@ namespace Kinectitude.Core.Base
         {
             Type managerType = ClassFactory.TypesDict[name];
             IManager manager = null;
-            managersDictionary.TryGetValue(managerType, out manager);
+            ManagersDictionary.TryGetValue(managerType, out manager);
             return manager as Changeable;
         }
     }

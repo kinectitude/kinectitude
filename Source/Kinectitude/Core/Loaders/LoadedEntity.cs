@@ -10,8 +10,7 @@ namespace Kinectitude.Core.Loaders
     internal class LoadedEntity : LoadedObject
     {
         //used to see that the entity has everything it needs
-        private readonly Dictionary<Type, LoadedComponent> componentDictionary = 
-            new Dictionary<Type, LoadedComponent>();
+        private readonly HashSet<Type> componentSet = new HashSet<Type>();
 
         //used to see that everything needed is provided
         private readonly List<Type> needs = new List<Type>();
@@ -22,31 +21,34 @@ namespace Kinectitude.Core.Loaders
         private readonly List<LoadedEvent> events = new List<LoadedEvent>();
 
 
-        private readonly string name;
+        private readonly string Name;
 
         private bool firstCreate = true;
 
-        internal LoadedEntity(string name, List<Tuple<string, string>> values): base(values)
+        int id;
+
+        internal LoadedEntity(string name, List<Tuple<string, string>> values, int id): base(values)
         {
-            this.name = name;
+            Name = name;
+            this.id = id;
         }
 
         internal void AddLoadedComponent(LoadedComponent component)
         {
             components.Add(component);
-            componentDictionary.Add(component.ComponentType, component);
-            foreach (Type type in ClassFactory.GetRequirements(component.ComponentType))
+            componentSet.Add(component.Type);
+            foreach (Type type in ClassFactory.GetRequirements(component.Type))
             {
                 needs.Add(type);
             }
 
-            foreach (Type type in ClassFactory.GetProvided(component.GetType()))
+            foreach (Type type in ClassFactory.GetProvided(component.Type))
             {
-                componentDictionary.Add(type, component);
+                componentSet.Add(type);
             }
         }
 
-        internal Entity Create(int id)
+        internal Entity Create(int id, Scene scene)
         {
 
             if (firstCreate)
@@ -54,7 +56,7 @@ namespace Kinectitude.Core.Loaders
                 List<Type> missing = new List<Type>();
                 foreach (Type type in needs)
                 {
-                    if (!componentDictionary.ContainsKey(type))
+                    if (!componentSet.Contains(type))
                     {
                         if (!missing.Contains(type))
                         {
@@ -65,22 +67,42 @@ namespace Kinectitude.Core.Loaders
 
                 if (missing.Count != 0)
                 {
-                    string identity = null != name ? name : "Entity " + id.ToString();
+                    string identity = null != Name ? Name : "Entity " + id.ToString();
                     throw MissingRequirementsException.MissingRequirement(identity, missing);
                 }
                 firstCreate = false;
             }
 
             Entity entity = new Entity(id);
+            entity.Name = Name;
+            entity.Scene = scene;
 
-            setValues(entity, null);
+            setValues(entity);
+
+            foreach (LoadedComponent loadedComponent in components)
+            {
+                entity.AddComponent(loadedComponent.Create(entity), loadedComponent.Name);
+            }
 
             foreach (LoadedEvent loadedEvent in events)
             {
                 Event evt = loadedEvent.Create(entity);
+                evt.Entity = entity;
                 evt.Initialize();
             }
+
             return entity;
         }
+
+        internal Entity Create(Scene scene)
+        {
+            return Create(id, scene);
+        }
+
+        internal void AddLoadedEvent(LoadedEvent evt)
+        {
+            events.Add(evt);
+        }
+
     }
 }

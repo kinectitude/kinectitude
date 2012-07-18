@@ -14,6 +14,31 @@ namespace Kinectitude.Tests.Core.Actions
     [TestClass]
     public class CoreActionTests
     {
+
+        static CoreActionTests()
+        {
+            try
+            {
+                ClassFactory.RegisterType("component", typeof(TransformComponent));
+            }
+            catch (ArgumentException) { }
+            try
+            {
+                ClassFactory.RegisterType("action", typeof(SetPositionAction));
+            }
+            catch (ArgumentException) { }
+            try
+            {
+                ClassFactory.RegisterType("event", typeof(EventMock));
+            }
+            catch (ArgumentException) { }
+            try
+            {
+                ClassFactory.RegisterType("writer", typeof(WriterMock));
+            }
+            catch (ArgumentException) { }
+        }
+
         [TestMethod]
         public void SetPosition()
         {
@@ -51,6 +76,7 @@ namespace Kinectitude.Tests.Core.Actions
             GameLoaderMock gameLoader = new GameLoaderMock();
             Game game = new Game(gameLoader);
             SceneLoaderMock sceneLoader = new SceneLoaderMock(gameLoader);
+            sceneLoader.callPrototypeMaker("CreateX");
             Scene scene = new Scene(sceneLoader, game);
             Entity entity = new Entity(0);
             entity.Scene = scene;

@@ -139,7 +139,7 @@ namespace Kinectitude.Physics
             set
             {
                 movesWhenHit = value;
-                if (movesWhenHit && body.BodyType != BodyType.Dynamic) createBody();
+                if (body != null && movesWhenHit && body.BodyType != BodyType.Dynamic) createBody();
             }
  
         }

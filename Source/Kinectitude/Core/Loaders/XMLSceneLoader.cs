@@ -15,43 +15,29 @@ namespace Kinectitude.Core.Loaders
         internal static readonly XName ConditionName = XMLGameLoader.Namespace + "Condition";
         internal static readonly XName ManagerName = XMLGameLoader.Namespace + "Manager";
 
-        private int onid = 0;
         XMLGameLoader xmlGameLoader;
 
         internal XMLSceneLoader(XElement scene, XMLGameLoader gl):base(gl)
         {
             xmlGameLoader = gl;
-            Scene = new Scene(this, gl.Game);
+
+            string sceneName = "";
+            List<Tuple<string, string>> sceneValues = new List<Tuple<string, string>>();
+
             foreach (XAttribute attrib in scene.Attributes())
             {
                 string attribName = attrib.Name.ToString();
-                if ("Name" == attribName)
-                {
-                    Scene.Name = attrib.Value;
-                }
-                else
-                {
-                    Scene[attribName] = attrib.Value;
-                }
+                if ("Name" == attribName) sceneName = attrib.Value;
+                else sceneValues.Add(new Tuple<string, string>(attribName, attrib.Value));
             }
+
+            LoadedScene = new LoadedScene(sceneName, sceneValues, this, gl.Game);
 
             foreach (XElement e in scene.Elements().Where(input => ManagerName == input.Name))
             {
-                List<Tuple<string, string>> values = new List<Tuple<string, string>>();
-
-                foreach (XAttribute attrib in e.Attributes())
-                {
-                    if ("Type" == attrib.Name)
-                    {
-                        continue;
-                    }
-                    string value = attrib.Value;
-                    string param = attrib.Name.ToString();
-                    Tuple<string, string> t = new Tuple<string, string>(param, value);
-                    values.Add(t);
-                }
-
-                Scene.CreateManager((string)e.Attribute("Type"), values);
+                string managerName = (string)e.Attribute("Type");
+                LoadedScene.addManagerName(managerName);
+                LoadedManager.GetLoadedManager(managerName, LoadedScene, gatherTuples(e));
             }
 
             foreach (XElement e in scene.Elements().Where(input => EntityName == input.Name))
@@ -66,71 +52,42 @@ namespace Kinectitude.Core.Loaders
                     if (name.Contains(' '))
                     {
                         string[] names = name.Split(' ');
-                        foreach (string n in names)
-                        {
-                            createWithPrototype(gl, n, parsedNode, onid);
-                        }
+                        foreach (string n in names) createWithPrototype(gl, n, parsedNode, Onid);
                     }
                     else
                     {
-                        createWithPrototype(gl, name, parsedNode, onid);
+                        createWithPrototype(gl, name, parsedNode, Onid);
                     }
                 }
-                Entity entity = new Entity(onid);
-                
+
+                string entityName = null;
+                List<Tuple<string, string>> entityValues = new List<Tuple<string, string>>();
+
                 foreach (XAttribute attrib in parsedNode.Attributes())
                 {
-                    if ("Prototype" == attrib.Name)
-                    {
-                        continue;
-                    }
-                    else if ("Name" == attrib.Name)
-                    {
-                        entity.Name = attrib.Value;
-                        EntityByName.Add(attrib.Value, entity);
-                    }
-                    else
-                    {
-                        entity[attrib.Name.ToString()] = attrib.Value;
-                    }
+                    if ("Prototype" == attrib.Name) continue;
+                    else if ("Name" == attrib.Name) entityName = attrib.Value;
+                    else entityValues.Add(new Tuple<string, string>(attrib.Name.ToString(), attrib.Value));
                 }
-                onid += 1;
-                EntityById[onid] = entity;
-                entity.Scene = Scene;
+
+                LoadedEntity entity = new LoadedEntity(entityName, entityValues, Onid++);
+                LoadedScene.addLoadedEntity(entity);
+                
                 entityParse(parsedNode, entity);
-                EntityById[onid] = entity;
-                entity.Ready();
             }            
         }
 
         //Adds actions to an event or trigger
-        internal void AddActions(Game game, XElement node, Event evt, Condition cond = null)
+        internal void AddActions(Game game, XElement node, LoadedEvent evt, LoadedCondition cond = null)
         {
             foreach (XElement action in node.Elements())
             {
                 if (action.Name == ActionName)
                 {
+                    LoadedAction loadedAction = new LoadedAction(action.Attribute("Type").Value, gatherTuples(action));
 
-                    List<Tuple<string, string>> values = new List<Tuple<string,string>>();
-
-                    foreach (XAttribute attrib in action.Attributes())
-                    {
-                        if ("Type" == attrib.Name.ToString())
-                        {
-                            continue;
-                        }
-                        values.Add(new Tuple<string, string>(attrib.Name.ToString(), attrib.Value));
-                    }
-                    LoadedAction loadedAction = new LoadedAction(action.Attribute("Type").Value, values);
-                    Action created = loadedAction.Create(evt);
-                    if (null != cond)
-                    {
-                        cond.AddAction(created);
-                    }
-                    else
-                    {
-                        evt.AddAction(created);
-                    }
+                    if (null != cond) cond.AddAction(loadedAction);
+                    else evt.AddAction(loadedAction);
                 }
                 else if (action.Name == ConditionName)
                 {
@@ -139,11 +96,12 @@ namespace Kinectitude.Core.Loaders
             }
         }
 
-        internal override void CreateEntity(string name)
+        protected override LoadedEntity PrototypeMaker(string name)
         {
-            Entity entity = new Entity(onid);
-            
             XElement prototype = xmlGameLoader.Prototypes[name];
+
+            List<Tuple<string, string>> values = new List<Tuple<string, string>>();
+            string entityName = null;
 
             foreach (XAttribute attrib in prototype.Attributes())
             {
@@ -152,133 +110,73 @@ namespace Kinectitude.Core.Loaders
                     if (name.Contains(' '))
                     {
                         string[] names = name.Split(' ');
-                        foreach (string n in names)
-                        {
-                            addToAllTypes(n, onid);
-                        }
+                        foreach (string n in names) addToAllTypes(n, Onid);
                     }
                     else
                     {
-                        addToAllTypes(name, onid);
+                        addToAllTypes(name, Onid);
                     }
                 }
                 else if ("Name" == attrib.Name)
                 {
-                    entity.Name = "";
                     continue;
                 }
                 else
                 {
-                    entity[attrib.Name.ToString()] = attrib.Value;
+                    values.Add(new Tuple<string,string>(attrib.Name.ToString(), attrib.Value));
                 }
             }
-            onid += 1;
-            entity.Scene = Scene;
+
+            LoadedEntity entity = new LoadedEntity(entityName, values, Onid);
             entityParse(prototype, entity);
-            entity.Ready();
-        }
-
-        private static void addToHashSet(int value, string name, Dictionary<string, HashSet<int>> dictionary)
-        {
-            HashSet<int> addTo;
-            if (!dictionary.ContainsKey(name))
-            {
-                addTo = new HashSet<int>();
-                dictionary[name] = addTo;
-            }
-            else
-            {
-                addTo = dictionary[name];
-            }
-            addTo.Add(value);
-        }
-
-        private void addToAllTypes(string name, int id)
-        {
-            HashSet<int> addTo;
-
-            foreach (string prototypeIs in xmlGameLoader.PrototypeIs[name])
-            {
-                if (!IsType.ContainsKey(prototypeIs))
-                {
-                    addTo = new HashSet<int>();
-                    IsType.Add(prototypeIs, addTo);
-                }
-                else
-                {
-                    addTo = IsType[prototypeIs];
-                }
-                addTo.Add(id);
-            }
+            return entity;
         }
 
         private void createWithPrototype(XMLGameLoader gl, string name, XElement parsedNode, int id)
         {
             XElement prototype = gl.Prototypes[name];
-            XMLGameLoader.mergeXmlNodes(prototype, parsedNode);
-
-            addToHashSet(id, name, IsType);
-            addToHashSet(id, name, IsExactType);
-
-            addToAllTypes(name, id);
-
+            XMLGameLoader.mergeXmlNodes(prototype, parsedNode);   
         }
 
-        private void entityParse(XElement e, Entity entity)
+        private static List<Tuple<string, string>> gatherTuples(XElement node)
+        {
+            List<Tuple<string, string>> values = new List<Tuple<string, string>>();
+
+            foreach (XAttribute attrib in node.Attributes())
+            {
+                if ("Type" == attrib.Name) continue;
+                string value = attrib.Value;
+                string param = attrib.Name.ToString();
+                values.Add(new Tuple<string, string>(param, value));
+            }
+            return values;
+        }
+
+        private void entityParse(XElement e, LoadedEntity entity)
         {
             foreach (XElement node in e.Elements().Where(element => element.Name == XMLGameLoader.ComponentName))
             {
                 string stringType = (string)node.Attribute("Type");
-
-                List<Tuple<string, string>> values = new List<Tuple<string, string>>();
-
-                foreach (XAttribute attrib in node.Attributes())
-                {
-                    if ("Type" == attrib.Name)
-                    {
-                        continue;
-                    }
-                    string value = attrib.Value;
-                    string param = attrib.Name.ToString();
-                    Tuple<string, string> t = new Tuple<string, string>(param, value);
-                    values.Add(t);
-                }
-                Scene.CreateComponent(entity, stringType, values);
+                LoadedComponent lc = new LoadedComponent(stringType, gatherTuples(node));
+                entity.AddLoadedComponent(lc);
             }
 
             foreach (XElement node in e.Elements().Where(element => element.Name == XMLGameLoader.EventName))
-            {
-                Event evt = createEvent(Game, node, entity);
-                evt.Initialize();
-            }
+                createEvent(Game, node, entity);
         }
 
-        private Event createEvent(Game game, XElement node, Entity entity)
+        private LoadedEvent createEvent(Game game, XElement node, LoadedEntity entity)
         {
-            Event evt = ClassFactory.Create<Event>((string)node.Attribute("Type"));
-            evt.Entity = entity;
-
-            foreach (XAttribute attrib in node.Attributes())
-            {
-                if ("Type" == attrib.Name.ToString())
-                {
-                    continue;
-                }
-                string value = attrib.Value;
-                string param = attrib.Name.ToString();
-                ClassFactory.SetParam(evt, param, value, evt, evt.Entity);
-            }
-            AddActions(game, node, evt);
-            return evt;
+            LoadedEvent loadedEvt = new LoadedEvent((string)node.Attribute("Type"), gatherTuples(node), entity);
+            AddActions(game, node, loadedEvt);
+            return loadedEvt;
         }
 
-        private Condition createCondition(Game game, Event e, XElement node)
+        private LoadedCondition createCondition(Game game, LoadedEvent e, XElement node)
         {
-
             LoadedCondition lc = new LoadedCondition((string)node.Attribute("If"));
-            Condition c = lc.Create(e) as Condition;
-            AddActions(game, node, e, c);
-            return c;
+            AddActions(game, node, e, lc);
+            return lc;
         }
     }
 }

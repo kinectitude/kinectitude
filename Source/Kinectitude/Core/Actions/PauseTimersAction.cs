@@ -7,7 +7,7 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Actions
 {
-    [Plugin("Pause timers with a given name", "")]
+    [Plugin("Pause timers with a given Name", "")]
     internal class PauseTimersAction : Action
     {
         [Plugin("Name of the timers to pause", "")]

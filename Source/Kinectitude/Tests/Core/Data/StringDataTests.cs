@@ -4,6 +4,7 @@ using Kinectitude.Core.Base;
 using Kinectitude.Core.Data;
 using Kinectitude.Tests.Core.TestMocks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Kinectitude.Core.Loaders;
 
 namespace Kinectitude.Tests.Core.Data
 {
@@ -23,6 +24,27 @@ namespace Kinectitude.Tests.Core.Data
         Event evt = new EventMock();
         ManagerMock manager = new ManagerMock();
 
+        static StringDataTests()
+        {
+           try
+            {
+                ClassFactory.RegisterType("component", typeof(ComponentMock));
+            }
+            catch (ArgumentException)
+            {
+                //this is incase another test case registered this type already
+            }
+
+            try
+            {
+                ClassFactory.RegisterType("manager", typeof(ManagerMock));
+            }
+            catch (ArgumentException)
+            {
+                //this is incase another test case registered this type already
+            }
+        }
+
         public StringDataTests()
         {
             scene = new Scene(new SceneLoaderMock(new GameLoaderMock()), game);
@@ -31,7 +53,7 @@ namespace Kinectitude.Tests.Core.Data
             entity["etest"] = entityTest;
             entity["one"] = "1";
             entity.Scene = scene;
-            entity.AddComponent(component, "component");
+            
             try
             {
                 ClassFactory.RegisterType("component", typeof(ComponentMock));
@@ -50,11 +72,17 @@ namespace Kinectitude.Tests.Core.Data
                 //this is incase another test case registered this type already
             }
 
+            entity.AddComponent(component, "component");
             evt.Entity = entity;
             Tuple<string, string> values = new Tuple<string, string>("Value", managerTest);
             List<Tuple<string, string>> list = new List<Tuple<string,string>>();
             list.Add(values);
-            scene.CreateManager("manager", list);
+            GameLoaderMock glm = new GameLoaderMock();
+            LoadedScene tmp = new LoadedScene("name", new List<Tuple<string,string>>(), new SceneLoaderMock(glm), glm.Game);
+            LoadedManager.GetLoadedManager("manager", tmp, new List<Tuple<string, string>>() { new Tuple<string,string>("Value", managerTest) });
+            IManager manager = LoadedManager.CreateManagers(tmp, "manager");
+            scene.Managers.Add(manager);
+            scene.ManagersDictionary.Add(typeof(ManagerMock), manager);
         }
 
         [TestMethod]
@@ -87,7 +115,7 @@ namespace Kinectitude.Tests.Core.Data
         {
             ExpressionReader reader = 
                 ExpressionReader.CreateExpressionReader("Entity {this.etest} scene {scene.stest}{scene.manager.Value} [this.one + this.one] lol", evt, entity);
-            Assert.IsTrue(reader.GetValue() == "Entity " + entityTest + " scene " + sceneTest + managerTest + " 2 lol");
+            Assert.IsTrue(reader.GetValue() == "Entity " + entityTest + " scene " + sceneTest + managerTest + " 2 lol", reader.GetValue());
         }
 
     }

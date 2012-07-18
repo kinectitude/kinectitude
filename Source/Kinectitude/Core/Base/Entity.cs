@@ -54,11 +54,6 @@ namespace Kinectitude.Core.Base
             componentNameDictionary[name] = component;
             componentList.Add(component);
 
-            foreach (Type type in ClassFactory.GetRequirements(component.GetType()))
-            {
-                needs.Add(type);
-            }
-
             foreach (Type type in ClassFactory.GetProvided(component.GetType()))
             {
                 componentDictionary[type] = component;
