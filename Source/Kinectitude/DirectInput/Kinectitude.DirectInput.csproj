@@ -46,6 +46,7 @@
     <Compile Include="DirectInputService.cs" />
     <Compile Include="KeyboardManager.cs" />
     <Compile Include="KeyEvent.cs" />
+    <Compile Include="MouseClickEvent.cs" />
     <Compile Include="MouseFollowComponent.cs" />
     <Compile Include="MouseManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

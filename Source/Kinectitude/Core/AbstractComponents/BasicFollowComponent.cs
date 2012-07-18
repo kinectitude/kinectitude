@@ -48,7 +48,7 @@ namespace Kinectitude.Core.AbstractComponents
         public override void OnUpdate(float t)
         {
             //if they are following with physics, we will set a velocity
-            if (/*null != physics*/ false)
+            if (null != physics)
             {
                 switch (Direction)
                 {

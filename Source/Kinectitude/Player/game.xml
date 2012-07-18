@@ -24,6 +24,7 @@
     <Define Name="KeyboardManager" Class="Kinectitude.DirectInput.KeyboardManager"/>
     <Define Name="MouseManager" Class="Kinectitude.DirectInput.MouseManager"/>
     <Define Name="MouseFollowComponent" Class="Kinectitude.DirectInput.MouseFollowComponent"/>
+    <Define Name="MouseClickEvent" Class="Kinectitude.DirectInput.MouseClickEvent"/>
   </Using>
   
   <Prototype Name="paddle">
@@ -147,7 +148,16 @@
       <Component Type="TransformComponent" X="782" Y="250"/>
       <!--this is testing to see that I can ovrride things in a Prototype-->
       <!--<Component Type="KinectFollowComponent" Player="1" Joint="HandRight" />-->
+
       <Event Type="CrossesLineEvent" Line="Y" Location="450"  Direction="Positive">
+        <Action Type="FireTriggerAction" Name="rdy2"/>
+      </Event>
+
+      <Event Type="MouseClickEvent" Button="Left">
+        <Action Type="FireTriggerAction" Name="rdy2"/>
+      </Event>
+      
+      <Event Type="TriggerOccursEvent" Trigger="rdy2">
         <Action Type="SetAction" Target="scene.ready2txt" Value="player 2 is ready!"/>
         <Action Type="SetAction" Target="scene.ready2" Value="true"/>
         <Condition If="scene.ready1">
