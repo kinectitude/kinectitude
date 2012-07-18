@@ -129,11 +129,20 @@ namespace Kinectitude.Physics
             }
         }
 
+        private bool movesWhenHit;
         [Preset("Bouncy Ball", true)]
         [Preset("Collision Event Line", false)]
         [Preset("Wall", false)]
         [Plugin("Object moves when hit", "")]
-        public bool MovesWhenHit { get; set; }
+        public bool MovesWhenHit {
+            get { return movesWhenHit; }
+            set
+            {
+                movesWhenHit = value;
+                if (movesWhenHit && body.BodyType != BodyType.Dynamic) createBody();
+            }
+ 
+        }
 
         [Preset("Bouncy Ball", false)]
         [Preset("Collision Event Line", false)]
