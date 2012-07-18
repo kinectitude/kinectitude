@@ -2,7 +2,6 @@
 using System.Collections.Specialized;
 using System.Linq;
 using EditorModels.Base;
-using EditorModels.Models;
 using System.Collections.Generic;
 using EditorModels.ViewModels.Interfaces;
 using System;
@@ -12,19 +11,9 @@ namespace EditorModels.ViewModels
 {
     internal sealed class SceneViewModel : BaseViewModel, IEntityNamespace, IAttributeScope, IEntityScope
     {
-        private readonly Scene scene;
+        private string name;
         private ISceneScope scope;
-        private Game game;
         private int nextAttribute;
-
-#if TEST
-
-        public Scene Scene
-        {
-            get { return scene; }
-        }
-
-#endif
 
         public event DefineAddedEventHandler DefineAdded;
         public event DefinedNameChangedEventHandler DefineChanged;
@@ -37,12 +26,12 @@ namespace EditorModels.ViewModels
 
         public string Name
         {
-            get { return scene.Name; }
+            get { return name; }
             set
             {
-                if (scene.Name != value)
+                if (name != value)
                 {
-                    scene.Name = value;
+                    name = value;
                     NotifyPropertyChanged("Name");
                 }
             }
@@ -68,7 +57,7 @@ namespace EditorModels.ViewModels
 
         public IEnumerable<PluginViewModel> Plugins
         {
-            get { return Entities.SelectMany(x => x.Plugins).Union(Managers.Select(x => x.Plugin)); }
+            get { return Entities.SelectMany(x => x.Plugins).Union(Managers.Select(x => x.Plugin)).Distinct(); }
         }
 
         public ICommand AddAttributeCommand
@@ -97,9 +86,7 @@ namespace EditorModels.ViewModels
 
         public SceneViewModel(string name)
         {
-            scene = new Scene();
-
-            Name = name;
+            this.name = name;
             Attributes = new ObservableCollection<AttributeViewModel>();
             Managers = new ObservableCollection<ManagerViewModel>();
             Entities = new ObservableCollection<EntityViewModel>();
@@ -135,7 +122,7 @@ namespace EditorModels.ViewModels
             );
         }
 
-        public void SetScope(Game game, ISceneScope scope)
+        public void SetScope(ISceneScope scope)
         {
             if (null != this.scope)
             {
@@ -144,18 +131,7 @@ namespace EditorModels.ViewModels
                 this.scope.ScopeChanged -= OnScopeChanged;
             }
 
-            if (null != this.game)
-            {
-                this.game.RemoveScene(scene);
-            }
-
             this.scope = scope;
-            this.game = game;
-
-            if (null != this.game)
-            {
-                this.game.AddScene(scene);
-            }
 
             if (null != this.scope)
             {
@@ -169,25 +145,23 @@ namespace EditorModels.ViewModels
 
         public void AddAttribute(AttributeViewModel attribute)
         {
-            attribute.SetScope(scene, this);
+            attribute.SetScope(this);
             Attributes.Add(attribute);
         }
 
         public void RemoveAttribute(AttributeViewModel attribute)
         {
-            attribute.SetScope(null, null);
+            attribute.SetScope(null);
             Attributes.Remove(attribute);
         }
 
         public void AddManager(ManagerViewModel manager)
         {
-            manager.SetScene(scene);
             Managers.Add(manager);
         }
 
         public void RemoveManager(ManagerViewModel manager)
         {
-            manager.SetScene(null);
             Managers.Remove(manager);
         }
 
@@ -195,7 +169,7 @@ namespace EditorModels.ViewModels
         {
             if (!EntityNameExists(entity.Name))
             {
-                entity.SetScope(scene, this);
+                entity.SetScope(this);
                 Entities.Add(entity);
 
                 entity.Components.CollectionChanged += OnEntityComponentChanged;
@@ -210,7 +184,7 @@ namespace EditorModels.ViewModels
 
         public void RemoveEntity(EntityViewModel entity)
         {
-            entity.SetScope(null, null);
+            entity.SetScope(null);
             Entities.Remove(entity);
             entity.Components.CollectionChanged -= OnEntityComponentChanged;
             entity.PluginAdded -= OnEntityPluginAdded;

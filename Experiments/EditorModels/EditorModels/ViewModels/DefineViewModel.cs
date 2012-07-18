@@ -1,20 +1,19 @@
-﻿using EditorModels.Models;
-
+﻿
 namespace EditorModels.ViewModels
 {
     internal sealed class DefineViewModel : BaseViewModel
     {
-        private Using use;
-        private readonly Define define;
+        private string name;
+        private string className;
 
         public string Name
         {
-            get { return define.Name; }
+            get { return name; }
             set
             {
-                if (define.Name != value)
+                if (name != value)
                 {
-                    define.Name = value;
+                    name = value;
                     NotifyPropertyChanged("Name");
                 }
             }
@@ -22,12 +21,12 @@ namespace EditorModels.ViewModels
 
         public string Class
         {
-            get { return define.Class; }
+            get { return className; }
             set
             {
-                if (define.Class != value)
+                if (className != value)
                 {
-                    define.Class = value;
+                    className = value;
                     NotifyPropertyChanged("Class");
                 }
             }
@@ -35,24 +34,8 @@ namespace EditorModels.ViewModels
 
         public DefineViewModel(string name, string className)
         {
-            define = new Define();
-            define.Name = name;
-            define.Class = className;
-        }
-
-        public void SetUsing(Using use)
-        {
-            if (null != this.use)
-            {
-                this.use.RemoveDefine(define);
-            }
-
-            this.use = use;
-
-            if (null != this.use)
-            {
-                this.use.AddDefine(define);
-            }
+            this.name = name;
+            this.className = className;
         }
     }
 }

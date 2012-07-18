@@ -1,20 +1,19 @@
-﻿using EditorModels.Models;
-
+﻿
 namespace EditorModels.ViewModels
 {
     class AssetViewModel : BaseViewModel
     {
-        private readonly Asset asset;
-        private Game game;
+        private string name;
+        private string fileName;
 
         public string Name
         {
-            get { return asset.Name; }
+            get { return name; }
             set
             {
-                if (asset.Name != value)
+                if (name != value)
                 {
-                    asset.Name = value;
+                    name = value;
                     NotifyPropertyChanged("Name");
                 }
             }
@@ -22,12 +21,12 @@ namespace EditorModels.ViewModels
 
         public string FileName
         {
-            get { return asset.FileName; }
+            get { return fileName; }
             set
             {
-                if (asset.FileName != value)
+                if (fileName != value)
                 {
-                    asset.FileName = value;
+                    fileName = value;
                     NotifyPropertyChanged("FileName");
                 }
             }
@@ -35,24 +34,7 @@ namespace EditorModels.ViewModels
 
         public AssetViewModel(string name)
         {
-            asset = new Asset();
-
-            Name = name;
-        }
-
-        public void SetGame(Game game)
-        {
-            if (null != this.game)
-            {
-                this.game.RemoveAsset(asset);
-            }
-
-            this.game = game;
-
-            if (null != this.game)
-            {
-                this.game.AddAsset(asset);
-            }
+            this.name = name;
         }
     }
 }

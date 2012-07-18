@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
 using EditorModels.Base;
-using EditorModels.Models;
 using EditorModels.Storage;
 using EditorModels.ViewModels.Interfaces;
 using System;
@@ -15,19 +14,13 @@ namespace EditorModels.ViewModels
     
     internal sealed class GameViewModel : BaseViewModel, IAttributeScope, IEntityScope, ISceneScope
     {
-        private readonly Game game;
+        private string name;
+        private int width;
+        private int height;
+        private bool fullScreen;
         private SceneViewModel firstScene;
         private int nextAttribute;
         private int nextScene;
-
-#if TEST
-
-        public Game Game
-        {
-            get { return game; }
-        }
-
-#endif
 
         public event ScopeChangedEventHandler ScopeChanged { add { } remove { } }
 
@@ -46,12 +39,12 @@ namespace EditorModels.ViewModels
 
         public string Name
         {
-            get { return game.Name; }
+            get { return name; }
             set
             {
-                if (game.Name != value)
+                if (name != value)
                 {
-                    game.Name = value;
+                    name = value;
                     NotifyPropertyChanged("Name");
                 }
             }
@@ -59,12 +52,12 @@ namespace EditorModels.ViewModels
 
         public int Width
         {
-            get { return game.Width; }
+            get { return width; }
             set
             {
-                if (game.Width != value)
+                if (width != value)
                 {
-                    game.Width = value;
+                    width = value;
                     NotifyPropertyChanged("Width");
                 }
             }
@@ -72,12 +65,12 @@ namespace EditorModels.ViewModels
 
         public int Height
         {
-            get { return game.Height; }
+            get { return height; }
             set
             {
-                if (game.Height != value)
+                if (height != value)
                 {
-                    game.Height = value;
+                    height = value;
                     NotifyPropertyChanged("Height");
                 }
             }
@@ -85,12 +78,12 @@ namespace EditorModels.ViewModels
 
         public bool IsFullScreen
         {
-            get { return game.IsFullScreen; }
+            get { return fullScreen; }
             set
             {
-                if (game.IsFullScreen != value)
+                if (fullScreen != value)
                 {
-                    game.IsFullScreen = value;
+                    fullScreen = value;
                     NotifyPropertyChanged("IsFullScreen");
                 }
             }
@@ -104,7 +97,6 @@ namespace EditorModels.ViewModels
                 if (firstScene != value)
                 {
                     firstScene = value;
-                    game.FirstScene = firstScene.Name;
                     NotifyPropertyChanged("FirstScene");
                 }
             }
@@ -202,9 +194,7 @@ namespace EditorModels.ViewModels
 
         public GameViewModel(string name)
         {
-            game = new Game();
-
-            Name = name;
+            this.name = name;
             Usings = new ObservableCollection<UsingViewModel>();
             Assets = new ObservableCollection<AssetViewModel>();
             Prototypes = new ObservableCollection<EntityViewModel>();
@@ -276,30 +266,28 @@ namespace EditorModels.ViewModels
             SaveGameCommand = new DelegateCommand(null,
                 (parameter) =>
                 {
-                    SaveGame(parameter as string);  // TODO: remove hard-coded string
+                    SaveGame();  // TODO: remove hard-coded string
                 }
             );
         }
 
         public void AddUsing(UsingViewModel use)
         {
-            use.SetGame(game);
-            use.DefineAdded += OnUsingDefineAdded;
+            use.DefineAdded += OnDefineAdded;
             use.DefineChanged += OnDefineChanged;
             Usings.Add(use);
         }
 
         public void RemoveUsing(UsingViewModel use)
         {
-            use.SetGame(null);
-            use.DefineAdded -= OnUsingDefineAdded;
+            use.DefineAdded -= OnDefineAdded;
             use.DefineChanged -= OnDefineChanged;
             Usings.Remove(use);
         }
 
         public void AddPrototype(EntityViewModel prototype)
         {
-            prototype.SetScope(game, this);
+            prototype.SetScope(this);
             
             prototype.PluginAdded += OnPluginAdded;
             foreach (PluginViewModel plugin in prototype.Plugins)
@@ -312,7 +300,7 @@ namespace EditorModels.ViewModels
 
         public void RemovePrototype(EntityViewModel prototype)
         {
-            prototype.SetScope(null, null);
+            prototype.SetScope(null);
             prototype.PluginAdded -= OnPluginAdded;
             Prototypes.Remove(prototype);
         }
@@ -324,7 +312,7 @@ namespace EditorModels.ViewModels
 
         public void AddScene(SceneViewModel scene)
         {
-            scene.SetScope(game, this);
+            scene.SetScope(this);
 
             scene.PluginAdded += OnPluginAdded;
             foreach (PluginViewModel plugin in scene.Plugins)
@@ -337,7 +325,7 @@ namespace EditorModels.ViewModels
 
         public void RemoveScene(SceneViewModel scene)
         {
-            scene.SetScope(null, null);
+            scene.SetScope(null);
             scene.PluginAdded -= OnPluginAdded;
             Scenes.Remove(scene);
         }
@@ -349,32 +337,30 @@ namespace EditorModels.ViewModels
 
         public void AddAttribute(AttributeViewModel attribute)
         {
-            attribute.SetScope(game, this);
+            attribute.SetScope(this);
             Attributes.Add(attribute);
         }
 
         public void RemoveAttribute(AttributeViewModel attribute)
         {
-            attribute.SetScope(null, null);
+            attribute.SetScope(null);
             Attributes.Remove(attribute);
         }
 
         public void AddAsset(AssetViewModel asset)
         {
-            asset.SetGame(game);
             Assets.Add(asset);
         }
 
         public void RemoveAsset(AssetViewModel asset)
         {
-            asset.SetGame(null);
             Assets.Remove(asset);
         }
 
-        public void SaveGame(string file)
+        public void SaveGame()
         {
             IGameStorage storage = new XmlGameStorage(FileName);
-            storage.SaveGame(game);
+            storage.SaveGame(this);
         }
 
         public PluginViewModel GetPlugin(string name)
@@ -449,7 +435,7 @@ namespace EditorModels.ViewModels
             }
         }
 
-        private void OnUsingDefineAdded(DefineViewModel define)
+        private void OnDefineAdded(DefineViewModel define)
         {
             if (null != DefineAdded)
             {

@@ -1,16 +1,23 @@
-﻿using EditorModels.Models;
+﻿using System.Collections.ObjectModel;
+using EditorModels.ViewModels.Interfaces;
+using System.Linq;
 
 namespace EditorModels.ViewModels
 {
-    internal sealed class ManagerViewModel : BaseViewModel
+    internal sealed class ManagerViewModel : BaseViewModel, IPropertyScope
     {
         private readonly PluginViewModel plugin;
-        private readonly Manager manager;
-        private Scene scene;
+        private IManagerScope scope;
 
+        public event ScopeChangedEventHandler ScopeChanged;
+        public event PropertyEventHandler InheritedPropertyAdded { add { } remove { } }
+        public event PropertyEventHandler InheritedPropertyRemoved { add { } remove { } }
+        public event PropertyEventHandler InheritedPropertyChanged { add { } remove { } }
+
+        [DependsOn("Scope")]
         public string Type
         {
-            get { return plugin.ClassName; }
+            get { return null != scope ? scope.GetDefinedName(plugin) : plugin.ClassName; }
         }
 
         public PluginViewModel Plugin
@@ -18,24 +25,65 @@ namespace EditorModels.ViewModels
             get { return plugin; }
         }
 
+        public ObservableCollection<PropertyViewModel> Properties
+        {
+            get;
+            private set;
+        }
+
         public ManagerViewModel(PluginViewModel plugin)
         {
             this.plugin = plugin;
-            manager = new Manager();
+
+            Properties = new ObservableCollection<PropertyViewModel>();
         }
 
-        public void SetScene(Scene scene)
+        public PropertyViewModel GetProperty(string name)
         {
-            if (null != this.scene)
+            return Properties.FirstOrDefault(x => x.Name == name);
+        }
+
+        public void SetProperty(string name, object value)
+        {
+            PropertyViewModel property = GetProperty(name);
+            if (null != property)
             {
-                this.scene.RemoveManager(manager);
+                property.Value = value;
+            }
+        }
+
+        bool IPropertyScope.HasInheritedProperty(string name)
+        {
+            return false;
+        }
+
+        object IPropertyScope.GetInheritedValue(string name)
+        {
+            return null;
+        }
+
+        public void SetScope(IManagerScope scope)
+        {
+            if (null != this.scope)
+            {
+                this.scope.ScopeChanged -= OnScopeChanged;
             }
 
-            this.scene = scene;
+            this.scope = scope;
 
-            if (null != this.scene)
+            if (null != this.scope)
             {
-                this.scene.AddManager(manager);
+                this.scope.ScopeChanged += OnScopeChanged;
+            }
+
+            NotifyPropertyChanged("Scope");
+        }
+
+        private void OnScopeChanged()
+        {
+            if (null != ScopeChanged)
+            {
+                ScopeChanged();
             }
         }
     }

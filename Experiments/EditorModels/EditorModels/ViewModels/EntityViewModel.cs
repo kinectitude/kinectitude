@@ -4,7 +4,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using EditorModels.Base;
-using EditorModels.Models;
 using EditorModels.ViewModels.Interfaces;
 
 namespace EditorModels.ViewModels
@@ -13,48 +12,30 @@ namespace EditorModels.ViewModels
 
     internal sealed class EntityViewModel : BaseViewModel, IAttributeScope, IComponentScope
     {
-        private readonly Entity entity;
-        private IEntityContainer container;
+        private string name;
         private IEntityScope scope;
         private int nextAttribute;
 
-#if TEST
-
-        public Entity Entity
-        {
-            get { return entity; }
-        }
-
-#endif
-
         public event ScopeChangedEventHandler ScopeChanged;
-        public event NameChangedEventHandler NameChanged;
         public event PluginAddedEventHandler PluginAdded;
         public event DefineAddedEventHandler DefineAdded;
         public event DefinedNameChangedEventHandler DefineChanged;
         public event AttributeEventHandler InheritedAttributeAdded;
         public event AttributeEventHandler InheritedAttributeRemoved;
         public event AttributeEventHandler InheritedAttributeChanged;
+        public event ComponentEventHandler InheritedComponentAdded;
+        public event ComponentEventHandler InheritedComponentRemoved;
+        public event PropertyEventHandler InheritedPropertyChanged;
 
         public string Name
         {
-            get { return entity.Name; }
+            get { return name; }
             set
             {
-                if (entity.Name != value)
+                if (name != value && !EntityNameExists(value))
                 {
-                    if (!EntityNameExists(value))
-                    {
-                        string oldName = entity.Name;
-                        entity.Name = value;
-
-                        if (null != NameChanged)
-                        {
-                            NameChanged(this, oldName, entity.Name);
-                        }
-
-                        NotifyPropertyChanged("Name");
-                    }
+                    name = value;
+                    NotifyPropertyChanged("Name");
                 }
             }
         }
@@ -138,8 +119,6 @@ namespace EditorModels.ViewModels
 
         public EntityViewModel()
         {
-            entity = new Entity();
-
             Prototypes = new ObservableCollection<EntityViewModel>();
             Attributes = new ObservableCollection<AttributeViewModel>();
             Components = new ObservableCollection<ComponentViewModel>();
@@ -229,7 +208,7 @@ namespace EditorModels.ViewModels
             );
         }
 
-        public void SetScope(IEntityContainer container, IEntityScope scope)
+        public void SetScope(IEntityScope scope)
         {
             if (null != this.scope)
             {
@@ -238,18 +217,7 @@ namespace EditorModels.ViewModels
                 this.scope.ScopeChanged -= OnScopeChanged;
             }
 
-            if (null != this.container)
-            {
-                this.container.RemoveEntity(entity);
-            }
-
             this.scope = scope;
-            this.container = container;
-
-            if (null != this.container)
-            {
-                this.container.AddEntity(entity);
-            }
 
             if (null != this.scope)
             {
@@ -265,7 +233,6 @@ namespace EditorModels.ViewModels
         {
             if (null != prototype.Name)
             {
-                entity.AddPrototype(prototype.Name);
                 Prototypes.Add(prototype);
 
                 prototype.Attributes.CollectionChanged += OnPrototypeAttributesChanged;
@@ -279,14 +246,11 @@ namespace EditorModels.ViewModels
                 {
                     InheritComponent(inheritedComponent);
                 }
-
-                prototype.NameChanged += OnPrototypeNameChanged;
             }
         }
 
         public void RemovePrototype(EntityViewModel prototype)
         {
-            entity.RemovePrototype(prototype.Name);
             Prototypes.Remove(prototype);
 
             prototype.Attributes.CollectionChanged -= OnPrototypeAttributesChanged;
@@ -300,8 +264,6 @@ namespace EditorModels.ViewModels
             {
                 DisinheritComponent(inheritedComponent);
             }
-
-            prototype.NameChanged -= OnPrototypeNameChanged;
         }
 
         private void InheritAttribute(AttributeViewModel inheritedAttribute)
@@ -427,7 +389,7 @@ namespace EditorModels.ViewModels
         {
             if (!HasLocalAttribute(attribute.Key))
             {
-                attribute.SetScope(entity, this);
+                attribute.SetScope(this);
                 attribute.KeyChanged += OnLocalAttributeKeyChanged;
                 Attributes.Add(attribute);
             }
@@ -437,7 +399,7 @@ namespace EditorModels.ViewModels
         {
             if (attribute.IsLocal || attribute.IsInherited && !attribute.CanInherit)
             {
-                attribute.SetScope(null, null);
+                attribute.SetScope(null);
                 attribute.KeyChanged -= OnLocalAttributeKeyChanged;
                 Attributes.Remove(attribute);
             }
@@ -445,20 +407,34 @@ namespace EditorModels.ViewModels
 
         private void InheritComponent(ComponentViewModel inheritedComponent)
         {
+            inheritedComponent.LocalPropertyChanged += OnPrototypeComponentLocalPropertyChanged;
+
             ComponentViewModel localComponent = GetComponentByRole(inheritedComponent.Provides);
             if (null == localComponent)
             {
                 localComponent = new ComponentViewModel(inheritedComponent.Plugin);
                 AddComponent(localComponent);
             }
+
+            if (null != InheritedComponentAdded)
+            {
+                InheritedComponentAdded(inheritedComponent.Plugin);
+            }
         }
 
         private void DisinheritComponent(ComponentViewModel inheritedComponent)
         {
+            inheritedComponent.LocalPropertyChanged -= OnPrototypeComponentLocalPropertyChanged;
+
             ComponentViewModel localComponent = GetComponentByRole(inheritedComponent.Provides);
             if (null != localComponent && !localComponent.HasLocalProperties)
             {
                 RemoveComponent(localComponent);
+            }
+
+            if (null != InheritedComponentRemoved)
+            {
+                InheritedComponentRemoved(inheritedComponent.Plugin);
             }
         }
 
@@ -490,7 +466,7 @@ namespace EditorModels.ViewModels
                     AddComponent(requiredComponent);
                 }
 
-                component.SetScope(entity, this);
+                component.SetScope(this);
                 Components.Add(component);
 
                 NotifyPluginAdded(component.Plugin);
@@ -503,7 +479,7 @@ namespace EditorModels.ViewModels
             {
                 if (!Components.Any(x => x.DependsOn(component)))
                 {
-                    component.SetScope(null, null);
+                    component.SetScope(null);
                     Components.Remove(component);
                 }
             }
@@ -531,14 +507,12 @@ namespace EditorModels.ViewModels
 
         public void AddEvent(EventViewModel evt)
         {
-            evt.SetEntity(entity);
             evt.PluginAdded += OnEventPluginAdded;
             Events.Add(evt);
         }
 
         public void RemoveEvent(EventViewModel evt)
         {
-            evt.SetEntity(null);
             evt.PluginAdded -= OnEventPluginAdded;
             Events.Remove(evt);
         }
@@ -546,11 +520,6 @@ namespace EditorModels.ViewModels
         private string GetNextAttributeKey()
         {
             return string.Format("attribute{0}", nextAttribute++);
-        }
-
-        private void OnPrototypeNameChanged(EntityViewModel prototype, string oldName, string newName)
-        {
-            entity.ReplacePrototype(oldName, newName);
         }
 
         public bool EntityNameExists(string name)
@@ -651,6 +620,31 @@ namespace EditorModels.ViewModels
         public bool HasInheritedComponent(PluginViewModel plugin)
         {
             return Prototypes.SelectMany(x => x.Components).Any(x => x.Plugin == plugin);
+        }
+
+        object IComponentScope.GetInheritedValue(PluginViewModel plugin, string name)
+        {
+            foreach (EntityViewModel prototype in Prototypes)
+            {
+                ComponentViewModel component = prototype.Components.FirstOrDefault(x => x.Plugin == plugin);
+                if (null != component)
+                {
+                    PropertyViewModel property = component.GetProperty(name);
+                    if (null != property)
+                    {
+                        return property.Value;
+                    }
+                }
+            }
+            return null;
+        }
+
+        private void OnPrototypeComponentLocalPropertyChanged(string name)
+        {
+            if (null != InheritedPropertyChanged)
+            {
+                InheritedPropertyChanged(name);
+            }
         }
     }
 }

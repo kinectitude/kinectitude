@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
-using EditorModels.Models;
 using System.ComponentModel;
 
 namespace EditorModels.ViewModels
@@ -9,20 +8,19 @@ namespace EditorModels.ViewModels
 
     internal sealed class UsingViewModel : BaseViewModel
     {
-        private Game game;
-        private readonly Using use;
+        private string file;
 
         public event DefineAddedEventHandler DefineAdded;
         public event DefineChangedEventHandler DefineChanged;
 
         public string File
         {
-            get { return use.File; }
+            get { return file; }
             set
             {
-                if (use.File != value)
+                if (file != value)
                 {
-                    use.File = value;
+                    file = value;
                     NotifyPropertyChanged("File");
                 }
             }
@@ -36,28 +34,11 @@ namespace EditorModels.ViewModels
 
         public UsingViewModel()
         {
-            use = new Using();
             Defines = new ObservableCollection<DefineViewModel>();
-        }
-
-        public void SetGame(Game game)
-        {
-            if (null != this.game)
-            {
-                this.game.RemoveUsing(use);
-            }
-
-            this.game = game;
-
-            if (null != this.game)
-            {
-                this.game.AddUsing(use);
-            }
         }
 
         public void AddDefine(DefineViewModel define)
         {
-            define.SetUsing(use);
             define.PropertyChanged += OnDefinePropertyChanged;
             Defines.Add(define);
 
@@ -69,7 +50,6 @@ namespace EditorModels.ViewModels
 
         public void RemoveDefine(DefineViewModel define)
         {
-            define.SetUsing(null);
             define.PropertyChanged -= OnDefinePropertyChanged;
             Defines.Remove(define);
         }

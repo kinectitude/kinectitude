@@ -1,28 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using EditorModels.Models;
 using EditorModels.ViewModels.Interfaces;
+using System.ComponentModel;
 
 namespace EditorModels.ViewModels
 {
-    internal sealed class ComponentViewModel : BaseViewModel
+    internal sealed class ComponentViewModel : BaseViewModel, IPropertyScope
     {
         private readonly PluginViewModel plugin;
-        private readonly Component component;
         private readonly List<PropertyViewModel> properties;
-        private Entity entity;
         private IComponentScope scope;
 
-#if TEST
-
-        public Component Component
-        {
-            get { return component; }
-        }
-
-#endif
-
         public event ScopeChangedEventHandler ScopeChanged;
+        public event PropertyEventHandler InheritedPropertyAdded;
+        public event PropertyEventHandler InheritedPropertyRemoved;
+        public event PropertyEventHandler InheritedPropertyChanged;
+        public event PropertyEventHandler LocalPropertyChanged;
 
         public PluginViewModel Plugin
         {
@@ -34,6 +27,7 @@ namespace EditorModels.ViewModels
             get { return plugin.DisplayName; }
         }
 
+        [DependsOn("Scope")]
         public string Type
         {
             get { return null != scope ? scope.GetDefinedName(plugin) : plugin.ClassName; }
@@ -51,14 +45,16 @@ namespace EditorModels.ViewModels
 
         public bool HasLocalProperties
         {
-            get { return Properties.Any(x => x.IsLocal); }
+            get { return Properties.Any(x => !x.IsInherited); }
         }
 
+        [DependsOn("IsRoot")]
         public bool IsInherited
         {
             get { return !IsRoot; }
         }
 
+        [DependsOn("Scope")]
         public bool IsRoot
         {
             get { return null != scope ? !scope.HasInheritedComponent(plugin) : true; }
@@ -72,7 +68,6 @@ namespace EditorModels.ViewModels
         public ComponentViewModel(PluginViewModel plugin)
         {
             this.plugin = plugin;
-            component = new Component() { Type = this.Type };
             
             properties = new List<PropertyViewModel>();
             foreach (string property in plugin.Properties)
@@ -83,44 +78,31 @@ namespace EditorModels.ViewModels
 
         private void AddProperty(PropertyViewModel property)
         {
-            property.SetComponent(component);
+            property.SetScope(this);
+            property.PropertyChanged += OnPropertyValueChanged;
             properties.Add(property);
         }
 
-        public void SetScope(Entity entity, IComponentScope scope)
+        public void SetScope(IComponentScope scope)
         {
             if (null != this.scope)
             {
                 this.scope.ScopeChanged -= OnScopeChanged;
                 this.scope.DefineAdded -= OnDefineAdded;
                 this.scope.DefineChanged -= OnDefinedNameChanged;
-            }
-
-            if (null != this.entity)
-            {
-                if (IsRoot)
-                {
-                    this.entity.RemoveComponent(component);
-                }
+                this.scope.InheritedComponentAdded -= OnInheritedComponentAdded;
+                this.scope.InheritedComponentRemoved -= OnInheritedComponentRemoved;
             }
 
             this.scope = scope;
-            this.entity = entity;
 
             if (null != this.scope)
             {
                 this.scope.ScopeChanged += OnScopeChanged;
                 this.scope.DefineAdded += OnDefineAdded;
                 this.scope.DefineChanged += OnDefinedNameChanged;
-                component.Type = Type;
-            }
-
-            if (null != this.entity)
-            {
-                if (IsRoot)
-                {
-                    this.entity.AddComponent(component);
-                }
+                this.scope.InheritedComponentAdded += OnInheritedComponentAdded;
+                this.scope.InheritedComponentRemoved += OnInheritedComponentRemoved;
             }
 
             NotifyScopeChanged();
@@ -136,23 +118,26 @@ namespace EditorModels.ViewModels
             return Properties.FirstOrDefault(x => x.Name == name);
         }
 
+        public void SetProperty(string name, object value)
+        {
+            PropertyViewModel property = GetProperty(name);
+            if (null != property)
+            {
+                property.Value = value;
+            }
+        }
+
         private void OnDefineAdded(DefineViewModel define)
         {
             if (define.Class == plugin.ClassName)
             {
-                UpdateType();
+                NotifyPropertyChanged("Scope");
             }
         }
 
         private void OnScopeChanged()
         {
-            UpdateType();
-        }
-
-        private void UpdateType()
-        {
-            component.Type = Type;
-            NotifyPropertyChanged("Type");
+            NotifyScopeChanged();
         }
 
         private void NotifyScopeChanged()
@@ -161,13 +146,66 @@ namespace EditorModels.ViewModels
             {
                 ScopeChanged();
             }
+
+            NotifyPropertyChanged("Scope");
         }
 
         private void OnDefinedNameChanged(PluginViewModel plugin, string newName)
         {
             if (this.plugin == plugin)
             {
-                UpdateType();
+                NotifyPropertyChanged("Scope");
+            }
+        }
+
+        public bool HasInheritedProperty(string name)
+        {
+            return null != scope ? scope.HasInheritedComponent(plugin) : false;
+        }
+
+        public object GetInheritedValue(string name)
+        {
+            return null != scope ? scope.GetInheritedValue(plugin, name) : null;
+        }
+
+        private void OnInheritedComponentAdded(PluginViewModel plugin)
+        {
+            if (this.plugin == plugin)
+            {
+                if (null != InheritedPropertyAdded)
+                {
+                    foreach (string property in plugin.Properties)
+                    {
+                        InheritedPropertyAdded(property);
+                    }
+                }
+
+                NotifyPropertyChanged("Scope");
+            }
+        }
+
+        private void OnInheritedComponentRemoved(PluginViewModel plugin)
+        {
+            if (this.plugin == plugin)
+            {
+                if (null != InheritedPropertyAdded)
+                {
+                    foreach (string property in plugin.Properties)
+                    {
+                        InheritedPropertyRemoved(property);
+                    }
+                }
+
+                NotifyPropertyChanged("Scope");
+            }
+        }
+
+        private void OnPropertyValueChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (null != LocalPropertyChanged && args.PropertyName == "Value")
+            {
+                PropertyViewModel property = sender as PropertyViewModel;
+                LocalPropertyChanged(property.Name);
             }
         }
     }

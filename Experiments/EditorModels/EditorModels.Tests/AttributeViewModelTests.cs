@@ -13,7 +13,7 @@ namespace EditorModels.Tests
             AttributeViewModel attribute = new AttributeViewModel("test");
             attribute.Key = "test2";
 
-            Assert.AreEqual("test2", attribute.Attribute.Key);
+            Assert.AreEqual("test2", attribute.Key);
         }
 
         [TestMethod]
@@ -22,7 +22,7 @@ namespace EditorModels.Tests
             AttributeViewModel attribute = new AttributeViewModel("test");
             attribute.Value = "value";
 
-            Assert.AreEqual("value", attribute.Attribute.Value);
+            Assert.AreEqual("value", attribute.Value);
         }
 
         [TestMethod]
@@ -74,7 +74,7 @@ namespace EditorModels.Tests
             EntityViewModel child = new EntityViewModel();
             child.AddPrototype(parent);
 
-            Assert.AreEqual(0, child.Entity.Attributes.Count());
+            Assert.AreEqual(1, child.Attributes.Count(x => x.IsInherited));
 
             AttributeViewModel childAttribute = child.GetAttribute("test");
 
@@ -83,7 +83,7 @@ namespace EditorModels.Tests
             childAttribute.IsInherited = false;
             childAttribute.Value = "value";
 
-            Assert.AreEqual(1, child.Entity.Attributes.Count());
+            Assert.AreEqual(0, child.Attributes.Count(x => x.IsInherited));
         }
 
         [TestMethod]
@@ -104,11 +104,11 @@ namespace EditorModels.Tests
             childAttribute.IsInherited = false;
             childAttribute.Value = "value";
 
-            Assert.AreEqual(1, child.Entity.Attributes.Count());
+            Assert.AreEqual(0, child.Attributes.Count(x => x.IsInherited));
 
             childAttribute.IsInherited = true;
 
-            Assert.AreEqual(0, child.Entity.Attributes.Count());
+            Assert.AreEqual(1, child.Attributes.Count(x => x.IsInherited));
         }
     }
 }

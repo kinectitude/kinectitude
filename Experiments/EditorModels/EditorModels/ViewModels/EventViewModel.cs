@@ -1,17 +1,43 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using EditorModels.Models;
 using System.Linq;
+using EditorModels.ViewModels.Interfaces;
 
 namespace EditorModels.ViewModels
 {
-    internal sealed class EventViewModel : BaseViewModel
+    internal sealed class EventViewModel : BaseViewModel, IPropertyScope
     {
         private readonly PluginViewModel plugin;
-        private readonly Event evt;
-        private Entity entity;
+        private IEventScope scope;
 
         public event PluginAddedEventHandler PluginAdded;
+        public event ScopeChangedEventHandler ScopeChanged;
+        public event PropertyEventHandler InheritedPropertyAdded { add { } remove { } }
+        public event PropertyEventHandler InheritedPropertyRemoved { add { } remove { } }
+        public event PropertyEventHandler InheritedPropertyChanged { add { } remove { } }
+
+        [DependsOn("Scope")]
+        public string Type
+        {
+            get { return null != scope ? scope.GetDefinedName(plugin) : plugin.ClassName; }
+        }
+
+        [DependsOn("IsInherited")]
+        public bool IsLocal
+        {
+            get { return !IsInherited; }
+        }
+
+        public bool IsInherited
+        {
+            get { return false; }
+        }
+
+        public ObservableCollection<PropertyViewModel> Properties
+        {
+            get;
+            private set;
+        }
 
         public ObservableCollection<ActionViewModel> Actions
         {
@@ -27,22 +53,9 @@ namespace EditorModels.ViewModels
         public EventViewModel(PluginViewModel plugin)
         {
             this.plugin = plugin;
+
+            Properties = new ObservableCollection<PropertyViewModel>();
             Actions = new ObservableCollection<ActionViewModel>();
-        }
-
-        public void SetEntity(Entity entity)
-        {
-            if (null != this.entity)
-            {
-                this.entity.RemoveEvent(evt);
-            }
-
-            this.entity = entity;
-
-            if (null != this.entity)
-            {
-                this.entity.AddEvent(evt);
-            }
         }
 
         public void AddAction(ActionViewModel action)
@@ -50,11 +63,60 @@ namespace EditorModels.ViewModels
             // TODO: Notify plugin added
         }
 
-        private void RaisePluginAdded(PluginViewModel plugin)
+        private void NotifyPluginAdded(PluginViewModel plugin)
         {
             if (null != PluginAdded)
             {
                 PluginAdded(plugin);
+            }
+        }
+
+        public PropertyViewModel GetProperty(string name)
+        {
+            return Properties.FirstOrDefault(x => x.Name == name);
+        }
+
+        public void SetProperty(string name, object value)
+        {
+            PropertyViewModel property = GetProperty(name);
+            if (null != property)
+            {
+                property.Value = value;
+            }
+        }
+
+        bool IPropertyScope.HasInheritedProperty(string name)
+        {
+            return false;
+        }
+
+        object IPropertyScope.GetInheritedValue(string name)
+        {
+            return null;
+        }
+
+        public void SetScope(IEventScope scope)
+        {
+            if (null != this.scope)
+            {
+                this.scope.ScopeChanged -= OnScopeChanged;
+            }
+
+            this.scope = scope;
+
+            if (null != this.scope)
+            {
+                this.scope.ScopeChanged += OnScopeChanged;
+            }
+
+            NotifyPropertyChanged("Scope");
+        }
+
+        private void OnScopeChanged()
+        {
+            if (null != ScopeChanged)
+            {
+                ScopeChanged();
             }
         }
     }

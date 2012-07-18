@@ -39,7 +39,6 @@ namespace EditorModels.Tests
             entity.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
 
             Assert.AreEqual(1, entity.Components.Count(x => x.Type == TransformComponentType));
-            Assert.AreEqual(1, entity.Entity.Components.Count(x => x.Type == TransformComponentType));
         }
 
         [TestMethod]
@@ -52,7 +51,6 @@ namespace EditorModels.Tests
             entity.RemoveComponent(component);
 
             Assert.AreEqual(0, entity.Components.Count);
-            Assert.AreEqual(0, entity.Entity.Components.Count());
         }
 
         [TestMethod]
@@ -69,9 +67,7 @@ namespace EditorModels.Tests
             parent.RemoveComponent(component);
 
             Assert.AreEqual(0, parent.Components.Count(x => x.Type == TransformComponentType));
-            Assert.AreEqual(0, parent.Entity.Components.Count(x => x.Type == TransformComponentType));
             Assert.AreEqual(0, child.Components.Count(x => x.Type == TransformComponentType));
-            Assert.AreEqual(0, child.Entity.Components.Count(x => x.Type == TransformComponentType));
         }
 
         [TestMethod]
@@ -87,15 +83,14 @@ namespace EditorModels.Tests
 
             ComponentViewModel childComponent = child.GetComponentByType(TransformComponentType);
             PropertyViewModel childProperty = childComponent.GetProperty("X");
+            childProperty.IsInherited = false;
             childProperty.Value = 500;
 
             parent.RemoveComponent(component);
 
             Assert.AreEqual(0, parent.Components.Count(x => x.Type == TransformComponentType));
-            Assert.AreEqual(0, parent.Entity.Components.Count(x => x.Type == TransformComponentType));
             Assert.AreEqual(1, child.Components.Count(x => x.IsRoot));
-            Assert.AreEqual(0, child.Components.Count(x => x.Type == TransformComponentType));
-            Assert.AreEqual(0, child.Entity.Components.Count(x => x.Type == TransformComponentType));
+            Assert.AreEqual(1, child.Components.Count(x => x.Type == TransformComponentType));
         }
 
         [TestMethod]
@@ -111,9 +106,7 @@ namespace EditorModels.Tests
             child.RemoveComponent(inheritedComponent);
 
             Assert.AreEqual(1, parent.Components.Count(x => x.Type == TransformComponentType));
-            Assert.AreEqual(1, parent.Entity.Components.Count(x => x.Type == TransformComponentType));
             Assert.AreEqual(1, child.Components.Count(x => x.Type == TransformComponentType));
-            Assert.AreEqual(0, child.Entity.Components.Count(x => x.Type == TransformComponentType));
         }
 
         [TestMethod]
@@ -127,7 +120,6 @@ namespace EditorModels.Tests
             entity.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
 
             Assert.AreEqual(component, entity.Components.Single());
-            Assert.AreEqual(1, entity.Entity.Components.Count(x => x.Type == TransformComponentType));
         }
 
         [TestMethod]
@@ -153,9 +145,7 @@ namespace EditorModels.Tests
             parent.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
 
             Assert.AreEqual(1, parent.Components.Count(x => x.Type == TransformComponentType));
-            Assert.AreEqual(1, parent.Entity.Components.Count(x => x.Type == TransformComponentType));
             Assert.AreEqual(1, child.Components.Count(x => x.Type == TransformComponentType));
-            Assert.AreEqual(0, child.Entity.Components.Count(x => x.Type == TransformComponentType));
         }
 
         [TestMethod]
@@ -226,42 +216,14 @@ namespace EditorModels.Tests
             entity.AddComponent(component);
 
             Assert.AreEqual(TransformComponentShort, component.Type);
-            Assert.AreEqual(TransformComponentShort, component.Component.Type);
 
             define.Name = "tc";
 
             Assert.AreEqual("tc", component.Type);
-            Assert.AreEqual("tc", component.Component.Type);
-        }
-
-        /*[TestMethod]
-        public void ComponentIsRootIfNotInAnyPrototype()
-        {
-            EntityViewModel entity = new EntityViewModel();
-            
-            ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
-            entity.AddComponent(component);
-
-            Assert.IsFalse(component.IsLocal);
-
-            PropertyViewModel property = component.GetProperty("X");
-            property.IsInherited = false;
-            property.Value = 500;
-
-            Assert.IsTrue(component.IsLocal);
         }
 
         [TestMethod]
-        public void ComponentIsInheritedIfNoPropertiesDefined()
-        {
-            EntityViewModel entity = new EntityViewModel();
-            ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
-
-            Assert.IsTrue(component.IsInherited);   // TODO: Maybe not?
-        }*/
-
-        /*[TestMethod]
-        public void ComponentBecomesInheritableAfterAddToParent()
+        public void ComponentBecomesInheritedAfterAddToParent()
         {
             EntityViewModel parent = new EntityViewModel() { Name = "parent" };
 
@@ -270,11 +232,11 @@ namespace EditorModels.Tests
             child.AddComponent(childComponent);
             child.AddPrototype(parent);
 
-            Assert.IsFalse(childComponent.CanInherit);
+            Assert.IsFalse(childComponent.IsInherited);
 
             parent.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
 
-            Assert.IsTrue(childComponent.CanInherit);
+            Assert.IsTrue(childComponent.IsInherited);
         }
 
         [TestMethod]
@@ -287,11 +249,11 @@ namespace EditorModels.Tests
             ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
             child.AddComponent(component);
 
-            Assert.IsFalse(component.CanInherit);
+            Assert.IsFalse(component.IsInherited);
 
             child.AddPrototype(parent);
 
-            Assert.IsTrue(component.CanInherit);
+            Assert.IsTrue(component.IsInherited);
         }
 
         [TestMethod]
@@ -312,11 +274,11 @@ namespace EditorModels.Tests
             child.AddComponent(childComponent);
             child.AddPrototype(parent);
 
-            Assert.IsTrue(childComponent.CanInherit);
+            Assert.IsTrue(childComponent.IsInherited);
 
             parent.RemoveComponent(parentComponent);
 
-            Assert.IsFalse(childComponent.CanInherit);
+            Assert.IsFalse(childComponent.IsInherited);
         }
 
         [TestMethod]
@@ -335,12 +297,12 @@ namespace EditorModels.Tests
             child.AddComponent(component);
             child.AddPrototype(parent);
 
-            Assert.IsTrue(component.CanInherit);
+            Assert.IsTrue(component.IsInherited);
 
             child.RemovePrototype(parent);
 
-            Assert.IsFalse(component.CanInherit);
-        }*/
+            Assert.IsFalse(component.IsInherited);
+        }
 
         [TestMethod]
         public void AddingComponentAddsRequiredComponent()

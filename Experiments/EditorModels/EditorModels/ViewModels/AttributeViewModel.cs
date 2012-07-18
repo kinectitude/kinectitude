@@ -1,6 +1,4 @@
 ﻿using System.ComponentModel;
-using EditorModels.Models;
-using Attribute = EditorModels.Models.Attribute;
 using EditorModels.ViewModels.Interfaces;
 
 namespace EditorModels.ViewModels
@@ -11,33 +9,29 @@ namespace EditorModels.ViewModels
     {
         private const string DefaultValue = "";
 
-        private readonly Attribute attribute;
-        private IAttributeContainer container;
+        private string key;
+        private string value;
         private IAttributeScope scope;
         private bool inherited;
-
-#if TEST
-
-        public Attribute Attribute
-        {
-            get { return attribute; }
-        }
-
-#endif
 
         public event KeyChangedEventHandler KeyChanged;
 
         public string Key
         {
-            get { return attribute.Key; }
+            get { return key; }
             set
             {
-                if (IsLocal && attribute.Key != value && !KeyExists(value))
+                if (IsLocal && key != value && !KeyExists(value))
                 {
-                    string oldKey = attribute.Key;
-                    attribute.Key = value;
+                    string oldKey = key;
+                    key = value;
 
-                    NotifyKeyChanged(oldKey, attribute.Key);
+                    if (null != KeyChanged)
+                    {
+                        KeyChanged(oldKey, key);
+                    }
+
+                    NotifyPropertyChanged("Key");
                 }
             }
         }
@@ -50,38 +44,32 @@ namespace EditorModels.ViewModels
                 if (inherited != value)
                 {
                     inherited = value;
-
-                    if (!inherited && null != container)
-                    {
-                        container.AddAttribute(attribute);
-                    }
-                    else if (null != container)
-                    {
-                        container.RemoveAttribute(attribute);
-                    }
-
-                    NotifyPropertyChanged("IsInherited", "IsLocal", "Key", "Value");
+                    NotifyPropertyChanged("IsInherited");
                 }
             }
         }
 
+        [DependsOn("IsInherited")]
         public bool IsLocal
         {
             get { return !IsInherited; }
         }
 
+        [DependsOn("Scope")]
         public bool CanInherit
         {
             get { return null != scope ? scope.HasInheritedAttribute(Key) : false; }
         }
 
+        [DependsOn("IsLocal")]
+        [DependsOn("Scope")]
         public string Value
         {
             get
             {
                 if (IsLocal)
                 {
-                    return attribute.Value;
+                    return value;
                 }
 
                 return null != scope ? scope.GetInheritedValue(Key) : DefaultValue;
@@ -90,9 +78,9 @@ namespace EditorModels.ViewModels
             {
                 if (IsLocal)
                 {
-                    if (attribute.Value != value)
+                    if (this.value != value)
                     {
-                        attribute.Value = value;
+                        this.value = value;
                         NotifyPropertyChanged("Value");
                     }
                 }
@@ -101,13 +89,11 @@ namespace EditorModels.ViewModels
 
         public AttributeViewModel(string key)
         {
-            attribute = new Attribute();
-
-            Key = key;
-            Value = DefaultValue;
+            this.key = key;
+            this.value = DefaultValue;
         }
 
-        public void SetScope(IAttributeContainer container, IAttributeScope scope)
+        public void SetScope(IAttributeScope scope)
         {
             if (null != this.scope)
             {
@@ -116,30 +102,13 @@ namespace EditorModels.ViewModels
                 this.scope.InheritedAttributeChanged -= OnInheritedAttributeChanged;
             }
 
-            if (null != this.container)
-            {
-                if (IsLocal)
-                {
-                    this.container.RemoveAttribute(attribute);
-                }
-            }
-
             this.scope = scope;
-            this.container = container;
 
             if (null != this.scope)
             {
                 this.scope.InheritedAttributeAdded += OnInheritedAttributeChanged;
                 this.scope.InheritedAttributeRemoved += OnInheritedAttributeChanged;
                 this.scope.InheritedAttributeChanged += OnInheritedAttributeChanged;
-            }
-
-            if (null != this.container)
-            {
-                if (IsLocal)
-                {
-                    this.container.AddAttribute(attribute);
-                }
             }
         }
 
@@ -157,21 +126,8 @@ namespace EditorModels.ViewModels
         {
             if (key == Key)
             {
-                NotifyPropertyChanged("CanInherit");
-                if (IsInherited)
-                {
-                    NotifyPropertyChanged("Value");
-                }
+                NotifyPropertyChanged("Scope");
             }
-        }
-
-        private void NotifyKeyChanged(string oldKey, string newKey)
-        {
-            if (null != KeyChanged)
-            {
-                KeyChanged(oldKey, newKey);
-            }
-            NotifyPropertyChanged("Key");
         }
     }
 }

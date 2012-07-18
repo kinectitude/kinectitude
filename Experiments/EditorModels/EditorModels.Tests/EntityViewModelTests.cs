@@ -13,7 +13,7 @@ namespace EditorModels.Tests
             EntityViewModel entity = new EntityViewModel();
             entity.Name = "entity";
 
-            Assert.AreEqual(entity.Entity.Name, "entity");
+            Assert.AreEqual("entity", entity.Name);
         }
 
         [TestMethod]
@@ -24,7 +24,7 @@ namespace EditorModels.Tests
             EntityViewModel prototype = new EntityViewModel() { Name = "prototype" };
             entity.AddPrototype(prototype);
 
-            Assert.AreEqual(entity.Entity.Prototypes.Where(x => x == "prototype").Count(), 1);
+            Assert.AreEqual(1, entity.Prototypes.Where(x => x.Name == "prototype").Count());
         }
 
         [TestMethod]
@@ -36,7 +36,7 @@ namespace EditorModels.Tests
             entity.AddPrototype(prototype);
             entity.RemovePrototype(prototype);
 
-            Assert.AreEqual(entity.Entity.Prototypes.Where(x => x == "prototype").Count(), 0);
+            Assert.AreEqual(0, entity.Prototypes.Where(x => x.Name == "prototype").Count());
         }
 
         [TestMethod]
@@ -47,7 +47,7 @@ namespace EditorModels.Tests
             EntityViewModel prototype = new EntityViewModel();
             entity.AddPrototype(prototype);
 
-            Assert.AreEqual(entity.Entity.Prototypes.Count(), 0);
+            Assert.AreEqual(0, entity.Prototypes.Count());
         }
 
         [TestMethod]
@@ -58,8 +58,7 @@ namespace EditorModels.Tests
             AttributeViewModel attribute = new AttributeViewModel("test");
             entity.AddAttribute(attribute);
 
-            Assert.AreEqual(entity.Attributes.Where(x => x.Key == "test").Count(), 1);
-            Assert.AreEqual(entity.Entity.Attributes.Where(x => x.Key == "test").Count(), 1);
+            Assert.AreEqual(1, entity.Attributes.Where(x => x.Key == "test").Count());
         }
 
         [TestMethod]
@@ -71,10 +70,8 @@ namespace EditorModels.Tests
             EntityViewModel child = new EntityViewModel();
             child.AddPrototype(parent);
 
-            Assert.AreEqual(parent.Attributes.Where(x => x.Key == "test").Count(), 1);
-            Assert.AreEqual(parent.Entity.Attributes.Where(x => x.Key == "test").Count(), 1);
-            Assert.AreEqual(child.Attributes.Where(x => x.Key == "test").Count(), 1);
-            Assert.AreEqual(child.Entity.Attributes.Where(x => x.Key == "test").Count(), 0);
+            Assert.AreEqual(1, parent.Attributes.Where(x => x.Key == "test").Count());
+            Assert.AreEqual(1, child.Attributes.Where(x => x.Key == "test").Count());
         }
 
         [TestMethod]
@@ -86,11 +83,8 @@ namespace EditorModels.Tests
             entity.AddAttribute(attribute);
             entity.RemoveAttribute(attribute);
 
-            Assert.AreEqual(entity.Attributes.Where(x => x.Key == "test").Count(), 0);
-            Assert.AreEqual(entity.Entity.Attributes.Where(x => x.Key == "test").Count(), 0);
+            Assert.AreEqual(0, entity.Attributes.Where(x => x.Key == "test").Count());
         }
-
-
 
         [TestMethod]
         public void CannotAddDuplicateAttributeKey()
@@ -100,8 +94,7 @@ namespace EditorModels.Tests
             entity.AddAttribute(new AttributeViewModel("test"));
             entity.AddAttribute(new AttributeViewModel("test"));
 
-            Assert.AreEqual(entity.Attributes.Where(x => x.Key == "test").Count(), 1);
-            Assert.AreEqual(entity.Entity.Attributes.Where(x => x.Key == "test").Count(), 1);
+            Assert.AreEqual(1, entity.Attributes.Where(x => x.Key == "test").Count());
         }
 
         [TestMethod]
@@ -116,8 +109,7 @@ namespace EditorModels.Tests
             AttributeViewModel childAttribute = child.GetAttribute("test");
             child.RemoveAttribute(childAttribute);
 
-            Assert.AreEqual(child.Attributes.Where(x => x.Key == "test").Count(), 1);
-            Assert.AreEqual(child.Entity.Attributes.Count(x => x.Key == "test"), 0);
+            Assert.AreEqual(1, child.Attributes.Where(x => x.Key == "test").Count());
         }
 
         [TestMethod]
@@ -139,10 +131,8 @@ namespace EditorModels.Tests
             attribute.Key = "test2";
 
             Assert.IsTrue(childAttribute.CanInherit);
-            Assert.AreEqual(parent.Attributes.Count, 1);
-            Assert.AreEqual(parent.Entity.Attributes.Count(), 1);
-            Assert.AreEqual(child.Attributes.Count, 1);
-            Assert.AreEqual(child.Entity.Attributes.Count(), 1);
+            Assert.AreEqual(1, parent.Attributes.Count);
+            Assert.AreEqual(1, child.Attributes.Count);
         }
 
         [TestMethod]
@@ -158,7 +148,6 @@ namespace EditorModels.Tests
 
             Assert.AreEqual("test2", attribute.Key);
             Assert.AreEqual(2, entity.Attributes.Count);
-            Assert.AreEqual(2, entity.Entity.Attributes.Count());
         }
 
         [TestMethod]
@@ -178,10 +167,8 @@ namespace EditorModels.Tests
             parent.AddAttribute(parentAttribute);
 
             Assert.IsTrue(attribute.CanInherit);
-            Assert.AreEqual(parent.Attributes.Count, 1);
-            Assert.AreEqual(parent.Entity.Attributes.Count(), 1);
-            Assert.AreEqual(child.Attributes.Count, 1);
-            Assert.AreEqual(child.Entity.Attributes.Count(), 1);
+            Assert.AreEqual(1, parent.Attributes.Count);
+            Assert.AreEqual(1, child.Attributes.Count);
         }
 
         [TestMethod]
@@ -205,10 +192,8 @@ namespace EditorModels.Tests
             child.AddPrototype(parentWithAttribute);
 
             Assert.IsTrue(childAttribute.CanInherit);
-            Assert.AreEqual(parentWithAttribute.Attributes.Count, 1);
-            Assert.AreEqual(parentWithAttribute.Entity.Attributes.Count(), 1);
-            Assert.AreEqual(child.Attributes.Count, 1);
-            Assert.AreEqual(child.Entity.Attributes.Count(), 1);
+            Assert.AreEqual(1, parentWithAttribute.Attributes.Count);
+            Assert.AreEqual(1, child.Attributes.Count);
         }
 
         [TestMethod]
@@ -230,10 +215,8 @@ namespace EditorModels.Tests
 
             Assert.AreEqual(childAttribute.Key, "test");
             Assert.IsFalse(childAttribute.CanInherit);
-            Assert.AreEqual(parent.Attributes.Count, 1);
-            Assert.AreEqual(parent.Entity.Attributes.Count(), 1);
-            Assert.AreEqual(child.Attributes.Count, 2);
-            Assert.AreEqual(child.Entity.Attributes.Count(), 1);
+            Assert.AreEqual(1, parent.Attributes.Count);
+            Assert.AreEqual(2, child.Attributes.Count);
         }
 
         [TestMethod]
@@ -256,10 +239,8 @@ namespace EditorModels.Tests
             childAttribute.Key = "test2";
 
             Assert.IsFalse(childAttribute.CanInherit);
-            Assert.AreEqual(parent.Attributes.Count, 1);
-            Assert.AreEqual(parent.Entity.Attributes.Count(), 1);
-            Assert.AreEqual(child.Attributes.Count, 2);
-            Assert.AreEqual(child.Entity.Attributes.Count(), 1);
+            Assert.AreEqual(1, parent.Attributes.Count);
+            Assert.AreEqual(2, child.Attributes.Count);
         }
 
         [TestMethod]
@@ -282,10 +263,8 @@ namespace EditorModels.Tests
             parent.RemoveAttribute(attribute);
 
             Assert.IsFalse(childAttribute.CanInherit);
-            Assert.AreEqual(parent.Attributes.Count, 0);
-            Assert.AreEqual(parent.Entity.Attributes.Count(), 0);
-            Assert.AreEqual(child.Attributes.Count, 1);
-            Assert.AreEqual(child.Entity.Attributes.Count(), 1);
+            Assert.AreEqual(0, parent.Attributes.Count);
+            Assert.AreEqual(1, child.Attributes.Count);
         }
 
         [TestMethod]
@@ -310,10 +289,8 @@ namespace EditorModels.Tests
             child.RemovePrototype(parentWithAttribute);
 
             Assert.IsFalse(childAttribute.CanInherit);
-            Assert.AreEqual(parentWithAttribute.Attributes.Count, 1);
-            Assert.AreEqual(parentWithAttribute.Entity.Attributes.Count(), 1);
-            Assert.AreEqual(child.Attributes.Count, 1);
-            Assert.AreEqual(child.Entity.Attributes.Count(), 1);
+            Assert.AreEqual(1, parentWithAttribute.Attributes.Count);
+            Assert.AreEqual(1, child.Attributes.Count);
         }
 
         [TestMethod]
@@ -368,7 +345,7 @@ namespace EditorModels.Tests
             Assert.Fail();
         }
 
-        [TestMethod]
+        /*[TestMethod]
         public void EntityFollowsPrototypeNameChange()
         {
             EntityViewModel parent = new EntityViewModel() { Name = "parent" };
@@ -386,7 +363,7 @@ namespace EditorModels.Tests
 
             Assert.AreEqual("changed", child.Entity.Prototypes.ElementAt(0));
             Assert.AreEqual("otherParent", child.Entity.Prototypes.ElementAt(1));
-        }
+        }*/
 
         [TestMethod]
         public void CannotAddDuplicateNameInSameScope()
@@ -443,8 +420,6 @@ namespace EditorModels.Tests
 
             Assert.AreEqual(1, scene1.Entities.Count);
             Assert.AreEqual(1, scene2.Entities.Count);
-            Assert.AreEqual(1, scene1.Scene.Entities.Count());
-            Assert.AreEqual(1, scene2.Scene.Entities.Count());
         }
     }
 }

@@ -12,7 +12,7 @@ namespace EditorModels.Tests
         {
             SceneViewModel scene = new SceneViewModel("Test Scene");
 
-            Assert.AreEqual(scene.Scene.Name, "Test Scene");
+            Assert.AreEqual(scene.Name, "Test Scene");
         }
 
         [TestMethod]
@@ -23,7 +23,7 @@ namespace EditorModels.Tests
             AttributeViewModel attribute = new AttributeViewModel("test");
             scene.AddAttribute(attribute);
 
-            Assert.AreEqual(scene.Scene.Attributes.Count(x => x.Key == "test"), 1);
+            Assert.AreEqual(1, scene.Attributes.Count(x => x.Key == "test"));
         }
 
         [TestMethod]
@@ -35,7 +35,7 @@ namespace EditorModels.Tests
             scene.AddAttribute(attribute);
             scene.RemoveAttribute(attribute);
 
-            Assert.AreEqual(scene.Scene.Attributes.Count(x => x.Key == "test"), 0);
+            Assert.AreEqual(0, scene.Attributes.Count(x => x.Key == "test"));
         }
 
         [TestMethod]
@@ -46,7 +46,7 @@ namespace EditorModels.Tests
             EntityViewModel entity = new EntityViewModel();
             scene.AddEntity(entity);
 
-            Assert.AreEqual(scene.Scene.Entities.Count(), 1);
+            Assert.AreEqual(1, scene.Entities.Count());
         }
 
         [TestMethod]
@@ -58,7 +58,7 @@ namespace EditorModels.Tests
             scene.AddEntity(entity);
             scene.RemoveEntity(entity);
 
-            Assert.AreEqual(scene.Scene.Entities.Count(), 0);
+            Assert.AreEqual(0, scene.Entities.Count());
         }
 
         [TestMethod]

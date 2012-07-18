@@ -17,7 +17,7 @@ namespace EditorModels.Tests
         {
             GameViewModel game = new GameViewModel("Test Game");
 
-            Assert.AreEqual(game.Game.Name, "Test Game");
+            Assert.AreEqual(game.Name, "Test Game");
         }
 
         [TestMethod]
@@ -25,7 +25,7 @@ namespace EditorModels.Tests
         {
             GameViewModel game = new GameViewModel("Test Game") { Width = 800 };
 
-            Assert.AreEqual(game.Game.Width, 800);
+            Assert.AreEqual(game.Width, 800);
         }
 
         [TestMethod]
@@ -33,7 +33,7 @@ namespace EditorModels.Tests
         {
             GameViewModel game = new GameViewModel("Test Game") { Height = 600 };
 
-            Assert.AreEqual(game.Game.Height, 600);
+            Assert.AreEqual(game.Height, 600);
         }
 
         [TestMethod]
@@ -41,7 +41,7 @@ namespace EditorModels.Tests
         {
             GameViewModel game = new GameViewModel("Test Game") { IsFullScreen = true };
 
-            Assert.AreEqual(game.Game.IsFullScreen, true);
+            Assert.AreEqual(game.IsFullScreen, true);
         }
 
         [TestMethod]
@@ -52,7 +52,7 @@ namespace EditorModels.Tests
             GameViewModel game = new GameViewModel("Test Game");
             game.FirstScene = scene;
 
-            Assert.AreEqual(game.Game.FirstScene, "Test Scene");
+            Assert.AreEqual(game.FirstScene.Name, "Test Scene");
         }
 
         [TestMethod]
@@ -63,8 +63,8 @@ namespace EditorModels.Tests
             UsingViewModel use = new UsingViewModel() { File = "Test.dll" };
             game.AddUsing(use);
 
-            Assert.AreEqual(game.Game.Usings.Count(), 1);
-            Assert.AreEqual(game.Game.Usings.First().File, "Test.dll");
+            Assert.AreEqual(game.Usings.Count(), 1);
+            Assert.AreEqual(game.Usings.First().File, "Test.dll");
         }
 
         [TestMethod]
@@ -76,7 +76,7 @@ namespace EditorModels.Tests
             game.AddUsing(use);
             game.RemoveUsing(use);
 
-            Assert.AreEqual(game.Game.Usings.Count(), 0);
+            Assert.AreEqual(game.Usings.Count(), 0);
         }
 
         [TestMethod]
@@ -91,11 +91,8 @@ namespace EditorModels.Tests
             game.AddPrototype(entity);
 
             Assert.AreEqual(1, game.Usings.Count);
-            Assert.AreEqual(1, game.Game.Usings.Count());
             Assert.AreEqual(1, game.Usings.Single().Defines.Count(x => x.Name == TransformComponentShort && x.Class == TransformComponentType));
-            Assert.AreEqual(1, game.Game.Usings.Single().Defines.Count(x => x.Name == TransformComponentShort && x.Class == TransformComponentType));
             Assert.AreEqual(TransformComponentShort, component.Type);
-            Assert.AreEqual(TransformComponentShort, component.Component.Type);
         }
 
         [TestMethod]
@@ -116,11 +113,8 @@ namespace EditorModels.Tests
             game.AddPrototype(entity);
             
             Assert.AreEqual(1, game.Usings.Count);
-            Assert.AreEqual(1, game.Game.Usings.Count());
             Assert.AreEqual(1, game.Usings.Single().Defines.Count(x => x.Name == TransformComponentShort && x.Class == TransformComponentType));
-            Assert.AreEqual(1, game.Game.Usings.Single().Defines.Count(x => x.Name == TransformComponentShort && x.Class == TransformComponentType));
             Assert.AreEqual(TransformComponentShort, component.Type);
-            Assert.AreEqual(TransformComponentShort, component.Component.Type);
         }
 
         [TestMethod]
@@ -131,8 +125,8 @@ namespace EditorModels.Tests
             EntityViewModel entity = new EntityViewModel() { Name = "TestPrototype" };
             game.AddPrototype(entity);
 
-            Assert.AreEqual(game.Game.Entities.Count(), 1);
-            Assert.AreEqual(game.Game.Entities.First().Name, "TestPrototype");
+            Assert.AreEqual(game.Prototypes.Count(), 1);
+            Assert.AreEqual(game.Prototypes.First().Name, "TestPrototype");
         }
 
         [TestMethod]
@@ -144,7 +138,7 @@ namespace EditorModels.Tests
             game.AddPrototype(entity);
             game.RemovePrototype(entity);
 
-            Assert.AreEqual(game.Game.Entities.Count(), 0);
+            Assert.AreEqual(game.Prototypes.Count(), 0);
         }
 
         [TestMethod]
@@ -155,7 +149,7 @@ namespace EditorModels.Tests
             AttributeViewModel attribute = new AttributeViewModel("test");
             game.AddAttribute(attribute);
 
-            Assert.AreEqual(game.Game.Attributes.Count(x => x.Key == "test"), 1);
+            Assert.AreEqual(game.Attributes.Count(x => x.Key == "test"), 1);
         }
 
         [TestMethod]
@@ -167,7 +161,7 @@ namespace EditorModels.Tests
             game.AddAttribute(attribute);
             game.RemoveAttribute(attribute);
 
-            Assert.AreEqual(game.Game.Attributes.Count(x => x.Key == "test"), 0);
+            Assert.AreEqual(game.Attributes.Count(x => x.Key == "test"), 0);
         }
 
         [TestMethod]
@@ -178,8 +172,8 @@ namespace EditorModels.Tests
             SceneViewModel scene = new SceneViewModel("Test Scene");
             game.AddScene(scene);
 
-            Assert.AreEqual(game.Game.Scenes.Count(), 1);
-            Assert.AreEqual(game.Game.Scenes.First().Name, "Test Scene");
+            Assert.AreEqual(game.Scenes.Count(), 1);
+            Assert.AreEqual(game.Scenes.First().Name, "Test Scene");
         }
 
         [TestMethod]
@@ -191,7 +185,7 @@ namespace EditorModels.Tests
             game.AddScene(scene);
             game.RemoveScene(scene);
 
-            Assert.AreEqual(game.Game.Scenes.Count(), 0);
+            Assert.AreEqual(game.Scenes.Count(), 0);
         }
 
         [TestMethod]
@@ -202,7 +196,7 @@ namespace EditorModels.Tests
             AssetViewModel asset = new AssetViewModel("Test Asset");
             game.AddAsset(asset);
 
-            Assert.AreEqual(game.Game.Assets.Count(x => x.Name == "Test Asset"), 1);
+            Assert.AreEqual(game.Assets.Count(x => x.Name == "Test Asset"), 1);
         }
 
         [TestMethod]
@@ -214,7 +208,7 @@ namespace EditorModels.Tests
             game.AddAsset(asset);
             game.RemoveAsset(asset);
 
-            Assert.AreEqual(game.Game.Assets.Count(x => x.Name == "Test Asset"), 0);
+            Assert.AreEqual(game.Assets.Count(x => x.Name == "Test Asset"), 0);
         }
 
         [TestMethod]

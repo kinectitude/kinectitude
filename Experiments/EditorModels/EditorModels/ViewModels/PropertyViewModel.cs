@@ -1,32 +1,18 @@
 ﻿using System.ComponentModel;
-using EditorModels.Models;
-using Component = EditorModels.Models.Component;
+using EditorModels.ViewModels.Interfaces;
 
 namespace EditorModels.ViewModels
 {
     internal sealed class PropertyViewModel : BaseViewModel
     {
+        private readonly string name;
+        private object value;
         private bool inherited;
-        private Component component;
-        private PropertyViewModel inheritedProperty;
-        private readonly Property property;
+        private IPropertyScope scope;
 
         public string Name
         {
-            get { return property.Name; }
-            set
-            {
-                if (property.Name != value)
-                {
-                    property.Name = value;
-                    NotifyPropertyChanged("Name");
-                }
-            }
-        }
-
-        public bool IsLocal
-        {
-            get { return !IsInherited; }
+            get { return name; }
         }
 
         public bool IsInherited
@@ -37,53 +23,50 @@ namespace EditorModels.ViewModels
                 if (inherited != value)
                 {
                     inherited = value;
-
-                    if (!inherited && null != component)
-                    {
-                        component.AddProperty(property);
-                    }
-                    else if (null != component)
-                    {
-                        component.RemoveProperty(property);
-                    }
-
-                    NotifyPropertyChanged("IsLocal");
                     NotifyPropertyChanged("IsInherited");
-                    NotifyPropertyChanged("Key");
-                    NotifyPropertyChanged("Value");
                 }
             }
         }
 
-        public bool CanInherit
+        [DependsOn("IsInherited")]
+        public bool IsLocal
         {
-            get { return null != inheritedProperty; }
+            get { return !IsInherited; }
         }
 
+        [DependsOn("Scope")]
+        public bool CanInherit
+        {
+            get { return null != scope ? scope.HasInheritedProperty(Name) : false; }
+        }
+
+        [DependsOn("CanInherit")]
+        public bool IsRoot
+        {
+            get { return !CanInherit; }
+        }
+
+        [DependsOn("IsInherited")]
+        [DependsOn("Scope")]
         public object Value
         {
             get
             {
-                object ret = null;
-
-                if (IsLocal)
+                if (IsInherited)
                 {
-                    ret = property.Value;
-                }
-                else if (IsInherited)
-                {
-                    ret = inheritedProperty.Value;
+                    return null != scope ? scope.GetInheritedValue(Name) : 0;   // TODO: Get actual default
                 }
 
-                return ret;
+                return value;
             }
             set
             {
-                if (property.Value != value)
+                if (this.value != value)
                 {
-                    if (IsLocal)
+                    if (IsRoot || IsLocal)
                     {
-                        property.Value = value;  // TODO: Serialize anything
+                        this.value = value;  // TODO: Serialize anything
+                        IsInherited = false;
                         NotifyPropertyChanged("Value");
                     }
                 }
@@ -92,55 +75,52 @@ namespace EditorModels.ViewModels
 
         public PropertyViewModel(string name)
         {
-            property = new Property();
-
-            Name = name;
-            IsInherited = true;
+            this.name = name;
+            this.inherited = true;
         }
 
-        public void SetComponent(Component component)
+        public void SetScope(IPropertyScope scope)
         {
-            if (null != this.component)
+            if (null != this.scope)
             {
-                if (IsLocal)
-                {
-                    this.component.RemoveProperty(property);
-                }
+                this.scope.InheritedPropertyAdded -= OnInheritedPropertyAdded;
+                this.scope.InheritedPropertyRemoved -= OnInheritedPropertyRemoved;
+                this.scope.InheritedPropertyChanged -= OnInheritedPropertyChanged;
             }
 
-            this.component = component;
+            this.scope = scope;
 
-            if (null != this.component)
+            if (null != this.scope)
             {
-                if (IsLocal)
-                {
-                    this.component.AddProperty(property);
-                }
+                this.scope.InheritedPropertyAdded += OnInheritedPropertyAdded;
+                this.scope.InheritedPropertyRemoved += OnInheritedPropertyRemoved;
+                this.scope.InheritedPropertyChanged += OnInheritedPropertyChanged;
+            }
+
+            NotifyPropertyChanged("Scope");
+        }
+
+        private void OnInheritedPropertyAdded(string name)
+        {
+            if (name == Name)
+            {
+                NotifyPropertyChanged("Scope");
             }
         }
 
-        public void SetInheritedProperty(PropertyViewModel property)
+        private void OnInheritedPropertyRemoved(string name)
         {
-            if (null != inheritedProperty)
+            if (name == Name)
             {
-                inheritedProperty.PropertyChanged -= OnPropertyChanged;
+                NotifyPropertyChanged("Scope");
             }
-
-            inheritedProperty = property;
-
-            if (null != inheritedProperty)
-            {
-                inheritedProperty.PropertyChanged += OnPropertyChanged;
-            }
-
-            NotifyPropertyChanged("CanInherit");
         }
 
-        private void OnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        private void OnInheritedPropertyChanged(string name)
         {
-            if (IsInherited && args.PropertyName == "Value")
+            if (name == Name)
             {
-                NotifyPropertyChanged("Value");
+                NotifyPropertyChanged("Scope");
             }
         }
     }
