@@ -26,7 +26,7 @@ namespace Kinectitude.Player
             Assembly renderAssembly = Assembly.GetAssembly(typeof(RenderService));
             Assembly directAssemdly = Assembly.GetAssembly(typeof(DirectInputService));
             GameLoader gameLoader = GameLoader.GetGameLoader("game.xml", new Assembly[] { renderAssembly, directAssemdly });
-            game = gameLoader.Game;
+            game = gameLoader.CreateGame();
 
             Factory drawFactory = new SlimDX.Direct2D.Factory();
             SizeF dpi = drawFactory.DesktopDpi;

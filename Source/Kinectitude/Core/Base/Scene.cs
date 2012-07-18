@@ -124,7 +124,7 @@ namespace Kinectitude.Core.Base
         internal void CreateComponent(Entity entity, string stringType, List<Tuple<string, string>> values)
         {
             Component created = ClassFactory.Create<Component>(stringType);
-            created.entity = entity;
+            created.Entity = entity;
             entity.AddComponent(created, stringType);
             foreach (Tuple<string, string> tuple in values)
             {

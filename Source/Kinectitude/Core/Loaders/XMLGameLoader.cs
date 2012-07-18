@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Loaders
 {
@@ -22,7 +23,6 @@ namespace Kinectitude.Core.Loaders
         internal static readonly XName SceneName = Namespace + "Scene";
 
         private static readonly XmlSchemaSet schemas = new XmlSchemaSet();
-
 
         static XMLGameLoader()
         {
@@ -48,13 +48,67 @@ namespace Kinectitude.Core.Loaders
             }
         }
 
-        internal XMLGameLoader(string fileName)
+        internal XMLGameLoader(string fileName) : base(fileName) { }
+
+        internal override SceneLoader GetSceneLoader(string name)
+        {
+            return new XMLSceneLoader(scenes[name], this);
+        }
+
+        internal static XElement mergeXmlNodes(XElement src, XElement dst)
+        {
+            //TODO merge prototype attribute and insert into the dictionary's list
+            Dictionary<string, XElement> nodes = new Dictionary<string, XElement>();
+            //keep track of all the nodes in the dst because they will need to be merged if they are also in src
+            foreach (XElement node in dst.Elements())
+            {
+                if (EventName == node.Name  || TriggerName == node.Name)
+                {
+                    continue;
+                }
+                nodes.Add((string)node.Attribute("Type"), node);
+            }
+            foreach (XAttribute attr in src.Attributes())
+            {
+                if ("Name" == attr.Name || "Type" == attr.Name)
+                {
+                    continue;
+                }
+                if (null == dst.Attribute(attr.Name))
+                {
+                    dst.SetAttributeValue(attr.Name, attr.Value);
+
+                }
+            }
+            foreach (XElement node in src.Elements(ComponentName))
+            {
+                string key = (string)node.Attribute("Type");
+                if (nodes.ContainsKey(key))
+                {
+                    mergeXmlNodes(node, nodes[key]);
+                }
+                else
+                {
+                    XElement copy = new XElement(node);
+                    dst.AddFirst(copy);
+                }
+            }
+            foreach (XElement node in src.Elements(EventName))
+            {
+                string key = (string)node.Attribute("Type");
+                XElement copy = new XElement(node);
+                dst.Add(copy);
+            }
+            return dst;
+        }
+
+        public override Game CreateGame()
         {
             Prototypes = new Dictionary<string, XElement>();
 
-            XDocument document = XDocument.Load(Path.Combine(Environment.CurrentDirectory, fileName));
+            XDocument document = XDocument.Load(Path.Combine(Environment.CurrentDirectory, FileName));
             XElement root = document.Root;
-            
+
             document.Validate(schemas, (o, e) => { throw new ArgumentException("Invalid Kinectitude XML file."); });
 
             IEnumerable<XAttribute> rootAttribs = root.Attributes();
@@ -114,58 +168,7 @@ namespace Kinectitude.Core.Loaders
             {
                 scenes[(string)node.Attribute("Name")] = node;
             }
-        }
-
-        internal override SceneLoader GetSceneLoader(string name)
-        {
-            return new XMLSceneLoader(scenes[name], this);
-        }
-
-        internal static XElement mergeXmlNodes(XElement src, XElement dst)
-        {
-            //TODO merge prototype attribute and insert into the dictionary's list
-            Dictionary<string, XElement> nodes = new Dictionary<string, XElement>();
-            //keep track of all the nodes in the dst because they will need to be merged if they are also in src
-            foreach (XElement node in dst.Elements())
-            {
-                if (EventName == node.Name  || TriggerName == node.Name)
-                {
-                    continue;
-                }
-                nodes.Add((string)node.Attribute("Type"), node);
-            }
-            foreach (XAttribute attr in src.Attributes())
-            {
-                if ("Name" == attr.Name || "Type" == attr.Name)
-                {
-                    continue;
-                }
-                if (null == dst.Attribute(attr.Name))
-                {
-                    dst.SetAttributeValue(attr.Name, attr.Value);
-
-                }
-            }
-            foreach (XElement node in src.Elements(ComponentName))
-            {
-                string key = (string)node.Attribute("Type");
-                if (nodes.ContainsKey(key))
-                {
-                    mergeXmlNodes(node, nodes[key]);
-                }
-                else
-                {
-                    XElement copy = new XElement(node);
-                    dst.AddFirst(copy);
-                }
-            }
-            foreach (XElement node in src.Elements(EventName))
-            {
-                string key = (string)node.Attribute("Type");
-                XElement copy = new XElement(node);
-                dst.Add(copy);
-            }
-            return dst;
+            return base.CreateGame();
         }
     }
 }

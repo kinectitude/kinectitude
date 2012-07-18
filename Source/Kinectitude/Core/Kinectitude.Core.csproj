@@ -86,6 +86,7 @@
     <Compile Include="Base\Game.cs" />
     <Compile Include="Base\IEntity.cs" />
     <Compile Include="Base\Component.cs" />
+    <Compile Include="Base\ReadonlyArray.cs" />
     <Compile Include="Base\Service.cs" />
     <Compile Include="Base\Scene.cs" />
     <Compile Include="Base\Timer.cs" />

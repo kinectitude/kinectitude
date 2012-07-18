@@ -12,9 +12,13 @@ namespace Kinectitude.Core.Loaders
         public string FirstScene { get; protected set; }
 
         protected static Dictionary<string, Assembly> LoadedFiles = new Dictionary<string, Assembly>();
+        
         internal readonly HashSet<string> AvaliblePrototypes = new HashSet<string>();
         internal readonly Dictionary<string, List<string>> PrototypeIs = new Dictionary<string, List<string>>();
-        public Game Game { get; private set; }
+        
+        internal Game Game { get; private set; }
+
+        protected readonly string FileName;
 
         /**
          * Factory method for loading files.  We don't need to expose XMLGameLoader this way 
@@ -31,6 +35,7 @@ namespace Kinectitude.Core.Loaders
             {
                 throw new ArgumentException("File " + fileName + " could not be loaded");
             }
+
             foreach (Assembly loaded in preloads)
             {
                 string name = Path.GetFileName(loaded.Location);
@@ -40,11 +45,18 @@ namespace Kinectitude.Core.Loaders
                     ClassFactory.LoadServices(loaded);
                 }
             }
+
             return gameLoader;
         }
 
-        protected GameLoader()
+        public virtual Game CreateGame()
         {
+            return Game;
+        }
+
+        protected GameLoader(string fileName)
+        {
+            FileName = fileName;
             Game = new Game(this);
         }
 

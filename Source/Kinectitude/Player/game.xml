@@ -18,7 +18,12 @@
     <Define Name="TextRenderComponent" Class="Kinectitude.Render.TextRenderComponent"/>
     <Define Name="ImageRenderComponent" Class="Kinectitude.Render.ImageRenderComponent" />
   </Using>
-    
+
+  <Using File="Kinectitude.DirectInput.dll">
+    <Define Name="KeyEvent" Class="Kinectitude.DirectInput.KeyEvent"/>
+    <Define Name="KeyboardManager" Class="Kinectitude.DirectInput.KeyboardManager"/>
+  </Using>
+  
   <Prototype Name="paddle">
     <Component Type="KinectFollowComponent" Direction="Y" Player="1" Joint="HandLeft"/>
     <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Rectangle"/>

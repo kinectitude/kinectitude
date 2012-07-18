@@ -22,6 +22,8 @@ namespace Kinectitude.Core.Base
         internal readonly List<Tuple<DataContainer, string, Action<string>>> Changes = 
             new List<Tuple<DataContainer, string, Action<string>>>();
 
+        private readonly List<Event> Events = new List<Event>();
+
         internal Scene Scene { get; set; }
 
         internal T GetComponent<T>() where T : class
@@ -80,7 +82,7 @@ namespace Kinectitude.Core.Base
 
             if (missing.Count != 0)
             {
-                string identity = null != Name ? Name : "entity " + Id.ToString();
+                string identity = null != Name ? Name : "Entity " + Id.ToString();
                 throw MissingRequirementsException.MissingRequirement(identity, missing);
             }
 
@@ -102,12 +104,22 @@ namespace Kinectitude.Core.Base
                 unsubscribe.Item1.UnnotifyOfComponentChange(unsubscribe.Item2, unsubscribe.Item3);
             }
 
+            foreach (Event evt in Events)
+            {
+                evt.Destroy();
+            }
+
             foreach (Component component in componentList)
             {
                 component.Destroy();
             }
             Scene.DeleteEntity(this);
             Deleted = true;
+        }
+
+        internal void addEvent(Event evt)
+        {
+            Events.Add(evt);
         }
     }
 }

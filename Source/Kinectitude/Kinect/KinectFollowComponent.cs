@@ -5,11 +5,12 @@ using Microsoft.Kinect;
 
 namespace Kinectitude.Kinect
 {
+
+    public enum FollowType { X, Y, Both };
+
     [Plugin("Kinect Motion Component", "")]
     public class KinectFollowComponent : KinectComponent
     {
-        public enum FollowType { X, Y, Both };
-
         private float nextDx = 0;
         private float nextDy = 0;
 
