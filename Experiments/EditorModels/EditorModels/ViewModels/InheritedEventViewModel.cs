@@ -2,18 +2,13 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using EditorModels.ViewModels.Interfaces;
+using System.Linq;
 
 namespace EditorModels.ViewModels
 {
     internal sealed class InheritedEventViewModel : AbstractEventViewModel
     {
         private readonly AbstractEventViewModel inheritedEvent;
-
-        public override event PluginAddedEventHandler PluginAdded
-        {
-            add { inheritedEvent.PluginAdded += value; }
-            remove { inheritedEvent.PluginAdded -= value; }
-        }
 
         public override event DefineAddedEventHandler DefineAdded
         {
@@ -50,7 +45,13 @@ namespace EditorModels.ViewModels
         public InheritedEventViewModel(AbstractEventViewModel inheritedEvent)
         {
             this.inheritedEvent = inheritedEvent;
+
             inheritedEvent.Actions.CollectionChanged += OnInheritedEventActionsChanged;
+            foreach (AbstractActionViewModel inheritedAction in inheritedEvent.Actions)
+            {
+                InheritAction(inheritedAction);
+            }
+            
             inheritedEvent.PropertyChanged += (sender, args) => NotifyPropertyChanged(args.PropertyName);
 
             foreach (AbstractPropertyViewModel inheritedProperty in inheritedEvent.Properties)
@@ -62,12 +63,38 @@ namespace EditorModels.ViewModels
 
         private void OnInheritedEventActionsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
-            if (args.Action == NotifyCollectionChangedAction.Remove)
+            if (args.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (AbstractActionViewModel action in args.NewItems)
+                {
+                    InheritAction(action);
+                }
+            }
+            else if (args.Action == NotifyCollectionChangedAction.Remove)
             {
                 foreach (AbstractActionViewModel action in args.OldItems)
                 {
-
+                    DisinheritAction(action);
                 }
+            }
+        }
+
+        private void InheritAction(AbstractActionViewModel inheritedAction)
+        {
+            AbstractActionViewModel localAction = Actions.FirstOrDefault(x => x.InheritsFrom(inheritedAction));
+            if (null == localAction)
+            {
+                localAction = new InheritedActionViewModel(inheritedAction);
+                AddAction(localAction);
+            }
+        }
+
+        private void DisinheritAction(AbstractActionViewModel inheritedAction)
+        {
+            AbstractActionViewModel localAction = Actions.FirstOrDefault(x => x.InheritsFrom(inheritedAction));
+            if (null != localAction)
+            {
+                PrivateRemoveAction(localAction);
             }
         }
 

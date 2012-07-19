@@ -9,7 +9,6 @@ namespace EditorModels.ViewModels
     {
         private readonly PluginViewModel plugin;
 
-        public override event PluginAddedEventHandler PluginAdded;
         public override event DefineAddedEventHandler DefineAdded;
         public override event DefinedNameChangedEventHandler DefineChanged;
 
@@ -42,19 +41,6 @@ namespace EditorModels.ViewModels
             foreach (string property in plugin.Properties)
             {
                 AddProperty(new PropertyViewModel(property));
-            }
-        }
-
-        public void AddAction(ActionViewModel action)
-        {
-            // TODO: Notify plugin added
-        }
-
-        private void NotifyPluginAdded(PluginViewModel plugin)
-        {
-            if (null != PluginAdded)
-            {
-                PluginAdded(plugin);
             }
         }
 

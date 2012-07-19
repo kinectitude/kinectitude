@@ -45,6 +45,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActionViewModelTests.cs" />
     <Compile Include="AttributeViewModelTests.cs" />
     <Compile Include="ComponentViewModelTests.cs" />
     <Compile Include="EntityViewModelTests.cs" />

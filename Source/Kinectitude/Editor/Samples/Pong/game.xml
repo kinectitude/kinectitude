@@ -62,7 +62,7 @@
       <Component Type="TextRenderComponent" Value="Player 1 not ready!" FontColor="White" />
       
       <Event Type="TriggerOccursEvent" Trigger="Player1Ready">
-        <Action Type="SetTextAction" Value="Player 1 is ready!" />
+        <Action Type="SetAction" Target="TextRenderComponent.Text" Value="Player 1 is ready!" />
       </Event>
     </Entity>
 
@@ -72,7 +72,7 @@
       <Component Type="TextRenderComponent" Value="Player 2 Not Ready!" FontColor="White" />
       
       <Event Type="TriggerOccursEvent" Trigger="Player2Ready">
-        <Action Type="SetTextAction" Value="Player 2 is ready!" />
+        <Action Type="SetAction" Target="TextRenderComponent.Text" Value="Player 2 is ready!" />
       </Event>
     </Entity>
 
@@ -82,7 +82,7 @@
       
       <Event Type="CrossesLineEvent" Line="Y" Location="450" Direction="Positive">
         <Action Type="FireTriggerAction" Name="Player1Ready" />
-        <Action Type="IncrementAction" Key="scene.numReady" />
+        <Action Type="IncrementAction" Target="scene.numReady" />
       </Event>
     </Entity>
 
@@ -93,7 +93,7 @@
       <Event Type="CrossesLineEvent" Line="Y" Location="450" Direction="Positive">
         <Condition If="scene.numReady &lt; 2">
           <Action Type="FireTriggerAction" Name="Player2Ready" />
-          <Action Type="IncrementAction" Key="scene.numReady" />
+          <Action Type="IncrementAction" Target="scene.numReady" />
         </Condition>
       </Event>
     </Entity>
@@ -117,7 +117,7 @@
       <Component Type="TransformComponent" X="5" Y="250" />
       
       <Event Type="TriggerOccursEvent" Trigger="Player1Scores">
-        <Action Type="IncrementAction" Key="score" />
+        <Action Type="IncrementAction" Target="score" />
       </Event>
     </Entity>
 
@@ -126,7 +126,7 @@
       <Component Type="TransformComponent" X="770" Y="250" />
       
       <Event Type="TriggerOccursEvent" Trigger="Player2Scores">
-        <Action Type="IncrementAction" Key="score" />
+        <Action Type="IncrementAction" Target="score" />
       </Event>
     </Entity>
 
@@ -158,12 +158,12 @@
 
     <Entity>
       <Event Type="AttributeEqualsEvent" Value="paddle1.score" Target="7">
-        <Action Type="SetAttributeAction" Key="game.winner" Value="1" />
+        <Action Type="SetAction" Key="game.winner" Value="1" />
         <Action Type="ChangeSceneAction" Target="Game Over" />
       </Event>
 
       <Event Type="AttributeEqualsEvent" Value="paddle2.score" Target="7">
-        <Action Type="SetAttributeAction" Key="game.winner" Value="2" />
+        <Action Type="SetAction" Key="game.winner" Value="2" />
         <Action Type="ChangeSceneAction" Target="Game Over" />
       </Event>
     </Entity>

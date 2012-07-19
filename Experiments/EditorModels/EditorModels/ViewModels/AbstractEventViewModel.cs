@@ -12,7 +12,7 @@ namespace EditorModels.ViewModels
         protected IEventScope scope;
 
         public event ScopeChangedEventHandler ScopeChanged;
-        public abstract event PluginAddedEventHandler PluginAdded;
+        public event PluginAddedEventHandler PluginAdded;
         public event PropertyEventHandler InheritedPropertyAdded { add { } remove { } }
         public event PropertyEventHandler InheritedPropertyRemoved { add { } remove { } }
         public event PropertyEventHandler InheritedPropertyChanged { add { } remove { } }
@@ -63,6 +63,34 @@ namespace EditorModels.ViewModels
             {
                 property.Value = value;
             }
+        }
+
+        public void AddAction(AbstractActionViewModel action)
+        {
+            action.SetScope(this);
+            Actions.Add(action);
+
+            if (null != PluginAdded)
+            {
+                foreach (PluginViewModel plugin in action.Plugins)
+                {
+                    PluginAdded(plugin);
+                }
+            }
+        }
+
+        public void RemoveAction(AbstractActionViewModel action)
+        {
+            if (action.IsLocal)
+            {
+                PrivateRemoveAction(action);
+            }
+        }
+
+        protected void PrivateRemoveAction(AbstractActionViewModel action)
+        {
+            action.SetScope(null);
+            Actions.Remove(action);
         }
 
         public void SetScope(IEventScope scope)

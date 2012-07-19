@@ -367,10 +367,13 @@ namespace EditorModels.Storage
         {
             XElement element = new XElement(Constants.Component, new XAttribute(Constants.Type, manager.Type));
 
-            foreach (PropertyViewModel property in manager.Properties)
+            foreach (AbstractPropertyViewModel property in manager.Properties)
             {
-                XAttribute propertyAttribute = SerializeProperty(property);
-                element.Add(propertyAttribute);
+                if (!property.IsInherited)
+                {
+                    XAttribute propertyAttribute = SerializeProperty(property);
+                    element.Add(propertyAttribute);
+                }
             }
             return element;
         }
@@ -430,7 +433,7 @@ namespace EditorModels.Storage
         {
             XElement element = new XElement(Constants.Component, new XAttribute(Constants.Type, component.Type));
 
-            foreach (PropertyViewModel property in component.Properties)
+            foreach (AbstractPropertyViewModel property in component.Properties)
             {
                 if (property.IsLocal)
                 {
@@ -447,8 +450,11 @@ namespace EditorModels.Storage
 
             foreach (AbstractPropertyViewModel property in evt.Properties)
             {
-                XAttribute propertyAttribute = SerializeProperty(property);
-                element.Add(propertyAttribute);
+                if (!property.IsInherited)
+                {
+                    XAttribute propertyAttribute = SerializeProperty(property);
+                    element.Add(propertyAttribute);
+                }
             }
 
             foreach (AbstractActionViewModel action in evt.Actions)
@@ -463,10 +469,13 @@ namespace EditorModels.Storage
         {
             XElement element = new XElement(Constants.Action, new XAttribute(Constants.Type, action.Type));
 
-            foreach (PropertyViewModel property in action.Properties)
+            foreach (AbstractPropertyViewModel property in action.Properties)
             {
-                XAttribute propertyAttribute = SerializeProperty(property);
-                element.Add(propertyAttribute);
+                if (!property.IsInherited)
+                {
+                    XAttribute propertyAttribute = SerializeProperty(property);
+                    element.Add(propertyAttribute);
+                }
             }
             return element;
         }
