@@ -48,6 +48,7 @@
     <Compile Include="ActionViewModelTests.cs" />
     <Compile Include="AttributeViewModelTests.cs" />
     <Compile Include="ComponentViewModelTests.cs" />
+    <Compile Include="ConditionViewModelTests.cs" />
     <Compile Include="EntityViewModelTests.cs" />
     <Compile Include="EventViewModelTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

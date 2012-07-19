@@ -31,7 +31,7 @@ namespace EditorModels.ViewModels
 
         public override IEnumerable<PluginViewModel> Plugins
         {
-            get { return Actions.SelectMany(x => x.Plugins).Union(Enumerable.Repeat(plugin, 1)); }
+            get { return Actions.SelectMany(x => x.Plugins).Union(Enumerable.Repeat(plugin, 1)).Distinct(); }
         }
 
         public EventViewModel(PluginViewModel plugin)

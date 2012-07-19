@@ -1,30 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using EditorModels.ViewModels.Interfaces;
-using System.Linq;
 
 namespace EditorModels.ViewModels
 {
-    internal sealed class InheritedEventViewModel : AbstractEventViewModel
+    internal sealed class InheritedConditionViewModel : AbstractConditionViewModel
     {
-        private readonly AbstractEventViewModel inheritedEvent;
+        private readonly AbstractConditionViewModel inheritedCondition;
 
-        public override event DefineAddedEventHandler DefineAdded
+        public override string If
         {
-            add { inheritedEvent.DefineAdded += value; }
-            remove { inheritedEvent.DefineAdded -= value; }
-        }
-
-        public override event DefinedNameChangedEventHandler DefineChanged
-        {
-            add { inheritedEvent.DefineChanged += value; }
-            remove { inheritedEvent.DefineChanged -= value; }
+            get { return inheritedCondition.If; }
+            set { }
         }
 
         public override string Type
         {
-            get { return inheritedEvent.Type; }
+            get { return null; }
         }
 
         public override bool IsLocal
@@ -39,42 +34,39 @@ namespace EditorModels.ViewModels
 
         public override IEnumerable<PluginViewModel> Plugins
         {
-            get { return inheritedEvent.Plugins; }
+            get { return inheritedCondition.Plugins; }
         }
 
-        public InheritedEventViewModel(AbstractEventViewModel inheritedEvent)
+        public InheritedConditionViewModel(AbstractConditionViewModel inheritedCondition)
         {
-            this.inheritedEvent = inheritedEvent;
+            this.inheritedCondition = inheritedCondition;
 
-            inheritedEvent.Actions.CollectionChanged += OnInheritedEventActionsChanged;
-            foreach (AbstractActionViewModel inheritedAction in inheritedEvent.Actions)
+            inheritedCondition.Actions.CollectionChanged += OnInheritedConditionActionsChanged;
+            foreach (AbstractActionViewModel inheritedAction in inheritedCondition.Actions)
             {
                 InheritAction(inheritedAction);
             }
-            
-            inheritedEvent.PropertyChanged += (sender, args) => NotifyPropertyChanged(args.PropertyName);
-
-            foreach (AbstractPropertyViewModel inheritedProperty in inheritedEvent.Properties)
-            {
-                InheritedPropertyViewModel localProperty = new InheritedPropertyViewModel(inheritedProperty);
-                AddProperty(localProperty);
-            }
         }
 
-        private void OnInheritedEventActionsChanged(object sender, NotifyCollectionChangedEventArgs args)
+        public override bool InheritsFrom(AbstractActionViewModel action)
+        {
+            return action == inheritedCondition;
+        }
+
+        private void OnInheritedConditionActionsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
             if (args.Action == NotifyCollectionChangedAction.Add)
             {
-                foreach (AbstractActionViewModel action in args.NewItems)
+                foreach (AbstractActionViewModel inheritedAction in args.NewItems)
                 {
-                    InheritAction(action);
+                    InheritAction(inheritedAction);
                 }
             }
             else if (args.Action == NotifyCollectionChangedAction.Remove)
             {
-                foreach (AbstractActionViewModel action in args.OldItems)
+                foreach (AbstractActionViewModel inheritedAction in args.OldItems)
                 {
-                    DisinheritAction(action);
+                    DisinheritAction(inheritedAction);
                 }
             }
         }
@@ -93,7 +85,7 @@ namespace EditorModels.ViewModels
                 {
                     localAction = new InheritedActionViewModel(inheritedAction);
                 }
-                
+
                 AddAction(localAction);
             }
         }
@@ -105,11 +97,6 @@ namespace EditorModels.ViewModels
             {
                 PrivateRemoveAction(localAction);
             }
-        }
-
-        public override bool InheritsFrom(AbstractEventViewModel evt)
-        {
-            return evt == inheritedEvent;
         }
     }
 }

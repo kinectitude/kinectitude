@@ -39,6 +39,7 @@ namespace EditorModels.Storage
             public static readonly XName Type = "Type";
             public static readonly XName File = "File";
             public static readonly XName Class = "Class";
+            public static readonly XName If = "If";
 
             public static readonly XName Project = "Project";
             public static readonly XName Root = "Root";
@@ -232,12 +233,45 @@ namespace EditorModels.Storage
                 evt.SetProperty(attribute.Name.LocalName, (string)attribute);
             }
 
-            foreach (XElement actionElement in element.Elements(Constants.Action))
+            foreach (XElement actionElement in element.Elements())
             {
-                ActionViewModel action = CreateAction(actionElement);
+                AbstractActionViewModel action = null;
+
+                if (actionElement.Name == Constants.Action)
+                {
+                    action = CreateAction(actionElement);
+                }
+                else if (actionElement.Name == Constants.Condition)
+                {
+                    action = CreateCondition(actionElement);
+                }
+
                 evt.AddAction(action);
             }
             return evt;
+        }
+
+        private ConditionViewModel CreateCondition(XElement element)
+        {
+            ConditionViewModel condition = new ConditionViewModel() { If = (string)element.Attribute(Constants.If) };
+
+            foreach (XElement actionElement in element.Elements())
+            {
+                AbstractActionViewModel action = null;
+
+                if (actionElement.Name == Constants.Action)
+                {
+                    action = CreateAction(actionElement);
+                }
+                else if (actionElement.Name == Constants.Condition)
+                {
+                    action = CreateCondition(actionElement);
+                }
+
+                condition.AddAction(action);
+            }
+
+            return condition;
         }
 
         private ActionViewModel CreateAction(XElement element)
@@ -459,9 +493,45 @@ namespace EditorModels.Storage
 
             foreach (AbstractActionViewModel action in evt.Actions)
             {
-                XElement actionElement = SerializeAction(action);
+                XElement actionElement = null;
+
+                AbstractConditionViewModel condition = action as AbstractConditionViewModel;
+                if (null != condition)
+                {
+                    actionElement = SerializeCondition(condition);
+                }
+                else
+                {
+                    actionElement = SerializeAction(action);
+                }
+
                 element.Add(actionElement);
             }
+
+            return element;
+        }
+
+        private XElement SerializeCondition(AbstractConditionViewModel condition)
+        {
+            XElement element = new XElement(Constants.Condition, new XAttribute(Constants.If, condition.If));
+
+            foreach (AbstractActionViewModel action in condition.Actions)
+            {
+                XElement actionElement = null;
+
+                AbstractConditionViewModel nestedCondition = action as AbstractConditionViewModel;
+                if (null != nestedCondition)
+                {
+                    actionElement = SerializeCondition(nestedCondition);
+                }
+                else
+                {
+                    actionElement = SerializeAction(action);
+                }
+
+                element.Add(actionElement);
+            }
+
             return element;
         }
 

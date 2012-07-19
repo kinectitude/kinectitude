@@ -114,10 +114,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Storage\IGameStorage.cs" />
     <Compile Include="ViewModels\AbstractActionViewModel.cs" />
+    <Compile Include="ViewModels\AbstractConditionViewModel.cs" />
     <Compile Include="ViewModels\AbstractEventViewModel.cs" />
     <Compile Include="ViewModels\AbstractPropertyViewModel.cs" />
     <Compile Include="ViewModels\ConditionViewModel.cs" />
     <Compile Include="ViewModels\InheritedActionViewModel.cs" />
+    <Compile Include="ViewModels\InheritedConditionViewModel.cs" />
     <Compile Include="ViewModels\InheritedEventViewModel.cs" />
     <Compile Include="ViewModels\InheritedPropertyViewModel.cs" />
     <Compile Include="ViewModels\Interfaces\IActionScope.cs" />

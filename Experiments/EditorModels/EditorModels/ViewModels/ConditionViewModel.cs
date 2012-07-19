@@ -1,23 +1,55 @@
 ﻿using EditorModels.ViewModels.Interfaces;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace EditorModels.ViewModels
 {
-    internal class ConditionViewModel : BaseViewModel, IActionScope
+    internal class ConditionViewModel : AbstractConditionViewModel
     {
-        public event ScopeChangedEventHandler ScopeChanged;
+        private string rule;
 
-        public event DefineAddedEventHandler DefineAdded;
-
-        public event DefinedNameChangedEventHandler DefineChanged;
-
-        public string GetDefinedName(PluginViewModel plugin)
+        public override string If
         {
-            throw new System.NotImplementedException();
+            get { return rule; }
+            set
+            {
+                if (rule != value)
+                {
+                    rule = value;
+                    NotifyPropertyChanged("If");
+                }
+            }
         }
 
-        public PluginViewModel GetPlugin(string name)
+        public override string Type
         {
-            throw new System.NotImplementedException();
+            get { return null; }
+        }
+
+        public override bool IsLocal
+        {
+            get { return true; }
+        }
+
+        public override bool IsInherited
+        {
+            get { return false; }
+        }
+
+        public override IEnumerable<PluginViewModel> Plugins
+        {
+            get { return Actions.SelectMany(x => x.Plugins).Distinct(); }
+        }
+
+        public ConditionViewModel()
+        {
+            
+        }
+
+        public override bool InheritsFrom(AbstractActionViewModel action)
+        {
+            return false;
         }
     }
 }
