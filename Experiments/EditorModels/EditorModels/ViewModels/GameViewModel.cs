@@ -3,8 +3,6 @@ using System.Linq;
 using EditorModels.Base;
 using EditorModels.Storage;
 using EditorModels.ViewModels.Interfaces;
-using System;
-using System.ComponentModel;
 
 namespace EditorModels.ViewModels
 {

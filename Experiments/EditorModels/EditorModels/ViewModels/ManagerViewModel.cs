@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
-using EditorModels.ViewModels.Interfaces;
 using System.Linq;
+using EditorModels.ViewModels.Interfaces;
 
 namespace EditorModels.ViewModels
 {

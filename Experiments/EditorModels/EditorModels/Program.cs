@@ -1,7 +1,6 @@
-﻿
+﻿using EditorModels.Storage;
 using EditorModels.ViewModels;
-using Kinectitude.Core.Components;
-using EditorModels.Storage;
+
 namespace EditorModels
 {
     class Program

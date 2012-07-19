@@ -5,9 +5,9 @@ namespace EditorModels.Tests
     [TestClass]
     public class WorkspaceTests
     {
-        [TestMethod]
+        /*[TestMethod]
         public void TestMethod1()
         {
-        }
+        }*/
     }
 }

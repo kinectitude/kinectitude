@@ -5,47 +5,32 @@ using EditorModels.ViewModels.Interfaces;
 
 namespace EditorModels.ViewModels
 {
-    internal sealed class EventViewModel : BaseViewModel, IPropertyScope
+    internal sealed class EventViewModel : AbstractEventViewModel
     {
         private readonly PluginViewModel plugin;
-        private IEventScope scope;
 
-        public event PluginAddedEventHandler PluginAdded;
-        public event ScopeChangedEventHandler ScopeChanged;
-        public event PropertyEventHandler InheritedPropertyAdded { add { } remove { } }
-        public event PropertyEventHandler InheritedPropertyRemoved { add { } remove { } }
-        public event PropertyEventHandler InheritedPropertyChanged { add { } remove { } }
+        public override event PluginAddedEventHandler PluginAdded;
+        public override event DefineAddedEventHandler DefineAdded;
+        public override event DefinedNameChangedEventHandler DefineChanged;
 
         [DependsOn("Scope")]
-        public string Type
+        public override string Type
         {
             get { return null != scope ? scope.GetDefinedName(plugin) : plugin.ClassName; }
         }
 
         [DependsOn("IsInherited")]
-        public bool IsLocal
+        public override bool IsLocal
         {
             get { return !IsInherited; }
         }
 
-        public bool IsInherited
+        public override bool IsInherited
         {
             get { return false; }
         }
 
-        public ObservableCollection<PropertyViewModel> Properties
-        {
-            get;
-            private set;
-        }
-
-        public ObservableCollection<ActionViewModel> Actions
-        {
-            get;
-            private set;
-        }
-
-        public IEnumerable<PluginViewModel> Plugins
+        public override IEnumerable<PluginViewModel> Plugins
         {
             get { return Actions.SelectMany(x => x.Plugins).Union(Enumerable.Repeat(plugin, 1)); }
         }
@@ -54,8 +39,10 @@ namespace EditorModels.ViewModels
         {
             this.plugin = plugin;
 
-            Properties = new ObservableCollection<PropertyViewModel>();
-            Actions = new ObservableCollection<ActionViewModel>();
+            foreach (string property in plugin.Properties)
+            {
+                AddProperty(new PropertyViewModel(property));
+            }
         }
 
         public void AddAction(ActionViewModel action)
@@ -71,53 +58,9 @@ namespace EditorModels.ViewModels
             }
         }
 
-        public PropertyViewModel GetProperty(string name)
-        {
-            return Properties.FirstOrDefault(x => x.Name == name);
-        }
-
-        public void SetProperty(string name, object value)
-        {
-            PropertyViewModel property = GetProperty(name);
-            if (null != property)
-            {
-                property.Value = value;
-            }
-        }
-
-        bool IPropertyScope.HasInheritedProperty(string name)
+        public override bool InheritsFrom(AbstractEventViewModel evt)
         {
             return false;
-        }
-
-        object IPropertyScope.GetInheritedValue(string name)
-        {
-            return null;
-        }
-
-        public void SetScope(IEventScope scope)
-        {
-            if (null != this.scope)
-            {
-                this.scope.ScopeChanged -= OnScopeChanged;
-            }
-
-            this.scope = scope;
-
-            if (null != this.scope)
-            {
-                this.scope.ScopeChanged += OnScopeChanged;
-            }
-
-            NotifyPropertyChanged("Scope");
-        }
-
-        private void OnScopeChanged()
-        {
-            if (null != ScopeChanged)
-            {
-                ScopeChanged();
-            }
         }
     }
 }

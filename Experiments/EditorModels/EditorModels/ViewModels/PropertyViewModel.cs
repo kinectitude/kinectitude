@@ -1,21 +1,19 @@
-﻿using System.ComponentModel;
-using EditorModels.ViewModels.Interfaces;
+﻿using EditorModels.ViewModels.Interfaces;
 
 namespace EditorModels.ViewModels
 {
-    internal sealed class PropertyViewModel : BaseViewModel
+    internal sealed class PropertyViewModel : AbstractPropertyViewModel
     {
         private readonly string name;
         private object value;
         private bool inherited;
-        private IPropertyScope scope;
 
-        public string Name
+        public override string Name
         {
             get { return name; }
         }
 
-        public bool IsInherited
+        public override bool IsInherited
         {
             get { return inherited; }
             set
@@ -29,26 +27,26 @@ namespace EditorModels.ViewModels
         }
 
         [DependsOn("IsInherited")]
-        public bool IsLocal
+        public override bool IsLocal
         {
             get { return !IsInherited; }
         }
 
         [DependsOn("Scope")]
-        public bool CanInherit
+        public override bool CanInherit
         {
             get { return null != scope ? scope.HasInheritedProperty(Name) : false; }
         }
 
         [DependsOn("CanInherit")]
-        public bool IsRoot
+        public override bool IsRoot
         {
             get { return !CanInherit; }
         }
 
         [DependsOn("IsInherited")]
         [DependsOn("Scope")]
-        public object Value
+        public override object Value
         {
             get
             {
@@ -77,51 +75,6 @@ namespace EditorModels.ViewModels
         {
             this.name = name;
             this.inherited = true;
-        }
-
-        public void SetScope(IPropertyScope scope)
-        {
-            if (null != this.scope)
-            {
-                this.scope.InheritedPropertyAdded -= OnInheritedPropertyAdded;
-                this.scope.InheritedPropertyRemoved -= OnInheritedPropertyRemoved;
-                this.scope.InheritedPropertyChanged -= OnInheritedPropertyChanged;
-            }
-
-            this.scope = scope;
-
-            if (null != this.scope)
-            {
-                this.scope.InheritedPropertyAdded += OnInheritedPropertyAdded;
-                this.scope.InheritedPropertyRemoved += OnInheritedPropertyRemoved;
-                this.scope.InheritedPropertyChanged += OnInheritedPropertyChanged;
-            }
-
-            NotifyPropertyChanged("Scope");
-        }
-
-        private void OnInheritedPropertyAdded(string name)
-        {
-            if (name == Name)
-            {
-                NotifyPropertyChanged("Scope");
-            }
-        }
-
-        private void OnInheritedPropertyRemoved(string name)
-        {
-            if (name == Name)
-            {
-                NotifyPropertyChanged("Scope");
-            }
-        }
-
-        private void OnInheritedPropertyChanged(string name)
-        {
-            if (name == Name)
-            {
-                NotifyPropertyChanged("Scope");
-            }
         }
     }
 }

@@ -61,7 +61,7 @@
       <Component Type="TransformComponent" X="25" Y="125" />
       <Component Type="TextRenderComponent" Value="Player 1 not ready!" FontColor="White" />
       
-      <Event Type="TriggerOccursEvent" Name="Player1Ready">
+      <Event Type="TriggerOccursEvent" Trigger="Player1Ready">
         <Action Type="SetTextAction" Value="Player 1 is ready!" />
       </Event>
     </Entity>
@@ -71,7 +71,7 @@
       <Component Type="TransformComponent" X="425" Y="125" />
       <Component Type="TextRenderComponent" Value="Player 2 Not Ready!" FontColor="White" />
       
-      <Event Type="TriggerOccursEvent" Name="Player2Ready">
+      <Event Type="TriggerOccursEvent" Trigger="Player2Ready">
         <Action Type="SetTextAction" Value="Player 2 is ready!" />
       </Event>
     </Entity>
@@ -103,7 +103,7 @@
     </Entity>
 
     <Entity>
-      <Event Type="AttributeEqualsEvent" Key="scene.numReady" Value="2">
+      <Event Type="AttributeEqualsEvent" Value="scene.numReady" Target="2">
         <Action Type="ChangeSceneAction" Target="Game" />
       </Event>
     </Entity>
@@ -116,7 +116,7 @@
 
       <Component Type="TransformComponent" X="5" Y="250" />
       
-      <Event Type="TriggerOccursEvent" Name="Player1Scores">
+      <Event Type="TriggerOccursEvent" Trigger="Player1Scores">
         <Action Type="IncrementAction" Key="score" />
       </Event>
     </Entity>
@@ -125,7 +125,7 @@
 
       <Component Type="TransformComponent" X="770" Y="250" />
       
-      <Event Type="TriggerOccursEvent" Name="Player2Scores">
+      <Event Type="TriggerOccursEvent" Trigger="Player2Scores">
         <Action Type="IncrementAction" Key="score" />
       </Event>
     </Entity>
@@ -157,12 +157,12 @@
 	</Entity>
 
     <Entity>
-      <Event Type="AttributeEqualsEvent" Key="paddle1.score" Value="7">
+      <Event Type="AttributeEqualsEvent" Value="paddle1.score" Target="7">
         <Action Type="SetAttributeAction" Key="game.winner" Value="1" />
         <Action Type="ChangeSceneAction" Target="Game Over" />
       </Event>
 
-      <Event Type="AttributeEqualsEvent" Key="paddle2.score" Value="7">
+      <Event Type="AttributeEqualsEvent" Value="paddle2.score" Target="7">
         <Action Type="SetAttributeAction" Key="game.winner" Value="2" />
         <Action Type="ChangeSceneAction" Target="Game Over" />
       </Event>

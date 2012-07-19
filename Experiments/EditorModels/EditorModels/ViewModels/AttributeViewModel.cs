@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using EditorModels.ViewModels.Interfaces;
+﻿using EditorModels.ViewModels.Interfaces;
 
 namespace EditorModels.ViewModels
 {

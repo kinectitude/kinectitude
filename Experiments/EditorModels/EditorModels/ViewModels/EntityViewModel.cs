@@ -10,7 +10,7 @@ namespace EditorModels.ViewModels
 {
     internal delegate void NameChangedEventHandler(EntityViewModel entity, string oldName, string newName);
 
-    internal sealed class EntityViewModel : BaseViewModel, IAttributeScope, IComponentScope
+    internal sealed class EntityViewModel : BaseViewModel, IAttributeScope, IComponentScope, IEventScope
     {
         private string name;
         private IEntityScope scope;
@@ -58,7 +58,7 @@ namespace EditorModels.ViewModels
             private set;
         }
 
-        public ObservableCollection<EventViewModel> Events
+        public ObservableCollection<AbstractEventViewModel> Events
         {
             get;
             private set;
@@ -122,7 +122,7 @@ namespace EditorModels.ViewModels
             Prototypes = new ObservableCollection<EntityViewModel>();
             Attributes = new ObservableCollection<AttributeViewModel>();
             Components = new ObservableCollection<ComponentViewModel>();
-            Events = new ObservableCollection<EventViewModel>();
+            Events = new ObservableCollection<AbstractEventViewModel>();
 
             AddPrototypeCommand = new DelegateCommand(null,
                 (parameter) =>
@@ -246,6 +246,12 @@ namespace EditorModels.ViewModels
                 {
                     InheritComponent(inheritedComponent);
                 }
+
+                prototype.Events.CollectionChanged += OnPrototypeEventsChanged;
+                foreach (AbstractEventViewModel inheritedEvent in prototype.Events)
+                {
+                    InheritEvent(inheritedEvent);
+                }
             }
         }
 
@@ -263,6 +269,12 @@ namespace EditorModels.ViewModels
             foreach (ComponentViewModel inheritedComponent in prototype.Components)
             {
                 DisinheritComponent(inheritedComponent);
+            }
+
+            prototype.Events.CollectionChanged -= OnPrototypeEventsChanged;
+            foreach (AbstractEventViewModel inheritedEvent in prototype.Events)
+            {
+                DisinheritEvent(inheritedEvent);
             }
         }
 
@@ -505,14 +517,24 @@ namespace EditorModels.ViewModels
             return Components.Any(x => x.Type == type);
         }
 
-        public void AddEvent(EventViewModel evt)
+        public void AddEvent(AbstractEventViewModel evt)
         {
+            evt.SetScope(this);
             evt.PluginAdded += OnEventPluginAdded;
             Events.Add(evt);
         }
 
-        public void RemoveEvent(EventViewModel evt)
+        public void RemoveEvent(AbstractEventViewModel evt)
         {
+            if (evt.IsLocal)
+            {
+                PrivateRemoveEvent(evt);
+            }
+        }
+
+        private void PrivateRemoveEvent(AbstractEventViewModel evt)
+        {
+            evt.SetScope(null);
             evt.PluginAdded -= OnEventPluginAdded;
             Events.Remove(evt);
         }
@@ -644,6 +666,43 @@ namespace EditorModels.ViewModels
             if (null != InheritedPropertyChanged)
             {
                 InheritedPropertyChanged(name);
+            }
+        }
+
+        private void OnPrototypeEventsChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            if (args.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (AbstractEventViewModel inheritedEvent in args.NewItems)
+                {
+                    InheritEvent(inheritedEvent);
+                }
+            }
+            else if (args.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (AbstractEventViewModel inheritedEvent in args.OldItems)
+                {
+                    DisinheritEvent(inheritedEvent);
+                }
+            }
+        }
+
+        private void InheritEvent(AbstractEventViewModel evt)
+        {
+            AbstractEventViewModel localEvent = Events.FirstOrDefault(x => x.InheritsFrom(evt));
+            if (null == localEvent)
+            {
+                localEvent = new InheritedEventViewModel(evt);
+                AddEvent(localEvent);
+            }
+        }
+
+        private void DisinheritEvent(AbstractEventViewModel evt)
+        {
+            AbstractEventViewModel localEvent = Events.FirstOrDefault(x => x.InheritsFrom(evt));
+            if (null != localEvent)
+            {
+                PrivateRemoveEvent(localEvent);
             }
         }
     }

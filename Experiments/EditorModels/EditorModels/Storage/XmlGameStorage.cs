@@ -409,7 +409,7 @@ namespace EditorModels.Storage
                 }
             }
 
-            foreach (EventViewModel evt in entity.Events)
+            foreach (AbstractEventViewModel evt in entity.Events)
             {
                 if (evt.IsLocal)
                 {
@@ -441,17 +441,17 @@ namespace EditorModels.Storage
             return element;
         }
 
-        private XElement SerializeEvent(EventViewModel evt)
+        private XElement SerializeEvent(AbstractEventViewModel evt)
         {
             XElement element = new XElement(Constants.Event, new XAttribute(Constants.Type, evt.Type));
 
-            foreach (PropertyViewModel property in evt.Properties)
+            foreach (AbstractPropertyViewModel property in evt.Properties)
             {
                 XAttribute propertyAttribute = SerializeProperty(property);
                 element.Add(propertyAttribute);
             }
 
-            foreach (ActionViewModel action in evt.Actions)
+            foreach (AbstractActionViewModel action in evt.Actions)
             {
                 XElement actionElement = SerializeAction(action);
                 element.Add(actionElement);
@@ -459,7 +459,7 @@ namespace EditorModels.Storage
             return element;
         }
 
-        private XElement SerializeAction(ActionViewModel action)
+        private XElement SerializeAction(AbstractActionViewModel action)
         {
             XElement element = new XElement(Constants.Action, new XAttribute(Constants.Type, action.Type));
 
@@ -471,7 +471,7 @@ namespace EditorModels.Storage
             return element;
         }
 
-        private XAttribute SerializeProperty(PropertyViewModel property)
+        private XAttribute SerializeProperty(AbstractPropertyViewModel property)
         {
             XAttribute propertyAttribute = new XAttribute(property.Name, property.Value);
             return propertyAttribute;

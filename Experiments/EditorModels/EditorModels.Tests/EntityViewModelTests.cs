@@ -334,38 +334,6 @@ namespace EditorModels.Tests
         }
 
         [TestMethod]
-        public void AddEvent()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod]
-        public void RemoveEvent()
-        {
-            Assert.Fail();
-        }
-
-        /*[TestMethod]
-        public void EntityFollowsPrototypeNameChange()
-        {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
-            
-            EntityViewModel otherParent = new EntityViewModel() { Name = "otherParent" };
-            
-            EntityViewModel child = new EntityViewModel();
-            child.AddPrototype(parent);
-            child.AddPrototype(otherParent);
-
-            Assert.AreEqual("parent", child.Entity.Prototypes.ElementAt(0));
-            Assert.AreEqual("otherParent", child.Entity.Prototypes.ElementAt(1));
-
-            parent.Name = "changed";
-
-            Assert.AreEqual("changed", child.Entity.Prototypes.ElementAt(0));
-            Assert.AreEqual("otherParent", child.Entity.Prototypes.ElementAt(1));
-        }*/
-
-        [TestMethod]
         public void CannotAddDuplicateNameInSameScope()
         {
             GameViewModel game = new GameViewModel("Test Game");

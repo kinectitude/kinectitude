@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using EditorModels.ViewModels.Interfaces;
-using System.ComponentModel;
 
 namespace EditorModels.ViewModels
 {

@@ -1,11 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using EditorModels.Base;
-using System.Collections.Generic;
 using EditorModels.ViewModels.Interfaces;
-using System;
-using System.ComponentModel;
 
 namespace EditorModels.ViewModels
 {
