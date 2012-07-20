@@ -1,27 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Kinectitude.Editor.Base;
-using Action = Kinectitude.Editor.Models.Plugins.Action;
-using Kinectitude.Editor.Models.Base;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    internal sealed class ActionViewModel : BaseModel
+    internal class ActionViewModel : AbstractActionViewModel
     {
-        private readonly Entity entity;
-        private readonly Action action;
+        private readonly PluginViewModel plugin;
 
-        /*public bool IsInherited
+        public override IEnumerable<PluginViewModel> Plugins
         {
-            get { return action.p
-        }*/
+            get { return Enumerable.Repeat(plugin, 1); }
+        }
 
-        public ActionViewModel(Entity entity, Action action)
+        [DependsOn("Scope")]
+        public override string Type
         {
-            this.entity = entity;
-            this.action = action;
+            get { return null != scope ? scope.GetDefinedName(plugin) : plugin.ClassName; }
+        }
+
+        public override bool IsInherited
+        {
+            get { return false; }
+        }
+
+        public override bool IsLocal
+        {
+            get { return true; }
+        }
+
+        public ActionViewModel(PluginViewModel plugin)
+        {
+            this.plugin = plugin;
+
+            foreach (string property in plugin.Properties)
+            {
+                AddProperty(new PropertyViewModel(property));
+            }
+        }
+
+        public override bool InheritsFrom(AbstractActionViewModel action)
+        {
+            return false;
         }
     }
 }

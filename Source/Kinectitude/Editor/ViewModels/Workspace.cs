@@ -1,85 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Windows;
-using System.Windows.Input;
 using Kinectitude.Core.Attributes;
 using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Commands.Base;
-using Kinectitude.Editor.Models.Base;
-using Kinectitude.Editor.Models.Plugins;
+using Kinectitude.Editor.Commands;
 using Kinectitude.Editor.Storage;
+using Kinectitude.Editor.Views;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    internal sealed class Workspace : BaseModel, IPluginNamespace
+    internal sealed class Workspace : BaseViewModel
     {
-        private static Workspace instance;
+        private const string PluginDirectory = "Plugins";
+
+        private static Lazy<Workspace> instance = new Lazy<Workspace>();
 
         public static Workspace Instance
         {
-            get
-            {
-                if (null == instance)
-                {
-                    instance = new Workspace();
-                }
-                return instance;
-            }
+            get { return instance.Value; }
         }
-        
-        public const string PluginDirectory = "Plugins";
-
-        private readonly List<PluginViewModel> plugins;
-        private readonly ObservableCollection<BaseModel> _activeItems;
-        private readonly ModelCollection<BaseModel> activeItems;
-        private readonly ResolutionPreset[] resolutionPresets;
 
         private GameViewModel game;
-        private BaseModel currentItem;
-
-        public ICommand NewCommand
-        {
-            get { return new DelegateCommand(null, NewGame); }
-        }
-
-        public ICommand LoadCommand
-        {
-            get { return new DelegateCommand(null, LoadGame); }
-        }
-
-        public ICommand SaveCommand
-        {
-            get { return new DelegateCommand(null, SaveGame); }
-        }
-
-        public ICommand SaveAsCommand
-        {
-            get { return new DelegateCommand(null, SaveGameAs); }
-        }
-
-        public ICommand RevertCommand
-        {
-            get { return new DelegateCommand(null, RevertGame); }
-        }
-
-        public ICommand OpenItemCommand
-        {
-            get { return new DelegateCommand(null, OpenItem); }
-        }
-
-        public ICommand CloseItemCommand
-        {
-            get { return new DelegateCommand(null, CloseItem); }
-        }
-
-        public ICommand ExitCommand
-        {
-            get { return new DelegateCommand(null, Exit); }
-        }
+        private BaseViewModel activeItem;
 
         public GameViewModel Game
         {
@@ -89,258 +33,142 @@ namespace Kinectitude.Editor.ViewModels
                 if (game != value)
                 {
                     game = value;
-                    RaisePropertyChanged("Game");
+                    NotifyPropertyChanged("Game");
                 }
             }
         }
 
-        public IEnumerable<PluginViewModel> Plugins
+        public BaseViewModel ActiveItem
         {
-            get { return plugins; }
-        }
-
-        public IEnumerable<PluginViewModel> ComponentPlugins
-        {
-            get { return plugins.Where(x => x.Descriptor.Type == PluginDescriptor.PluginType.Component); }
-        }
-
-        public BaseModel CurrentItem
-        {
-            get { return currentItem; }
+            get { return activeItem; }
             set
             {
-                if (currentItem != value)
+                if (activeItem != value)
                 {
-                    currentItem = value;
-                    RaisePropertyChanged("CurrentItem");
+                    activeItem = value;
+                    NotifyPropertyChanged("ActiveItem");
                 }
             }
         }
 
-        public ModelCollection<BaseModel> ActiveItems
+        public ObservableCollection<BaseViewModel> OpenItems
         {
-            get { return activeItems; }
+            get;
+            private set;
         }
 
-        public IEnumerable<ResolutionPreset> ResolutionPresets
+        public ObservableCollection<PluginViewModel> Plugins
         {
-            get { return resolutionPresets; }
+            get;
+            private set;
         }
 
-        public ICommand UndoCommand
+        public ICommandHistory CommandHistory
         {
-            get { return CommandHistory.UndoCommand; }
+            get;
+            private set;
         }
 
-        public ICommand RedoCommand
+        public ICommand NewGameCommand
         {
-            get { return CommandHistory.RedoCommand; }
+            get;
+            private set;
         }
 
-        public ObservableStack<IUndoableCommand> UndoableCommands
+        public ICommand LoadGameCommand
         {
-            get { return CommandHistory.UndoableCommands; }
+            get;
+            private set;
         }
 
-        public ObservableStack<IUndoableCommand> RedoableCommands
+        public Workspace()
         {
-            get { return CommandHistory.RedoableCommands; }
-        }
+            OpenItems = new ObservableCollection<BaseViewModel>();
+            Plugins = new ObservableCollection<PluginViewModel>();
+            CommandHistory = new CommandHistory();
 
-        private Workspace()
-        {
-            plugins = new List<PluginViewModel>();
+            NewGameCommand = new DelegateCommand(null, (parameter) => NewGame());
+
+            LoadGameCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    DialogService.ShowLoadDialog(
+                        (result, fileName) =>
+                        {
+                            if (result == true)
+                            {
+                                LoadGame(fileName);
+                            }
+                        }
+                    );
+                }
+            );
 
             Assembly core = typeof(Kinectitude.Core.Base.Component).Assembly;
-            registerTypesFromAssembly(core, true);
+            RegisterPluginsFromAssembly(core);
 
-            string[] files = Directory.GetFiles(Path.Combine(Environment.CurrentDirectory, PluginDirectory), "*.dll");
-            foreach (string file in files)
+            DirectoryInfo path = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, PluginDirectory));
+            if (path.Exists)
             {
-                Assembly asm = Assembly.LoadFrom(file);
-                registerTypesFromAssembly(asm);
-            }
-            NewGame(null);
-
-            _activeItems = new ObservableCollection<BaseModel>();
-            activeItems = new ModelCollection<BaseModel>(_activeItems);
-
-            resolutionPresets = new ResolutionPreset[]
-            {
-                new ResolutionPreset("Standard Definition", 640, 480),
-                new ResolutionPreset("1080p", 1920, 1080),
-                new ResolutionPreset("Custom", 0, 0)
-            };
-        }
-
-        private void registerTypesFromAssembly(Assembly assembly, bool includeInternalTypes = false)
-        {
-            IEnumerable<Type> types = from type in assembly.GetTypes()
-                                      where
-                                      (
-                                          (
-                                              typeof(Kinectitude.Core.Base.Component) != type &&
-                                              typeof(Kinectitude.Core.Base.Component).IsAssignableFrom(type)
-                                          ) ||
-                                          (
-                                              typeof(Kinectitude.Core.Base.Event) != type &&
-                                              typeof(Kinectitude.Core.Base.Event).IsAssignableFrom(type)
-                                          ) ||
-                                          (
-                                              typeof(Kinectitude.Core.Base.Action) != type &&
-                                              typeof(Kinectitude.Core.Base.Action).IsAssignableFrom(type)
-                                          )
-                                      ) &&
-                                      System.Attribute.IsDefined(type, typeof(PluginAttribute))
-                                      select type;
-
-            foreach (Type type in types)
-            {
-                PluginDescriptor descriptor = new PluginDescriptor(type);
-                plugins.Add(new PluginViewModel(descriptor));
+                FileInfo[] files = path.GetFiles("*.dll");
+                foreach (FileInfo file in files)
+                {
+                    Assembly asm = Assembly.LoadFrom(file.FullName);
+                    RegisterPluginsFromAssembly(asm);
+                }
             }
         }
 
-        public PluginDescriptor GetPluginDescriptor(string name)
+        public void NewGame()
         {
-            var descriptors = from viewModel in plugins select viewModel.Descriptor;
+            Game = new GameViewModel("Untitled Game");
+            Game.AddScene(new SceneViewModel("Scene 1"));
+        }
 
-            PluginDescriptor ret = null;
-            foreach (PluginDescriptor descriptor in descriptors)
+        public void LoadGame(string fileName)
+        {
+            IGameStorage storage = new XmlGameStorage(fileName);
+            Game = storage.LoadGame();
+        }
+
+        private void RegisterPluginsFromAssembly(Assembly assembly)
+        {
+            var types = from type in assembly.GetTypes()
+                        where System.Attribute.IsDefined(type, typeof(PluginAttribute)) &&
+                        (
+                            typeof(Kinectitude.Core.Base.Component) != type && typeof(Kinectitude.Core.Base.Component).IsAssignableFrom(type) ||
+                            typeof(Kinectitude.Core.Base.Event) != type && typeof(Kinectitude.Core.Base.Event).IsAssignableFrom(type) ||
+                            typeof(Kinectitude.Core.Base.Action) != type && typeof(Kinectitude.Core.Base.Action).IsAssignableFrom(type) ||
+                            typeof(Kinectitude.Core.Base.IManager) != type && typeof(Kinectitude.Core.Base.IManager).IsAssignableFrom(type)
+                        )
+                        select new PluginViewModel(type);
+
+            foreach (PluginViewModel plugin in types)
             {
-                if (descriptor.ClassName == name)
-                {
-                    ret = descriptor;
-                    break;
-                }
+                AddPlugin(plugin);
+            }
+        }
 
-                if (descriptor.File == "Kinectitude.Core.dll")
-                {
-                    string shortName = descriptor.ClassName.Substring(descriptor.ClassName.LastIndexOf('.') + 1);
-                    if (shortName == name)
-                    {
-                        ret = descriptor;
-                        break;
-                    }
-                }
+        public void AddPlugin(PluginViewModel plugin)
+        {
+            Plugins.Add(plugin);
+        }
+
+        public void RemovePlugin(PluginViewModel plugin)
+        {
+            Plugins.Remove(plugin);
+        }
+
+        public PluginViewModel GetPlugin(string name)
+        {
+            PluginViewModel plugin = Plugins.FirstOrDefault(x => x.ClassName == name);
+            
+            if (null == plugin)
+            {
+                plugin = Plugins.FirstOrDefault(x => x.File == typeof(Kinectitude.Core.Base.Component).Module.Name && x.ShortName == name);
             }
             
-            if (null == ret)
-            {
-                throw new PluginNotLoadedException(name);
-            }
-
-            return ret;
-        }
-
-        public void NewGame(object parameter)
-        {
-            Game game = new Game(this) { Name = "Untitled Game", Width = 800, Height = 600 };
-            Scene scene = new Scene() { Name = "Scene 1" };
-            game.AddScene(scene);
-            game.FirstScene = scene;
-
-            GameViewModel viewModel = new GameViewModel(game, this);
-            Game = viewModel;
-        }
-
-        public void LoadGame(object parameter)
-        {
-            Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
-            dialog.FileName = string.Empty;
-            dialog.DefaultExt = ".xml";
-            dialog.Filter = "Kinectitude XML Files (.xml)|*.xml";
-
-            Nullable<bool> result = dialog.ShowDialog();
-
-            if (result == true)
-            {
-                PrivateLoadGame(dialog.FileName);
-            }
-        }
-
-        public void RevertGame(object parameter)
-        {
-            if (null != Game.FileName)
-            {
-                PrivateLoadGame(Game.FileName);
-            }
-        }
-
-        private void PrivateLoadGame(string fileName)
-        {
-            IGameStorage storage = new XmlGameStorage(fileName, this);
-
-            try
-            {
-                Game game = storage.LoadGame();
-
-                GameViewModel gameViewModel = new GameViewModel(game, this);
-                gameViewModel.FileName = fileName;
-                Game = gameViewModel;
-            }
-            catch (PluginNotLoadedException e)
-            {
-                System.Windows.MessageBox.Show(e.Message);
-            }
-        }
-
-        public void SaveGame(object parameter)
-        {
-            if (null == Game.FileName)
-            {
-                SaveGameAs(parameter);
-            }
-            else
-            {
-                PrivateSaveGame(Game.FileName);
-            }
-        }
-
-        public void SaveGameAs(object parameter)
-        {
-            Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
-            dialog.FileName = string.Empty;
-            dialog.DefaultExt = ".xml";
-            dialog.Filter = "Kinectitude XML Files (.xml)|*.xml";
-
-            Nullable<bool> result = dialog.ShowDialog();
-
-            if (result == true)
-            {
-                Game.FileName = dialog.FileName;
-                PrivateSaveGame(Game.FileName);
-            }
-        }
-
-        private void PrivateSaveGame(string fileName)
-        {
-            IGameStorage storage = new XmlGameStorage(fileName, this);
-            storage.SaveGame(Game.Game);
-        }
-
-        public void OpenItem(object parameter)
-        {
-            BaseModel baseModel = parameter as BaseModel;
-            if (null != baseModel && !_activeItems.Contains(baseModel))
-            {
-                _activeItems.Add(baseModel);
-            }
-            CurrentItem = baseModel;
-        }
-
-        public void CloseItem(object parameter)
-        {
-            BaseModel baseModel = parameter as BaseModel;
-            if (null != baseModel)
-            {
-                _activeItems.Remove(baseModel);
-            }
-        }
-
-        public void Exit(object parameter)
-        {
-            Application.Current.Shutdown();
+            return plugin;
         }
     }
 }

@@ -1,10 +1,10 @@
-﻿using Kinectitude.Editor.Models.Base;
+﻿using Kinectitude.Editor.ViewModels;
 
 namespace Kinectitude.Editor.Storage
 {
     internal interface IGameStorage
     {
-        Game LoadGame();
-        void SaveGame(Game game);
+        GameViewModel LoadGame();
+        void SaveGame(GameViewModel game);
     }
 }

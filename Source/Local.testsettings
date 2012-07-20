@@ -25,13 +25,7 @@
           <Configuration>
             <CodeCoverage xmlns="">
               <Regular>
-<<<<<<< Updated upstream
-                <CodeCoverageItem binaryFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Editor.exe" pdbFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Editor.instr.pdb" instrumentInPlace="true" />
-                <CodeCoverageItem binaryFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Core.dll" pdbFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Core.instr.pdb" instrumentInPlace="true" />
-=======
                 <CodeCoverageItem binaryFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Editor.exe" pdbFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Editor.pdb" instrumentInPlace="true" />
-                <CodeCoverageItem binaryFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Core.dll" pdbFile="C:\Users\Brandon\Development\Kinectitude\Build\Test\Kinectitude.Core.pdb" instrumentInPlace="true" />
->>>>>>> Stashed changes
               </Regular>
             </CodeCoverage>
           </Configuration>

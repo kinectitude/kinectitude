@@ -1,643 +1,709 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
-using System.Windows.Input;
 using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Commands.Base;
-using Kinectitude.Editor.Commands.Entity;
-using Kinectitude.Editor.Models.Base;
-using Kinectitude.Editor.Models.Plugins;
-using Kinectitude.Editor.Views;
+using Kinectitude.Editor.ViewModels.Interfaces;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    internal sealed class AttributeAvailableEventArgs : EventArgs
+    internal delegate void NameChangedEventHandler(EntityViewModel entity, string oldName, string newName);
+
+    internal sealed class EntityViewModel : BaseViewModel, IAttributeScope, IComponentScope, IEventScope
     {
-        private readonly string oldKey;
-        private readonly string newKey;
+        private string name;
+        private IEntityScope scope;
+        private int nextAttribute;
 
-        public string OldKey
-        {
-            get { return oldKey; }
-        }
-
-        public string NewKey
-        {
-            get { return newKey; }
-        }
-
-        public AttributeAvailableEventArgs(string oldKey, string newKey)
-        {
-            this.oldKey = oldKey;
-            this.newKey = newKey;
-        }
-    }
-
-    internal sealed class EntityViewModel : BaseModel
-    {
-        //private const string RenderComponent = "Kinectitude.Render.RenderComponent";
-        //private const string Shape = "Shape";
-        //private const string Ellipse = "Ellipse";
-
-        private static readonly Dictionary<Entity, EntityViewModel> entities;
-
-        static EntityViewModel()
-        {
-            entities = new Dictionary<Entity, EntityViewModel>();
-        }
-
-        public static EntityViewModel GetViewModel(Entity entity)
-        {
-            EntityViewModel viewModel = null;
-            entities.TryGetValue(entity, out viewModel);
-            if (null == viewModel)
-            {
-                viewModel = new EntityViewModel(entity);
-                entities[entity] = viewModel;
-            }
-            return viewModel;
-        }
-
-        private int autoIncrement;
-        private PluginViewModel selectedComponent;
-        private readonly Entity entity;
-        private readonly ObservableCollection<EntityViewModel> _prototypes;
-        private readonly ObservableCollection<EntityAttributeViewModel> _attributes;
-        private readonly ObservableCollection<ComponentViewModel> _components;
-        private readonly ObservableCollection<EventViewModel> _events;
-        private readonly ModelCollection<EntityViewModel> prototypes;
-        private readonly ModelCollection<EntityAttributeViewModel> attributes;
-        private readonly ModelCollection<ComponentViewModel> components;
-        private readonly ModelCollection<EventViewModel> events;
-
-        public event EventHandler<AttributeAvailableEventArgs> AttributeAvailable = delegate { };
-
-        public Entity Entity
-        {
-            get { return entity; }
-        }
+        public event ScopeChangedEventHandler ScopeChanged;
+        public event PluginAddedEventHandler PluginAdded;
+        public event DefineAddedEventHandler DefineAdded;
+        public event DefinedNameChangedEventHandler DefineChanged;
+        public event AttributeEventHandler InheritedAttributeAdded;
+        public event AttributeEventHandler InheritedAttributeRemoved;
+        public event AttributeEventHandler InheritedAttributeChanged;
+        public event ComponentEventHandler InheritedComponentAdded;
+        public event ComponentEventHandler InheritedComponentRemoved;
+        public event PropertyEventHandler InheritedPropertyChanged;
 
         public string Name
         {
-            get { return entity.Name; }
+            get { return name; }
             set
             {
-                if (entity.Name != value)
+                if (name != value && !EntityNameExists(value))
                 {
-                    CommandHistory.LogCommand(new RenameEntityCommand(this, value));
-                    entity.Name = value;
-                    RaisePropertyChanged("Name");
+                    name = value;
+                    NotifyPropertyChanged("Name");
                 }
             }
         }
 
-        public ModelCollection<EntityAttributeViewModel> Attributes
+        public ObservableCollection<EntityViewModel> Prototypes
         {
-            get { return attributes; }
+            get;
+            private set;
         }
 
-        public ModelCollection<ComponentViewModel> Components
+        public ObservableCollection<AttributeViewModel> Attributes
         {
-            get { return components; }
+            get;
+            private set;
         }
 
-        public ModelCollection<EventViewModel> Events
+        public ObservableCollection<ComponentViewModel> Components
         {
-            get { return events; }
+            get;
+            private set;
         }
 
-        public PluginViewModel SelectedComponent
+        public ObservableCollection<AbstractEventViewModel> Events
         {
-            get { return selectedComponent; }
-            set
-            {
-                if (selectedComponent != value)
-                {
-                    selectedComponent = value;
-                    RaisePropertyChanged("SelectedComponent");
-                }
-            }
+            get;
+            private set;
         }
 
-        /*public int X
+        public IEnumerable<PluginViewModel> Plugins
         {
-            get
-            {
-                Attribute attribute = entity.GetAttribute("x");
-                return null != attribute ? entity.GetAttribute("x").Value : 0;
-            }
-            set
-            {
-                entity.SetAttribute("x", value);
-                RaisePropertyChanged("X");
-            }
-        }
-
-        public int Y
-        {
-            get
-            {
-                Attribute attribute = entity.GetAttribute("y");
-                return null != attribute ? entity.GetAttribute("y").Value : 0;
-            }
-            set
-            {
-                entity.SetAttribute("y", value);
-                RaisePropertyChanged("Y");
-            }
-        }
-
-        public int Width
-        {
-            get
-            {
-                Attribute attribute = entity.GetAttribute("width");
-                return null != attribute ? entity.GetAttribute("width").Value : 0;
-            }
-            set
-            {
-                entity.SetAttribute("width", value);
-                RaisePropertyChanged("Width");
-            }
-        }
-
-        public int Height
-        {
-            get
-            {
-                Attribute attribute = entity.GetAttribute("height");
-                return null != attribute ? entity.GetAttribute("height").Value : 0;
-            }
-            set
-            {
-                entity.GetAttribute("height").Value = value;
-                RaisePropertyChanged("Height");
-            }
-        }
-
-        public bool IsRenderable
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public bool IsRectangular
-        {
-            get
-            {
-                bool ret = true;
-                Component component = entity.GetComponent("Kinectitude.Render.RenderComponent");
-                if (null != component)
-                {
-                    TextProperty property = component.GetProperty<TextProperty>("Shape");
-                    if (null != property && property.Value == "Ellipse")
-                    {
-                        ret = false;
-                    }
-                }
-
-                return !HasText && ret;
-            }
-        }
-
-        public bool IsElliptical
-        {
-            get { return !HasText && !IsRectangular; }
-        }
-
-        public string Text
-        {
-            get
-            {
-                string text = string.Empty;
-                Component component = entity.GetComponent("Kinectitude.Render.TextRenderComponent");
-                if (null != component)
-                {
-                    TextProperty property = component.GetProperty<TextProperty>("Value");
-                    if (null != property)
-                    {
-                        text = property.Value;
-                    }
-                }
-
-                return text;
-            }
-        }
-
-        public bool HasText
-        {
-            get { return Text != string.Empty; }
-        }
-
-        public string Color
-        {
-            get
-            {
-                string color = string.Empty;
-                Component component = entity.GetComponent("Kinectitude.Render.RenderComponent");
-                if (null != component)
-                {
-                    TextProperty property = component.GetProperty<TextProperty>("Fillcolor");
-                    color = property.Value ?? color;
-                }
-                if (color == string.Empty)
-                {
-                    component = entity.GetComponent("Kinectitude.Render.TextRenderComponent");
-                    if (null != component)
-                    {
-                        TextProperty property = component.GetProperty<TextProperty>("Fontcolor");
-                        color = property.Value ?? color;
-                    }
-                }
-
-                return color;
-            }
-        }*/
-
-        public ModelCollection<EntityViewModel> Prototypes
-        {
-            get { return prototypes; }
-        }
-
-        public ICommand AddAttributeCommand
-        {
-            get { return new DelegateCommand(null, ExecuteAddAttributeCommand); }
-        }
-
-        public ICommand RemoveAttributeCommand
-        {
-            get { return new DelegateCommand(null, ExecuteRemoveAttributeCommand); }
-        }
-
-        public ICommand AddComponentCommand
-        {
-            get { return new DelegateCommand(null, ExecuteAddComponentCommand); }
-        }
-
-        public ICommand RemoveComponentCommand
-        {
-            get { return new DelegateCommand(null, ExecuteRemoveComponentCommand); }
+            get { return Components.Select(x => x.Plugin).Union(Events.SelectMany(x => x.Plugins)); }
         }
 
         public ICommand AddPrototypeCommand
         {
-            get { return new DelegateCommand(null, ExecuteAddPrototypeCommand); }
+            get;
+            private set;
         }
 
         public ICommand RemovePrototypeCommand
         {
-            get { return new DelegateCommand(null, ExecuteRemovePrototypeCommand); }
+            get;
+            private set;
         }
 
-        public ICommand ConvertToPrototypeCommand
+        public ICommand AddAttributeCommand
         {
-            get { return new DelegateCommand(null, ExecuteConvertToPrototypeCommand); }
+            get;
+            private set;
+        }
+
+        public ICommand RemoveAttributeCommand
+        {
+            get;
+            private set;
+        }
+
+        public ICommand AddComponentCommand
+        {
+            get;
+            private set;
+        }
+
+        public ICommand RemoveComponentCommand
+        {
+            get;
+            private set;
         }
 
         public ICommand AddEventCommand
         {
-            get { return new DelegateCommand(null, ExecuteAddEventCommand); }
+            get;
+            private set;
         }
 
         public ICommand RemoveEventCommand
         {
-            get { return new DelegateCommand(null, ExecuteRemoveEventCommand); }
+            get;
+            private set;
         }
 
-        private EntityViewModel(Entity entity)
+        public EntityViewModel()
         {
-            this.entity = entity;
+            Prototypes = new ObservableCollection<EntityViewModel>();
+            Attributes = new ObservableCollection<AttributeViewModel>();
+            Components = new ObservableCollection<ComponentViewModel>();
+            Events = new ObservableCollection<AbstractEventViewModel>();
 
-            var prototypeViewModels = from prototype in entity.Prototypes select EntityViewModel.GetViewModel(prototype);
-            var attributeViewModels = from attribute in entity.Attributes select new EntityAttributeViewModel(entity, attribute.Key);
-            var componentViewModels = from component in entity.Components select new ComponentViewModel(entity, component.Descriptor);
-            var eventViewModels = from evt in entity.Events select new EventViewModel(evt);
-
-            _prototypes = new ObservableCollection<EntityViewModel>();
-            _attributes = new ObservableCollection<EntityAttributeViewModel>(attributeViewModels);
-            _components = new ObservableCollection<ComponentViewModel>(componentViewModels);
-            _events = new ObservableCollection<EventViewModel>(eventViewModels);
-
-            foreach (EntityViewModel prototype in prototypeViewModels)
-            {
-                PrivateAddPrototype(prototype);
-            }
-
-            prototypes = new ModelCollection<EntityViewModel>(_prototypes);
-            attributes = new ModelCollection<EntityAttributeViewModel>(_attributes);
-            components = new ModelCollection<ComponentViewModel>(_components);
-            events = new ModelCollection<EventViewModel>(_events);
-        }
-
-        public void ExecuteAddAttributeCommand(object parameter)
-        {
-            EntityAttributeViewModel attribute = new EntityAttributeViewModel(entity, string.Format("attribute{0}", autoIncrement++));
-            AddAttribute(attribute);
-        }
-
-        public void ExecuteRemoveAttributeCommand(object parameter)
-        {
-            EntityAttributeViewModel attribute = parameter as EntityAttributeViewModel;
-            if (null != attribute)
-            {
-                RemoveAttribute(attribute);
-            }
-        }
-
-        public void ExecuteAddComponentCommand(object parameter)
-        {
-            ModalDialogService.ShowDialog<EntityViewModel>(ModalDialogService.Constants.ComponentDialog, this, (result) =>
-            {
-                if (true == result)
+            AddPrototypeCommand = new DelegateCommand(null,
+                (parameter) =>
                 {
-                    PluginDescriptor descriptor = selectedComponent.Descriptor;
-                    ComponentViewModel componentViewModel = new ComponentViewModel(entity, descriptor);
-                    AddComponent(componentViewModel);
+                    EntityViewModel prototype = parameter as EntityViewModel;
+                    if (null != prototype)
+                    {
+                        AddPrototype(prototype);
+                    }
                 }
-            });
-        }
+            );
 
-        public void ExecuteRemoveComponentCommand(object parameter)
-        {
-
-        }
-
-        public void ExecuteAddPrototypeCommand(object parameter)
-        {
-            EntityViewModel entityViewModel = parameter as EntityViewModel;
-            if (null != entityViewModel)
-            {
-                AddPrototype(entityViewModel);
-            }
-        }
-
-        public void ExecuteRemovePrototypeCommand(object parameter)
-        {
-            EntityViewModel entityViewModel = parameter as EntityViewModel;
-            if (null != entityViewModel)
-            {
-                RemovePrototype(entityViewModel);
-            }
-        }
-
-        public void ExecuteConvertToPrototypeCommand(object parameter)
-        {
-
-        }
-
-        public void ExecuteAddEventCommand(object parameter)
-        {
-
-        }
-
-        public void ExecuteRemoveEventCommand(object parameter)
-        {
-            
-        }
-
-        public void AddAttribute(EntityAttributeViewModel attribute)
-        {
-            CommandHistory.LogCommand(new AddAttributeCommand(this, attribute));
-            attribute.AddAttribute();
-            _attributes.Add(attribute);
-        }
-
-        public void RemoveAttribute(EntityAttributeViewModel attribute)
-        {
-            CommandHistory.LogCommand(new RemoveAttributeCommand(this, attribute));
-            attribute.RemoveAttribute();
-            _attributes.Remove(attribute);
-        }
-
-        public void AddPrototype(EntityViewModel entityViewModel)
-        {
-            CommandHistory.LogCommand(new AddPrototypeCommand(this, entityViewModel));
-            entity.AddPrototype(entityViewModel.Entity);
-            PrivateAddPrototype(entityViewModel);
-        }
-
-        public void RemovePrototype(EntityViewModel entityViewModel)
-        {
-            CommandHistory.LogCommand(new RemovePrototypeCommand(this, entityViewModel));
-            entity.RemovePrototype(entityViewModel.Entity);
-            PrivateRemovePrototype(entityViewModel);
-        }
-
-        public void AddComponent(ComponentViewModel componentViewModel)
-        {
-            //CommandHistory.LogCommand(new AddComponentCommand(this, componentViewModel));
-            componentViewModel.AddComponent();
-            _components.Add(componentViewModel);
-        }
-
-        public void RemoveComponent(ComponentViewModel componentViewModel)
-        {
-            //CommandHistory.LogCommand(new RemoveComponentCommand(this, componentViewModel));
-            componentViewModel.RemoveComponent();
-            _components.Remove(componentViewModel);
-        }
-
-        public EntityAttributeViewModel GetEntityAttributeViewModel(string key)
-        {
-            return attributes.FirstOrDefault(x => x.Key == key);
-        }
-
-        public ComponentViewModel GetComponentViewModel(PluginDescriptor descriptor)
-        {
-            return components.FirstOrDefault(x => x.Descriptor == descriptor);
-        }
-
-        private void PrivateAddPrototype(EntityViewModel prototype)
-        {
-            prototype.AttributeAvailable += OnAttributeAvailable;
-            prototype.Attributes.CollectionChanged += OnAttributesChanged;
-            prototype.Components.CollectionChanged += OnComponentsChanged;
-            prototype.Events.CollectionChanged += OnEventsChanged;
-
-            foreach (EntityAttributeViewModel inheritedAttribute in prototype.Attributes)
-            {
-                EntityAttributeViewModel localAttribute = _attributes.FirstOrDefault(x => x.Key == inheritedAttribute.Key);
-                if (null == localAttribute)
+            RemovePrototypeCommand = new DelegateCommand(null,
+                (parameter) =>
                 {
-                    localAttribute = new EntityAttributeViewModel(entity, inheritedAttribute.Key);
-                    _attributes.Add(localAttribute);
+                    EntityViewModel prototype = parameter as EntityViewModel;
+                    if (null != prototype)
+                    {
+                        RemovePrototype(prototype);
+                    }
                 }
-                localAttribute.FindInheritedViewModel();
+            );
+
+            AddAttributeCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    AttributeViewModel attribute = new AttributeViewModel(GetNextAttributeKey());
+                    AddAttribute(attribute);
+                }
+            );
+
+            RemoveAttributeCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    RemoveAttribute(parameter as AttributeViewModel);
+                }
+            );
+
+            AddComponentCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    PluginViewModel plugin = parameter as PluginViewModel;
+                    if (null != plugin)
+                    {
+                        ComponentViewModel component = new ComponentViewModel(plugin);
+                        AddComponent(component);
+                    }
+                }
+            );
+
+            RemoveComponentCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    ComponentViewModel component = parameter as ComponentViewModel;
+                    if (null != component)
+                    {
+                        RemoveComponent(component);
+                    }
+                }
+            );
+
+            AddEventCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    PluginViewModel plugin = parameter as PluginViewModel;
+                    if (null != plugin)
+                    {
+                        EventViewModel evt = new EventViewModel(plugin);
+                        AddEvent(evt);
+                    }
+                }
+            );
+
+            RemoveEventCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    EventViewModel evt = parameter as EventViewModel;
+                    if (null != evt)
+                    {
+                        RemoveEvent(evt);
+                    }
+                }
+            );
+        }
+
+        public void SetScope(IEntityScope scope)
+        {
+            if (null != this.scope)
+            {
+                this.scope.DefineAdded -= OnDefineAdded;
+                this.scope.DefineChanged -= OnDefinedNameChanged;
+                this.scope.ScopeChanged -= OnScopeChanged;
             }
 
-            // TODO components and events
+            this.scope = scope;
 
+            if (null != this.scope)
+            {
+                this.scope.DefineAdded += OnDefineAdded;
+                this.scope.DefineChanged += OnDefinedNameChanged;
+                this.scope.ScopeChanged += OnScopeChanged;
+            }
+
+            NotifyScopeChanged();
+        }
+
+        public void AddPrototype(EntityViewModel prototype)
+        {
+            if (null != prototype.Name)
+            {
+                Prototypes.Add(prototype);
+
+                prototype.Attributes.CollectionChanged += OnPrototypeAttributesChanged;
+                foreach (AttributeViewModel inheritedAttribute in prototype.Attributes)
+                {
+                    InheritAttribute(inheritedAttribute);
+                }
+
+                prototype.Components.CollectionChanged += OnPrototypeComponentsChanged;
+                foreach (ComponentViewModel inheritedComponent in prototype.Components)
+                {
+                    InheritComponent(inheritedComponent);
+                }
+
+                prototype.Events.CollectionChanged += OnPrototypeEventsChanged;
+                foreach (AbstractEventViewModel inheritedEvent in prototype.Events)
+                {
+                    InheritEvent(inheritedEvent);
+                }
+            }
+        }
+
+        public void RemovePrototype(EntityViewModel prototype)
+        {
+            Prototypes.Remove(prototype);
+
+            prototype.Attributes.CollectionChanged -= OnPrototypeAttributesChanged;
+            foreach (AttributeViewModel inheritedAttribute in prototype.Attributes)
+            {
+                DisinheritAttribute(inheritedAttribute);
+            }
+
+            prototype.Components.CollectionChanged -= OnPrototypeComponentsChanged;
             foreach (ComponentViewModel inheritedComponent in prototype.Components)
             {
-                ComponentViewModel localComponent = _components.FirstOrDefault(x => x.Descriptor == inheritedComponent.Descriptor);
-                if (null == localComponent)
-                {
-                    localComponent = new ComponentViewModel(entity, inheritedComponent.Descriptor);
-                    _components.Add(localComponent);
-                }
+                DisinheritComponent(inheritedComponent);
             }
 
-            foreach (EventViewModel inheritedEvent in prototype.Events)
+            prototype.Events.CollectionChanged -= OnPrototypeEventsChanged;
+            foreach (AbstractEventViewModel inheritedEvent in prototype.Events)
             {
-
+                DisinheritEvent(inheritedEvent);
             }
-
-            _prototypes.Add(prototype);
         }
 
-        private void PrivateRemovePrototype(EntityViewModel prototype)
+        private void InheritAttribute(AttributeViewModel inheritedAttribute)
         {
-            prototype.AttributeAvailable -= OnAttributeAvailable;
-            prototype.Attributes.CollectionChanged -= OnAttributesChanged;
-            prototype.Components.CollectionChanged -= OnComponentsChanged;
-            prototype.Events.CollectionChanged -= OnEventsChanged;
+            inheritedAttribute.KeyChanged += OnPrototypeAttributeKeyChanged;
 
-            foreach (EntityAttributeViewModel inheritedAttribute in prototype.Attributes)
+            AttributeViewModel localAttribute = GetAttribute(inheritedAttribute.Key);
+            if (null == localAttribute)
             {
-                EntityAttributeViewModel localAttribute = _attributes.FirstOrDefault(x => x.Key == inheritedAttribute.Key);
-                if (null != localAttribute)
-                {
-                    localAttribute.FindInheritedViewModel();
-                }
+                localAttribute = new AttributeViewModel(inheritedAttribute.Key) { IsInherited = true };
+                AddAttribute(localAttribute);
             }
 
-            foreach (ComponentViewModel inheritedComponent in prototype.Components)
+            if (null != InheritedAttributeAdded)
             {
-                ComponentViewModel localComponent = _components.FirstOrDefault(x => x.Descriptor == inheritedComponent.Descriptor);
-                if (null != localComponent)
-                {
-                    // TODO Recalc parent
-                }
+                InheritedAttributeAdded(inheritedAttribute.Key);
             }
-
-            _prototypes.Remove(prototype);
         }
 
-        private void OnAttributesChanged(object sender, NotifyCollectionChangedEventArgs args)
+        private void DisinheritAttribute(AttributeViewModel inheritedAttribute)
+        {
+            inheritedAttribute.KeyChanged -= OnPrototypeAttributeKeyChanged;
+
+            AttributeViewModel localAttribute = GetAttribute(inheritedAttribute.Key);
+            if (null != localAttribute && localAttribute.IsInherited)
+            {
+                RemoveAttribute(localAttribute);
+            }
+
+            if (null != InheritedAttributeRemoved)
+            {
+                InheritedAttributeRemoved(inheritedAttribute.Key);
+            }   
+        }
+
+        private void OnPrototypeAttributesChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
             if (args.Action == NotifyCollectionChangedAction.Add)
             {
-                foreach (EntityAttributeViewModel inheritedAttribute in args.NewItems)
+                foreach (AttributeViewModel inheritedAttribute in args.NewItems)
                 {
-                    EntityAttributeViewModel localAttribute = _attributes.FirstOrDefault(x => x.Key == inheritedAttribute.Key);
-                    if (null == localAttribute)
+                    InheritAttribute(inheritedAttribute);
+                }
+            }
+
+            if (args.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (AttributeViewModel inheritedAttribute in args.OldItems)
+                {
+                    DisinheritAttribute(inheritedAttribute);
+                }
+            }
+        }
+
+        private void OnPrototypeAttributeKeyChanged(string oldKey, string newKey)
+        {
+            AttributeViewModel inheritedAttributeWithOldKey = null;
+
+            foreach (EntityViewModel prototype in Prototypes)
+            {
+                inheritedAttributeWithOldKey = prototype.GetAttribute(oldKey);
+                if (null != inheritedAttributeWithOldKey)
+                {
+                    break;
+                }
+            }
+
+            if (null == inheritedAttributeWithOldKey)
+            {
+                AttributeViewModel localAttribute = GetAttribute(oldKey);
+                if (null != localAttribute && localAttribute.IsInherited)
+                {
+                    RemoveAttribute(localAttribute);
+
+                    if (null != InheritedAttributeRemoved)
                     {
-                        _attributes.Add(new EntityAttributeViewModel(entity, inheritedAttribute.Key));
+                        InheritedAttributeRemoved(oldKey);
                     }
-                    else
-                    {
-                        localAttribute.FindInheritedViewModel();
-                    }
+                }
+            }
+            else if (null != InheritedAttributeChanged)
+            {
+                InheritedAttributeChanged(oldKey);
+            }
+
+            AttributeViewModel localAttributeWithNewKey = GetAttribute(newKey);
+            if (null == localAttributeWithNewKey)
+            {
+                localAttributeWithNewKey = new AttributeViewModel(newKey) { IsInherited = true };
+                AddAttribute(localAttributeWithNewKey);
+
+                if (null != InheritedAttributeAdded)
+                {
+                    InheritedAttributeAdded(newKey);
+                }
+            }
+            else if (null != InheritedAttributeChanged)
+            {
+                InheritedAttributeChanged(newKey);
+            }
+        }
+
+        private void OnLocalAttributeKeyChanged(string oldKey, string newKey)
+        {
+            AttributeViewModel inheritedAttributeWithOldKey = null;
+
+            foreach (EntityViewModel prototype in Prototypes)
+            {
+                inheritedAttributeWithOldKey = prototype.GetAttribute(oldKey);
+                if (null != inheritedAttributeWithOldKey)
+                {
+                    InheritAttribute(inheritedAttributeWithOldKey);
+                }
+            }
+        }
+
+        public AttributeViewModel GetAttribute(string key)
+        {
+            return Attributes.FirstOrDefault(x => x.Key == key);
+        }
+
+        public void AddAttribute(AttributeViewModel attribute)
+        {
+            if (!HasLocalAttribute(attribute.Key))
+            {
+                attribute.SetScope(this);
+                attribute.KeyChanged += OnLocalAttributeKeyChanged;
+                Attributes.Add(attribute);
+            }
+        }
+
+        public void RemoveAttribute(AttributeViewModel attribute)
+        {
+            if (attribute.IsLocal || attribute.IsInherited && !attribute.CanInherit)
+            {
+                attribute.SetScope(null);
+                attribute.KeyChanged -= OnLocalAttributeKeyChanged;
+                Attributes.Remove(attribute);
+            }
+        }
+
+        private void InheritComponent(ComponentViewModel inheritedComponent)
+        {
+            inheritedComponent.LocalPropertyChanged += OnPrototypeComponentLocalPropertyChanged;
+
+            ComponentViewModel localComponent = GetComponentByRole(inheritedComponent.Provides);
+            if (null == localComponent)
+            {
+                localComponent = new ComponentViewModel(inheritedComponent.Plugin);
+                AddComponent(localComponent);
+            }
+
+            if (null != InheritedComponentAdded)
+            {
+                InheritedComponentAdded(inheritedComponent.Plugin);
+            }
+        }
+
+        private void DisinheritComponent(ComponentViewModel inheritedComponent)
+        {
+            inheritedComponent.LocalPropertyChanged -= OnPrototypeComponentLocalPropertyChanged;
+
+            ComponentViewModel localComponent = GetComponentByRole(inheritedComponent.Provides);
+            if (null != localComponent && !localComponent.HasLocalProperties)
+            {
+                RemoveComponent(localComponent);
+            }
+
+            if (null != InheritedComponentRemoved)
+            {
+                InheritedComponentRemoved(inheritedComponent.Plugin);
+            }
+        }
+
+        public void OnPrototypeComponentsChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            if (args.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (ComponentViewModel component in args.NewItems)
+                {
+                    InheritComponent(component);
                 }
             }
             else if (args.Action == NotifyCollectionChangedAction.Remove)
             {
-                foreach (EntityAttributeViewModel inheritedAttribute in args.OldItems)
+                foreach (ComponentViewModel component in args.OldItems)
                 {
-                    EntityAttributeViewModel localAttribute = _attributes.FirstOrDefault(x => x.Key == inheritedAttribute.Key);
-                    if (null != localAttribute)
-                    {
-                        if (localAttribute.IsInherited)
-                        {
-                            _attributes.Remove(localAttribute);
-                        }
-                        else
-                        {
-                            localAttribute.FindInheritedViewModel();
-                        }
-                    }
+                    DisinheritComponent(component);
                 }
             }
         }
 
-        private void OnComponentsChanged(object sender, NotifyCollectionChangedEventArgs args)
+        public void AddComponent(ComponentViewModel component)
+        {
+            if (!HasComponentWithRole(component.Provides))
+            {
+                foreach (string require in component.Requires)
+                {
+                    ComponentViewModel requiredComponent = new ComponentViewModel(GetPlugin(require));
+                    AddComponent(requiredComponent);
+                }
+
+                component.SetScope(this);
+                Components.Add(component);
+
+                NotifyPluginAdded(component.Plugin);
+            }
+        }
+
+        public void RemoveComponent(ComponentViewModel component)
+        {
+            if (component.IsRoot)
+            {
+                if (!Components.Any(x => x.DependsOn(component)))
+                {
+                    component.SetScope(null);
+                    Components.Remove(component);
+                }
+            }
+        }
+
+        public ComponentViewModel GetComponentByRole(string provides)
+        {
+            return Components.FirstOrDefault(x => x.Provides == provides);
+        }
+
+        public ComponentViewModel GetComponentByType(string type)
+        {
+            return Components.FirstOrDefault(x => x.Type == type);
+        }
+
+        public bool HasComponentWithRole(string provides)
+        {
+            return Components.Any(x => x.Provides == provides);
+        }
+
+        public bool HasComponentWithType(string type)
+        {
+            return Components.Any(x => x.Type == type);
+        }
+
+        public void AddEvent(AbstractEventViewModel evt)
+        {
+            evt.SetScope(this);
+            evt.PluginAdded += OnEventPluginAdded;
+            Events.Add(evt);
+        }
+
+        public void RemoveEvent(AbstractEventViewModel evt)
+        {
+            if (evt.IsLocal)
+            {
+                PrivateRemoveEvent(evt);
+            }
+        }
+
+        private void PrivateRemoveEvent(AbstractEventViewModel evt)
+        {
+            evt.SetScope(null);
+            evt.PluginAdded -= OnEventPluginAdded;
+            Events.Remove(evt);
+        }
+
+        private string GetNextAttributeKey()
+        {
+            return string.Format("attribute{0}", nextAttribute++);
+        }
+
+        public bool EntityNameExists(string name)
+        {
+            return null != scope ? scope.EntityNameExists(name) : false;
+        }
+
+        private void NotifyPluginAdded(PluginViewModel plugin)
+        {
+            if (null != PluginAdded)
+            {
+                PluginAdded(plugin);
+            }
+        }
+
+        private void OnEventPluginAdded(PluginViewModel plugin)
+        {
+            NotifyPluginAdded(plugin);
+        }
+
+        private void NotifyScopeChanged()
+        {
+            if (null != ScopeChanged)
+            {
+                ScopeChanged();
+            }
+        }
+
+        private void OnScopeChanged()
+        {
+            NotifyScopeChanged();
+        }
+
+        public PluginViewModel GetPlugin(string name)
+        {
+            return null != scope ? scope.GetPlugin(name) : Workspace.Instance.GetPlugin(name);
+        }
+
+        private void OnDefineAdded(DefineViewModel define)
+        {
+            if (null != DefineAdded)
+            {
+                DefineAdded(define);
+            }
+        }
+
+        private void OnDefinedNameChanged(PluginViewModel plugin, string newName)
+        {
+            if (null != DefineChanged)
+            {
+                DefineChanged(plugin, newName);
+            }
+        }
+
+        private void OnPrototypeAttributePropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (null != InheritedAttributeChanged && args.PropertyName == "Value")
+            {
+                AttributeViewModel attribute = sender as AttributeViewModel;
+                InheritedAttributeChanged(attribute.Key);
+            }
+        }
+
+        string IPluginNamespace.GetDefinedName(PluginViewModel plugin)
+        {
+            return null != scope ? scope.GetDefinedName(plugin) : plugin.ClassName;
+        }
+
+        string IAttributeScope.GetInheritedValue(string key)
+        {
+            foreach (EntityViewModel prototype in Prototypes)
+            {
+                AttributeViewModel attribute = prototype.GetAttribute(key);
+                if (null != attribute)
+                {
+                    return attribute.Value;
+                }
+            }
+
+            return null;
+        }
+
+        public bool HasInheritedAttribute(string key)
+        {
+            return Prototypes.Any(x => x.HasLocalAttribute(key));   // TODO: Check this logic for 3-level inheritance
+        }
+
+        public bool HasLocalAttribute(string key)
+        {
+            return Attributes.Any(x => x.Key == key);
+        }
+
+        public bool HasRootComponent(PluginViewModel plugin)
+        {
+            return Components.Any(x => x.Plugin == plugin);
+        }
+
+        public bool HasInheritedComponent(PluginViewModel plugin)
+        {
+            return Prototypes.SelectMany(x => x.Components).Any(x => x.Plugin == plugin);
+        }
+
+        object IComponentScope.GetInheritedValue(PluginViewModel plugin, string name)
+        {
+            foreach (EntityViewModel prototype in Prototypes)
+            {
+                ComponentViewModel component = prototype.Components.FirstOrDefault(x => x.Plugin == plugin);
+                if (null != component)
+                {
+                    PropertyViewModel property = component.GetProperty(name);
+                    if (null != property)
+                    {
+                        return property.Value;
+                    }
+                }
+            }
+            return null;
+        }
+
+        private void OnPrototypeComponentLocalPropertyChanged(string name)
+        {
+            if (null != InheritedPropertyChanged)
+            {
+                InheritedPropertyChanged(name);
+            }
+        }
+
+        private void OnPrototypeEventsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
             if (args.Action == NotifyCollectionChangedAction.Add)
             {
-                foreach (ComponentViewModel inheritedComponent in args.NewItems)
+                foreach (AbstractEventViewModel inheritedEvent in args.NewItems)
                 {
-                    ComponentViewModel localComponent = _components.FirstOrDefault(x => x.Descriptor == inheritedComponent.Descriptor);
-                    if (null == localComponent)
-                    {
-                        _components.Add(new ComponentViewModel(entity, inheritedComponent.Descriptor));
-                    }
-                    else
-                    {
-                        // TODO: Tell component to resolve properties
-                    }
+                    InheritEvent(inheritedEvent);
                 }
             }
             else if (args.Action == NotifyCollectionChangedAction.Remove)
             {
-                foreach (ComponentViewModel inheritedComponent in args.OldItems)
+                foreach (AbstractEventViewModel inheritedEvent in args.OldItems)
                 {
-                    ComponentViewModel localComponent = _components.FirstOrDefault(x => x.Descriptor == inheritedComponent.Descriptor);
-                    if (null != localComponent)
-                    {
-                        if (localComponent.IsInherited)
-                        {
-                            _components.Remove(localComponent);
-                        }
-                        else
-                        {
-                            // TODO: Tell component to resolve properties
-                        }
-                    }
+                    DisinheritEvent(inheritedEvent);
                 }
             }
         }
 
-        private void OnEventsChanged(object sender, NotifyCollectionChangedEventArgs args)
+        private void InheritEvent(AbstractEventViewModel evt)
         {
-            if (args.Action == NotifyCollectionChangedAction.Add)
+            AbstractEventViewModel localEvent = Events.FirstOrDefault(x => x.InheritsFrom(evt));
+            if (null == localEvent)
             {
-                foreach (EventViewModel evt in args.NewItems)
-                {
-
-                }
-            }
-            else if (args.Action == NotifyCollectionChangedAction.Remove)
-            {
-                foreach (EventViewModel evt in args.OldItems)
-                {
-
-                }
+                localEvent = new InheritedEventViewModel(evt);
+                AddEvent(localEvent);
             }
         }
 
-        public void RaiseAttributeAvailable(string oldKey, string key)
+        private void DisinheritEvent(AbstractEventViewModel evt)
         {
-            foreach (EntityViewModel prototype in _prototypes)
+            AbstractEventViewModel localEvent = Events.FirstOrDefault(x => x.InheritsFrom(evt));
+            if (null != localEvent)
             {
-                EntityAttributeViewModel exposedAttribute = prototype.GetEntityAttributeViewModel(oldKey);
-
-                if (null != exposedAttribute)
-                {
-                    _attributes.Add(new EntityAttributeViewModel(entity, oldKey));
-                }
+                PrivateRemoveEvent(localEvent);
             }
-        
-            AttributeAvailable(this, new AttributeAvailableEventArgs(oldKey, key));
-        }
-
-        private void OnAttributeAvailable(object sender, AttributeAvailableEventArgs args)
-        {
-            EntityAttributeViewModel localAttribute = _attributes.FirstOrDefault(x => x.Key == args.NewKey);
-
-            if (null != localAttribute)
-            {
-                localAttribute.FindInheritedViewModel();
-            }
-            else
-            {
-                _attributes.Add(new EntityAttributeViewModel(entity, args.NewKey));
-            }
-
-            AttributeAvailable(sender, args);
         }
     }
 }

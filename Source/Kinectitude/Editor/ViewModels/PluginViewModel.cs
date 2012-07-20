@@ -1,31 +1,118 @@
 ﻿using System;
-using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Models.Plugins;
+using System.Collections.Generic;
+using System.Linq;
+using Kinectitude.Core.Attributes;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    internal sealed class PluginViewModel : BaseModel
+    public enum PluginType
     {
-        private readonly PluginDescriptor descriptor;
+        Manager,
+        Component,
+        Event,
+        Action
+    }
 
-        public PluginDescriptor Descriptor
+    internal sealed class PluginViewModel : BaseViewModel
+    {
+        public string File
         {
-            get { return descriptor; }
+            get;
+            private set;
         }
 
-        public string Name
+        public PluginType Type
         {
-            get { return descriptor.DisplayName; }
+            get;
+            private set;
         }
 
-        public string Type
+        public string Provides
         {
-            get { return Enum.GetName(typeof(PluginDescriptor.PluginType), descriptor.Type); }
+            get;
+            private set;
         }
 
-        public PluginViewModel(PluginDescriptor descriptor)
+        public IEnumerable<string> Requires
         {
-            this.descriptor = descriptor;
+            get;
+            private set;
+        }
+
+        public string DisplayName
+        {
+            get;
+            private set;
+        }
+
+        public string Description
+        {
+            get;
+            private set;
+        }
+
+        public string ClassName
+        {
+            get;
+            private set;
+        }
+
+        public string ShortName
+        {
+            get;
+            private set;
+        }
+
+        public IEnumerable<string> Properties
+        {
+            get;
+            private set;
+        }
+
+        public PluginViewModel(Type type)
+        {
+            PluginAttribute pluginAttribute = System.Attribute.GetCustomAttribute(type, typeof(PluginAttribute)) as PluginAttribute;
+
+            File = type.Module.Name;
+            DisplayName = pluginAttribute.Name;
+            Description = pluginAttribute.Description;
+            ClassName = type.FullName;
+            ShortName = type.Name;
+            Provides = ClassName;
+
+            if (typeof(Kinectitude.Core.Base.IManager).IsAssignableFrom(type))
+            {
+                Type = PluginType.Manager;
+            }
+            else if (typeof(Kinectitude.Core.Base.Component).IsAssignableFrom(type))
+            {
+                Type = PluginType.Component;
+            }
+            else if (typeof(Kinectitude.Core.Base.Event).IsAssignableFrom(type))
+            {
+                Type = PluginType.Event;
+            }
+            else if (typeof(Kinectitude.Core.Base.Action).IsAssignableFrom(type))
+            {
+                Type = PluginType.Action;
+            }
+
+            var properties = from property in type.GetProperties() where System.Attribute.IsDefined(property, typeof(PluginAttribute)) select property.Name;
+            Properties = properties.ToArray();
+
+            ProvidesAttribute providesAttribute = System.Attribute.GetCustomAttribute(type, typeof(ProvidesAttribute)) as ProvidesAttribute;
+            if (null != providesAttribute)
+            {
+                Provides = providesAttribute.Type.FullName;
+            }
+
+            List<string> requires = new List<string>();
+            Attribute[] requiresAttributes = System.Attribute.GetCustomAttributes(type, typeof(RequiresAttribute));
+            foreach (RequiresAttribute attribute in requiresAttributes)
+            {
+                requires.Add(attribute.Type.FullName);
+            }
+            Requires = requires.ToArray();
         }
     }
 }

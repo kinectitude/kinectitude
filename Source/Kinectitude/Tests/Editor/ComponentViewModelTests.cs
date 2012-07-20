@@ -1,171 +1,333 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Kinectitude.Editor.Models.Base;
-using Kinectitude.Editor.ViewModels;
+﻿using System.Linq;
+using Kinectitude.Core.Attributes;
+using Kinectitude.Core.Base;
 using Kinectitude.Core.Components;
-using Kinectitude.Editor.Models.Plugins;
+using Kinectitude.Editor.ViewModels;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Kinectitude.Tests.Editor
+namespace Kinectitude.Editor.Tests
 {
     [TestClass]
     public class ComponentViewModelTests
     {
-        [TestMethod]
-        public void ComponentHasDefaultInheritedProperties()
+        [Plugin("Dependent Manager", "")]
+        private class DependentManager : Manager<DependentComponent>
         {
-            PluginDescriptor descriptor = new PluginDescriptor(typeof(TransformComponent));
-            Entity entity = new Entity();
+            public override void OnUpdate(float frameDelta) { }
+        }
 
-            ComponentViewModel componentViewModel = new ComponentViewModel(entity, descriptor);
+        [Plugin("Dependent Component", "")]
+        [Requires(typeof(TransformComponent))]
+        [Requires(typeof(DependentManager))]
+        private class DependentComponent : Component
+        {
+            public override void Destroy() { }
+        }
 
-            Assert.AreNotEqual(componentViewModel.Properties.Count(), 0);
+        private static readonly string TransformComponentType = typeof(TransformComponent).FullName;
+        private static readonly string TransformComponentShort = typeof(TransformComponent).Name;
+        private static readonly string DependentComponentType = typeof(DependentComponent).FullName;
+        private static readonly string DependentManagerType = typeof(DependentManager).FullName;
 
-            foreach (ComponentPropertyViewModel propertyViewModel in componentViewModel.Properties)
-            {
-                if (propertyViewModel.IsLocal)
-                {
-                    Assert.Fail();
-                }
-            }
+        public ComponentViewModelTests()
+        {
+            Workspace.Instance.AddPlugin(new PluginViewModel(typeof(DependentComponent)));
+            Workspace.Instance.AddPlugin(new PluginViewModel(typeof(DependentManager)));
         }
 
         [TestMethod]
-        public void AddNewComponentToEntity()
+        public void AddLocalComponent()
         {
-            PluginDescriptor descriptor = new PluginDescriptor(typeof(TransformComponent));
+            EntityViewModel entity = new EntityViewModel();
+            entity.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
 
-            Entity entity = new Entity();
-            ComponentViewModel componentViewModel = new ComponentViewModel(entity, descriptor);
-
-            Assert.IsNull(entity.GetComponent(descriptor));
-
-            componentViewModel.AddComponent();
-
-            Component component = entity.GetComponent(descriptor);
-
-            Assert.IsNotNull(component);
-            Assert.IsFalse(componentViewModel.IsInherited);
-            Assert.IsTrue(componentViewModel.IsLocal);
+            Assert.AreEqual(1, entity.Components.Count(x => x.Type == TransformComponentType));
         }
 
         [TestMethod]
-        public void RemoveComponentFromEntity()
+        public void RemoveLocalComponent()
         {
-            PluginDescriptor descriptor = new PluginDescriptor(typeof(TransformComponent));
-
-            Entity entity = new Entity();
-            entity.AddComponent(new Component(descriptor));
-
-            ComponentViewModel componentViewModel = EntityViewModel.GetViewModel(entity).GetComponentViewModel(descriptor);
-            componentViewModel.RemoveComponent();
-
-            Component component = entity.GetComponent(descriptor);
-
-            Assert.IsNull(component);
-        }
-
-        [TestMethod]
-        public void ExistingInheritedComponent()
-        {
-            PluginDescriptor descriptor = new PluginDescriptor(typeof(TransformComponent));
-
-            Entity parent = new Entity() { Name = "parent" };
-            parent.AddComponent(new Component(descriptor));
-
-            Entity child = new Entity();
-            child.AddPrototype(parent);
-
-            ComponentViewModel componentViewModel = EntityViewModel.GetViewModel(child).GetComponentViewModel(descriptor);
-
-            Assert.IsNotNull(componentViewModel);
-            Assert.IsTrue(componentViewModel.IsInherited);
-        }
-
-        [TestMethod]
-        public void ExistingLocalComponent()
-        {
-            PluginDescriptor descriptor = new PluginDescriptor(typeof(TransformComponent));
-
-            Entity entity = new Entity();
-            entity.AddComponent(new Component(descriptor));
-
-            ComponentViewModel componentViewModel = EntityViewModel.GetViewModel(entity).GetComponentViewModel(descriptor);
-
-            Assert.IsNotNull(componentViewModel);
-            Assert.IsTrue(componentViewModel.IsLocal);
-            Assert.IsFalse(componentViewModel.IsInherited);
-        }
-
-        [TestMethod]
-        public void AddedComponentVisibleInChildEntity()
-        {
-            PluginDescriptor descriptor = new PluginDescriptor(typeof(TransformComponent));
-
-            Entity parent = new Entity() { Name = "parent" };
-
-            Entity child = new Entity();
-            child.AddPrototype(parent);
-
-            EntityViewModel childEntityViewModel = EntityViewModel.GetViewModel(child);
-
-            Assert.AreEqual(childEntityViewModel.Components.Count, 0);
-
-            EntityViewModel parentEntityViewModel = EntityViewModel.GetViewModel(parent);
-            ComponentViewModel componentViewModel = new ComponentViewModel(parent, descriptor);
-            parentEntityViewModel.AddComponent(componentViewModel);
-
-            Assert.AreEqual(childEntityViewModel.Components.Count, 1);
-        }
-
-        [TestMethod]
-        public void RemovedComponentRemovedFromChildEntity()
-        {
-            PluginDescriptor descriptor = new PluginDescriptor(typeof(TransformComponent));
-
-            Entity parent = new Entity() { Name = "parent" };
-            parent.AddComponent(new Component(descriptor));
-
-            Entity child = new Entity();
-            child.AddPrototype(parent);
-
-            EntityViewModel childEntityViewModel = EntityViewModel.GetViewModel(child);
-
-            Assert.AreEqual(childEntityViewModel.Components.Count, 1);
-
-            EntityViewModel parentEntityViewModel = EntityViewModel.GetViewModel(parent);
-            ComponentViewModel componentViewModel = parentEntityViewModel.GetComponentViewModel(descriptor);
-            parentEntityViewModel.RemoveComponent(componentViewModel);
-
-            Assert.AreEqual(childEntityViewModel.Components.Count, 0);
-        }
-
-        [TestMethod]
-        public void ComponentInheritedFromLeftmostPrototype()
-        {
-            PluginDescriptor descriptor = new PluginDescriptor(typeof(TransformComponent));
-
-            Entity leftParent = new Entity() { Name = "leftParent" };
-            Component leftComponent = new Component(descriptor);
-            leftParent.AddComponent(leftComponent);
-
-            Entity rightParent = new Entity() { Name = "rightParent" };
-            Component rightComponent = new Component(descriptor);
-            rightParent.AddComponent(rightComponent);
-
-            Entity child = new Entity();
-            child.AddPrototype(leftParent);
-            child.AddPrototype(rightParent);
-
-            EntityViewModel childEntityViewModel = EntityViewModel.GetViewModel(child);
-
-            Assert.AreEqual(childEntityViewModel.Components.Count, 1);
-
-            ComponentViewModel componentViewModel = EntityViewModel.GetViewModel(child).GetComponentViewModel(descriptor);
+            EntityViewModel entity = new EntityViewModel();
             
-            Assert.AreEqual(componentViewModel.Component, leftComponent);
+            ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            entity.AddComponent(component);
+            entity.RemoveComponent(component);
+
+            Assert.AreEqual(0, entity.Components.Count);
+        }
+
+        [TestMethod]
+        public void RemoveRootComponent()
+        {
+            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            
+            ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            parent.AddComponent(component);
+
+            EntityViewModel child = new EntityViewModel();
+            child.AddPrototype(parent);
+
+            parent.RemoveComponent(component);
+
+            Assert.AreEqual(0, parent.Components.Count(x => x.Type == TransformComponentType));
+            Assert.AreEqual(0, child.Components.Count(x => x.Type == TransformComponentType));
+        }
+
+        [TestMethod]
+        public void RemoveRootComponentWhenInheritedComponentHasProperties()
+        {
+            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            
+            ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            parent.AddComponent(component);
+
+            EntityViewModel child = new EntityViewModel();
+            child.AddPrototype(parent);
+
+            ComponentViewModel childComponent = child.GetComponentByType(TransformComponentType);
+            PropertyViewModel childProperty = childComponent.GetProperty("X");
+            childProperty.IsInherited = false;
+            childProperty.Value = 500;
+
+            parent.RemoveComponent(component);
+
+            Assert.AreEqual(0, parent.Components.Count(x => x.Type == TransformComponentType));
+            Assert.AreEqual(1, child.Components.Count(x => x.IsRoot));
+            Assert.AreEqual(1, child.Components.Count(x => x.Type == TransformComponentType));
+        }
+
+        [TestMethod]
+        public void CannotRemoveInheritedComponent()
+        {
+            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            parent.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
+
+            EntityViewModel child = new EntityViewModel();
+            child.AddPrototype(parent);
+
+            ComponentViewModel inheritedComponent = child.GetComponentByType(TransformComponentType);
+            child.RemoveComponent(inheritedComponent);
+
+            Assert.AreEqual(1, parent.Components.Count(x => x.Type == TransformComponentType));
+            Assert.AreEqual(1, child.Components.Count(x => x.Type == TransformComponentType));
+        }
+
+        [TestMethod]
+        public void CannotAddMultipleComponentsPerRole()
+        {
+            EntityViewModel entity = new EntityViewModel();
+            
+            ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            entity.AddComponent(component);
+            
+            entity.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
+
+            Assert.AreEqual(component, entity.Components.Single());
+        }
+
+        [TestMethod]
+        public void CannotRemoveComponentWithDependency()
+        {
+            EntityViewModel entity = new EntityViewModel();
+            entity.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(DependentComponentType)));
+
+            ComponentViewModel transform = entity.GetComponentByType(TransformComponentType);
+            entity.RemoveComponent(transform);
+
+            Assert.AreEqual(1, entity.Components.Count(x => x.Type == TransformComponentType));
+        }
+
+        [TestMethod]
+        public void EntityInheritsComponentFromPrototype()
+        {
+            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            
+            EntityViewModel child = new EntityViewModel();
+            child.AddPrototype(parent);
+
+            parent.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
+
+            Assert.AreEqual(1, parent.Components.Count(x => x.Type == TransformComponentType));
+            Assert.AreEqual(1, child.Components.Count(x => x.Type == TransformComponentType));
+        }
+
+        [TestMethod]
+        public void EntityInheritsExistingComponentFromPrototype()
+        {
+            /*EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            parent.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
+
+            EntityViewModel child = new EntityViewModel();
+            child.AddPrototype(parent);
+
+            Assert.AreEqual(1, parent.Components.Count(x => x.Type == TransformComponentType));
+            Assert.AreEqual(1, parent.Entity.Components.Count(x => x.Type == TransformComponentType));
+            Assert.AreEqual(1, child.Components.Count(x => x.Type == TransformComponentType));
+            Assert.AreEqual(0, child.Entity.Components.Count(x => x.Type == TransformComponentType));*/
+
+            GameViewModel game = new GameViewModel("Test Game")
+            {
+                Width = 800,
+                Height = 600,
+                IsFullScreen = false
+            };
+
+            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            
+            ComponentViewModel parentComponent = new ComponentViewModel(game.GetPlugin(typeof(TransformComponent).FullName));
+            
+            PropertyViewModel x = parentComponent.GetProperty("X");
+            x.IsInherited = false;
+            x.Value = 400;
+            parent.AddComponent(parentComponent);
+            
+            game.AddPrototype(parent);
+
+            SceneViewModel scene = new SceneViewModel("Test Scene");
+
+            EntityViewModel child = new EntityViewModel();
+            child.AddPrototype(parent);
+            
+            ComponentViewModel childComponent = child.Components[0];
+            
+            PropertyViewModel y = childComponent.GetProperty("Y");
+            y.IsInherited = false;
+            y.Value = 300;
+            
+            scene.AddEntity(child);
+
+            game.AddScene(scene);
+            game.FirstScene = scene;
+        }
+
+        [TestMethod]
+        public void ComponentFollowsDefineChange()
+        {
+            GameViewModel game = new GameViewModel("Test Game");
+
+            UsingViewModel use = new UsingViewModel() { File = "Kinectitude.Core.dll" };
+
+            DefineViewModel define = new DefineViewModel(TransformComponentShort, TransformComponentType);
+            use.AddDefine(define);
+            
+            game.AddUsing(use);
+
+            EntityViewModel entity = new EntityViewModel() { Name = "parent" };
+            game.AddPrototype(entity);
+
+            ComponentViewModel component = new ComponentViewModel(game.GetPlugin(TransformComponentShort));
+            entity.AddComponent(component);
+
+            Assert.AreEqual(TransformComponentShort, component.Type);
+
+            define.Name = "tc";
+
+            Assert.AreEqual("tc", component.Type);
+        }
+
+        [TestMethod]
+        public void ComponentBecomesInheritedAfterAddToParent()
+        {
+            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+
+            EntityViewModel child = new EntityViewModel();
+            ComponentViewModel childComponent = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            child.AddComponent(childComponent);
+            child.AddPrototype(parent);
+
+            Assert.IsFalse(childComponent.IsInherited);
+
+            parent.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
+
+            Assert.IsTrue(childComponent.IsInherited);
+        }
+
+        [TestMethod]
+        public void ComponentBecomesInheritableAfterPrototypeChange()
+        {
+            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            parent.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
+
+            EntityViewModel child = new EntityViewModel();
+            ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            child.AddComponent(component);
+
+            Assert.IsFalse(component.IsInherited);
+
+            child.AddPrototype(parent);
+
+            Assert.IsTrue(component.IsInherited);
+        }
+
+        [TestMethod]
+        public void ComponentBecomesNonInheritableAfterRemoveFromParent()
+        {
+            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            
+            ComponentViewModel parentComponent = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            parent.AddComponent(parentComponent);
+
+            EntityViewModel child = new EntityViewModel();
+            
+            ComponentViewModel childComponent = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            
+            PropertyViewModel property = childComponent.GetProperty("X");
+            property.Value = 500;
+            
+            child.AddComponent(childComponent);
+            child.AddPrototype(parent);
+
+            Assert.IsTrue(childComponent.IsInherited);
+
+            parent.RemoveComponent(parentComponent);
+
+            Assert.IsFalse(childComponent.IsInherited);
+        }
+
+        [TestMethod]
+        public void ComponentBecomesNonInheritableAfterPrototypeChange()
+        {
+            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            parent.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
+
+            EntityViewModel child = new EntityViewModel();
+            
+            ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            
+            PropertyViewModel property = component.GetProperty("X");
+            property.Value = 500;
+            
+            child.AddComponent(component);
+            child.AddPrototype(parent);
+
+            Assert.IsTrue(component.IsInherited);
+
+            child.RemovePrototype(parent);
+
+            Assert.IsFalse(component.IsInherited);
+        }
+
+        [TestMethod]
+        public void AddingComponentAddsRequiredComponent()
+        {
+            EntityViewModel entity = new EntityViewModel();
+            entity.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(DependentComponentType)));
+
+            Assert.AreEqual(1, entity.Components.Count(x => x.Type == DependentComponentType));
+            Assert.AreEqual(1, entity.Components.Count(x => x.Type == TransformComponentType));
+        }
+
+        [TestMethod]
+        public void AddingComponentAddsRequiredManagers()
+        {
+            SceneViewModel scene = new SceneViewModel("Test Scene");
+            
+            EntityViewModel entity = new EntityViewModel();
+            entity.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(DependentComponentType)));
+
+            scene.AddEntity(entity);
+
+            Assert.AreEqual(1, scene.Managers.Count(x => x.Type == DependentManagerType));
         }
     }
 }

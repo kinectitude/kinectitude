@@ -1,104 +1,131 @@
-﻿using System;
-using System.Collections.Generic;
-using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Commands.Attribute;
-using Kinectitude.Editor.Commands.Base;
-using Kinectitude.Editor.Models.Base;
-using Attribute = Kinectitude.Editor.Models.Base.Attribute;
+﻿using Kinectitude.Editor.ViewModels.Interfaces;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    internal sealed class AttributeViewModel : BaseModel, IAttributeViewModel
+    internal delegate void KeyChangedEventHandler(string oldKey, string newKey);
+    
+    internal sealed class AttributeViewModel : BaseViewModel
     {
-        private static readonly Dictionary<Tuple<AttributeContainer, string>, AttributeViewModel> attributes;
+        private const string DefaultValue = "";
 
-        static AttributeViewModel()
-        {
-            attributes = new Dictionary<Tuple<AttributeContainer, string>, AttributeViewModel>();
-        }
+        private string key;
+        private string value;
+        private IAttributeScope scope;
+        private bool inherited;
 
-        public static AttributeViewModel GetViewModel(AttributeContainer container, string key)
-        {
-            AttributeViewModel viewModel = null;
-            var tuple = new Tuple<AttributeContainer, string>(container, key);
-            attributes.TryGetValue(tuple, out viewModel);
-            if (null == viewModel)
-            {
-                viewModel = new AttributeViewModel(container, key);
-                attributes[tuple] = viewModel;
-            }
-            return viewModel;
-        }
-
-        private readonly AttributeContainer container;
-        private Attribute attribute;
+        public event KeyChangedEventHandler KeyChanged;
 
         public string Key
         {
-            get { return attribute.Key; }
+            get { return key; }
             set
             {
-                CommandHistory.LogCommand(new RenameAttributeCommand(this, value));
-                attribute.Key = value;
-
-                RaisePropertyChanged("Key");
-            }
-        }
-
-        public string Value
-        {
-            get { return attribute.Value.ToString(); }
-            set
-            {
-                if (!IsInherited)
+                if (IsLocal && key != value && !KeyExists(value))
                 {
-                    CommandHistory.LogCommand(new SetAttributeValueCommand(this, value));
-                    attribute.Value = Attribute.TryParse(value);
-                    RaisePropertyChanged("Value");
+                    string oldKey = key;
+                    key = value;
+
+                    if (null != KeyChanged)
+                    {
+                        KeyChanged(oldKey, key);
+                    }
+
+                    NotifyPropertyChanged("Key");
                 }
             }
         }
 
-        public bool CanInherit
-        {
-            get { return false; }
-        }
-
-        public bool IsLocal
-        {
-            get { return true; }
-        }
-
         public bool IsInherited
         {
-            get { return false; }
-            set { }
-        }
-
-        private AttributeViewModel(AttributeContainer container, string key)
-        {
-            this.container = container;
-            
-            attribute = container.GetAttribute(key);
-            if (null == attribute)
+            get { return inherited; }
+            set
             {
-                attribute = new Attribute(key, 0);
+                if (inherited != value)
+                {
+                    inherited = value;
+                    NotifyPropertyChanged("IsInherited");
+                }
             }
         }
 
-        public void AddAttribute()
+        [DependsOn("IsInherited")]
+        public bool IsLocal
         {
-            if (null == attribute.Parent)
+            get { return !IsInherited; }
+        }
+
+        [DependsOn("Scope")]
+        public bool CanInherit
+        {
+            get { return null != scope ? scope.HasInheritedAttribute(Key) : false; }
+        }
+
+        [DependsOn("IsLocal")]
+        [DependsOn("Scope")]
+        public string Value
+        {
+            get
             {
-                container.AddAttribute(attribute);
+                if (IsLocal)
+                {
+                    return value;
+                }
+
+                return null != scope ? scope.GetInheritedValue(Key) : DefaultValue;
+            }
+            set
+            {
+                if (IsLocal)
+                {
+                    if (this.value != value)
+                    {
+                        this.value = value;
+                        NotifyPropertyChanged("Value");
+                    }
+                }
             }
         }
 
-        public void RemoveAttribute()
+        public AttributeViewModel(string key)
         {
-            if (attribute.Parent == container)
+            this.key = key;
+            this.value = DefaultValue;
+        }
+
+        public void SetScope(IAttributeScope scope)
+        {
+            if (null != this.scope)
             {
-                container.RemoveAttribute(attribute);
+                this.scope.InheritedAttributeAdded -= OnInheritedAttributeChanged;
+                this.scope.InheritedAttributeRemoved -= OnInheritedAttributeChanged;
+                this.scope.InheritedAttributeChanged -= OnInheritedAttributeChanged;
+            }
+
+            this.scope = scope;
+
+            if (null != this.scope)
+            {
+                this.scope.InheritedAttributeAdded += OnInheritedAttributeChanged;
+                this.scope.InheritedAttributeRemoved += OnInheritedAttributeChanged;
+                this.scope.InheritedAttributeChanged += OnInheritedAttributeChanged;
+            }
+        }
+
+        private bool KeyExists(string key)
+        {
+            if (null == scope)
+            {
+                return false;
+            }
+
+            return scope.HasInheritedAttribute(key) || scope.HasLocalAttribute(key);
+        }
+
+        private void OnInheritedAttributeChanged(string key)
+        {
+            if (key == Key)
+            {
+                NotifyPropertyChanged("Scope");
             }
         }
     }

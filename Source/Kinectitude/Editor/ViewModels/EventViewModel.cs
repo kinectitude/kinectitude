@@ -1,30 +1,50 @@
-﻿using Kinectitude.Editor.Models.Plugins;
-using System.Collections.ObjectModel;
-using Kinectitude.Editor.Base;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    internal sealed class EventViewModel
+    internal sealed class EventViewModel : AbstractEventViewModel
     {
-        private readonly Event evt;
-        private readonly ObservableCollection<ActionViewModel> _actions;
-        private readonly ModelCollection<ActionViewModel> actions;
+        private readonly PluginViewModel plugin;
 
-        public string Name
+        public override event DefineAddedEventHandler DefineAdded;
+        public override event DefinedNameChangedEventHandler DefineChanged;
+
+        [DependsOn("Scope")]
+        public override string Type
         {
-            get { return evt.Descriptor.DisplayName; }
+            get { return null != scope ? scope.GetDefinedName(plugin) : plugin.ClassName; }
         }
 
-        public ModelCollection<ActionViewModel> Actions
+        [DependsOn("IsInherited")]
+        public override bool IsLocal
         {
-            get { return actions; }
+            get { return !IsInherited; }
         }
 
-        public EventViewModel(Event evt)
+        public override bool IsInherited
         {
-            this.evt = evt;
+            get { return false; }
+        }
 
-            //var actionViewModels = from action in evt.Actions select new ActionViewModel(action);
+        public override IEnumerable<PluginViewModel> Plugins
+        {
+            get { return Actions.SelectMany(x => x.Plugins).Union(Enumerable.Repeat(plugin, 1)).Distinct(); }
+        }
+
+        public EventViewModel(PluginViewModel plugin)
+        {
+            this.plugin = plugin;
+
+            foreach (string property in plugin.Properties)
+            {
+                AddProperty(new PropertyViewModel(property));
+            }
+        }
+
+        public override bool InheritsFrom(AbstractEventViewModel evt)
+        {
+            return false;
         }
     }
 }

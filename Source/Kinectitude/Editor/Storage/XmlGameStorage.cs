@@ -2,15 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Kinectitude.Editor.Models.Base;
-using Kinectitude.Editor.Models.Plugins;
-using Kinectitude.Editor.Models.Properties;
-using Action = Kinectitude.Editor.Models.Plugins.Action;
-using Attribute = Kinectitude.Editor.Models.Base.Attribute;
-using System.Reflection;
+using Kinectitude.Editor.ViewModels;
 
 namespace Kinectitude.Editor.Storage
 {
@@ -24,6 +20,7 @@ namespace Kinectitude.Editor.Storage
             public static readonly XName Using = Namespace + "Using";
             public static readonly XName Define = Namespace + "Define";
             public static readonly XName Scene = Namespace + "Scene";
+            public static readonly XName Manager = Namespace + "Manager";
             public static readonly XName PrototypeElement = Namespace + "Prototype";
             public static readonly XName Entity = Namespace + "Entity";
             public static readonly XName Component = Namespace + "Component";
@@ -41,73 +38,66 @@ namespace Kinectitude.Editor.Storage
             public static readonly XName Type = "Type";
             public static readonly XName File = "File";
             public static readonly XName Class = "Class";
+            public static readonly XName If = "If";
 
             public static readonly XName Project = "Project";
             public static readonly XName Root = "Root";
         }
 
-        private static readonly XName[] gameProperties = new[] { Constants.Xmlns, Constants.Name, Constants.Width, Constants.Height, Constants.IsFullScreen, Constants.FirstScene };
-        private static readonly XName[] sceneProperties = new[] { Constants.Name };
-        private static readonly XName[] entityProperties = new[] { Constants.Name, Constants.Prototype };
+        private static readonly XName[] GameProperties = new[] { Constants.Xmlns, Constants.Name, Constants.Width, Constants.Height, Constants.IsFullScreen, Constants.FirstScene };
+        private static readonly XName[] SceneProperties = new[] { Constants.Name };
+        private static readonly XName[] EntityProperties = new[] { Constants.Name, Constants.Prototype };
 
-        private readonly Game game;
+        private GameViewModel game;
         private readonly string fileName;
-        private readonly IPluginNamespace pluginNamespace;
-        private readonly Queue<Tuple<XElement, Entity>> entities;
+        private readonly Queue<Tuple<XElement, EntityViewModel>> entities;
 
-        public XmlGameStorage(string fileName, IPluginNamespace pluginNamespace)
+        public XmlGameStorage(string fileName)
         {
             this.fileName = fileName;
-            this.game = new Game(pluginNamespace);
-            this.pluginNamespace = pluginNamespace;
-            entities = new Queue<Tuple<XElement,Entity>>();
+            entities = new Queue<Tuple<XElement, EntityViewModel>>();
         }
 
-        public Game LoadGame()
+        public GameViewModel LoadGame()
         {
-            XmlSchemaSet schemas = new XmlSchemaSet();
-            Assembly asm = Assembly.GetExecutingAssembly();
-            schemas.Add(null, new XmlTextReader(asm.GetManifestResourceStream("Kinectitude.Editor.Storage.schema.xsd")));
-
-            XElement project = XElement.Load(fileName);
-            XElement root = project.Element(Constants.Root);
-            string gameFileName = Path.Combine(Path.GetDirectoryName(fileName), root.Value, "game.xml");
-
-            XDocument document = XDocument.Load(gameFileName);
+            XDocument document = XDocument.Load(fileName);
             XElement gameElement = document.Root;
 
+            XmlSchemaSet schemas = new XmlSchemaSet();
+            Assembly asm = Assembly.GetExecutingAssembly();
+            schemas.Add(null, new XmlTextReader(asm.GetManifestResourceStream("EditorModels.Storage.schema.xsd")));
             document.Validate(schemas, (o, e) => { throw new ArgumentException("Invalid Kinectitude XML file."); });
 
-            // First Pass
-            // Create the Game object top-down, including properties, attributes, and parent relationships.
-
-            game.Name = (string)gameElement.Attribute(Constants.Name);
-            game.Width = (int)gameElement.Attribute(Constants.Width);
-            game.Height = (int)gameElement.Attribute(Constants.Height);
-            game.IsFullScreen = (bool)gameElement.Attribute(Constants.IsFullScreen);
+            game = new GameViewModel((string)gameElement.Attribute(Constants.Name))
+            {
+                FileName = fileName,
+                Width = (int)gameElement.Attribute(Constants.Width),
+                Height = (int)gameElement.Attribute(Constants.Height),
+                IsFullScreen = (bool)gameElement.Attribute(Constants.IsFullScreen)
+            };
 
             foreach (XElement usingElement in gameElement.Elements(Constants.Using))
             {
-                Using use = CreateUsing(usingElement);
+                UsingViewModel use = CreateUsing(usingElement);
                 game.AddUsing(use);
             }
 
-            foreach (XAttribute xmlAttribute in gameElement.Attributes().Where(x => !gameProperties.Contains(x.Name)))
+            foreach (XAttribute xmlAttribute in gameElement.Attributes().Where(x => !GameProperties.Contains(x.Name)))
             {
-                Attribute attribute = CreateAttribute(xmlAttribute);
+                AttributeViewModel attribute = CreateAttribute(xmlAttribute);
                 game.AddAttribute(attribute);
             }
 
             foreach (XElement prototypeElement in gameElement.Elements(Constants.PrototypeElement))
             {
-                Entity entity = CreateEntity(prototypeElement);
-                entities.Enqueue(Tuple.Create<XElement, Entity>(prototypeElement, entity));
-                game.AddEntity(entity);
+                EntityViewModel entity = CreateEntity(prototypeElement);
+                entities.Enqueue(Tuple.Create<XElement, EntityViewModel>(prototypeElement, entity));
+                game.AddPrototype(entity);
             }
 
             foreach (XElement sceneElement in gameElement.Elements(Constants.Scene))
             {
-                Scene scene = CreateScene(sceneElement);
+                SceneViewModel scene = CreateScene(sceneElement);
                 game.AddScene(scene);
             }
 
@@ -118,17 +108,17 @@ namespace Kinectitude.Editor.Storage
 
             while (entities.Count > 0)
             {
-                Tuple<XElement, Entity> tuple = entities.Dequeue();
+                Tuple<XElement, EntityViewModel> tuple = entities.Dequeue();
                 XElement element = tuple.Item1;
-                Entity entity = tuple.Item2;
-                
+                EntityViewModel entity = tuple.Item2;
+
                 string prototypeNames = (string)element.Attribute(Constants.Prototype);
                 if (null != prototypeNames)
                 {
                     string[] tokens = prototypeNames.Split(' ');
                     foreach (string token in tokens)
                     {
-                        Entity prototype = game.GetPrototype(token);
+                        EntityViewModel prototype = game.GetPrototype(token);
                         if (null != prototype)
                         {
                             entity.AddPrototype(prototype);
@@ -139,87 +129,91 @@ namespace Kinectitude.Editor.Storage
             return game;
         }
 
-        private Using CreateUsing(XElement element)
+        private UsingViewModel CreateUsing(XElement element)
         {
-            Using use = new Using
-            {
-                File = (string)element.Attribute(Constants.File)
-            };
+            UsingViewModel use = new UsingViewModel() { File = (string)element.Attribute(Constants.File) };
 
             foreach (XElement defineElement in element.Elements(Constants.Define))
             {
-                Define define = CreateDefine(defineElement);
+                DefineViewModel define = CreateDefine(defineElement);
                 use.AddDefine(define);
             }
 
             return use;
         }
 
-        private Define CreateDefine(XElement element)
+        private DefineViewModel CreateDefine(XElement element)
         {
-            Define define = new Define
-            {
-                Name = (string)element.Attribute(Constants.Name),
-                Class = (string)element.Attribute(Constants.Class)
-            };
-
+            DefineViewModel define = new DefineViewModel((string)element.Attribute(Constants.Name), (string)element.Attribute(Constants.Class));
             return define;
         }
 
-        private Scene CreateScene(XElement element)
+        private SceneViewModel CreateScene(XElement element)
         {
-            Scene scene = new Scene
-            {
-                Name = (string)element.Attribute(Constants.Name)
-            };
+            SceneViewModel scene = new SceneViewModel((string)element.Attribute(Constants.Name));
 
-            foreach (XAttribute xmlAttribute in element.Attributes().Where(x => !sceneProperties.Contains(x.Name)))
+            foreach (XAttribute xmlAttribute in element.Attributes().Where(x => !SceneProperties.Contains(x.Name)))
             {
-                Attribute attribute = CreateAttribute(xmlAttribute);
+                AttributeViewModel attribute = CreateAttribute(xmlAttribute);
                 scene.AddAttribute(attribute);
+            }
+
+            foreach (XElement managerElement in element.Elements(Constants.Manager))
+            {
+                ManagerViewModel manager = CreateManager(managerElement);
+                scene.AddManager(manager);
             }
 
             foreach (XElement entityElement in element.Elements(Constants.Entity))
             {
-                Entity entity = CreateEntity(entityElement);
-                entities.Enqueue(Tuple.Create<XElement,Entity>(entityElement, entity));
+                EntityViewModel entity = CreateEntity(entityElement);
+                entities.Enqueue(Tuple.Create<XElement, EntityViewModel>(entityElement, entity));
                 scene.AddEntity(entity);
             }
 
             return scene;
         }
 
-        private Entity CreateEntity(XElement element)
+        private ManagerViewModel CreateManager(XElement element)
         {
-            Entity entity = new Entity
-            {
-                Name = (string)element.Attribute(Constants.Name)
-            };
+            PluginViewModel plugin = game.GetPlugin((string)element.Attribute(Constants.Type));
+            ManagerViewModel manager = new ManagerViewModel(plugin);
 
-            foreach (XAttribute xmlAttribute in element.Attributes().Where(x => !entityProperties.Contains(x.Name)))
+            foreach (XAttribute attribute in element.Attributes().Except(element.Attributes(Constants.Type)))
             {
-                Attribute attribute = CreateAttribute(xmlAttribute);
+                manager.SetProperty(attribute.Name.LocalName, (string)attribute);
+            }
+            return manager;
+        }
+
+        private EntityViewModel CreateEntity(XElement element)
+        {
+            EntityViewModel entity = new EntityViewModel() { Name = (string)element.Attribute(Constants.Name) };
+
+            foreach (XAttribute xmlAttribute in element.Attributes().Where(x => !EntityProperties.Contains(x.Name)))
+            {
+                AttributeViewModel attribute = CreateAttribute(xmlAttribute);
                 entity.AddAttribute(attribute);
             }
 
             foreach (XElement componentElement in element.Elements(Constants.Component))
             {
-                Component component = CreateComponent(componentElement);
+                ComponentViewModel component = CreateComponent(componentElement);
                 entity.AddComponent(component);
             }
 
             foreach (XElement eventElement in element.Elements(Constants.Event))
             {
-                Event evt = CreateEvent(eventElement);
+                EventViewModel evt = CreateEvent(eventElement);
                 entity.AddEvent(evt);
             }
             return entity;
         }
 
-        private Component CreateComponent(XElement element)
+        private ComponentViewModel CreateComponent(XElement element)
         {
-            PluginDescriptor descriptor = game.GetPluginDescriptor((string)element.Attribute(Constants.Type));
-            Component component = new Component(descriptor);
+            PluginViewModel plugin = game.GetPlugin((string)element.Attribute(Constants.Type));
+            ComponentViewModel component = new ComponentViewModel(plugin);
 
             foreach (XAttribute attribute in element.Attributes().Except(element.Attributes(Constants.Type)))
             {
@@ -228,28 +222,61 @@ namespace Kinectitude.Editor.Storage
             return component;
         }
 
-        private Event CreateEvent(XElement element)
+        private EventViewModel CreateEvent(XElement element)
         {
-            PluginDescriptor descriptor = game.GetPluginDescriptor((string)element.Attribute(Constants.Type));
-            Event evt = new Event(descriptor);
+            PluginViewModel plugin = game.GetPlugin((string)element.Attribute(Constants.Type));
+            EventViewModel evt = new EventViewModel(plugin);
 
             foreach (XAttribute attribute in element.Attributes().Except(element.Attributes(Constants.Type)))
             {
                 evt.SetProperty(attribute.Name.LocalName, (string)attribute);
             }
 
-            foreach (XElement actionElement in element.Elements(Constants.Action))
+            foreach (XElement actionElement in element.Elements())
             {
-                Action action = CreateAction(actionElement);
+                AbstractActionViewModel action = null;
+
+                if (actionElement.Name == Constants.Action)
+                {
+                    action = CreateAction(actionElement);
+                }
+                else if (actionElement.Name == Constants.Condition)
+                {
+                    action = CreateCondition(actionElement);
+                }
+
                 evt.AddAction(action);
             }
             return evt;
         }
 
-        private Action CreateAction(XElement element)
+        private ConditionViewModel CreateCondition(XElement element)
         {
-            PluginDescriptor descriptor = game.GetPluginDescriptor((string)element.Attribute(Constants.Type));
-            Action action = new Action(descriptor);
+            ConditionViewModel condition = new ConditionViewModel() { If = (string)element.Attribute(Constants.If) };
+
+            foreach (XElement actionElement in element.Elements())
+            {
+                AbstractActionViewModel action = null;
+
+                if (actionElement.Name == Constants.Action)
+                {
+                    action = CreateAction(actionElement);
+                }
+                else if (actionElement.Name == Constants.Condition)
+                {
+                    action = CreateCondition(actionElement);
+                }
+
+                condition.AddAction(action);
+            }
+
+            return condition;
+        }
+
+        private ActionViewModel CreateAction(XElement element)
+        {
+            PluginViewModel plugin = game.GetPlugin((string)element.Attribute(Constants.Type));
+            ActionViewModel action = new ActionViewModel(plugin);
 
             foreach (XAttribute attribute in element.Attributes().Except(element.Attributes(Constants.Type)))
             {
@@ -258,15 +285,14 @@ namespace Kinectitude.Editor.Storage
             return action;
         }
 
-        private Attribute CreateAttribute(XAttribute xmlAttribute)
+        private AttributeViewModel CreateAttribute(XAttribute xmlAttribute)
         {
-            string key = (string)xmlAttribute.Name.LocalName;
-            string value = (string)xmlAttribute.Value;
-            Attribute attribute = new Attribute(key, value);
+            AttributeViewModel attribute = new AttributeViewModel((string)xmlAttribute.Name.LocalName) { Value = (string)xmlAttribute.Value };
+
             return attribute;
         }
 
-        public void SaveGame(Game game)
+        public void SaveGame(GameViewModel game)
         {
             // Check if the project file exists
 
@@ -296,28 +322,28 @@ namespace Kinectitude.Editor.Storage
                 new XAttribute(Constants.Width, game.Width),
                 new XAttribute(Constants.Height, game.Height),
                 new XAttribute(Constants.IsFullScreen, game.IsFullScreen),
-                new XAttribute(Constants.FirstScene, game.FirstScene.Name)
+                new XAttribute(Constants.FirstScene, game.FirstScene)
             );
 
-            foreach (Using use in game.Usings)
+            foreach (UsingViewModel use in game.Usings)
             {
                 XElement element = SerializeUsing(use);
                 document.Add(element);
             }
 
-            foreach (Entity entity in game.Entities)
+            foreach (EntityViewModel entity in game.Prototypes)
             {
                 XElement element = SerializeEntity(entity, Constants.PrototypeElement);
                 document.Add(element);
             }
 
-            foreach (Attribute attribute in game.Attributes)
+            foreach (AttributeViewModel attribute in game.Attributes)
             {
                 XAttribute xmlAttribute = SerializeAttribute(attribute);
                 document.Add(xmlAttribute);
             }
 
-            foreach (Scene scene in game.Scenes)
+            foreach (SceneViewModel scene in game.Scenes)
             {
                 XElement element = SerializeScene(scene);
                 document.Add(element);
@@ -326,15 +352,11 @@ namespace Kinectitude.Editor.Storage
             document.Save(gameFile);
         }
 
-        private XElement SerializeUsing(Using use)
+        private XElement SerializeUsing(UsingViewModel use)
         {
-            XElement element = new XElement
-            (
-                Constants.Using,
-                new XAttribute(Constants.File, use.File)
-            );
+            XElement element = new XElement(Constants.Using, new XAttribute(Constants.File, use.File));
 
-            foreach (Define define in use.Defines)
+            foreach (DefineViewModel define in use.Defines)
             {
                 XElement defineElement = SerializeDefine(define);
                 element.Add(defineElement);
@@ -343,32 +365,29 @@ namespace Kinectitude.Editor.Storage
             return element;
         }
 
-        private XElement SerializeDefine(Define define)
+        private XElement SerializeDefine(DefineViewModel define)
         {
-            XElement element = new XElement
-            (
-                Constants.Define,
-                new XAttribute(Constants.Name, define.Name),
-                new XAttribute(Constants.Class, define.Class)
-            );
+            XElement element = new XElement(Constants.Define, new XAttribute(Constants.Name, define.Name), new XAttribute(Constants.Class, define.Class));
             return element;
         }
 
-        private XElement SerializeScene(Scene scene)
+        private XElement SerializeScene(SceneViewModel scene)
         {
-            XElement element = new XElement
-            (
-                Constants.Scene,
-                new XAttribute(Constants.Name, scene.Name)
-            );
+            XElement element = new XElement(Constants.Scene, new XAttribute(Constants.Name, scene.Name));
 
-            foreach (Attribute attribute in scene.Attributes)
+            foreach (AttributeViewModel attribute in scene.Attributes)
             {
                 XAttribute xmlAttribute = SerializeAttribute(attribute);
                 element.Add(xmlAttribute);
             }
 
-            foreach (Entity entity in scene.Entities)
+            foreach (ManagerViewModel manager in scene.Managers)
+            {
+                XElement managerElement = SerializeManager(manager);
+                element.Add(managerElement);
+            }
+
+            foreach (EntityViewModel entity in scene.Entities)
             {
                 XElement entityElement = SerializeEntity(entity, Constants.Entity);
                 element.Add(entityElement);
@@ -377,7 +396,22 @@ namespace Kinectitude.Editor.Storage
             return element;
         }
 
-        private XElement SerializeEntity(Entity entity, XName elementName)
+        private XElement SerializeManager(ManagerViewModel manager)
+        {
+            XElement element = new XElement(Constants.Component, new XAttribute(Constants.Type, manager.Type));
+
+            foreach (AbstractPropertyViewModel property in manager.Properties)
+            {
+                if (!property.IsInherited)
+                {
+                    XAttribute propertyAttribute = SerializeProperty(property);
+                    element.Add(propertyAttribute);
+                }
+            }
+            return element;
+        }
+
+        private XElement SerializeEntity(EntityViewModel entity, XName elementName)
         {
             XElement element = new XElement(elementName);
 
@@ -389,88 +423,136 @@ namespace Kinectitude.Editor.Storage
 
             if (entity.Prototypes.Count() > 0)
             {
-                var prototypeNames = from prototypeEntity in entity.Prototypes select prototypeEntity.Name;
-                XAttribute prototype = new XAttribute(Constants.Prototype, string.Join(" ", prototypeNames));
+                XAttribute prototype = new XAttribute(Constants.Prototype, string.Join(" ", entity.Prototypes.Select(x => x.Name)));
                 element.Add(prototype);
             }
 
-            foreach (Attribute attribute in entity.Attributes)
+            foreach (AttributeViewModel attribute in entity.Attributes)
             {
-                XAttribute xmlAttribute = SerializeAttribute(attribute);
-                element.Add(xmlAttribute);
+                if (attribute.IsLocal)
+                {
+                    XAttribute xmlAttribute = SerializeAttribute(attribute);
+                    element.Add(xmlAttribute);
+                }
             }
 
-            foreach (Component component in entity.Components)
+            foreach (ComponentViewModel component in entity.Components)
             {
-                XElement componentElement = SerializeComponent(component);
-                element.Add(componentElement);
+                if (component.IsRoot || component.HasLocalProperties)
+                {
+                    XElement componentElement = SerializeComponent(component);
+                    element.Add(componentElement);
+                }
             }
 
-            foreach (Event evt in entity.Events)
+            foreach (AbstractEventViewModel evt in entity.Events)
             {
-                XElement eventElement = SerializeEvent(evt);
-                element.Add(eventElement);
+                if (evt.IsLocal)
+                {
+                    XElement eventElement = SerializeEvent(evt);
+                    element.Add(eventElement);
+                }
             }
             return element;
         }
 
-        private XAttribute SerializeAttribute(Attribute attribute)
+        private XAttribute SerializeAttribute(AttributeViewModel attribute)
         {
-            XAttribute xmlAttribute = new XAttribute(attribute.Key, attribute.Value.ToString());
+            XAttribute xmlAttribute = new XAttribute(attribute.Key, attribute.Value);
             return xmlAttribute;
         }
 
-        private XElement SerializeComponent(Component component)
+        private XElement SerializeComponent(ComponentViewModel component)
         {
-            XElement element = new XElement(
-                Constants.Component,
-                new XAttribute(Constants.Type, component.Descriptor.ClassName)
-            );
+            XElement element = new XElement(Constants.Component, new XAttribute(Constants.Type, component.Type));
 
-            foreach (Property property in component.Properties)
+            foreach (AbstractPropertyViewModel property in component.Properties)
             {
-                XAttribute propertyAttribute = new XAttribute(property.Descriptor.Name, property.ToString());
-                element.Add(propertyAttribute);
+                if (property.IsLocal)
+                {
+                    XAttribute propertyAttribute = SerializeProperty(property);
+                    element.Add(propertyAttribute);
+                }
             }
             return element;
         }
 
-        private XElement SerializeEvent(Event evt)
+        private XElement SerializeEvent(AbstractEventViewModel evt)
         {
-            XElement element = new XElement
-            (
-                Constants.Event,
-                new XAttribute(Constants.Type, evt.Descriptor.DisplayName)
-            );
+            XElement element = new XElement(Constants.Event, new XAttribute(Constants.Type, evt.Type));
 
-            foreach (Property property in evt.Properties)
+            foreach (AbstractPropertyViewModel property in evt.Properties)
             {
-                XAttribute propertyAttribute = new XAttribute(property.Descriptor.DisplayName, property.ToString());
-                element.Add(propertyAttribute);
+                if (!property.IsInherited)
+                {
+                    XAttribute propertyAttribute = SerializeProperty(property);
+                    element.Add(propertyAttribute);
+                }
             }
 
-            foreach (Action action in evt.Actions)
+            foreach (AbstractActionViewModel action in evt.Actions)
             {
-                XElement actionElement = SerializeAction(action);
+                XElement actionElement = null;
+
+                AbstractConditionViewModel condition = action as AbstractConditionViewModel;
+                if (null != condition)
+                {
+                    actionElement = SerializeCondition(condition);
+                }
+                else
+                {
+                    actionElement = SerializeAction(action);
+                }
+
                 element.Add(actionElement);
             }
+
             return element;
         }
 
-        private XElement SerializeAction(Action action)
+        private XElement SerializeCondition(AbstractConditionViewModel condition)
         {
-            XElement element = new XElement
-            (
-                Constants.Action,
-                new XAttribute(Constants.Type, action.Descriptor.DisplayName)
-            );
+            XElement element = new XElement(Constants.Condition, new XAttribute(Constants.If, condition.If));
 
-            foreach (Property property in action.Properties)
+            foreach (AbstractActionViewModel action in condition.Actions)
             {
-                XAttribute propertyAttribute = new XAttribute(property.Descriptor.DisplayName, property.ToString());
-                element.Add(propertyAttribute);
+                XElement actionElement = null;
+
+                AbstractConditionViewModel nestedCondition = action as AbstractConditionViewModel;
+                if (null != nestedCondition)
+                {
+                    actionElement = SerializeCondition(nestedCondition);
+                }
+                else
+                {
+                    actionElement = SerializeAction(action);
+                }
+
+                element.Add(actionElement);
+            }
+
+            return element;
+        }
+
+        private XElement SerializeAction(AbstractActionViewModel action)
+        {
+            XElement element = new XElement(Constants.Action, new XAttribute(Constants.Type, action.Type));
+
+            foreach (AbstractPropertyViewModel property in action.Properties)
+            {
+                if (!property.IsInherited)
+                {
+                    XAttribute propertyAttribute = SerializeProperty(property);
+                    element.Add(propertyAttribute);
+                }
             }
             return element;
+        }
+
+        private XAttribute SerializeProperty(AbstractPropertyViewModel property)
+        {
+            XAttribute propertyAttribute = new XAttribute(property.Name, property.Value);
+            return propertyAttribute;
         }
     }
 }

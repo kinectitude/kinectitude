@@ -1,326 +1,495 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows.Input;
 using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Commands.Base;
-using Kinectitude.Editor.Commands.Game;
-using Kinectitude.Editor.Models.Base;
 using Kinectitude.Editor.Storage;
-using Kinectitude.Editor.Views;
+using Kinectitude.Editor.ViewModels.Interfaces;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    internal sealed class GameViewModel : BaseModel
+    internal delegate void DefineAddedEventHandler(DefineViewModel define);
+    internal delegate void PluginAddedEventHandler(PluginViewModel plugin);
+    internal delegate void DefinedNameChangedEventHandler(PluginViewModel plugin, string newName);
+    
+    internal sealed class GameViewModel : BaseViewModel, IAttributeScope, IEntityScope, ISceneScope
     {
-        public const string DefaultName = "Untitled Game";
+        private string name;
+        private int width;
+        private int height;
+        private bool fullScreen;
+        private SceneViewModel firstScene;
+        private int nextAttribute;
+        private int nextScene;
 
-        private int autoIncrement;
-        private string fileName;
-        private readonly Game game;
-        private readonly ObservableCollection<AttributeViewModel> _attributes;
-        private readonly ObservableCollection<EntityViewModel> _prototypes;
-        private readonly ObservableCollection<SceneViewModel> _scenes;
-        private readonly ModelCollection<AttributeViewModel> attributes;
-        private readonly ModelCollection<EntityViewModel> prototypes;
-        private readonly ModelCollection<SceneViewModel> scenes;
-        private readonly IPluginNamespace pluginNamespace;
+        public event ScopeChangedEventHandler ScopeChanged { add { } remove { } }
 
-        public Game Game
-        {
-            get { return game; }
-        }
+        public event DefineAddedEventHandler DefineAdded;
+        public event DefinedNameChangedEventHandler DefineChanged;
+
+        public event AttributeEventHandler InheritedAttributeAdded { add { } remove { } }
+        public event AttributeEventHandler InheritedAttributeRemoved { add { } remove { } }
+        public event AttributeEventHandler InheritedAttributeChanged { add { } remove { } }
 
         public string FileName
         {
-            get { return fileName; }
-            set
-            {
-                if (fileName != value)
-                {
-                    fileName = value;
-                    RaisePropertyChanged("FileName");
-                }
-            }
+            get;
+            set;
         }
 
         public string Name
         {
-            get
-            {
-                return null != game.Name ? game.Name : DefaultName;
-            }
+            get { return name; }
             set
             {
-                if (game.Name != value)
+                if (name != value)
                 {
-                    CommandHistory.LogCommand(new RenameGameCommand(this, value));
-                    game.Name = value;
-                    RaisePropertyChanged("Name");
-                }
-            }
-        }
-
-        public string Description
-        {
-            get { return game.Description; }
-            set
-            {
-                if (game.Description != value)
-                {
-                    CommandHistory.LogCommand(new SetDescriptionCommand(this, value));
-                    game.Description = value;
-                    RaisePropertyChanged("Description");
+                    name = value;
+                    NotifyPropertyChanged("Name");
                 }
             }
         }
 
         public int Width
         {
-            get { return game.Width; }
+            get { return width; }
             set
             {
-                if (game.Width != value)
+                if (width != value)
                 {
-                    CommandHistory.LogCommand(new SetResolutionCommand(this, value, Height));
-                    game.Width = value;
-                    RaisePropertyChanged("Width");
+                    width = value;
+                    NotifyPropertyChanged("Width");
                 }
             }
         }
 
         public int Height
         {
-            get { return game.Height; }
+            get { return height; }
             set
             {
-                if (game.Height != value)
+                if (height != value)
                 {
-                    CommandHistory.LogCommand(new SetResolutionCommand(this, Width, value));
-                    game.Height = value;
-                    RaisePropertyChanged("Height");
+                    height = value;
+                    NotifyPropertyChanged("Height");
                 }
             }
         }
 
         public bool IsFullScreen
         {
-            get { return game.IsFullScreen; }
+            get { return fullScreen; }
             set
             {
-                if (game.IsFullScreen != value)
+                if (fullScreen != value)
                 {
-                    CommandHistory.LogCommand(new SetFullScreenCommand(this, value));
-                    game.IsFullScreen = value;
-                    RaisePropertyChanged("IsFullScreen");
+                    fullScreen = value;
+                    NotifyPropertyChanged("IsFullScreen");
                 }
             }
         }
 
         public SceneViewModel FirstScene
         {
-            get { return scenes.FirstOrDefault(x => x.Scene == game.FirstScene); }
+            get { return firstScene; }
             set
             {
-                if (null != value)
+                if (firstScene != value)
                 {
-                    CommandHistory.LogCommand(new SetFirstSceneCommand(this, value));
-                    game.FirstScene = value.Scene;
-                    RaisePropertyChanged("FirstScene");
+                    firstScene = value;
+                    NotifyPropertyChanged("FirstScene");
                 }
             }
         }
 
-        public ModelCollection<AttributeViewModel> Attributes
+        public ObservableCollection<UsingViewModel> Usings
         {
-            get { return attributes; }
+            get;
+            private set;
         }
 
-        public ModelCollection<EntityViewModel> Prototypes
+        public ObservableCollection<EntityViewModel> Prototypes
         {
-            get { return prototypes; }
+            get;
+            private set;
         }
 
-        public ModelCollection<SceneViewModel> Scenes
+        public ObservableCollection<SceneViewModel> Scenes
         {
-            get { return scenes; }
+            get;
+            private set;
+        }
+
+        public ObservableCollection<AttributeViewModel> Attributes
+        {
+            get;
+            private set;
+        }
+
+        public ObservableCollection<AssetViewModel> Assets
+        {
+            get;
+            private set;
+        }
+
+        public BaseViewModel CurrentItem
+        {
+            get;
+            set;
+        }
+
+        public ICommand AddPrototypeCommand
+        {
+            get;
+            private set;
+        }
+
+        public ICommand RemovePrototypeCommand
+        {
+            get;
+            private set;
         }
 
         public ICommand AddAttributeCommand
         {
-            get { return new DelegateCommand(null, ExecuteAddAttributeCommand); }
+            get;
+            private set;
         }
 
         public ICommand RemoveAttributeCommand
         {
-            get { return new DelegateCommand(null, ExecuteRemoveAttributeCommand); }
+            get;
+            private set;
         }
 
-        public ICommand CreateSceneCommand
+        public ICommand AddSceneCommand
         {
-            get { return new DelegateCommand(null, ExecuteCreateSceneCommand); }
+            get;
+            private set;
         }
 
-        public ICommand CreatePrototypeCommand
+        public ICommand RemoveSceneCommand
         {
-            get { return new DelegateCommand(null, ExecuteCreatePrototypeCommand); }
+            get;
+            private set;
         }
 
-        public ICommand DeleteItemCommand
+        public ICommand AddAssetCommand
         {
-            get { return new DelegateCommand(null, ExecuteDeleteItemCommand); }
+            get;
+            private set;
         }
 
-        public GameViewModel(Game game, IPluginNamespace pluginNamespace)
+        public ICommand RemoveAssetCommand
         {
-            this.game = game;
-            this.pluginNamespace = pluginNamespace;
-
-            var attributeViewModels = from attribute in game.Attributes select AttributeViewModel.GetViewModel(game, attribute.Key);
-            var prototypeViewModels = from entity in game.Entities select EntityViewModel.GetViewModel(entity);
-            var sceneViewModels = from scene in game.Scenes select SceneViewModel.GetViewModel(scene);
-
-            _attributes = new ObservableCollection<AttributeViewModel>(attributeViewModels);
-            _prototypes = new ObservableCollection<EntityViewModel>(prototypeViewModels);
-            _scenes = new ObservableCollection<SceneViewModel>(sceneViewModels);
-
-            attributes = new ModelCollection<AttributeViewModel>(_attributes);
-            prototypes = new ModelCollection<EntityViewModel>(_prototypes);
-            scenes = new ModelCollection<SceneViewModel>(_scenes);
+            get;
+            private set;
         }
 
-        public void SaveGame()
+        public ICommand SaveGameCommand
         {
-            if (null == FileName)
-            {
-                SaveGameAs();
-            }
-            else
-            {
-                IGameStorage storage = new XmlGameStorage(FileName, pluginNamespace);
-                storage.SaveGame(game);
-            }
+            get;
+            private set;
         }
 
-        public void SaveGameAs()
+        public GameViewModel(string name)
         {
-            Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
-            dialog.FileName = "game";
-            dialog.DefaultExt = ".xml";
-            dialog.Filter = "Kinectitude XML Files (.xml)|*.xml";
+            this.name = name;
+            Usings = new ObservableCollection<UsingViewModel>();
+            Assets = new ObservableCollection<AssetViewModel>();
+            Prototypes = new ObservableCollection<EntityViewModel>();
+            Scenes = new ObservableCollection<SceneViewModel>();
+            Attributes = new ObservableCollection<AttributeViewModel>();
 
-            Nullable<bool> result = dialog.ShowDialog();
-
-            if (result == true)
-            {
-                FileName = dialog.FileName;
-                IGameStorage storage = new XmlGameStorage(FileName, pluginNamespace);
-                storage.SaveGame(game);
-            }
-        }
-
-        public void ExecuteAddAttributeCommand(object parameter)
-        {
-            AttributeViewModel attribute = AttributeViewModel.GetViewModel(game, string.Format("attribute{0}", autoIncrement++));
-            AddAttribute(attribute);
-        }
-
-        public void ExecuteRemoveAttributeCommand(object parameter)
-        {
-            AttributeViewModel attribute = parameter as AttributeViewModel;
-            if (null != attribute)
-            {
-                RemoveAttribute(attribute);
-            }
-        }
-
-        public void ExecuteCreateSceneCommand(object parameter)
-        {
-            Scene scene = new Scene();
-            SceneViewModel viewModel = SceneViewModel.GetViewModel(scene);
-
-            SceneDialog dialog = new SceneDialog();
-            dialog.DataContext = viewModel;
-            dialog.ShowDialog();
-
-            if (dialog.DialogResult == true)
-            {
-                AddScene(viewModel);
-            }
-        }
-
-        public void ExecuteCreatePrototypeCommand(object parameter)
-        {
-            Entity entity = new Entity();
-            EntityViewModel entityViewModel = EntityViewModel.GetViewModel(entity);
-
-            ModalDialogService.ShowDialog<EntityViewModel>(ModalDialogService.Constants.EntityDialog, entityViewModel, (result) =>
+            AddPrototypeCommand = new DelegateCommand(null,
+                (parameter) =>
                 {
-                    if (true == result)
-                    {
-                        AddPrototype(entityViewModel);
-                    }
+                    EntityViewModel prototype = new EntityViewModel();
+                    // TODO Create UI to fill in prototype
+                    AddPrototype(prototype);
+                }
+            );
+
+            RemovePrototypeCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    RemovePrototype(parameter as EntityViewModel);
+                }
+            );
+
+            AddSceneCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    SceneViewModel scene = new SceneViewModel(GetNextSceneName());
+                    AddScene(scene);
+                }
+            );
+
+            RemoveSceneCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    RemoveScene(parameter as SceneViewModel);
+                }
+            );
+
+            AddAttributeCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    AttributeViewModel attribute = new AttributeViewModel(GetNextAttributeKey());
+                    AddAttribute(attribute);
+                }
+            );
+
+            RemoveAttributeCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    RemoveAttribute(parameter as AttributeViewModel);
+                }
+            );
+
+            AddAssetCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    // TODO: File Chooser
+                    AssetViewModel asset = new AssetViewModel("An Asset");
+                    AddAsset(asset);
+                }
+            );
+
+            RemoveAssetCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    RemoveAsset(parameter as AssetViewModel);
+                }
+            );
+
+            SaveGameCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    SaveGame();  // TODO: remove hard-coded string
                 }
             );
         }
 
-        public void ExecuteDeleteItemCommand(object parameter)
+        public void AddUsing(UsingViewModel use)
         {
-            SceneViewModel scene = parameter as SceneViewModel;
-            if (null != scene)
-            {
-                RemoveScene(scene);
-            }
-            else
-            {
-                EntityViewModel entity = parameter as EntityViewModel;
-                if (null != entity)
-                {
-                    RemovePrototype(entity);
-                }
-            }
+            use.DefineAdded += OnDefineAdded;
+            use.DefineChanged += OnDefineChanged;
+            Usings.Add(use);
         }
 
-        public void AddAttribute(AttributeViewModel attribute)
+        public void RemoveUsing(UsingViewModel use)
         {
-            CommandHistory.LogCommand(new AddAttributeCommand(this, attribute));
-            attribute.AddAttribute();
-            _attributes.Add(attribute);
+            use.DefineAdded -= OnDefineAdded;
+            use.DefineChanged -= OnDefineChanged;
+            Usings.Remove(use);
         }
 
-        public void RemoveAttribute(AttributeViewModel attribute)
+        private bool HasPrototypeWithName(string name)
         {
-            CommandHistory.LogCommand(new RemoveAttributeCommand(this, attribute));
-            attribute.RemoveAttribute();
-            _attributes.Remove(attribute);
+            return Prototypes.Any(x => x.Name == name);
         }
 
         public void AddPrototype(EntityViewModel prototype)
         {
-            CommandHistory.LogCommand(new CreatePrototypeCommand(this, prototype));
-            game.AddEntity(prototype.Entity);
-            _prototypes.Add(prototype);
+            if (null != prototype.Name && !HasPrototypeWithName(prototype.Name))
+            {
+                prototype.SetScope(this);
+
+                prototype.PluginAdded += OnPluginAdded;
+                foreach (PluginViewModel plugin in prototype.Plugins)
+                {
+                    DefinePlugin(plugin);
+                }
+
+                Prototypes.Add(prototype);
+            }
         }
 
         public void RemovePrototype(EntityViewModel prototype)
         {
-            CommandHistory.LogCommand(new DeletePrototypeCommand(this, prototype));
-            _prototypes.Remove(prototype);
-            game.RemoveEntity(prototype.Entity);
+            prototype.SetScope(null);
+            prototype.PluginAdded -= OnPluginAdded;
+            Prototypes.Remove(prototype);
+        }
+
+        public EntityViewModel GetPrototype(string name)
+        {
+            return Prototypes.FirstOrDefault(x => x.Name == name);
         }
 
         public void AddScene(SceneViewModel scene)
         {
-            CommandHistory.LogCommand(new CreateSceneCommand(this, scene));
-            game.AddScene(scene.Scene);
-            _scenes.Add(scene);
+            scene.SetScope(this);
+
+            scene.PluginAdded += OnPluginAdded;
+            foreach (PluginViewModel plugin in scene.Plugins)
+            {
+                DefinePlugin(plugin);
+            }
+            
+            Scenes.Add(scene);
         }
 
         public void RemoveScene(SceneViewModel scene)
         {
-            CommandHistory.LogCommand(new DeleteSceneCommand(this, scene));
-            _scenes.Remove(scene);
-            game.RemoveScene(scene.Scene);
+            scene.SetScope(null);
+            scene.PluginAdded -= OnPluginAdded;
+            Scenes.Remove(scene);
+        }
+
+        public SceneViewModel GetScene(string name)
+        {
+            return Scenes.FirstOrDefault(x => x.Name == name);
+        }
+
+        public void AddAttribute(AttributeViewModel attribute)
+        {
+            attribute.SetScope(this);
+            Attributes.Add(attribute);
+        }
+
+        public void RemoveAttribute(AttributeViewModel attribute)
+        {
+            attribute.SetScope(null);
+            Attributes.Remove(attribute);
+        }
+
+        public void AddAsset(AssetViewModel asset)
+        {
+            Assets.Add(asset);
+        }
+
+        public void RemoveAsset(AssetViewModel asset)
+        {
+            Assets.Remove(asset);
+        }
+
+        public void SaveGame()
+        {
+            IGameStorage storage = new XmlGameStorage(FileName);
+            storage.SaveGame(this);
+        }
+
+        public PluginViewModel GetPlugin(string name)
+        {
+            foreach (UsingViewModel use in Usings)
+            {
+                DefineViewModel define = use.GetDefineByName(name);
+                if (null != define)
+                {
+                    name = define.Class;
+                    break;
+                }
+            }
+
+            return Workspace.Instance.GetPlugin(name);
+        }
+
+        private string GetNextAttributeKey()
+        {
+            return string.Format("attribute{0}", nextAttribute++);
+        }
+
+        private string GetNextSceneName()
+        {
+            return string.Format("Scene {0}", nextScene++);
+        }
+
+        private void OnPluginAdded(PluginViewModel plugin)
+        {
+            DefinePlugin(plugin);
+        }
+
+        private bool HasDefineWithName(string name)
+        {
+            return Usings.Any(x => x.HasDefineWithName(name));
+        }
+
+        private bool HasDefineWithClass(string name)
+        {
+            return Usings.Any(x => x.HasDefineWithClass(name));
+        }
+
+        private UsingViewModel GetUsing(string file)
+        {
+            return Usings.FirstOrDefault(x => x.File == file);
+        }
+
+        private void DefinePlugin(PluginViewModel plugin)
+        {
+            if (!HasDefineWithClass(plugin.ClassName))
+            {
+                string name = plugin.ShortName;
+                if (HasDefineWithName(name))
+                {
+                    int sequenceNumber = 0;
+                    while (HasDefineWithName(string.Format("{0}{1}", plugin.ShortName, sequenceNumber)))
+                    {
+                        sequenceNumber++;
+                    }
+                    name = string.Format("{0}{1}", plugin.ShortName, sequenceNumber);
+                }
+
+                UsingViewModel use = GetUsing(plugin.File);
+                if (null == use)
+                {
+                    use = new UsingViewModel() { File = plugin.File };
+                    AddUsing(use);
+                }
+
+                DefineViewModel define = new DefineViewModel(name, plugin.ClassName);
+                use.AddDefine(define);
+            }
+        }
+
+        private void OnDefineAdded(DefineViewModel define)
+        {
+            if (null != DefineAdded)
+            {
+                DefineAdded(define);
+            }
+        }
+
+        private void OnDefineChanged(DefineViewModel define)
+        {
+            if (null != DefineChanged)
+            {
+                PluginViewModel plugin = GetPlugin(define.Class);
+                DefineChanged(plugin, define.Name);
+            }
+        }
+
+        bool IEntityNamespace.EntityNameExists(string name)
+        {
+            return HasPrototypeWithName(name);
+        }
+
+        string IAttributeScope.GetInheritedValue(string key)
+        {
+            return null;
+        }
+
+        bool IAttributeScope.HasInheritedAttribute(string key)
+        {
+            return false;
+        }
+
+        bool IAttributeScope.HasLocalAttribute(string key)
+        {
+            return Attributes.Any(x => x.Key == key);
+        }
+
+        string IPluginNamespace.GetDefinedName(PluginViewModel plugin)
+        {
+            foreach (UsingViewModel use in Usings)
+            {
+                DefineViewModel define = use.GetDefineByClass(plugin.ClassName);
+                if (null != define)
+                {
+                    return define.Name;
+                }
+            }
+
+            return null;
         }
     }
 }

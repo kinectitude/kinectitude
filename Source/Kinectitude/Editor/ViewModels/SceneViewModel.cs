@@ -1,130 +1,287 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
-using System.Windows.Input;
 using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Commands.Base;
-using Kinectitude.Editor.Commands.Scene;
-using Kinectitude.Editor.Models.Base;
+using Kinectitude.Editor.ViewModels.Interfaces;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    internal sealed class SceneViewModel : BaseModel
+    internal sealed class SceneViewModel : BaseViewModel, IEntityNamespace, IAttributeScope, IEntityScope
     {
-        private static readonly Dictionary<Scene, SceneViewModel> sceneViewModels;
+        private string name;
+        private ISceneScope scope;
+        private int nextAttribute;
 
-        static SceneViewModel()
-        {
-            sceneViewModels = new Dictionary<Scene, SceneViewModel>();
-        }
+        public event DefineAddedEventHandler DefineAdded;
+        public event DefinedNameChangedEventHandler DefineChanged;
+        public event ScopeChangedEventHandler ScopeChanged;
+        public event PluginAddedEventHandler PluginAdded;
 
-        public static SceneViewModel GetViewModel(Scene scene)
-        {
-            SceneViewModel sceneViewModel = null;
-            sceneViewModels.TryGetValue(scene, out sceneViewModel);
-            if (null == sceneViewModel)
-            {
-                sceneViewModel = new SceneViewModel(scene);
-                sceneViewModels[scene] = sceneViewModel;
-            }
-            return sceneViewModel;
-        }
-
-        private int autoIncrement;
-        private EntityViewModel currentEntity;
-        private readonly Scene scene;
-        private readonly ObservableCollection<AttributeViewModel> _attributes;
-        private readonly ObservableCollection<EntityViewModel> _entities;
-        private readonly ModelCollection<AttributeViewModel> attributes;
-        private readonly ModelCollection<EntityViewModel> entities;
-        
-        public Scene Scene
-        {
-            get { return scene; }
-        }
+        public event AttributeEventHandler InheritedAttributeAdded { add { } remove { } }
+        public event AttributeEventHandler InheritedAttributeRemoved { add { } remove { } }
+        public event AttributeEventHandler InheritedAttributeChanged { add { } remove { } }
 
         public string Name
         {
-            get { return scene.Name; }
+            get { return name; }
             set
             {
-                CommandHistory.LogCommand(new RenameSceneCommand(this, value));
-                scene.Name = value;
-                RaisePropertyChanged("Name");
+                if (name != value)
+                {
+                    name = value;
+                    NotifyPropertyChanged("Name");
+                }
             }
         }
 
-        public EntityViewModel CurrentEntity
+        public ObservableCollection<AttributeViewModel> Attributes
         {
-            get { return currentEntity; }
-            set
-            {
-                //SelectEntityCommand command = new SelectEntityCommand(this, value);
-                //command.Execute();
-            }
+            get;
+            private set;
         }
 
-        public ModelCollection<AttributeViewModel> Attributes
+        public ObservableCollection<ManagerViewModel> Managers
         {
-            get { return attributes; }
+            get;
+            private set;
         }
 
-        public ModelCollection<EntityViewModel> Entities
+        public ObservableCollection<EntityViewModel> Entities
         {
-            get { return entities; }
+            get;
+            private set;
+        }
+
+        public IEnumerable<PluginViewModel> Plugins
+        {
+            get { return Entities.SelectMany(x => x.Plugins).Union(Managers.Select(x => x.Plugin)).Distinct(); }
         }
 
         public ICommand AddAttributeCommand
         {
-            get { return new DelegateCommand(null, ExecuteAddAttributeCommand); }
+            get;
+            private set;
         }
 
         public ICommand RemoveAttributeCommand
         {
-            get { return new DelegateCommand(null, ExecuteRemoveAttributeCommand); }
+            get;
+            private set;
         }
 
-        public SceneViewModel(Scene scene)
+        public ICommand AddEntityCommand
         {
-            this.scene = scene;
-
-            var attributeViewModels = from attribute in scene.Attributes select AttributeViewModel.GetViewModel(scene, attribute.Key);
-            var entityViewModels = from entity in scene.Entities select EntityViewModel.GetViewModel(entity);
-
-            _attributes = new ObservableCollection<AttributeViewModel>(attributeViewModels);
-            _entities = new ObservableCollection<EntityViewModel>(entityViewModels);
-
-            attributes = new ModelCollection<AttributeViewModel>(_attributes);
-            entities = new ModelCollection<EntityViewModel>(_entities);
+            get;
+            private set;
         }
 
-        public void ExecuteAddAttributeCommand(object parameter)
+        public ICommand RemoveEntityCommand
         {
-            AttributeViewModel attribute = AttributeViewModel.GetViewModel(scene, string.Format("attribute{0}", autoIncrement++));
-            AddAttribute(attribute);
+            get;
+            private set;
         }
 
-        public void ExecuteRemoveAttributeCommand(object parameter)
+        public SceneViewModel(string name)
         {
-            AttributeViewModel attribute = parameter as AttributeViewModel;
-            if (null != attribute)
+            this.name = name;
+            Attributes = new ObservableCollection<AttributeViewModel>();
+            Managers = new ObservableCollection<ManagerViewModel>();
+            Entities = new ObservableCollection<EntityViewModel>();
+
+            AddAttributeCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    AttributeViewModel attribute = new AttributeViewModel(GetNextAttributeKey());
+                    AddAttribute(attribute);
+                }
+            );
+
+            RemoveAttributeCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    RemoveAttribute(parameter as AttributeViewModel);
+                }
+            );
+
+            AddEntityCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    EntityViewModel entity = new EntityViewModel();
+                    AddEntity(entity);
+                }
+            );
+
+            RemoveEntityCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    RemoveEntity(parameter as EntityViewModel);
+                }
+            );
+        }
+
+        public void SetScope(ISceneScope scope)
+        {
+            if (null != this.scope)
             {
-                RemoveAttribute(attribute);
+                this.scope.DefineAdded -= OnDefineAdded;
+                this.scope.DefineChanged -= OnDefinedNameChanged;
+                this.scope.ScopeChanged -= OnScopeChanged;
             }
+
+            this.scope = scope;
+
+            if (null != this.scope)
+            {
+                this.scope.DefineAdded += OnDefineAdded;
+                this.scope.DefineChanged += OnDefinedNameChanged;
+                this.scope.ScopeChanged += OnScopeChanged;
+            }
+
+            NotifyScopeChanged();
         }
 
         public void AddAttribute(AttributeViewModel attribute)
         {
-            CommandHistory.LogCommand(new AddAttributeCommand(this, attribute));
-            attribute.AddAttribute();
-            _attributes.Add(attribute);
+            attribute.SetScope(this);
+            Attributes.Add(attribute);
         }
 
         public void RemoveAttribute(AttributeViewModel attribute)
         {
-            CommandHistory.LogCommand(new RemoveAttributeCommand(this, attribute));
-            attribute.RemoveAttribute();
-            _attributes.Remove(attribute);
+            attribute.SetScope(null);
+            Attributes.Remove(attribute);
+        }
+
+        public void AddManager(ManagerViewModel manager)
+        {
+            Managers.Add(manager);
+        }
+
+        public void RemoveManager(ManagerViewModel manager)
+        {
+            Managers.Remove(manager);
+        }
+
+        public void AddEntity(EntityViewModel entity)
+        {
+            if (!EntityNameExists(entity.Name))
+            {
+                entity.SetScope(this);
+                Entities.Add(entity);
+
+                entity.Components.CollectionChanged += OnEntityComponentChanged;
+                foreach (ComponentViewModel component in entity.Components)
+                {
+                    ResolveComponentDependencies(component);
+                }
+
+                entity.PluginAdded += OnEntityPluginAdded;
+            }
+        }
+
+        public void RemoveEntity(EntityViewModel entity)
+        {
+            entity.SetScope(null);
+            Entities.Remove(entity);
+            entity.Components.CollectionChanged -= OnEntityComponentChanged;
+            entity.PluginAdded -= OnEntityPluginAdded;
+        }
+
+        private string GetNextAttributeKey()
+        {
+            return string.Format("attribute{0}", nextAttribute++);
+        }
+
+        private void ResolveComponentDependencies(ComponentViewModel component)
+        {
+            foreach (string require in component.Requires)
+            {
+                PluginViewModel plugin = GetPlugin(require);
+                if (plugin.Type == PluginType.Manager)
+                {
+                    ManagerViewModel manager = new ManagerViewModel(plugin);
+                    AddManager(manager);
+                }
+            }
+        }
+
+        private void OnEntityComponentChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            if (args.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (ComponentViewModel component in args.NewItems)
+                {
+                    ResolveComponentDependencies(component);
+                }
+            }
+        }
+
+        public PluginViewModel GetPlugin(string type)
+        {
+            return null != scope ? scope.GetPlugin(type) : Workspace.Instance.GetPlugin(type);
+        }
+
+        private void OnEntityPluginAdded(PluginViewModel plugin)
+        {
+            if (null != PluginAdded)
+            {
+                PluginAdded(plugin);
+            }
+        }
+
+        private void NotifyScopeChanged()
+        {
+            if (null != ScopeChanged)
+            {
+                ScopeChanged();
+            }
+        }
+
+        private void OnScopeChanged()
+        {
+            NotifyScopeChanged();
+        }
+
+        private void OnDefineAdded(DefineViewModel define)
+        {
+            if (null != DefineAdded)
+            {
+                DefineAdded(define);
+            }
+        }
+
+        private void OnDefinedNameChanged(PluginViewModel plugin, string newName)
+        {
+            if (null != DefineChanged)
+            {
+                DefineChanged(plugin, newName);
+            }
+        }
+
+        public bool EntityNameExists(string name)
+        {
+            return Entities.Any(x => x.Name != null && x.Name == name) || null != scope && scope.EntityNameExists(name);
+        }
+
+        string IPluginNamespace.GetDefinedName(PluginViewModel plugin)
+        {
+            return null != scope ? scope.GetDefinedName(plugin) : null;
+        }
+
+        bool IAttributeScope.HasInheritedAttribute(string key)
+        {
+            return false;
+        }
+
+        string IAttributeScope.GetInheritedValue(string key)
+        {
+            return null;
+        }
+
+        bool IAttributeScope.HasLocalAttribute(string key)
+        {
+            return Attributes.Any(x => x.Key == key);
         }
     }
 }

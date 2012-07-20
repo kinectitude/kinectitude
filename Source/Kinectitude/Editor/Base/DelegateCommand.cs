@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Input;
 
 namespace Kinectitude.Editor.Base
 {
@@ -26,8 +25,8 @@ namespace Kinectitude.Editor.Base
 
         public event EventHandler CanExecuteChanged
         {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
+            add { }
+            remove { }
         }
 
         public void Execute(object parameter)

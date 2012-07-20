@@ -62,10 +62,17 @@
     <Compile Include="Core\Data\StringDataTests.cs" />
     <Compile Include="Core\Loaders\GameLoaderTests.cs" />
     <Compile Include="Core\TestMocks\TestMocks.cs" />
-    <Compile Include="Editor\ComponentViewModelTests.cs" />
-    <Compile Include="Editor\EntityAttributeViewModelTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Editor\ActionViewModelTests.cs" />
     <Compile Include="Editor\AttributeViewModelTests.cs" />
+    <Compile Include="Editor\ComponentViewModelTests.cs" />
+    <Compile Include="Editor\ConditionViewModelTests.cs" />
+    <Compile Include="Editor\EntityViewModelTests.cs" />
+    <Compile Include="Editor\EventViewModelTests.cs" />
+    <Compile Include="Editor\GameViewModelTests.cs" />
+    <Compile Include="Editor\PropertyViewModelTests.cs" />
+    <Compile Include="Editor\SceneViewModelTests.cs" />
+    <Compile Include="Editor\WorkspaceTests.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Kinectitude.Core.csproj">
