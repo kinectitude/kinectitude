@@ -9,17 +9,17 @@ namespace Kinectitude.Tests.Core.Base
     public class ConditionTests
     {
 
-        Scene scene;
-        Entity one = new Entity(0);
+        static Scene scene;
+        static Entity one = new Entity(0);
 
-        public ConditionTests()
+        static ConditionTests()
         {
-            SceneLoaderMock slm = new SceneLoaderMock(new GameLoaderMock());
+            SceneLoaderMock slm = new SceneLoaderMock(new GameLoaderMock(), new LoaderUtilityMock());
             one["true"] = "true";
             one["one"] = "one";
             one["false"] = "false";
-            slm.EntityByName["one"] = one;
             scene = new Scene(slm, new Game(new GameLoaderMock()));
+            scene.EntityByName["one"] = one;
             one.Scene = scene;
         }
 

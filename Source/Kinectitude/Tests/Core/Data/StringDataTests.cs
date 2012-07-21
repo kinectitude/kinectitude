@@ -47,7 +47,7 @@ namespace Kinectitude.Tests.Core.Data
 
         public StringDataTests()
         {
-            scene = new Scene(new SceneLoaderMock(new GameLoaderMock()), game);
+            scene = new Scene(new SceneLoaderMock(new GameLoaderMock(), new LoaderUtilityMock()), game);
             game["gtest"] = gameTest;
             scene["stest"] = sceneTest;
             entity["etest"] = entityTest;
@@ -78,7 +78,7 @@ namespace Kinectitude.Tests.Core.Data
             List<Tuple<string, string>> list = new List<Tuple<string,string>>();
             list.Add(values);
             GameLoaderMock glm = new GameLoaderMock();
-            LoadedScene tmp = new LoadedScene("name", new List<Tuple<string,string>>(), new SceneLoaderMock(glm), glm.Game);
+            LoadedScene tmp = new LoadedScene("name", new List<Tuple<string,string>>(), new SceneLoaderMock(glm, new LoaderUtilityMock()), glm.Game);
             LoadedManager.GetLoadedManager("manager", tmp, new List<Tuple<string, string>>() { new Tuple<string,string>("Value", managerTest) });
             IManager manager = LoadedManager.CreateManagers(tmp, "manager");
             scene.Managers.Add(manager);

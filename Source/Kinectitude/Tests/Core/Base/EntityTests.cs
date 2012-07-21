@@ -37,21 +37,21 @@ namespace Kinectitude.Tests.Core.Base
         [ExpectedException(typeof(MissingRequirementsException))]
         public void MissingComponent()
         {
-            LoadedEntity e = new LoadedEntity("", new System.Collections.Generic.List<Tuple<string, string>>(), 0);
+            LoadedEntity e = new LoadedEntity("", new System.Collections.Generic.List<Tuple<string, string>>(), 0, new List<string>(), new List<string>());
             e.AddLoadedComponent(new LoadedComponent("RequiresTransformComponent", new List<Tuple<string,string>>()));
             GameLoaderMock glm = new GameLoaderMock();
-            Scene s = new Scene(new SceneLoaderMock(glm), glm.Game);
+            Scene s = new Scene(new SceneLoaderMock(glm, new LoaderUtilityMock()), glm.Game);
             e.Create(s);
         }
 
         [TestMethod]
         public void HasComponent()
         {
-            LoadedEntity e = new LoadedEntity("", new System.Collections.Generic.List<Tuple<string, string>>(), 0);
+            LoadedEntity e = new LoadedEntity("", new List<Tuple<string, string>>(), 0, new List<string>(), new List<string>());
             e.AddLoadedComponent(new LoadedComponent("RequiresTransformComponent", new List<Tuple<string,string>>()));
             e.AddLoadedComponent(new LoadedComponent("TransformComponent", new List<Tuple<string, string>>()));
             GameLoaderMock glm = new GameLoaderMock();
-            Scene s = new Scene(new SceneLoaderMock(glm), glm.Game);
+            Scene s = new Scene(new SceneLoaderMock(glm, new LoaderUtilityMock()), glm.Game);
             e.Create(s);
         }
 
@@ -62,18 +62,18 @@ namespace Kinectitude.Tests.Core.Base
             string name = "name";
             e.Name = name;
             GameLoaderMock glm = new GameLoaderMock();
-            SceneLoaderMock slm = new SceneLoaderMock(glm);
-            slm.EntityById[0] = e;
-            slm.EntityByName[name] = e;
+            SceneLoaderMock slm = new SceneLoaderMock(glm, new LoaderUtilityMock());
             Scene s = new Scene(slm, new Game(glm));
+            s.EntityById[0] = e;
+            s.EntityByName[name] = e;
             e.Scene = s;
             ComponentMock cm = new ComponentMock();
             e.AddComponent(cm, "component");
             e.Ready();
             e.Destroy();
             Assert.IsTrue(cm.Destroyed);
-            Assert.IsFalse(slm.EntityById.ContainsKey(0));
-            Assert.IsFalse(slm.EntityByName.ContainsKey(name));
+            Assert.IsFalse(s.EntityById.ContainsKey(0));
+            Assert.IsFalse(s.EntityByName.ContainsKey(name));
         }
     }
 }

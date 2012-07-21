@@ -132,6 +132,9 @@
     <Compile Include="Exceptions\InvalidValueWriterException.cs" />
     <Compile Include="Exceptions\MissingRequirementsException.cs" />
     <Compile Include="Exceptions\NoSuchPrototypeException.cs" />
+    <Compile Include="Loaders\EnglishLanguageKeywords.cs" />
+    <Compile Include="Loaders\LanguageKeywords.cs" />
+    <Compile Include="Loaders\XMLLoaderUtility.cs" />
     <Compile Include="Loaders\GameLoader.cs" />
     <Compile Include="Loaders\LoadedAction.cs" />
     <Compile Include="Loaders\LoadedBaseAction.cs" />
@@ -142,9 +145,8 @@
     <Compile Include="Loaders\LoadedManager.cs" />
     <Compile Include="Loaders\LoadedObject.cs" />
     <Compile Include="Loaders\LoadedScene.cs" />
+    <Compile Include="Loaders\LoaderUtility.cs" />
     <Compile Include="Loaders\SceneLoader.cs" />
-    <Compile Include="Loaders\XMLGameLoader.cs" />
-    <Compile Include="Loaders\XMLSceneLoader.cs" />
     <Compile Include="Managers\TimeManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

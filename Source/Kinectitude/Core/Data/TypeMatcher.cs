@@ -85,7 +85,7 @@ namespace Kinectitude.Core.Data
             {
                 return new SingleTypeMatcher(entity);
             }
-            entity = scene.EntityByName(value);
+            entity = scene.GetEntity(value);
             return new SingleTypeMatcher(entity);
         }
 

@@ -8,6 +8,7 @@ using Kinectitude.Core.Components;
 using Kinectitude.Core.Actions;
 using Kinectitude.Tests.Core.TestMocks;
 using Kinectitude.Core.Events;
+using Kinectitude.Core.Loaders;
 
 namespace Kinectitude.Tests.Core.Actions
 {
@@ -75,7 +76,12 @@ namespace Kinectitude.Tests.Core.Actions
         {
             GameLoaderMock gameLoader = new GameLoaderMock();
             Game game = new Game(gameLoader);
-            SceneLoaderMock sceneLoader = new SceneLoaderMock(gameLoader);
+            LoaderUtilityMock loadermock = new LoaderUtilityMock();
+            loadermock.Lang = new EnglishLanguageKeywords();
+            loadermock.Properties = new Dictionary<string, string>() { {"Name", "a" }};
+            loadermock.Values = new List<Tuple<string, string>>();
+            SceneLoaderMock sceneLoader = new SceneLoaderMock(gameLoader, loadermock);
+            gameLoader.AvaliblePrototypes.Add("CreateX");
             sceneLoader.callPrototypeMaker("CreateX");
             Scene scene = new Scene(sceneLoader, game);
             Entity entity = new Entity(0);
@@ -86,7 +92,7 @@ namespace Kinectitude.Tests.Core.Actions
             createEntityAction.Event = evtMock;
             createEntityAction.Prototype = "CreateX";
             createEntityAction.Run();
-            Assert.IsTrue(sceneLoader.EntityCreated == "CreateX");
+            Assert.IsTrue(scene.IsType["CreateX"].Contains(sceneLoader.EntityCreated.Id));
         }
     }
 }

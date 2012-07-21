@@ -2,31 +2,28 @@
 <Game Name="pong" Width="800" Height="600" FirstScene="Main Menu" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1">
   
   <Prototype Name="prototype1" score="100">
-    <Component Type="SomeComponent" Property1="1000" Property2="2000"/>
-    <Event Type="SomeEvent">
-      <Action Type="SomeAction"/>
+    <Component Type="TransformComponent" X="1000" Y="2000"/>
+    <Event Type="AttributeChanges">
+      <Action Type="TransformComponent"/>
     </Event>
   </Prototype>
 
   <Prototype Name="prototype2" score="50" Prototype="prototype1">
-    <Component Type="SomeComponent" Property2="5000" Property3="5900"/>
-    <Event Type="SomeEvent">
-      <Action Type="SomeAction"/>
+    <Component Type="TransformComponent" X="5000" Y="5900"/>
+    <Event Type="AttributeChanges">
+      <Action Type="SetAction"/>
     </Event>
   </Prototype>
 
   <Prototype Name="prototype3" Prototype="prototype2">
-    <Component Type="SomeComponent" Property3="10"/>
+    <Component Type="TransformComponent" Property3="10"/>
   </Prototype>
 
-  <Prototype Name="prototype4" Prototype="prototype1 prototype2">
-    <Component Type="SomeComponent" />
-  </Prototype>
+  <Prototype Name="prototype4" Prototype="prototype1 prototype2"/>
 
   <Scene Name="this scene" score="0">
     <Entity Name="myName" Prototype="prototype2 prototype3">
-      <Component Type="lol"/>
-      <Component Type="SomeComponent" Property1="15"/>
+      <Component Type="TransformComponent" X="15"/>
     </Entity>
   </Scene>
   

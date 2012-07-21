@@ -27,7 +27,6 @@ namespace Kinectitude.Core.Loaders
         {
             Scene scene = new Scene(Loader, Game);
             scene.Name = Name;
-            int onid = 0;
             setValues(scene);
             foreach (string type in Managers)
             {
@@ -39,9 +38,9 @@ namespace Kinectitude.Core.Loaders
             foreach (LoadedEntity loadedEntity in loadedEntities)
             {
                 Entity entity = loadedEntity.Create(scene);
-                Loader.EntityById[entity.Id] = entity;
+                scene.EntityById[entity.Id] = entity;
                 entity.Scene = scene;
-                if (null != entity.Name) Loader.EntityByName.Add(entity.Name, entity);
+                if (null != entity.Name) scene.EntityByName.Add(entity.Name, entity);
                 entity.Ready();
             }
 

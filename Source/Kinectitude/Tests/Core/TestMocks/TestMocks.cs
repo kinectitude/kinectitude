@@ -5,6 +5,9 @@ using Kinectitude.Core.Data;
 using Kinectitude.Core.Loaders;
 using Action = Kinectitude.Core.Base.Action;
 using System.Collections.Generic;
+using System.Reflection;
+using System;
+using System.Collections;
 
 namespace Kinectitude.Tests.Core.TestMocks
 {
@@ -13,12 +16,7 @@ namespace Kinectitude.Tests.Core.TestMocks
     {
         internal SceneLoader mockScene = null;
 
-        public GameLoaderMock() : base("test") { }
-
-        internal override SceneLoader GetSceneLoader(string name) 
-        {
-            return mockScene;
-        }
+        public GameLoaderMock() : base("test.xml", new Assembly[] { }) { }
 
         public void addType(string name)
         {
@@ -29,27 +27,107 @@ namespace Kinectitude.Tests.Core.TestMocks
 
     internal class SceneLoaderMock : SceneLoader
     {
-        public string EntityCreated = "";
-
         GameLoaderMock glm;
+        LoaderUtility lu;
 
-        public SceneLoaderMock(GameLoader gameLoader) : base(gameLoader) 
+        public SceneLoaderMock(GameLoader gameLoader, LoaderUtility lu) : base("a", null, lu, gameLoader) 
         {
             glm = gameLoader as GameLoaderMock;
-        }
-
-        protected override LoadedEntity PrototypeMaker(string name)
-        {
-            EntityCreated = name;
-            return new LoadedEntity(name, new List<System.Tuple<string, string>>(), 0);
+            this.lu = lu;
         }
 
         public void callPrototypeMaker(string name)
         {
             if (glm != null) glm.addType(name);
+            glm.Prototypes[name] = 10;
             PrototypeMaker(name);
         }
 
+    }
+
+    internal class LoaderUtilityMock : LoaderUtility
+    {
+
+        bool loaded = false;
+
+        internal override object Load()
+        {
+            loaded = true;
+            return null;
+        }
+
+        public List<Tuple<string, string>> Values { get; set; }
+
+        internal override List<Tuple<string, string>> GetValues(object from, HashSet<string> ignore)
+        {
+            return Values;
+        }
+
+        public Dictionary<string, string> Properties { get; set; }
+
+        internal override Dictionary<string, string> GetProperties(object from, HashSet<string> specialWords)
+        {
+            return Properties;
+        }
+
+        internal override IEnumerable<object> GetOfType(object entity, object type)
+        {
+            return new EnumerableMock<object>();
+        }
+
+        internal override IEnumerable<object> GetAll(object evt)
+        {
+            return null;
+        }
+
+        internal override bool IsAciton(object obj)
+        {
+            return true;
+        }
+
+        internal override void CreateWithPrototype(GameLoader gl, string name, ref object entity, int id) { }
+
+        internal override void MergePrototpye(ref object newPrototype, string myName, string mergeWith) { }
+
+        public LoaderUtilityMock()
+        {
+            Lang = new EnglishLanguageKeywords();
+        }
+    }
+
+    public class EnumerableMock<T> : IEnumerable<T>
+    {
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return new EMock<T>();
+        }
+
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class EMock<T> : IEnumerator<T>
+    {
+
+        public T Current
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public void Dispose() { }
+
+        public bool MoveNext(){return false;}
+
+        public void Reset() { }
+
+        object IEnumerator.Current
+        {
+            get { throw new NotImplementedException(); }
+        }
     }
 
     public class ActionMock : Action

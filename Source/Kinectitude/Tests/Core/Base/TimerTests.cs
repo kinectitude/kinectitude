@@ -18,7 +18,7 @@ namespace Kinectitude.Tests.Core.Base
         {
             GameLoaderMock gameLoader = new GameLoaderMock();
             Game game = new Game(gameLoader);
-            SceneLoaderMock sceneLoader = new SceneLoaderMock(gameLoader);
+            SceneLoaderMock sceneLoader = new SceneLoaderMock(gameLoader, new LoaderUtilityMock());
             Scene scene = new Scene(sceneLoader, game);
             Entity entity = new Entity(0);
             entity.Scene = scene;
@@ -46,7 +46,7 @@ namespace Kinectitude.Tests.Core.Base
         {
             GameLoaderMock gameLoader = new GameLoaderMock();
             Game game = new Game(gameLoader);
-            SceneLoaderMock sceneLoader = new SceneLoaderMock(gameLoader);
+            SceneLoaderMock sceneLoader = new SceneLoaderMock(gameLoader, new LoaderUtilityMock());
             Scene scene = new Scene(sceneLoader, game);
             Entity entity = new Entity(0);
             entity.Scene = scene;

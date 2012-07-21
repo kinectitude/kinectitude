@@ -39,7 +39,7 @@ namespace Kinectitude.Tests.Core.Data
 
         public MathDataTests()
         {
-            scene = new Scene(new SceneLoaderMock(new GameLoaderMock()), game);
+            scene = new Scene(new SceneLoaderMock(new GameLoaderMock(), new LoaderUtilityMock()), game);
             entity["one"] = "1";
             entity["onePOne"] = "1.1";
             entity["two"] = "2";

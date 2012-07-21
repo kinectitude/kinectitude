@@ -10,39 +10,25 @@ namespace Kinectitude.Core.Base
     {
         internal readonly Dictionary<Type, IManager> ManagersDictionary;
         internal readonly List<IManager> Managers;
-        private readonly Dictionary<int, Entity> entityById;
         private readonly Dictionary<string, List<TriggerOccursEvent>> triggers;
         private readonly SceneLoader seceneLoader;
-        private readonly Dictionary<string, Entity> entityByName;
 
         private readonly Dictionary<string, List<Timer>> runningTimers = new Dictionary<string, List<Timer>>();
         private readonly Dictionary<string, List<Timer>> pausedTimers = new Dictionary<string, List<Timer>>();
 
         private bool started = false;
 
-        internal List<SceneStartsEvent> OnStart
-        {
-            get;
-            private set;
-        }
-        
-        internal Game Game
-        {
-            get;
-            private set;
-        }
+        internal List<SceneStartsEvent> OnStart { get; private set; }
 
-        internal Dictionary<string, HashSet<int>> IsType
-        {
-            get;
-            set;
-        }
-        
-        internal Dictionary<string, HashSet<int>> IsExactType
-        {
-            get;
-            set;
-        }
+        internal Game Game { get; private set; }
+
+        internal Dictionary<string, HashSet<int>> IsType { get; private set; }
+
+        internal Dictionary<string, HashSet<int>> IsExactType { get; private set; }
+
+        internal Dictionary<int, Entity> EntityById { get; private set; }
+
+        internal Dictionary<string, Entity> EntityByName { get; private set; }
 
         private bool running = false;
         internal bool Running
@@ -82,10 +68,10 @@ namespace Kinectitude.Core.Base
             Managers = new List<IManager>();
             Game = game;
             OnStart = new List<SceneStartsEvent>();
-            IsType = sceneLoader.IsType;
-            IsExactType = sceneLoader.IsExactType;
-            entityById = sceneLoader.EntityById;
-            entityByName = sceneLoader.EntityByName;
+            IsType = new Dictionary<string, HashSet<int>>();
+            IsExactType = new Dictionary<string, HashSet<int>>();
+            EntityById = new Dictionary<int, Entity>();
+            EntityByName = new Dictionary<string, Entity>();
             triggers = new Dictionary<string,List<TriggerOccursEvent>>();
             this.seceneLoader = sceneLoader;
         }
@@ -146,9 +132,9 @@ namespace Kinectitude.Core.Base
             triggers.Add(name, tlist);
         }
 
-        internal Entity EntityByName(string name)
+        internal Entity GetEntity(string name)
         {
-            return entityByName[name];
+            return EntityByName[name];
         }
 
         internal void CreateEntity(string prototype)
@@ -230,9 +216,9 @@ namespace Kinectitude.Core.Base
         {
             if (delete.Name != null)
             {
-                entityByName.Remove(delete.Name);
+                EntityByName.Remove(delete.Name);
             }
-            entityById.Remove(delete.Id);
+            EntityById.Remove(delete.Id);
             //I don't think I need to remove the entity from each type matcher, since it won't be refered to by anything.
         }
 

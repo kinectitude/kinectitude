@@ -19,18 +19,21 @@ namespace Kinectitude.Core.Loaders
         private readonly List<LoadedComponent> components = new List<LoadedComponent>();
 
         private readonly List<LoadedEvent> events = new List<LoadedEvent>();
-
-
         private readonly string Name;
+        private readonly List<string> isType;
+        private readonly List<string> isExactType;
 
         private bool firstCreate = true;
 
         int id;
 
-        internal LoadedEntity(string name, List<Tuple<string, string>> values, int id): base(values)
+        internal LoadedEntity(string name, List<Tuple<string, string>> values, 
+            int id, List<string> isType, List<string> isExactType): base(values)
         {
             Name = name;
             this.id = id;
+            this.isExactType = isExactType;
+            this.isType = isType;
         }
 
         internal void AddLoadedComponent(LoadedComponent component)

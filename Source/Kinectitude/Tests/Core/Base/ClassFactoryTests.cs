@@ -12,7 +12,7 @@ namespace Kinectitude.Tests.Core.Base
     public class ClassFactoryTests
     {
 
-        private Scene scene = new Scene(new SceneLoaderMock(new GameLoaderMock()), new Game(new GameLoaderMock()));
+        private Scene scene = new Scene(new SceneLoaderMock(new GameLoaderMock(), new LoaderUtilityMock()), new Game(new GameLoaderMock()));
         private EventMock evt = new EventMock();
         private ActionMock action = new ActionMock();
 
@@ -83,12 +83,9 @@ namespace Kinectitude.Tests.Core.Base
         [TestMethod]
         public void SetTypeExpressionTest()
         {
-            
 
-            scene.IsType = new Dictionary<string,HashSet<int>>()
-            {
-                { "ball", new HashSet<int>() { 0 } }
-            };
+
+            scene.IsType["ball"] = new HashSet<int>() { 0 };
             evt.AddAction(action);
 
             Entity entity = new Entity(0);

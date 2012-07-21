@@ -61,7 +61,6 @@
     <Compile Include="Core\Data\MathDataTests.cs" />
     <Compile Include="Core\Data\StringDataTests.cs" />
     <Compile Include="Core\Loaders\GameLoaderTests.cs" />
-    <Compile Include="Core\Loaders\XMLGameLoaderTests.cs" />
     <Compile Include="Core\TestMocks\TestMocks.cs" />
     <Compile Include="Editor\ComponentViewModelTests.cs" />
     <Compile Include="Editor\EntityAttributeViewModelTests.cs" />

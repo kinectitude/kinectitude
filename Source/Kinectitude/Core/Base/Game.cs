@@ -32,7 +32,7 @@ namespace Kinectitude.Core.Base
 
         public void Start()
         {
-            Scene main = GameLoader.GetSceneLoader(GameLoader.FirstScene).LoadedScene.Create();
+            Scene main = GameLoader.GetScene(GameLoader.FirstScene);
             currentScenes.Push(main);
             main.Running = true;
         }
@@ -49,7 +49,7 @@ namespace Kinectitude.Core.Base
         internal void RunScene(string name)
         {
             currentScenes.Pop().Running = false;
-            Scene run = GameLoader.GetSceneLoader(name).LoadedScene.Create();
+            Scene run = GameLoader.GetScene(name);
             currentScenes.Push(run);
             run.Running = true;
         }
@@ -57,7 +57,7 @@ namespace Kinectitude.Core.Base
         internal void PushScene(string name)
         {
             currentScenes.Peek().Running = false;
-            Scene run = GameLoader.GetSceneLoader(name).LoadedScene.Create();
+            Scene run = GameLoader.GetScene(name);
             currentScenes.Push(run);
             run.Running = true;
         }

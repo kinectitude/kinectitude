@@ -13,7 +13,7 @@ namespace Kinectitude.DirectInput
 
         private MouseManager mouseManager;
 
-        [Plugin("Button to create action with", "")]
+        [Plugin("Button to create evt with", "")]
         public Button Button { get; set; }
 
         [Plugin("Button number for other buttons", "If button type is other, the button with id ButtonNumber is used")]

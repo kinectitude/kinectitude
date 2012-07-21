@@ -14,8 +14,6 @@ namespace Kinectitude.Core.Base
         private float time;
         private readonly float initTime;
 
-        int i = 0;
-
         internal Timer(IExpressionReader expressionReader, float time, bool recurring)
         {
             ExpressionReader = expressionReader;
