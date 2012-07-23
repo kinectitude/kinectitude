@@ -216,11 +216,10 @@ namespace Kinectitude.Physics
                 tc.Y = y;
                 checkCrossesLine(x, y);
             }
-			
-			float speed = body.LinearVelocity.Length();
 
-            xVelocity = body.LinearVelocity.X / speedRatio;
-            yVelocity = body.LinearVelocity.Y / speedRatio;
+            tc.Rotation = body.Rotation;
+
+			float speed = body.LinearVelocity.Length();
 
             if (speed > maximumVelocity)
             {
@@ -269,6 +268,7 @@ namespace Kinectitude.Physics
             body.Awake = true;
             prevX = tc.X;
             prevY = tc.Y;
+            body.Rotation = tc.Rotation;
             body.Position = new Vector2(prevX * sizeRatio, prevY * sizeRatio);
         }
 

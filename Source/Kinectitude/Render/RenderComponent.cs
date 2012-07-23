@@ -5,6 +5,7 @@ using Kinectitude.Core.Components;
 using SlimDX.Direct2D;
 using RenderTarget = SlimDX.Direct2D.RenderTarget;
 using Kinectitude.Core.ComponentInterfaces;
+using SlimDX;
 
 namespace Kinectitude.Render
 {
@@ -109,6 +110,8 @@ namespace Kinectitude.Render
 
         public void Render(RenderTarget renderTarget)
         {
+            Matrix3x2 matrix = renderTarget.Transform;
+
             if (Shape == ShapeType.Ellipse)
             {
                 ellipse.Center = new PointF(transformComponent.X, transformComponent.Y);
@@ -128,6 +131,8 @@ namespace Kinectitude.Render
                 renderTarget.FillRectangle(fillBrush, rectangle);
                 renderTarget.DrawRectangle(lineBrush, rectangle, LineThickness);
             }
+
+            renderTarget.Transform = matrix;
         }
 
         public override void Ready()

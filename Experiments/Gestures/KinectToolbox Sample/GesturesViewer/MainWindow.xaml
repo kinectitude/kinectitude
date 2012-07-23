@@ -93,6 +93,7 @@
                 <CheckBox Content="Audio Control" x:Name="audioControl" VerticalAlignment="Center"/>
                 <Button Content="Replay" x:Name="replayButton" Click="replayButton_Click" Margin="5" VerticalAlignment="Center"/>
                 <Button Content="Capture Circle" x:Name="recordCircle" Click="recordCircle_Click" Margin="5" VerticalAlignment="Center"/>
+                <Button Content="Capture Step" x:Name="recordStep" Click="recordStep_Click" Margin="5" VerticalAlignment="Center"/>
                 <Button Content="Capture T" x:Name="recordT" Click="recordT_Click" Margin="5" VerticalAlignment="Center"/>
             </StackPanel>
         </StackPanel>

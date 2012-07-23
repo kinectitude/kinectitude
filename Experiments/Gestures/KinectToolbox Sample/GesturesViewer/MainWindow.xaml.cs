@@ -18,8 +18,25 @@ namespace GesturesViewer
     {
         KinectSensor kinectSensor;
 
-        SwipeGestureDetector swipeGestureRecognizer;
+        /*SwipeGestureDetector swipeGestureRecognizer;*/
         TemplatedGestureDetector circleGestureRecognizer;
+        TemplatedGestureDetector circleGestureRecognizerL;
+        
+        TemplatedGestureDetector stepGestureRecognizer;
+        TemplatedGestureDetector stepGestureRecognizerL;
+
+        /*TemplatedGestureDetector strikeGestureRecognizer;
+        TemplatedGestureDetector strikeGestureRecognizerL;*/
+
+        TemplatedGestureDetector blockGestureRecognizer;
+        TemplatedGestureDetector blockGestureRecognizerL;
+
+        TemplatedGestureDetector highBlockGestureRecognizer;
+        TemplatedGestureDetector highBlockGestureRecognizerL;
+
+        TemplatedGestureDetector lobBlockGestureRecognizer;
+        TemplatedGestureDetector lowBlockGestureRecognizerL;
+
         readonly ColorStreamManager colorManager = new ColorStreamManager();
         readonly DepthStreamManager depthManager = new DepthStreamManager();
         AudioStreamManager audioManager;
@@ -32,6 +49,17 @@ namespace GesturesViewer
 
         string circleKBPath;
         string letterT_KBPath;
+        string stepPath;
+        string stepPathL;
+        
+        string blockPath;
+        string blockPathL;
+        string highBlockPath;
+        string lowBlockPath;
+        string lowBlockPathL;
+
+        string strikePath;
+        string strikePathL;
 
         SkeletonRecorder recorder;
         SkeletonReplay replay;
@@ -84,6 +112,13 @@ namespace GesturesViewer
         {
             circleKBPath = Path.Combine(Environment.CurrentDirectory, @"data\circleKB.save");
             letterT_KBPath = Path.Combine(Environment.CurrentDirectory, @"data\t_KB.save");
+            stepPath = Path.Combine(Environment.CurrentDirectory, @"data\stepR.save");
+            stepPathL = Path.Combine(Environment.CurrentDirectory, @"data\stepL.save");
+            blockPath = Path.Combine(Environment.CurrentDirectory, @"data\block.save");
+            blockPathL = Path.Combine(Environment.CurrentDirectory, @"data\blockL.save");
+            highBlockPath = Path.Combine(Environment.CurrentDirectory, @"data\highBlock.save");
+            lowBlockPath = Path.Combine(Environment.CurrentDirectory, @"data\lowBlock.save");
+            string lowBlockPathL = Path.Combine(Environment.CurrentDirectory, @"data\lowBlockL.save");
 
             try
             {
@@ -136,14 +171,14 @@ namespace GesturesViewer
                                              });
             kinectSensor.SkeletonFrameReady += kinectRuntime_SkeletonFrameReady;
 
-            swipeGestureRecognizer = new SwipeGestureDetector();
-            swipeGestureRecognizer.OnGestureDetected += OnGestureDetected;
+            //swipeGestureRecognizer = new SwipeGestureDetector();
+            //swipeGestureRecognizer.OnGestureDetected += OnGestureDetected;
 
             skeletonDisplayManager = new SkeletonDisplayManager(kinectSensor, kinectCanvas);
 
             kinectSensor.Start();
 
-            LoadCircleGestureDetector();
+            LoadGestureDetectors();
             LoadLetterTPostureDetector();
 
             nuiCamera = new BindableNUICamera(kinectSensor);
@@ -224,9 +259,19 @@ namespace GesturesViewer
 
                     if (joint.JointType == JointType.HandRight)
                     {
-                        swipeGestureRecognizer.Add(joint.Position, kinectSensor);
+                        //swipeGestureRecognizer.Add(joint.Position, kinectSensor);
                         circleGestureRecognizer.Add(joint.Position, kinectSensor);
                     }
+
+                    else if (joint.JointType == JointType.FootRight)
+                    {
+                        stepGestureRecognizer.Add(joint.Position, kinectSensor);
+                    }
+                    else if (joint.JointType == JointType.FootLeft)
+                    {
+                        stepGestureRecognizerL.Add(joint.Position, kinectSensor);
+                    }
+
                 }
 
                 algorithmicPostureRecognizer.TrackPostures(skeleton);
@@ -253,10 +298,10 @@ namespace GesturesViewer
 
         private void Clean()
         {
-            if (swipeGestureRecognizer != null)
+            /*if (swipeGestureRecognizer != null)
             {
                 swipeGestureRecognizer.OnGestureDetected -= OnGestureDetected;
-            }
+            }*/
 
             if (audioManager != null)
             {

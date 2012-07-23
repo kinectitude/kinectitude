@@ -20,10 +20,12 @@ namespace GesturesViewer
                 switch (order)
                 {
                     case "record":
-                        DirectRecord(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "kinectRecord" + Guid.NewGuid() + ".replay"));
+                        StepRecord();
+                        //DirectRecord(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "kinectRecord" + Guid.NewGuid() + ".replay"));
                         break;
                     case "stop":
-                        StopRecord();
+                        StepRecord();
+                        //StopRecord();
                         break;
                 }
             }));

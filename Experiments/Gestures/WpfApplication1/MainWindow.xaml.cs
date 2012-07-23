@@ -29,7 +29,7 @@ namespace WpfApplication1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            circleKBPath = Path.Combine(Environment.CurrentDirectory, @"data\circleKB.save");
+            circleKBPath = Path.Combine(Environment.CurrentDirectory, @"../../Data\circleKB.save");
 
             try
             {
