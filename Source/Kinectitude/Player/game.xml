@@ -4,6 +4,7 @@
   <Using File="Kinectitude.Kinect.dll">
     <Define Name="KinectFollowComponent" Class="Kinectitude.Kinect.KinectFollowComponent"/>
     <Define Name="KinectManager" Class="Kinectitude.Kinect.KinectManager"/>
+    <Define Name="GestureEvent" Class="Kinectitude.Kinect.GestureEvent"/>
   </Using>
 
   <Using File="Kinectitude.Physics.dll">
@@ -141,7 +142,16 @@
 
     <Entity Name="player1" Prototype="paddle">
       <Component Type="TransformComponent" X="17" Y="250"/>
-      <Event Type="CrossesLineEvent" Line="Y" Location="450"  Direction="Positive">
+
+      <Event Type="GestureEvent" Player="1" Joint="HandLeft" GestureName="circle">
+        <Action Type="FireTriggerAction" Name="rdy1"/>
+      </Event>
+      
+      <!--<Event Type="CrossesLineEvent" Line="Y" Location="450"  Direction="Positive">
+        <Action Type="FireTriggerAction" Name="rdy1"/>
+      </Event>-->
+      
+      <Event Type="TriggerOccursEvent" Trigger="rdy1">
         <Action Type="SetAction" Target="scene.ready1txt" Value="player 1 is ready!"/>
         <Action Type="SetAction" Target="scene.ready1" Value="True"/>
         <Condition If="scene.ready2 and scene.ready1 or scene.ready1 and scene.ready2">
@@ -154,7 +164,7 @@
       <Component Type="TransformComponent" X="782" Y="250"/>
       <!--this is testing to see that I can ovrride things in a Prototype-->
       <!--<Component Type="KinectFollowComponent" Player="1" Joint="HandRight" />-->
-
+      
       <Event Type="CrossesLineEvent" Line="Y" Location="450"  Direction="Positive">
         <Action Type="FireTriggerAction" Name="rdy2"/>
       </Event>

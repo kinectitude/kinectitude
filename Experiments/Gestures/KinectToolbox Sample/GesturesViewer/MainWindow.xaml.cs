@@ -262,7 +262,10 @@ namespace GesturesViewer
                         //swipeGestureRecognizer.Add(joint.Position, kinectSensor);
                         circleGestureRecognizer.Add(joint.Position, kinectSensor);
                     }
-
+                    else if (joint.JointType == JointType.HandLeft)
+                    {
+                        circleGestureRecognizerL.Add(joint.Position, kinectSensor);
+                    }
                     else if (joint.JointType == JointType.FootRight)
                     {
                         stepGestureRecognizer.Add(joint.Position, kinectSensor);

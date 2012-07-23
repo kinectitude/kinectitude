@@ -21,7 +21,7 @@ namespace GesturesViewer
             using (Stream recordStream = File.Open(circleKBPath, FileMode.OpenOrCreate))
             {
                 circleGestureRecognizerL = new TemplatedGestureDetector("Circle L", recordStream);
-                circleGestureRecognizerL.TraceTo(gesturesCanvas, Colors.Chocolate);
+                //circleGestureRecognizerL.TraceTo(gesturesCanvas, Colors.Aquamarine);
                 circleGestureRecognizerL.OnGestureDetected += OnGestureDetected;
             }
 
@@ -99,7 +99,7 @@ namespace GesturesViewer
             }
             stepGestureRecognizer.StartRecordTemplate();*/
 
-            if (stepGestureRecognizerL.IsRecordingPath)
+            /*if (stepGestureRecognizerL.IsRecordingPath)
             {
                 stepGestureRecognizerL.EndRecordTemplate();
                 recordStep.Content = "Record new Step";
@@ -107,7 +107,19 @@ namespace GesturesViewer
             }
             stepGestureRecognizerL.StartRecordTemplate();
 
-            recordStep.Content = "";
+            recordStep.Content = "";*/
+
+
+            if (circleGestureRecognizer.IsRecordingPath)
+            {
+                circleGestureRecognizer.EndRecordTemplate();
+                recordCircle.Content = "Record new Step";
+                return;
+            }
+            circleGestureRecognizer.StartRecordTemplate();
+
+            recordCircle.Content = "";
+
         }
 
         void OnGestureDetected(string gesture)

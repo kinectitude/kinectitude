@@ -43,7 +43,6 @@ namespace Kinect.Toolbox
         {
             Entry newEntry = new Entry {Position = position.ToVector3(), Time = DateTime.Now};
             Entries.Add(newEntry);
-
             if (displayCanvas != null)
             {
                 newEntry.DisplayEllipse = new Ellipse

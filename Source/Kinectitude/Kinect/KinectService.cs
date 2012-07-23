@@ -8,7 +8,7 @@ namespace Kinectitude.Kinect
     public class KinectService : Service
     {
 
-        private static KinectSensor kinectDriver = null;
+        public static KinectSensor KinectDriver { get; private set; }
         private const int scount = 6;
         private static Skeleton[] allSkeletons = new Skeleton[scount];
 
@@ -18,8 +18,8 @@ namespace Kinectitude.Kinect
         {
             if (0 != KinectSensor.KinectSensors.Count)
             {
-                kinectDriver = KinectSensor.KinectSensors.First();
-                kinectDriver.SkeletonStream.Enable(new TransformSmoothParameters()
+                KinectDriver = KinectSensor.KinectSensors.First();
+                KinectDriver.SkeletonStream.Enable(new TransformSmoothParameters()
                 {
                     Smoothing = 0.5f,
                     Correction = 0.5f,
@@ -27,11 +27,11 @@ namespace Kinectitude.Kinect
                     JitterRadius = 0.05f,
                     MaxDeviationRadius = 0.04f
                 });
-                kinectDriver.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
-                kinectDriver.Start();
-                if (null != kinectDriver)
+                KinectDriver.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
+                KinectDriver.Start();
+                if (null != KinectDriver)
                 {
-                    kinectDriver.AllFramesReady += sensorReady;
+                    KinectDriver.AllFramesReady += sensorReady;
                 }
             }
         }
@@ -82,7 +82,7 @@ namespace Kinectitude.Kinect
 
         public override void OnStop()
         {
-            kinectDriver.Dispose();
+            KinectDriver.Dispose();
         }
 
         public override bool AutoStart()
