@@ -4,7 +4,6 @@ namespace Kinectitude.Editor.ViewModels
     class AssetViewModel : BaseViewModel
     {
         private string name;
-        private string fileName;
 
         public string Name
         {
@@ -13,6 +12,14 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (name != value)
                 {
+                    string oldName = name;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "rename asset to '" + value + "'",
+                        () => Name = value,
+                        () => Name = oldName
+                    );
+
                     name = value;
                     NotifyPropertyChanged("Name");
                 }
@@ -21,20 +28,13 @@ namespace Kinectitude.Editor.ViewModels
 
         public string FileName
         {
-            get { return fileName; }
-            set
-            {
-                if (fileName != value)
-                {
-                    fileName = value;
-                    NotifyPropertyChanged("FileName");
-                }
-            }
+            get;
+            private set;
         }
 
-        public AssetViewModel(string name)
+        public AssetViewModel(string fileName)
         {
-            this.name = name;
+            FileName = fileName;
         }
     }
 }

@@ -38,6 +38,8 @@ namespace Kinectitude.Editor.ViewModels
         {
             this.inheritedCondition = inheritedCondition;
 
+            inheritedCondition.PropertyChanged += (sender, args) => NotifyPropertyChanged(args.PropertyName);
+
             inheritedCondition.Actions.CollectionChanged += OnInheritedConditionActionsChanged;
             foreach (AbstractActionViewModel inheritedAction in inheritedCondition.Actions)
             {

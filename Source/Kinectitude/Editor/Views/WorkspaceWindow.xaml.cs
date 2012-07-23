@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Kinectitude.Editor.ViewModels;
 
 namespace Kinectitude.Editor.Views
 {
@@ -20,6 +21,9 @@ namespace Kinectitude.Editor.Views
     {
         public WorkspaceWindow()
         {
+            DataContext = Workspace.Instance;
+            Workspace.Instance.NewGame();
+
             InitializeComponent();
         }
     }

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Game Name="pong" Width="800" Height="600" FirstScene="game" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1">
+<Game Name="pong" Width="800" Height="600" FirstScene="Main Menu" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1">
 
   <Using File="Kinectitude.Kinect.dll">
     <Define Name="KinectFollowComponent" Class="Kinectitude.Kinect.KinectFollowComponent"/>
@@ -105,9 +105,14 @@
 
     <Entity Name="tennis">
       <Component Type="TransformComponent" X="400.5" Y="300.5" Width="263" Height="263" />
-      <Component Type="ImageRenderComponent" Image="tennisball.png" />
+      <Component Type="ImageRenderComponent" Image="tennisball.png" Animated="true" Duration="2" />
     </Entity>
-    
+
+    <Entity Name="sonic">
+      <Component Type="TransformComponent" X="400.5" Y="155.5" Width="27" Height="36" />
+      <Component Type="ImageRenderComponent" Image="sonic.png" Animated="true" Duration="2" />
+    </Entity>
+
     <Entity Name="topText" Prototype="text">
       <Component Type="TransformComponent" X="0" Y="24" Width="800"/>
       <Component Type="TextRenderComponent" Value="Kinect Wimbledon Deluxe" FontColor="Yellow" TextAlignment="Center" FontWeight="Bold" />

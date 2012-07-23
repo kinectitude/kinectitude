@@ -3,15 +3,17 @@ using System.Linq;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.ViewModels.Interfaces;
+using System.Windows.Input;
+using Kinectitude.Editor.Commands;
+using Kinectitude.Editor.Views;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    internal delegate void DefineAddedEventHandler(DefineViewModel define);
-    internal delegate void PluginAddedEventHandler(PluginViewModel plugin);
-    internal delegate void DefinedNameChangedEventHandler(PluginViewModel plugin, string newName);
+    internal delegate void PluginAddedEventHandler(PluginViewModel plugin);   
     
     internal sealed class GameViewModel : BaseViewModel, IAttributeScope, IEntityScope, ISceneScope
     {
+        private string fileName;
         private string name;
         private int width;
         private int height;
@@ -31,8 +33,15 @@ namespace Kinectitude.Editor.ViewModels
 
         public string FileName
         {
-            get;
-            set;
+            get { return fileName; }
+            set
+            {
+                if (fileName != value)
+                {
+                    fileName = value;
+                    NotifyPropertyChanged("FileName");
+                }
+            }
         }
 
         public string Name
@@ -42,6 +51,14 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (name != value)
                 {
+                    string oldName = name;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "rename game to '" + value + "'",
+                        () => Name = value,
+                        () => Name = oldName
+                    );
+
                     name = value;
                     NotifyPropertyChanged("Name");
                 }
@@ -55,6 +72,14 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (width != value)
                 {
+                    int oldWidth = width;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "set game width",
+                        () => Width = value,
+                        () => Width = oldWidth
+                    );
+
                     width = value;
                     NotifyPropertyChanged("Width");
                 }
@@ -68,6 +93,14 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (height != value)
                 {
+                    int oldHeight = height;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "set game height",
+                        () => Height = value,
+                        () => Height = oldHeight
+                    );
+
                     height = value;
                     NotifyPropertyChanged("Height");
                 }
@@ -81,6 +114,14 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (fullScreen != value)
                 {
+                    bool oldFullScreen = fullScreen;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "toggle full screen",
+                        () => IsFullScreen = value,
+                        () => IsFullScreen = oldFullScreen
+                    );
+
                     fullScreen = value;
                     NotifyPropertyChanged("IsFullScreen");
                 }
@@ -94,6 +135,14 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (firstScene != value)
                 {
+                    SceneViewModel oldFirstScene = firstScene;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "set first scene to '" + value.Name + "'",
+                        () => FirstScene = value,
+                        () => FirstScene = oldFirstScene
+                    );
+
                     firstScene = value;
                     NotifyPropertyChanged("FirstScene");
                 }
@@ -128,12 +177,6 @@ namespace Kinectitude.Editor.ViewModels
         {
             get;
             private set;
-        }
-
-        public BaseViewModel CurrentItem
-        {
-            get;
-            set;
         }
 
         public ICommand AddPrototypeCommand
@@ -184,7 +227,7 @@ namespace Kinectitude.Editor.ViewModels
             private set;
         }
 
-        public ICommand SaveGameCommand
+        public ICommand RemoveItemCommand
         {
             get;
             private set;
@@ -193,6 +236,7 @@ namespace Kinectitude.Editor.ViewModels
         public GameViewModel(string name)
         {
             this.name = name;
+            
             Usings = new ObservableCollection<UsingViewModel>();
             Assets = new ObservableCollection<AssetViewModel>();
             Prototypes = new ObservableCollection<EntityViewModel>();
@@ -203,15 +247,37 @@ namespace Kinectitude.Editor.ViewModels
                 (parameter) =>
                 {
                     EntityViewModel prototype = new EntityViewModel();
-                    // TODO Create UI to fill in prototype
-                    AddPrototype(prototype);
+
+                    DialogService.ShowDialog(DialogService.Constants.EntityDialog, prototype,
+                        (result) =>
+                        {
+                            if (result == true)
+                            {
+                                Workspace.Instance.CommandHistory.Log(
+                                    "add prototype '" + prototype.Name + "'",
+                                    () => AddPrototype(prototype),
+                                    () => RemovePrototype(prototype)
+                                );
+
+                                AddPrototype(prototype);
+                            }
+                        }
+                    ); 
                 }
             );
 
             RemovePrototypeCommand = new DelegateCommand(null,
                 (parameter) =>
                 {
-                    RemovePrototype(parameter as EntityViewModel);
+                    EntityViewModel prototype = parameter as EntityViewModel;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "remove prototype '" + prototype.Name + "'",
+                        () => RemovePrototype(prototype),
+                        () => AddPrototype(prototype)
+                    );
+
+                    RemovePrototype(prototype);
                 }
             );
 
@@ -219,14 +285,37 @@ namespace Kinectitude.Editor.ViewModels
                 (parameter) =>
                 {
                     SceneViewModel scene = new SceneViewModel(GetNextSceneName());
-                    AddScene(scene);
+
+                    DialogService.ShowDialog(DialogService.Constants.SceneDialog, scene,
+                        (result) =>
+                        {
+                            if (result == true)
+                            {
+                                Workspace.Instance.CommandHistory.Log(
+                                    "add scene '" + scene.Name + "'",
+                                    () => AddScene(scene),
+                                    () => RemoveScene(scene)
+                                );
+
+                                AddScene(scene);
+                            }
+                        }
+                    );
                 }
             );
 
             RemoveSceneCommand = new DelegateCommand(null,
                 (parameter) =>
                 {
-                    RemoveScene(parameter as SceneViewModel);
+                    SceneViewModel scene = parameter as SceneViewModel;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "remove scene '" + scene.Name + "'",
+                        () => RemoveScene(scene),
+                        () => AddScene(scene)
+                    );
+
+                    RemoveScene(scene);
                 }
             );
 
@@ -234,6 +323,13 @@ namespace Kinectitude.Editor.ViewModels
                 (parameter) =>
                 {
                     AttributeViewModel attribute = new AttributeViewModel(GetNextAttributeKey());
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "add attribute '" + attribute.Key + "'",
+                        () => AddAttribute(attribute),
+                        () => RemoveAttribute(attribute)
+                    );
+
                     AddAttribute(attribute);
                 }
             );
@@ -241,7 +337,15 @@ namespace Kinectitude.Editor.ViewModels
             RemoveAttributeCommand = new DelegateCommand(null,
                 (parameter) =>
                 {
-                    RemoveAttribute(parameter as AttributeViewModel);
+                    AttributeViewModel attribute = parameter as AttributeViewModel;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "remove attribute '" + attribute.Key + "'",
+                        () => RemoveAttribute(attribute),
+                        () => AddAttribute(attribute)
+                    );
+
+                    RemoveAttribute(attribute);
                 }
             );
 
@@ -250,6 +354,13 @@ namespace Kinectitude.Editor.ViewModels
                 {
                     // TODO: File Chooser
                     AssetViewModel asset = new AssetViewModel("An Asset");
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "add asset '" + asset.FileName + "'",
+                        () => AddAsset(asset),
+                        () => RemoveAsset(asset)
+                    );
+
                     AddAsset(asset);
                 }
             );
@@ -257,14 +368,34 @@ namespace Kinectitude.Editor.ViewModels
             RemoveAssetCommand = new DelegateCommand(null,
                 (parameter) =>
                 {
-                    RemoveAsset(parameter as AssetViewModel);
+                    AssetViewModel asset = parameter as AssetViewModel;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "remove asset '" + asset.FileName + "'",
+                        () => RemoveAsset(asset),
+                        () => AddAsset(asset)
+                    );
+
+                    RemoveAsset(asset);
                 }
             );
 
-            SaveGameCommand = new DelegateCommand(null,
+            RemoveItemCommand = new DelegateCommand(null,
                 (parameter) =>
                 {
-                    SaveGame();  // TODO: remove hard-coded string
+                    EntityViewModel prototype = parameter as EntityViewModel;
+                    if (null != prototype)
+                    {
+                        RemovePrototype(prototype);
+                    }
+                    else
+                    {
+                        SceneViewModel scene = parameter as SceneViewModel;
+                        if (null != scene)
+                        {
+                            RemoveScene(scene);
+                        }
+                    }
                 }
             );
         }
@@ -325,7 +456,12 @@ namespace Kinectitude.Editor.ViewModels
             {
                 DefinePlugin(plugin);
             }
-            
+
+            if (Scenes.Count == 0)
+            {
+                FirstScene = scene;
+            }
+
             Scenes.Add(scene);
         }
 
@@ -363,12 +499,6 @@ namespace Kinectitude.Editor.ViewModels
             Assets.Remove(asset);
         }
 
-        public void SaveGame()
-        {
-            IGameStorage storage = new XmlGameStorage(FileName);
-            storage.SaveGame(this);
-        }
-
         public PluginViewModel GetPlugin(string name)
         {
             foreach (UsingViewModel use in Usings)
@@ -386,12 +516,28 @@ namespace Kinectitude.Editor.ViewModels
 
         private string GetNextAttributeKey()
         {
-            return string.Format("attribute{0}", nextAttribute++);
+            string ret = "attribute" + nextAttribute;
+
+            while (Attributes.Any(x => x.Key == ret))
+            {
+                nextAttribute++;
+                ret = "attribute" + nextAttribute;
+            }
+
+            return ret;
         }
 
         private string GetNextSceneName()
         {
-            return string.Format("Scene {0}", nextScene++);
+            string ret = "Scene " + nextScene;
+
+            while (Scenes.Any(x => x.Name == ret))
+            {
+                nextScene++;
+                ret = "Scene " + nextScene;
+            }
+
+            return ret;
         }
 
         private void OnPluginAdded(PluginViewModel plugin)
@@ -422,11 +568,11 @@ namespace Kinectitude.Editor.ViewModels
                 if (HasDefineWithName(name))
                 {
                     int sequenceNumber = 0;
-                    while (HasDefineWithName(string.Format("{0}{1}", plugin.ShortName, sequenceNumber)))
+                    while (HasDefineWithName(plugin.ShortName + sequenceNumber))
                     {
                         sequenceNumber++;
                     }
-                    name = string.Format("{0}{1}", plugin.ShortName, sequenceNumber);
+                    name = plugin.ShortName + sequenceNumber;
                 }
 
                 UsingViewModel use = GetUsing(plugin.File);

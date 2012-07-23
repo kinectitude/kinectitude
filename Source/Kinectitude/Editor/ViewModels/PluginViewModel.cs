@@ -27,6 +27,12 @@ namespace Kinectitude.Editor.ViewModels
             private set;
         }
 
+        public Type CoreType
+        {
+            get;
+            private set;
+        }
+
         public string Provides
         {
             get;
@@ -71,6 +77,8 @@ namespace Kinectitude.Editor.ViewModels
 
         public PluginViewModel(Type type)
         {
+            CoreType = type;
+            
             PluginAttribute pluginAttribute = System.Attribute.GetCustomAttribute(type, typeof(PluginAttribute)) as PluginAttribute;
 
             File = type.Module.Name;

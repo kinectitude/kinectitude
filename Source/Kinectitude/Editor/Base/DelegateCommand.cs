@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Input;
 
 namespace Kinectitude.Editor.Base
 {
@@ -6,6 +7,12 @@ namespace Kinectitude.Editor.Base
     {
         private readonly Predicate<object> canExecuteDelegate;
         private readonly Action<object> executeDelegate;
+
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
 
         public DelegateCommand(Predicate<object> canExecuteDelegate, Action<object> executeDelegate)
         {
@@ -21,12 +28,6 @@ namespace Kinectitude.Editor.Base
                 result = canExecuteDelegate(parameter);
             }
             return result;
-        }
-
-        public event EventHandler CanExecuteChanged
-        {
-            add { }
-            remove { }
         }
 
         public void Execute(object parameter)

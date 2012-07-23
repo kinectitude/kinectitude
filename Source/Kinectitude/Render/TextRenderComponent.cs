@@ -1,23 +1,18 @@
 ﻿using System.Drawing;
 using Kinectitude.Core.Attributes;
-using Kinectitude.Core.Base;
-using Kinectitude.Core.Components;
 using SlimDX.Direct2D;
 using SlimDX.DirectWrite;
 using FontStyle = SlimDX.DirectWrite.FontStyle;
 using RenderTarget = SlimDX.Direct2D.RenderTarget;
-using Kinectitude.Core.ComponentInterfaces;
 
 namespace Kinectitude.Render
 {
     [Plugin("Text Render Component", "")]
-    public class TextRenderComponent : Component, IRender
+    public class TextRenderComponent : BaseRenderComponent
     {
         private SolidColorBrush brush;
         private TextFormat textFormat;
         private RectangleF layoutRectangle;
-        private TransformComponent transformComponent;
-        private RenderManager renderManager;
 
 
         private string _value = "";
@@ -260,21 +255,6 @@ namespace Kinectitude.Render
             }
         }
 
-        private float opacity;
-        [Plugin("Opacity", "")]
-        public float Opacity
-        {
-            get { return opacity; }
-            set
-            {
-                if (value != opacity)
-                {
-                    opacity = value;
-                    Change("Opacity");
-                }
-            }
-        }
-
         public TextRenderComponent()
         {
             FontFamily = "Arial";
@@ -289,11 +269,10 @@ namespace Kinectitude.Render
             ReadingDirection = ReadingDirection.LeftToRight;
             TextAlignment = TextAlignment.Leading;
             WordWrapping = WordWrapping.NoWrap;
-            Opacity = 1.0f;
             Value = "";
         }
 
-        public void Render(RenderTarget renderTarget)
+        protected override void OnRender(RenderTarget renderTarget)
         {
             layoutRectangle.X = transformComponent.X + OffsetX;
             layoutRectangle.Y = transformComponent.Y + OffsetY;
@@ -303,11 +282,8 @@ namespace Kinectitude.Render
             renderTarget.DrawText(Value, textFormat, layoutRectangle, brush);
         }
 
-        public override void Ready()
+        protected override void OnReady()
         {
-            renderManager = GetManager<RenderManager>();
-            renderManager.Add(this);
-
             textFormat = renderManager.DirectWriteFactory.CreateTextFormat(FontFamily, FontWeight, FontStyle, FontStretch, FontSize, Locale);
             textFormat.FlowDirection = FlowDirection;
             textFormat.IncrementalTabStop = textFormat.FontSize * TabSize;
@@ -315,18 +291,13 @@ namespace Kinectitude.Render
             textFormat.ReadingDirection = ReadingDirection;
             textFormat.TextAlignment = TextAlignment;
             textFormat.WordWrapping = WordWrapping;
-
             brush = renderManager.GetSolidColorBrush(FontColor, Opacity);
-
-            transformComponent = GetComponent<TransformComponent>();
-            
             layoutRectangle = new RectangleF();
         }
 
-        public override void Destroy()
+        protected override void OnDestroy()
         {
             textFormat.Dispose();
-            renderManager.Remove(this);
         }
     }
 }

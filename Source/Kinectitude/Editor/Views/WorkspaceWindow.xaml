@@ -6,7 +6,6 @@
         Title="Kinectitude Editor v1.0 Beta"
         Name="window"
         WindowState="Maximized"
-        DataContext="{Binding Source={x:Static vm:Workspace.Instance}}"
         UseLayoutRounding="True">
 
     <Window.InputBindings>
@@ -22,23 +21,23 @@
         
         <Menu DockPanel.Dock="Top" Background="Transparent">
             <MenuItem Header="_File">
-                <MenuItem Header="_New Game" Command="{Binding NewCommand, Mode=OneWay}" InputGestureText="Ctrl+N" />
-                <MenuItem Header="_Open Game" Command="{Binding LoadCommand, Mode=OneWay}" InputGestureText="Ctrl+O" />
-                <MenuItem Header="_Save Game" Command="{Binding SaveCommand, Mode=OneWay}" InputGestureText="Ctrl+S" />
-                <MenuItem Header="Save Game _As..." Command="{Binding SaveAsCommand, Mode=OneWay}" />
-                <MenuItem Header="_Revert To Saved" Command="{Binding RevertCommand, Mode=OneWay}" />
+                <MenuItem Header="_New Game" Command="{Binding NewGameCommand, Mode=OneWay}" InputGestureText="Ctrl+N" />
+                <MenuItem Header="_Open Game" Command="{Binding LoadGameCommand, Mode=OneWay}" InputGestureText="Ctrl+O" />
+                <MenuItem Header="_Save Game" Command="{Binding SaveGameCommand, Mode=OneWay}" InputGestureText="Ctrl+S" />
+                <MenuItem Header="Save Game _As..." Command="{Binding SaveGameAsCommand, Mode=OneWay}" />
+                <MenuItem Header="_Revert To Saved" Command="{Binding RevertGameCommand, Mode=OneWay}" />
                 <Separator />
                 <MenuItem Header="_Exit" Command="{Binding ExitCommand, Mode=OneWay}" InputGestureText="Alt+F4" />
             </MenuItem>
             <MenuItem Header="_Edit">
-                <MenuItem Command="{Binding UndoCommand, Mode=OneWay}" InputGestureText="Ctrl+Z">
+                <MenuItem Command="{Binding CommandHistory.UndoCommand, Mode=OneWay}" InputGestureText="Ctrl+Z">
                     <MenuItem.Header>
-                        <TextBlock Text="{Binding UndoableCommands[0], StringFormat=Undo {0}}" />
+                        <TextBlock Text="{Binding CommandHistory.LastUndoableCommand.Name, StringFormat=Undo {0}}" />
                     </MenuItem.Header>
                 </MenuItem>
-                <MenuItem Command="{Binding RedoCommand, Mode=OneWay}" InputGestureText="Ctrl+Y">
+                <MenuItem Command="{Binding CommandHistory.RedoCommand, Mode=OneWay}" InputGestureText="Ctrl+Y">
                     <MenuItem.Header>
-                        <TextBlock Text="{Binding RedoableCommands[0], StringFormat=Redo {0}}" />
+                        <TextBlock Text="{Binding CommandHistory.LastRedoableCommand.Name, StringFormat=Redo {0}}" />
                     </MenuItem.Header>
                 </MenuItem>
                 <Separator />
@@ -69,7 +68,7 @@
 
                 </StackPanel>
 
-                <TabControl ItemsSource="{Binding ActiveItems}" Name="tabItems" SelectedItem="{Binding CurrentItem}">
+                <TabControl ItemsSource="{Binding OpenItems}" Name="tabItems" SelectedItem="{Binding ActiveItem}">
                     <TabControl.ItemTemplate>
                         <DataTemplate>
                             <DockPanel MinWidth="64">
@@ -116,13 +115,13 @@
                 <DockPanel Grid.Row="0">
                     <Border DockPanel.Dock="Bottom" Padding="0,4,4,0">
                         <StackPanel Orientation="Horizontal">
-                            <Button ToolTip="Delete" Margin="0,0,4,0" Command="{Binding Game.DeleteItemCommand, Mode=OneWay}" CommandParameter="{Binding ElementName=treGame, Path=SelectedItem}">
+                            <Button ToolTip="Delete" Margin="0,0,4,0" Command="{Binding Game.RemoveItemCommand, Mode=OneWay}" CommandParameter="{Binding ElementName=treGame, Path=SelectedItem}">
                                 <Image Source="{StaticResource icoDelete}" Stretch="None" />
                             </Button>
-                            <Button ToolTip="New Prototype" Margin="0,0,4,0" Command="{Binding Game.CreatePrototypeCommand, Mode=OneWay}">
+                            <Button ToolTip="New Prototype" Margin="0,0,4,0" Command="{Binding Game.AddPrototypeCommand, Mode=OneWay}">
                                 <Image Source="{StaticResource icoEntity}" Stretch="None" />
                             </Button>
-                            <Button ToolTip="New Scene" Margin="0,0,4,0" Command="{Binding Game.CreateSceneCommand, Mode=OneWay}">
+                            <Button ToolTip="New Scene" Margin="0,0,4,0" Command="{Binding Game.AddSceneCommand, Mode=OneWay}">
                                 <Image Source="{StaticResource icoNewScene}" Stretch="None" />
                             </Button>
                         </StackPanel>
@@ -191,7 +190,7 @@
 
                 <GridSplitter Height="4" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
 
-                <DockPanel x:Name="dockDetails" Grid.Row="2" DataContext="{Binding CurrentItem}">
+                <DockPanel x:Name="dockDetails" Grid.Row="2" DataContext="{Binding ActiveItem}">
                     <DockPanel.Resources>
                         <CompositeCollection x:Key="detailsCollection">
                             <Expander IsExpanded="True">
@@ -230,7 +229,7 @@
                             <Expander IsExpanded="True">
                                 <Expander.Header>
                                     <Border Padding="8">
-                                        <TextBlock Text="{Binding Name}" />
+                                        <TextBlock Text="{Binding DisplayName}" />
                                     </Border>
                                 </Expander.Header>
                                 <Expander.Content>

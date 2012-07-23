@@ -65,7 +65,10 @@ namespace Kinectitude.Editor.Storage
 
             XmlSchemaSet schemas = new XmlSchemaSet();
             Assembly asm = Assembly.GetExecutingAssembly();
-            schemas.Add(null, new XmlTextReader(asm.GetManifestResourceStream("EditorModels.Storage.schema.xsd")));
+
+            var ns = asm.GetManifestResourceNames();
+
+            schemas.Add(null, new XmlTextReader(asm.GetManifestResourceStream("Kinectitude.Editor.Storage.schema.xsd")));
             document.Validate(schemas, (o, e) => { throw new ArgumentException("Invalid Kinectitude XML file."); });
 
             game = new GameViewModel((string)gameElement.Attribute(Constants.Name))
@@ -322,7 +325,7 @@ namespace Kinectitude.Editor.Storage
                 new XAttribute(Constants.Width, game.Width),
                 new XAttribute(Constants.Height, game.Height),
                 new XAttribute(Constants.IsFullScreen, game.IsFullScreen),
-                new XAttribute(Constants.FirstScene, game.FirstScene)
+                new XAttribute(Constants.FirstScene, game.FirstScene.Name)
             );
 
             foreach (UsingViewModel use in game.Usings)

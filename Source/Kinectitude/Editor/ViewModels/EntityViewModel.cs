@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.Linq;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.ViewModels.Interfaces;
+using System.Windows.Input;
+using System;
 
 namespace Kinectitude.Editor.ViewModels
 {
@@ -34,6 +36,14 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (name != value && !EntityNameExists(value))
                 {
+                    string oldName = name;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "rename entity",
+                        () => Name = value,
+                        () => Name = oldName
+                    );
+
                     name = value;
                     NotifyPropertyChanged("Name");
                 }
@@ -66,7 +76,7 @@ namespace Kinectitude.Editor.ViewModels
 
         public IEnumerable<PluginViewModel> Plugins
         {
-            get { return Components.Select(x => x.Plugin).Union(Events.SelectMany(x => x.Plugins)); }
+            get { return Components.Select(x => x.Plugin).Union(Events.SelectMany(x => x.Plugins)).Distinct(); }
         }
 
         public ICommand AddPrototypeCommand
@@ -117,6 +127,86 @@ namespace Kinectitude.Editor.ViewModels
             private set;
         }
 
+        public double X
+        {
+            get
+            {
+                double ret = 0;
+
+                ComponentViewModel transformComponent = GetComponentByCoreType(typeof(Kinectitude.Core.Components.TransformComponent));
+                if (null != transformComponent)
+                {
+                    AbstractPropertyViewModel x = transformComponent.GetProperty("X");
+                    if (null != x)
+                    {
+                        double.TryParse(x.Value.ToString(), out ret);
+                    }
+                }
+
+                return ret;
+            }
+        }
+
+        public double Y
+        {
+            get
+            {
+                double ret = 0;
+
+                ComponentViewModel transformComponent = GetComponentByCoreType(typeof(Kinectitude.Core.Components.TransformComponent));
+                if (null != transformComponent)
+                {
+                    AbstractPropertyViewModel y = transformComponent.GetProperty("Y");
+                    if (null != y)
+                    {
+                        double.TryParse(y.Value.ToString(), out ret);
+                    }
+                }
+
+                return ret;
+            }
+        }
+
+        public double Width
+        {
+            get
+            {
+                double ret = 0;
+
+                ComponentViewModel transformComponent = GetComponentByCoreType(typeof(Kinectitude.Core.Components.TransformComponent));
+                if (null != transformComponent)
+                {
+                    AbstractPropertyViewModel width = transformComponent.GetProperty("Width");
+                    if (null != width)
+                    {
+                        double.TryParse(width.Value.ToString(), out ret);
+                    }
+                }
+
+                return ret;
+            }
+        }
+
+        public double Height
+        {
+            get
+            {
+                double ret = 0;
+
+                ComponentViewModel transformComponent = GetComponentByCoreType(typeof(Kinectitude.Core.Components.TransformComponent));
+                if (null != transformComponent)
+                {
+                    AbstractPropertyViewModel height = transformComponent.GetProperty("Height");
+                    if (null != height)
+                    {
+                        double.TryParse(height.Value.ToString(), out ret);
+                    }
+                }
+
+                return ret;
+            }
+        }
+
         public EntityViewModel()
         {
             Prototypes = new ObservableCollection<EntityViewModel>();
@@ -130,6 +220,12 @@ namespace Kinectitude.Editor.ViewModels
                     EntityViewModel prototype = parameter as EntityViewModel;
                     if (null != prototype)
                     {
+                        Workspace.Instance.CommandHistory.Log(
+                            "change entity prototype",
+                            () => AddPrototype(prototype),
+                            () => RemovePrototype(prototype)
+                        );
+
                         AddPrototype(prototype);
                     }
                 }
@@ -141,6 +237,12 @@ namespace Kinectitude.Editor.ViewModels
                     EntityViewModel prototype = parameter as EntityViewModel;
                     if (null != prototype)
                     {
+                        Workspace.Instance.CommandHistory.Log(
+                            "change entity prototype",
+                            () => RemovePrototype(prototype),
+                            () => AddPrototype(prototype)
+                        );
+
                         RemovePrototype(prototype);
                     }
                 }
@@ -150,6 +252,13 @@ namespace Kinectitude.Editor.ViewModels
                 (parameter) =>
                 {
                     AttributeViewModel attribute = new AttributeViewModel(GetNextAttributeKey());
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "add attribute '" + attribute.Key + "'",
+                        () => AddAttribute(attribute),
+                        () => RemoveAttribute(attribute)
+                    );
+
                     AddAttribute(attribute);
                 }
             );
@@ -157,7 +266,15 @@ namespace Kinectitude.Editor.ViewModels
             RemoveAttributeCommand = new DelegateCommand(null,
                 (parameter) =>
                 {
-                    RemoveAttribute(parameter as AttributeViewModel);
+                    AttributeViewModel attribute = parameter as AttributeViewModel;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "remove attribute '" + attribute.Key + "'",
+                        () => RemoveAttribute(attribute),
+                        () => AddAttribute(attribute)
+                    );
+
+                    RemoveAttribute(attribute);
                 }
             );
 
@@ -168,6 +285,13 @@ namespace Kinectitude.Editor.ViewModels
                     if (null != plugin)
                     {
                         ComponentViewModel component = new ComponentViewModel(plugin);
+
+                        Workspace.Instance.CommandHistory.Log(
+                            "add component '" + component.DisplayName + "'",
+                            () => AddComponent(component),
+                            () => RemoveComponent(component)
+                        );
+
                         AddComponent(component);
                     }
                 }
@@ -179,6 +303,12 @@ namespace Kinectitude.Editor.ViewModels
                     ComponentViewModel component = parameter as ComponentViewModel;
                     if (null != component)
                     {
+                        Workspace.Instance.CommandHistory.Log(
+                            "remove component '" + component.DisplayName + "'",
+                            () => RemoveComponent(component),
+                            () => AddComponent(component)
+                        );
+
                         RemoveComponent(component);
                     }
                 }
@@ -191,6 +321,13 @@ namespace Kinectitude.Editor.ViewModels
                     if (null != plugin)
                     {
                         EventViewModel evt = new EventViewModel(plugin);
+
+                        Workspace.Instance.CommandHistory.Log(
+                            "add event '" + evt.DisplayName + "'",
+                            () => AddEvent(evt),
+                            () => RemoveEvent(evt)
+                        );
+
                         AddEvent(evt);
                     }
                 }
@@ -202,6 +339,12 @@ namespace Kinectitude.Editor.ViewModels
                     EventViewModel evt = parameter as EventViewModel;
                     if (null != evt)
                     {
+                        Workspace.Instance.CommandHistory.Log(
+                            "remove event '" + evt.DisplayName + "'",
+                            () => RemoveEvent(evt),
+                            () => AddEvent(evt)
+                        );
+
                         RemoveEvent(evt);
                     }
                 }
@@ -320,8 +463,7 @@ namespace Kinectitude.Editor.ViewModels
                     InheritAttribute(inheritedAttribute);
                 }
             }
-
-            if (args.Action == NotifyCollectionChangedAction.Remove)
+            else if (args.Action == NotifyCollectionChangedAction.Remove)
             {
                 foreach (AttributeViewModel inheritedAttribute in args.OldItems)
                 {
@@ -507,6 +649,11 @@ namespace Kinectitude.Editor.ViewModels
             return Components.FirstOrDefault(x => x.Type == type);
         }
 
+        public ComponentViewModel GetComponentByCoreType(Type type)
+        {
+            return Components.FirstOrDefault(x => x.Plugin.CoreType == type);
+        }
+
         public bool HasComponentWithRole(string provides)
         {
             return Components.Any(x => x.Provides == provides);
@@ -541,7 +688,15 @@ namespace Kinectitude.Editor.ViewModels
 
         private string GetNextAttributeKey()
         {
-            return string.Format("attribute{0}", nextAttribute++);
+            string ret = "attribute" + nextAttribute;
+
+            while (HasInheritedAttribute(ret) || HasLocalAttribute(ret))
+            {
+                nextAttribute++;
+                ret = "attribute" + nextAttribute;
+            }
+
+            return ret;
         }
 
         public bool EntityNameExists(string name)
@@ -626,7 +781,7 @@ namespace Kinectitude.Editor.ViewModels
 
         public bool HasInheritedAttribute(string key)
         {
-            return Prototypes.Any(x => x.HasLocalAttribute(key));   // TODO: Check this logic for 3-level inheritance
+            return Prototypes.Any(x => x.HasLocalAttribute(key));
         }
 
         public bool HasLocalAttribute(string key)

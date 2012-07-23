@@ -4,10 +4,11 @@ using System.Collections.Specialized;
 using System.Linq;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.ViewModels.Interfaces;
+using System.Windows.Input;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    internal sealed class SceneViewModel : BaseViewModel, IEntityNamespace, IAttributeScope, IEntityScope
+    internal sealed class SceneViewModel : BaseViewModel, IEntityNamespace, IAttributeScope, IEntityScope, IManagerScope
     {
         private string name;
         private ISceneScope scope;
@@ -29,6 +30,14 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (name != value)
                 {
+                    string oldName = name;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "rename scene to '" + value + "'",
+                        () => Name = value,
+                        () => Name = oldName
+                    );
+
                     name = value;
                     NotifyPropertyChanged("Name");
                 }
@@ -93,6 +102,13 @@ namespace Kinectitude.Editor.ViewModels
                 (parameter) =>
                 {
                     AttributeViewModel attribute = new AttributeViewModel(GetNextAttributeKey());
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "add attribute '" + attribute.Key + "'",
+                        () => AddAttribute(attribute),
+                        () => RemoveAttribute(attribute)
+                    );
+
                     AddAttribute(attribute);
                 }
             );
@@ -100,7 +116,15 @@ namespace Kinectitude.Editor.ViewModels
             RemoveAttributeCommand = new DelegateCommand(null,
                 (parameter) =>
                 {
-                    RemoveAttribute(parameter as AttributeViewModel);
+                    AttributeViewModel attribute = parameter as AttributeViewModel;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "remove attribute '" + attribute.Key + "'",
+                        () => RemoveAttribute(attribute),
+                        () => AddAttribute(attribute)
+                    );
+
+                    RemoveAttribute(attribute);
                 }
             );
 
@@ -108,6 +132,13 @@ namespace Kinectitude.Editor.ViewModels
                 (parameter) =>
                 {
                     EntityViewModel entity = new EntityViewModel();
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "add entity",
+                        () => AddEntity(entity),
+                        () => RemoveEntity(entity)
+                    );
+
                     AddEntity(entity);
                 }
             );
@@ -115,7 +146,15 @@ namespace Kinectitude.Editor.ViewModels
             RemoveEntityCommand = new DelegateCommand(null,
                 (parameter) =>
                 {
-                    RemoveEntity(parameter as EntityViewModel);
+                    EntityViewModel entity = parameter as EntityViewModel;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "remove entity",
+                        () => RemoveEntity(entity),
+                        () => AddEntity(entity)
+                    );
+
+                    RemoveEntity(entity);
                 }
             );
         }
@@ -155,11 +194,13 @@ namespace Kinectitude.Editor.ViewModels
 
         public void AddManager(ManagerViewModel manager)
         {
+            manager.SetScope(this);
             Managers.Add(manager);
         }
 
         public void RemoveManager(ManagerViewModel manager)
         {
+            manager.SetScope(null);
             Managers.Remove(manager);
         }
 
@@ -190,7 +231,15 @@ namespace Kinectitude.Editor.ViewModels
 
         private string GetNextAttributeKey()
         {
-            return string.Format("attribute{0}", nextAttribute++);
+            string ret = "attribute" + nextAttribute;
+
+            while (Attributes.Any(x => x.Key == ret))
+            {
+                nextAttribute++;
+                ret = "attribute" + nextAttribute;
+            }
+
+            return ret;
         }
 
         private void ResolveComponentDependencies(ComponentViewModel component)
@@ -236,6 +285,8 @@ namespace Kinectitude.Editor.ViewModels
             {
                 ScopeChanged();
             }
+
+            NotifyPropertyChanged("Scope");
         }
 
         private void OnScopeChanged()

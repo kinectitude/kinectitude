@@ -22,6 +22,8 @@ namespace Kinectitude.Editor.ViewModels
         [DependsOn("Scope")]
         public abstract string Type { get; }
 
+        public abstract string DisplayName { get; }
+
         [DependsOn("IsInherited")]
         public abstract bool IsLocal { get; }
 

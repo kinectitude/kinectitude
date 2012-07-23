@@ -8,6 +8,7 @@ using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Commands;
 using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.Views;
+using System.Windows.Input;
 
 namespace Kinectitude.Editor.ViewModels
 {
@@ -15,7 +16,9 @@ namespace Kinectitude.Editor.ViewModels
     {
         private const string PluginDirectory = "Plugins";
 
-        private static Lazy<Workspace> instance = new Lazy<Workspace>();
+        private static readonly Lazy<Workspace> instance = new Lazy<Workspace>();
+
+        private readonly Lazy<CommandHistory> commandHistory;
 
         public static Workspace Instance
         {
@@ -63,12 +66,6 @@ namespace Kinectitude.Editor.ViewModels
             private set;
         }
 
-        public ICommandHistory CommandHistory
-        {
-            get;
-            private set;
-        }
-
         public ICommand NewGameCommand
         {
             get;
@@ -81,11 +78,41 @@ namespace Kinectitude.Editor.ViewModels
             private set;
         }
 
+        public ICommand SaveGameCommand
+        {
+            get;
+            private set;
+        }
+
+        public ICommand SaveGameAsCommand
+        {
+            get;
+            private set;
+        }
+
+        public ICommand OpenItemCommand
+        {
+            get;
+            private set;
+        }
+
+        public ICommand CloseItemCommand
+        {
+            get;
+            private set;
+        }
+
+        public ICommandHistory CommandHistory
+        {
+            get { return commandHistory.Value; }
+        }
+
         public Workspace()
         {
             OpenItems = new ObservableCollection<BaseViewModel>();
             Plugins = new ObservableCollection<PluginViewModel>();
-            CommandHistory = new CommandHistory();
+
+            commandHistory = new Lazy<CommandHistory>();
 
             NewGameCommand = new DelegateCommand(null, (parameter) => NewGame());
 
@@ -104,8 +131,51 @@ namespace Kinectitude.Editor.ViewModels
                 }
             );
 
+            SaveGameCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    if (null == Game.FileName)
+                    {
+                        DialogService.ShowSaveDialog(
+                            (result, fileName) =>
+                            {
+                                if (result == true)
+                                {
+                                    Game.FileName = fileName;
+                                }
+                            }
+                        );
+                    }
+
+                    if (null != Game.FileName)
+                    {
+                        SaveGame();
+                    }
+                }
+            );
+
+            SaveGameAsCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    DialogService.ShowSaveDialog(
+                        (result, fileName) =>
+                        {
+                            if (result == true)
+                            {
+                                Game.FileName = fileName;
+                                SaveGame();
+                            }
+                        }
+                    );
+                }
+            );
+
+            OpenItemCommand = new DelegateCommand(null, (parameter) => OpenItem(parameter as BaseViewModel));
+
+            CloseItemCommand = new DelegateCommand(null, (parameter) => CloseItem(parameter as BaseViewModel));
+
             Assembly core = typeof(Kinectitude.Core.Base.Component).Assembly;
-            RegisterPluginsFromAssembly(core);
+            RegisterPlugins(core);
 
             DirectoryInfo path = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, PluginDirectory));
             if (path.Exists)
@@ -114,14 +184,14 @@ namespace Kinectitude.Editor.ViewModels
                 foreach (FileInfo file in files)
                 {
                     Assembly asm = Assembly.LoadFrom(file.FullName);
-                    RegisterPluginsFromAssembly(asm);
+                    RegisterPlugins(asm);
                 }
             }
         }
 
         public void NewGame()
         {
-            Game = new GameViewModel("Untitled Game");
+            Game = new GameViewModel("Untitled Game") { Width = 800, Height = 600 };
             Game.AddScene(new SceneViewModel("Scene 1"));
         }
 
@@ -131,7 +201,33 @@ namespace Kinectitude.Editor.ViewModels
             Game = storage.LoadGame();
         }
 
-        private void RegisterPluginsFromAssembly(Assembly assembly)
+        public void SaveGame()
+        {
+            IGameStorage storage = new XmlGameStorage(Game.FileName);
+            storage.SaveGame(Game);
+        }
+
+        public void OpenItem(BaseViewModel item)
+        {
+            if (!OpenItems.Contains(item))
+            {
+                OpenItems.Add(item);
+            }
+
+            ActiveItem = item;
+        }
+
+        public void CloseItem(BaseViewModel item)
+        {
+            OpenItems.Remove(item);
+
+            if (ActiveItem == item)
+            {
+                ActiveItem = OpenItems.FirstOrDefault();
+            }
+        }
+
+        private void RegisterPlugins(Assembly assembly)
         {
             var types = from type in assembly.GetTypes()
                         where System.Attribute.IsDefined(type, typeof(PluginAttribute)) &&

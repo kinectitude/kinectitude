@@ -46,6 +46,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseRenderComponent.cs" />
     <Compile Include="ImageRenderComponent.cs" />
     <Compile Include="IRender.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

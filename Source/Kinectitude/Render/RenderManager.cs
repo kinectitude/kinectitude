@@ -53,6 +53,12 @@ namespace Kinectitude.Render
             return renderService.GetBitmap(image);
         }
 
-        public override void OnUpdate(float frameDelta) { }
+        public override void OnUpdate(float frameDelta)
+        {
+            foreach (IRender render in Children)
+            {
+                render.OnUpdate(frameDelta);
+            }
+        }
     }
 }

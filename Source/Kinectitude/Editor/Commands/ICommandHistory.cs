@@ -1,8 +1,11 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows.Input;
+using System;
+using System.ComponentModel;
 
 namespace Kinectitude.Editor.Commands
 {
-    internal interface ICommandHistory
+    internal interface ICommandHistory : INotifyPropertyChanged
     {
         ObservableCollection<IUndoableCommand> UndoableCommands { get; }
         ObservableCollection<IUndoableCommand> RedoableCommands { get; }
@@ -14,5 +17,6 @@ namespace Kinectitude.Editor.Commands
         ICommand RedoCommand { get; }
 
         void Log(IUndoableCommand command);
+        void Log(string name, Action executeDelegate, Action unexecuteDelegate);
     }
 }

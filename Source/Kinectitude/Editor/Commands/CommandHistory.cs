@@ -1,12 +1,17 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
 using Kinectitude.Editor.Base;
+using System.Windows.Input;
+using System;
+using System.ComponentModel;
 
 namespace Kinectitude.Editor.Commands
 {
     internal sealed class CommandHistory : ICommandHistory
     {
         private bool replay;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public ObservableCollection<IUndoableCommand> UndoableCommands
         {
@@ -55,10 +60,9 @@ namespace Kinectitude.Editor.Commands
 
                     if (UndoableCommands.Count > 0)
                     {
-                        IUndoableCommand command = UndoableCommands.Last();
-                        UndoableCommands.RemoveAt(UndoableCommands.Count - 1);
+                        IUndoableCommand command = PopUndo();
                         command.Unexecute();
-                        RedoableCommands.Add(command);
+                        PushRedo(command);
                     }
 
                     replay = false;
@@ -73,10 +77,9 @@ namespace Kinectitude.Editor.Commands
 
                     if (RedoableCommands.Count > 0)
                     {
-                        IUndoableCommand command = RedoableCommands.Last();
-                        RedoableCommands.RemoveAt(RedoableCommands.Count - 1);
+                        IUndoableCommand command = PopRedo();
                         command.Execute();
-                        UndoableCommands.Add(command);
+                        PushUndo(command);
                     }
 
                     replay = false;
@@ -84,12 +87,58 @@ namespace Kinectitude.Editor.Commands
             );
         }
 
+        private void PushUndo(IUndoableCommand command)
+        {
+            UndoableCommands.Add(command);
+            NotifyPropertyChanged("LastUndoableCommand");
+        }
+
+        private void PushRedo(IUndoableCommand command)
+        {
+            RedoableCommands.Add(command);
+            NotifyPropertyChanged("LastRedoableCommand");
+        }
+
+        private IUndoableCommand PopUndo()
+        {
+            IUndoableCommand command = UndoableCommands.Last();
+            UndoableCommands.RemoveAt(UndoableCommands.Count - 1);
+
+            NotifyPropertyChanged("LastUndoableCommand");
+            return command;
+        }
+
+        private IUndoableCommand PopRedo()
+        {
+            IUndoableCommand command = RedoableCommands.Last();
+            RedoableCommands.RemoveAt(RedoableCommands.Count - 1);
+
+            NotifyPropertyChanged("LastRedoableCommand");
+            return command;
+        }
+
         public void Log(IUndoableCommand command)
         {
             if (!replay)
             {
-                UndoableCommands.Add(command);
+                PushUndo(command);
                 RedoableCommands.Clear();
+            }
+        }
+
+        public void Log(string name, Action executeDelegate, Action unexecuteDelegate)
+        {
+            if (!replay)
+            {
+                Log(new DelegateUndoableCommand(name, executeDelegate, unexecuteDelegate));
+            }
+        }
+
+        private void NotifyPropertyChanged(string name)
+        {
+            if (null != PropertyChanged)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
         }
     }

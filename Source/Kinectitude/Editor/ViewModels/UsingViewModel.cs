@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using Kinectitude.Editor.ViewModels.Interfaces;
 
 namespace Kinectitude.Editor.ViewModels
 {

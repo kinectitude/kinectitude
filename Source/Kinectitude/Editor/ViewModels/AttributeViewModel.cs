@@ -23,6 +23,13 @@ namespace Kinectitude.Editor.ViewModels
                 if (IsLocal && key != value && !KeyExists(value))
                 {
                     string oldKey = key;
+                    
+                    Workspace.Instance.CommandHistory.Log(
+                        "rename attribute to '" + value + "'",
+                        () => Key = value,
+                        () => Key = oldKey
+                    );
+
                     key = value;
 
                     if (null != KeyChanged)
@@ -42,6 +49,14 @@ namespace Kinectitude.Editor.ViewModels
             {
                 if (inherited != value)
                 {
+                    bool oldInherited = inherited;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "toggle attribute inheritance",
+                        () => IsInherited = value,
+                        () => IsInherited = oldInherited
+                    );
+
                     inherited = value;
                     NotifyPropertyChanged("IsInherited");
                 }
@@ -75,13 +90,18 @@ namespace Kinectitude.Editor.ViewModels
             }
             set
             {
-                if (IsLocal)
+                if (IsLocal && this.value != value)
                 {
-                    if (this.value != value)
-                    {
-                        this.value = value;
-                        NotifyPropertyChanged("Value");
-                    }
+                    string oldValue = this.value;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "change attribute value",
+                        () => Value = value,
+                        () => Value = oldValue
+                    );
+
+                    this.value = value;
+                    NotifyPropertyChanged("Value");
                 }
             }
         }

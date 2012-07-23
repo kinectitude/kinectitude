@@ -80,7 +80,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Base\DelegateCommand.cs" />
-    <Compile Include="Base\ICommand.cs" />
     <Compile Include="Commands\CommandHistory.cs" />
     <Compile Include="Commands\DelegateUndoableCommand.cs" />
     <Compile Include="Commands\ICommandHistory.cs" />
@@ -125,7 +124,6 @@
     <Compile Include="Views\ComponentDialog.xaml.cs">
       <DependentUpon>ComponentDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\DialogService.cs" />
     <Compile Include="Views\FolderConverter.cs" />
     <Compile Include="Views\EntityDialog.xaml.cs">
       <DependentUpon>EntityDialog.xaml</DependentUpon>
@@ -136,7 +134,8 @@
     <Compile Include="Views\GameView.xaml.cs">
       <DependentUpon>GameView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ModalDialogService.cs" />
+    <Compile Include="Views\DialogService.cs" />
+    <Compile Include="Views\IDialogService.cs" />
     <Compile Include="Views\SceneDialog.xaml.cs">
       <DependentUpon>SceneDialog.xaml</DependentUpon>
     </Compile>
@@ -222,9 +221,9 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <None Include="Storage\schema.xsd">
+    <EmbeddedResource Include="Storage\schema.xsd">
       <SubType>Designer</SubType>
-    </None>
+    </EmbeddedResource>
     <Resource Include="Samples\Breakout\game.xml">
       <SubType>Designer</SubType>
     </Resource>

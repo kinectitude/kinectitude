@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Kinectitude.Editor.ViewModels.Interfaces;
 
 namespace Kinectitude.Editor.ViewModels
 {
@@ -14,6 +15,11 @@ namespace Kinectitude.Editor.ViewModels
         public override string Type
         {
             get { return null != scope ? scope.GetDefinedName(plugin) : plugin.ClassName; }
+        }
+
+        public override string DisplayName
+        {
+            get { return plugin.DisplayName; }
         }
 
         [DependsOn("IsInherited")]

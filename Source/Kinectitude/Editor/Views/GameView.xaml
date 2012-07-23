@@ -31,7 +31,7 @@
                 <TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,8" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" AcceptsReturn="True" Height="128" Text="{Binding Description}" />
 
                 <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,0,8,8" HorizontalAlignment="Right">First Scene</TextBlock>
-                <ComboBox Grid.Row="2" Grid.Column="1" Margin="0,0,0,8" ItemsSource="{Binding Scenes}" SelectedItem="{Binding FirstScene, Mode=OneWayToSource}">
+                <ComboBox Grid.Row="2" Grid.Column="1" Margin="0,0,0,8" ItemsSource="{Binding Scenes}" SelectedItem="{Binding FirstScene}">
                     <ComboBox.Resources>
                         <DataTemplate DataType="{x:Type vm:SceneViewModel}">
                             <TextBlock Text="{Binding Name}" />

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using Kinectitude.Editor.ViewModels.Interfaces;
 
 namespace Kinectitude.Editor.ViewModels
 {
@@ -23,6 +24,11 @@ namespace Kinectitude.Editor.ViewModels
         public override string Type
         {
             get { return inheritedEvent.Type; }
+        }
+
+        public override string DisplayName
+        {
+            get { return inheritedEvent.DisplayName; }
         }
 
         public override bool IsLocal

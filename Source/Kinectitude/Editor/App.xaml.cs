@@ -10,8 +10,9 @@ namespace Kinectitude.Editor
     {
         public App()
         {
-            ModalDialogService.RegisterWindow<EntityDialog>(ModalDialogService.Constants.EntityDialog);
-            ModalDialogService.RegisterWindow<ComponentDialog>(ModalDialogService.Constants.ComponentDialog);
+            DialogService.RegisterWindow<SceneDialog>(DialogService.Constants.SceneDialog);
+            DialogService.RegisterWindow<EntityDialog>(DialogService.Constants.EntityDialog);
+            DialogService.RegisterWindow<ComponentDialog>(DialogService.Constants.ComponentDialog);
         }
     }
 }

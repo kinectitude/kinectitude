@@ -10,7 +10,7 @@ using SlimDX;
 namespace Kinectitude.Render
 {
     [Plugin("Render Component", "")]
-    public class RenderComponent : Component, IRender
+    public class RenderComponent : BaseRenderComponent
     {
         public enum ShapeType
         {
@@ -20,12 +20,8 @@ namespace Kinectitude.Render
 
         private SolidColorBrush fillBrush;
         private SolidColorBrush lineBrush;
-        private TransformComponent transformComponent;
-        private RenderManager renderManager;
         private Ellipse ellipse;
         private RectangleF rectangle;
-
-        
         private ShapeType shape;
         [Plugin("Shape", "")]
         public ShapeType Shape
@@ -86,32 +82,14 @@ namespace Kinectitude.Render
             }
         }
 
-        private float opacity;
-        [Plugin("Opacity", "")]
-        public float Opacity
-        {
-            get { return opacity; }
-            set
-            {
-                if (opacity != value)
-                {
-                    opacity = value;
-                    Change("Opacity");
-                }
-            }
-        }
-
         public RenderComponent()
         {
-            Opacity = 1.0f;
             LineColor = "Black";
             LineThickness = 0.0f;
         }
 
-        public void Render(RenderTarget renderTarget)
+        protected override void OnRender(RenderTarget renderTarget)
         {
-            Matrix3x2 matrix = renderTarget.Transform;
-
             if (Shape == ShapeType.Ellipse)
             {
                 ellipse.Center = new PointF(transformComponent.X, transformComponent.Y);
@@ -131,20 +109,13 @@ namespace Kinectitude.Render
                 renderTarget.FillRectangle(fillBrush, rectangle);
                 renderTarget.DrawRectangle(lineBrush, rectangle, LineThickness);
             }
-
-            renderTarget.Transform = matrix;
         }
 
-        public override void Ready()
+        protected override void OnReady()
         {
-            renderManager = GetManager<RenderManager>();
-            renderManager.Add(this);
-
             fillBrush = renderManager.GetSolidColorBrush(FillColor, Opacity);
             lineBrush = renderManager.GetSolidColorBrush(LineColor, 1.0f);
 
-            transformComponent = GetComponent<TransformComponent>();
-            
             if (Shape == ShapeType.Ellipse)
             {
                 ellipse = new Ellipse();
@@ -153,11 +124,6 @@ namespace Kinectitude.Render
             {
                 rectangle = new RectangleF();
             }
-        }
-
-        public override void Destroy()
-        {
-            renderManager.Remove(this);
         }
     }
 }

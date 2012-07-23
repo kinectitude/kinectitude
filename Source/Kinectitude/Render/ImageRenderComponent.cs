@@ -8,13 +8,15 @@ using Kinectitude.Core.ComponentInterfaces;
 
 namespace Kinectitude.Render
 {
-    [Plugin("Makes an image for the loadedEntity", "")]
-    public class ImageRenderComponent : Component, IRender
+    [Plugin("Image Render Component", "")]
+    public class ImageRenderComponent : BaseRenderComponent
     {
-        private RenderManager renderManager;
-        private TransformComponent transformComponent;
         private Bitmap bitmap;
-        private RectangleF rectangle;
+        private RectangleF destRectangle;
+        private RectangleF sourceRectangle;
+        private int currentFrame;
+        private int totalFrames;
+        private float frameTime;
 
         private string image;
         [Plugin("Image", "")]
@@ -26,58 +28,109 @@ namespace Kinectitude.Render
                 if (image != value)
                 {
                     image = value;
+
+                    if (null != renderManager)
+                    {
+                        bitmap = renderManager.GetBitmap(image);
+                    }
+
                     Change("Image");
                 }
             }
         }
 
-        private float opacity;
-        [Plugin("Opacity", "")]
-        public float Opacity
+        private bool animated;
+        [Plugin("Animated", "")]
+        public bool Animated
         {
-            get { return opacity; }
+            get { return animated; }
             set
             {
-                if (opacity != value)
+                if (animated != value)
                 {
-                    opacity = value;
-                    Change("Opacity");
+                    animated = value;
+                    Change("Animated");
+                }
+            }
+        }
+
+        private int row;
+        [Plugin("Row", "")]
+        public int Row
+        {
+            get { return row; }
+            set
+            {
+                if (row != value)
+                {
+                    row = value;
+                    Change("Row");
+                }
+            }
+        }
+
+        private float duration;
+        [Plugin("Duration", "")]
+        public float Duration
+        {
+            get { return duration; }
+            set
+            {
+                if (duration != value)
+                {
+                    duration = value;
+                    Change("Duration");
                 }
             }
         }
 
         public ImageRenderComponent()
         {
-            Opacity = 1.0f;
+            Animated = false;
+            currentFrame = 0;
+
+            destRectangle = new RectangleF();
+            sourceRectangle = new RectangleF();
         }
 
-        public override void Ready()
+        protected override void OnReady()
         {
-            renderManager = GetManager<RenderManager>();
-            renderManager.Add(this);
-
-            transformComponent = GetComponent<TransformComponent>();
-            rectangle = new RectangleF();
+            Row = 1;
             bitmap = renderManager.GetBitmap(Image);
+            totalFrames = bitmap.PixelSize.Width / transformComponent.Width;
         }
 
-        public void UpdateTransform()
+        protected override void OnRender(RenderTarget renderTarget)
         {
-            rectangle.X = transformComponent.X - transformComponent.Width / 2.0f;
-            rectangle.Y = transformComponent.Y - transformComponent.Height / 2.0f;
-            rectangle.Width = transformComponent.Width;
-            rectangle.Height = transformComponent.Height;
+            destRectangle.X = transformComponent.X - transformComponent.Width / 2.0f;
+            destRectangle.Y = transformComponent.Y - transformComponent.Height / 2.0f;
+            destRectangle.Width = transformComponent.Width;
+            destRectangle.Height = transformComponent.Height;
+
+            sourceRectangle.X = transformComponent.Width * currentFrame;
+            sourceRectangle.Y = transformComponent.Height * (Row - 1);
+            sourceRectangle.Width = transformComponent.Width;
+            sourceRectangle.Height = transformComponent.Height;
+
+            renderTarget.DrawBitmap(bitmap, destRectangle, Opacity, SlimDX.Direct2D.InterpolationMode.Linear, sourceRectangle);
+
+            //if (Animated)
+            //{
+            //    currentFrame = (currentFrame + 1) % totalFrames;
+            //}
         }
 
-        public override void Destroy()
+        public override void OnUpdate(float frameDelta)
         {
-            renderManager.Remove(this);
-        }
-
-        public void Render(RenderTarget renderTarget)
-        {
-            UpdateTransform();
-            renderTarget.DrawBitmap(bitmap, rectangle, Opacity);
+            if (Animated)
+            {
+                frameTime += frameDelta;
+                if (frameTime > Duration / totalFrames)
+                {
+                    frameTime = 0.0f;
+                    currentFrame = (currentFrame + 1) % totalFrames;
+                }
+            }
         }
     }
 }
