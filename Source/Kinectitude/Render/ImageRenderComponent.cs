@@ -17,6 +17,8 @@ namespace Kinectitude.Render
         private int currentFrame;
         private int totalFrames;
         private float frameTime;
+        private float scaleX;
+        private float scaleY;
 
         private string image;
         [Plugin("Image", "")]
@@ -98,6 +100,8 @@ namespace Kinectitude.Render
             Row = 1;
             bitmap = renderManager.GetBitmap(Image);
             totalFrames = bitmap.PixelSize.Width / transformComponent.Width;
+            scaleX = bitmap.DotsPerInch.Width / 96.0f;
+            scaleY = bitmap.DotsPerInch.Height / 96.0f;
         }
 
         protected override void OnRender(RenderTarget renderTarget)
@@ -107,10 +111,10 @@ namespace Kinectitude.Render
             destRectangle.Width = transformComponent.Width;
             destRectangle.Height = transformComponent.Height;
 
-            sourceRectangle.X = transformComponent.Width * currentFrame;
-            sourceRectangle.Y = transformComponent.Height * (Row - 1);
-            sourceRectangle.Width = transformComponent.Width;
-            sourceRectangle.Height = transformComponent.Height;
+            sourceRectangle.X = transformComponent.Width * currentFrame / scaleX;
+            sourceRectangle.Y = transformComponent.Height * (Row - 1) / scaleY;
+            sourceRectangle.Width = transformComponent.Width / scaleX;
+            sourceRectangle.Height = transformComponent.Height / scaleY;
 
             renderTarget.DrawBitmap(bitmap, destRectangle, Opacity, SlimDX.Direct2D.InterpolationMode.Linear, sourceRectangle);
 

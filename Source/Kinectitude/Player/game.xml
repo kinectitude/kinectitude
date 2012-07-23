@@ -105,7 +105,7 @@
 
     <Entity Name="tennis">
       <Component Type="TransformComponent" X="400.5" Y="300.5" Width="263" Height="263" />
-      <Component Type="ImageRenderComponent" Image="tennisball.png" Animated="true" Duration="2" />
+      <Component Type="ImageRenderComponent" Image="tennisball.png" />
     </Entity>
 
     <Entity Name="sonic">
