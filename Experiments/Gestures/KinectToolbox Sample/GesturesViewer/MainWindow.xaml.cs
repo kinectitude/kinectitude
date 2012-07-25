@@ -18,6 +18,10 @@ namespace GesturesViewer
     {
         KinectSensor kinectSensor;
 
+<<<<<<< HEAD
+        SwipeGestureDetector swipeGestureRecognizer;
+        TemplatedGestureDetector circleGestureRecognizer;
+=======
         /*SwipeGestureDetector swipeGestureRecognizer;*/
         TemplatedGestureDetector circleGestureRecognizer;
         TemplatedGestureDetector circleGestureRecognizerL;
@@ -37,6 +41,7 @@ namespace GesturesViewer
         TemplatedGestureDetector lobBlockGestureRecognizer;
         TemplatedGestureDetector lowBlockGestureRecognizerL;
 
+>>>>>>> 11c5ca39c6e057b16bc2e5c5721c1ab574d74abd
         readonly ColorStreamManager colorManager = new ColorStreamManager();
         readonly DepthStreamManager depthManager = new DepthStreamManager();
         AudioStreamManager audioManager;
@@ -49,6 +54,8 @@ namespace GesturesViewer
 
         string circleKBPath;
         string letterT_KBPath;
+<<<<<<< HEAD
+=======
         string stepPath;
         string stepPathL;
         
@@ -60,6 +67,7 @@ namespace GesturesViewer
 
         string strikePath;
         string strikePathL;
+>>>>>>> 11c5ca39c6e057b16bc2e5c5721c1ab574d74abd
 
         SkeletonRecorder recorder;
         SkeletonReplay replay;
@@ -112,6 +120,8 @@ namespace GesturesViewer
         {
             circleKBPath = Path.Combine(Environment.CurrentDirectory, @"data\circleKB.save");
             letterT_KBPath = Path.Combine(Environment.CurrentDirectory, @"data\t_KB.save");
+<<<<<<< HEAD
+=======
             stepPath = Path.Combine(Environment.CurrentDirectory, @"data\stepR.save");
             stepPathL = Path.Combine(Environment.CurrentDirectory, @"data\stepL.save");
             blockPath = Path.Combine(Environment.CurrentDirectory, @"data\block.save");
@@ -119,6 +129,7 @@ namespace GesturesViewer
             highBlockPath = Path.Combine(Environment.CurrentDirectory, @"data\highBlock.save");
             lowBlockPath = Path.Combine(Environment.CurrentDirectory, @"data\lowBlock.save");
             string lowBlockPathL = Path.Combine(Environment.CurrentDirectory, @"data\lowBlockL.save");
+>>>>>>> 11c5ca39c6e057b16bc2e5c5721c1ab574d74abd
 
             try
             {
@@ -171,14 +182,23 @@ namespace GesturesViewer
                                              });
             kinectSensor.SkeletonFrameReady += kinectRuntime_SkeletonFrameReady;
 
+<<<<<<< HEAD
+            swipeGestureRecognizer = new SwipeGestureDetector();
+            swipeGestureRecognizer.OnGestureDetected += OnGestureDetected;
+=======
             //swipeGestureRecognizer = new SwipeGestureDetector();
             //swipeGestureRecognizer.OnGestureDetected += OnGestureDetected;
+>>>>>>> 11c5ca39c6e057b16bc2e5c5721c1ab574d74abd
 
             skeletonDisplayManager = new SkeletonDisplayManager(kinectSensor, kinectCanvas);
 
             kinectSensor.Start();
 
+<<<<<<< HEAD
+            LoadCircleGestureDetector();
+=======
             LoadGestureDetectors();
+>>>>>>> 11c5ca39c6e057b16bc2e5c5721c1ab574d74abd
             LoadLetterTPostureDetector();
 
             nuiCamera = new BindableNUICamera(kinectSensor);
@@ -259,6 +279,11 @@ namespace GesturesViewer
 
                     if (joint.JointType == JointType.HandRight)
                     {
+<<<<<<< HEAD
+                        swipeGestureRecognizer.Add(joint.Position, kinectSensor);
+                        circleGestureRecognizer.Add(joint.Position, kinectSensor);
+                    }
+=======
                         //swipeGestureRecognizer.Add(joint.Position, kinectSensor);
                         circleGestureRecognizer.Add(joint.Position, kinectSensor);
                     }
@@ -275,6 +300,7 @@ namespace GesturesViewer
                         stepGestureRecognizerL.Add(joint.Position, kinectSensor);
                     }
 
+>>>>>>> 11c5ca39c6e057b16bc2e5c5721c1ab574d74abd
                 }
 
                 algorithmicPostureRecognizer.TrackPostures(skeleton);
@@ -301,10 +327,17 @@ namespace GesturesViewer
 
         private void Clean()
         {
+<<<<<<< HEAD
+            if (swipeGestureRecognizer != null)
+            {
+                swipeGestureRecognizer.OnGestureDetected -= OnGestureDetected;
+            }
+=======
             /*if (swipeGestureRecognizer != null)
             {
                 swipeGestureRecognizer.OnGestureDetected -= OnGestureDetected;
             }*/
+>>>>>>> 11c5ca39c6e057b16bc2e5c5721c1ab574d74abd
 
             if (audioManager != null)
             {

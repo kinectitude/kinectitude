@@ -94,7 +94,10 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+<<<<<<< HEAD
+=======
       <SubType>Designer</SubType>
+>>>>>>> 11c5ca39c6e057b16bc2e5c5721c1ab574d74abd
     </EmbeddedResource>
     <None Include="Data\circleKB.save">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -16,9 +16,17 @@ namespace WpfApplication1
         KinectSensor kinectSensor;
         SwipeGestureDetector swipeGestureRecognizer;
         TemplatedGestureDetector circleGestureRecognizer;
+<<<<<<< HEAD
+        TemplatedGestureDetector handUpGestureRecognizer;
         readonly BarycenterHelper barycenterHelper = new BarycenterHelper();
 
         string circleKBPath;
+        string handUpPath;
+=======
+        readonly BarycenterHelper barycenterHelper = new BarycenterHelper();
+
+        string circleKBPath;
+>>>>>>> 11c5ca39c6e057b16bc2e5c5721c1ab574d74abd
 
         private Skeleton[] skeletons;
 
@@ -29,7 +37,12 @@ namespace WpfApplication1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+<<<<<<< HEAD
+            circleKBPath = Path.Combine(Environment.CurrentDirectory, @"data\circleKB.save");
+            handUpPath = Path.Combine(Environment.CurrentDirectory, @"data\moveHandUp.save");
+=======
             circleKBPath = Path.Combine(Environment.CurrentDirectory, @"../../Data\circleKB.save");
+>>>>>>> 11c5ca39c6e057b16bc2e5c5721c1ab574d74abd
 
             try
             {
@@ -76,6 +89,10 @@ namespace WpfApplication1
             kinectSensor.Start();
 
             LoadCircleGestureDetector();
+<<<<<<< HEAD
+            LoadHandUpGestureDetector();
+=======
+>>>>>>> 11c5ca39c6e057b16bc2e5c5721c1ab574d74abd
         }
 
         void kinectRuntime_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
@@ -114,6 +131,10 @@ namespace WpfApplication1
                     {
                         swipeGestureRecognizer.Add(joint.Position, kinectSensor);
                         circleGestureRecognizer.Add(joint.Position, kinectSensor);
+<<<<<<< HEAD
+                        handUpGestureRecognizer.Add(joint.Position, kinectSensor);
+=======
+>>>>>>> 11c5ca39c6e057b16bc2e5c5721c1ab574d74abd
                     }
                 }
             }

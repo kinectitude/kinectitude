@@ -9,11 +9,20 @@ namespace GesturesViewer
 {
     partial class MainWindow
     {
+<<<<<<< HEAD
+        void LoadCircleGestureDetector()
+=======
         void LoadGestureDetectors()
+>>>>>>> 11c5ca39c6e057b16bc2e5c5721c1ab574d74abd
         {
             using (Stream recordStream = File.Open(circleKBPath, FileMode.OpenOrCreate))
             {
                 circleGestureRecognizer = new TemplatedGestureDetector("Circle", recordStream);
+<<<<<<< HEAD
+                circleGestureRecognizer.TraceTo(gesturesCanvas, Colors.Red);
+                circleGestureRecognizer.OnGestureDetected += OnGestureDetected;
+            }
+=======
                 circleGestureRecognizer.TraceTo(gesturesCanvas, Colors.Chocolate);
                 circleGestureRecognizer.OnGestureDetected += OnGestureDetected;
             }
@@ -68,6 +77,7 @@ namespace GesturesViewer
                 stepGestureRecognizerL.OnGestureDetected += OnGestureDetected;
             }
 
+>>>>>>> 11c5ca39c6e057b16bc2e5c5721c1ab574d74abd
             templates.ItemsSource = circleGestureRecognizer.LearningMachine.Paths;
         }
 
@@ -84,6 +94,10 @@ namespace GesturesViewer
             recordCircle.Content = "Stop Recording";
         }
 
+<<<<<<< HEAD
+        void OnGestureDetected(string gesture)
+        {
+=======
         private void recordStep_Click(object sender, RoutedEventArgs e)
         {
             StepRecord();
@@ -125,6 +139,7 @@ namespace GesturesViewer
         void OnGestureDetected(string gesture)
         {
             //if (!gesture.ToLower().Contains("foot")) return;
+>>>>>>> 11c5ca39c6e057b16bc2e5c5721c1ab574d74abd
             int pos = detectedGestures.Items.Add(string.Format("{0} : {1}", gesture, DateTime.Now));
 
             detectedGestures.SelectedIndex = pos;
@@ -132,6 +147,16 @@ namespace GesturesViewer
 
         void CloseGestureDetector()
         {
+<<<<<<< HEAD
+            if (circleGestureRecognizer == null)
+                return;
+
+            using (Stream recordStream = File.Create(circleKBPath))
+            {
+                circleGestureRecognizer.SaveState(recordStream);
+            }
+            circleGestureRecognizer.OnGestureDetected -= OnGestureDetected;
+=======
             if (circleGestureRecognizer != null)
             {
                 using (Stream recordStream = File.Create(circleKBPath))
@@ -168,6 +193,7 @@ namespace GesturesViewer
                 highBlockGestureRecognizer.OnGestureDetected -= OnGestureDetected;
             }
 
+>>>>>>> 11c5ca39c6e057b16bc2e5c5721c1ab574d74abd
         }
     }
 }
