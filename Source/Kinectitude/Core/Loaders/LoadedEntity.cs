@@ -20,8 +20,8 @@ namespace Kinectitude.Core.Loaders
 
         private readonly List<LoadedEvent> events = new List<LoadedEvent>();
         private readonly string Name;
-        private readonly List<string> isType;
-        private readonly List<string> isExactType;
+        internal readonly List<string> IsType;
+        internal readonly List<string> IsExactType;
 
         private bool firstCreate = true;
 
@@ -32,8 +32,8 @@ namespace Kinectitude.Core.Loaders
         {
             Name = name;
             this.id = id;
-            this.isExactType = isExactType;
-            this.isType = isType;
+            this.IsExactType = isExactType;
+            this.IsType = isType;
         }
 
         internal void AddLoadedComponent(LoadedComponent component)

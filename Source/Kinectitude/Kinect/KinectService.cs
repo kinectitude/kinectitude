@@ -2,17 +2,23 @@
 using System.Linq;
 using Kinectitude.Core.Base;
 using Microsoft.Kinect;
+using Microsoft.Speech.Recognition;
 
 namespace Kinectitude.Kinect
 {
     public class KinectService : Service
     {
 
-        public static KinectSensor KinectDriver { get; private set; }
         private const int scount = 6;
         private static Skeleton[] allSkeletons = new Skeleton[scount];
 
+        public static KinectSensor KinectDriver { get; private set; }
+
         public Action<Skeleton[]> Callback { get; set; }
+
+        public Action<string> SpeechCallback { get; set; }
+
+        private readonly SpeechRecognitionEngine speechRecognitionEngine;
 
         private void enable()
         {

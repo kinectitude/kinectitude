@@ -14,6 +14,8 @@ namespace Kinectitude.Kinect
         private static readonly int numJoints = Enum.GetValues(typeof(JointType)).Length;
         private readonly List<GestureEvent>[][] events = new List<GestureEvent>[numPlayers][];
 
+        //private readonly 
+
         private void update(Skeleton[] skeletons)
         {
             latestSkeletons = skeletons;
@@ -74,6 +76,11 @@ namespace Kinectitude.Kinect
             latestSkeletons = null;
         }
 
+        private void said(string what)
+        {
+
+        }
+
         protected override void OnStart()
         {
             if (null == service)
@@ -81,11 +88,13 @@ namespace Kinectitude.Kinect
                 service = GetService<KinectService>();
             }
             service.Callback = update;
+            service.SpeechCallback = said;
         }
 
         protected override void OnStop()
         {
             service.Callback = null;
+            service.SpeechCallback = null;
         }
 
         public void AddGestureEvent(GestureEvent gestureEvent)

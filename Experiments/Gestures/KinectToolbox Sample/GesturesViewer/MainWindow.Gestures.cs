@@ -103,7 +103,7 @@ namespace GesturesViewer
             StepRecord();
         }
 
-        public void StepRecord()
+        public void StepRecord(string value = "")
         {
             /*if (stepGestureRecognizer.IsRecordingPath)
             {
@@ -124,7 +124,7 @@ namespace GesturesViewer
             recordStep.Content = "";*/
 
 
-            if (circleGestureRecognizer.IsRecordingPath)
+            /*if (circleGestureRecognizer.IsRecordingPath)
             {
                 circleGestureRecognizer.EndRecordTemplate();
                 recordCircle.Content = "Record new Step";
@@ -132,7 +132,8 @@ namespace GesturesViewer
             }
             circleGestureRecognizer.StartRecordTemplate();
 
-            recordCircle.Content = "";
+            recordCircle.Content = "";*/
+            recordCircle.Content = value;
 
         }
 

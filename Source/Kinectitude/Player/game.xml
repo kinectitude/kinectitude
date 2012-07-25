@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Game Name="pong" Width="800" Height="600" FirstScene="Main Menu" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1">
+<Game Name="pong" Width="800" Height="600" FirstScene="game" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1">
 
   <Using File="Kinectitude.Kinect.dll">
     <Define Name="KinectFollowComponent" Class="Kinectitude.Kinect.KinectFollowComponent"/>
@@ -59,7 +59,7 @@
   <Prototype Name="ball" Value="0">
     <Component Type="RenderComponent" FillColor="Red" Shape="Rectangle" />
     <Component Type="TransformComponent" X="250" Y="250" Width="24" Height="24"/>
-    <Component Type="PhysicsComponent" MinimumVelocity="5" MaximumVelocity="5" XVelocity="40" YVelocity="20" Shape="Ellipse" Restitution="1" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="true" FixedRotation="false" AngularVelocity="1"/>
+    <Component Type="PhysicsComponent" MinimumVelocity="45" MaximumVelocity="45"  XVelocity="40" YVelocity="20" Shape="Ellipse" Restitution="1" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="true" FixedRotation="true" AngularVelocity="1"/>
     <Event Type="CollisionEvent" CollidesWith="left_wall">
       <Action Type="SetPositionAction" X="400" Y="300" />
       <Action Type="IncrementAction" Target="scene.player2Score" IncrementBy="scene.scoreValue"/>
@@ -175,7 +175,7 @@
       
       <Event Type="TriggerOccursEvent" Trigger="rdy2">
         <Action Type="SetAction" Target="scene.ready2txt" Value="player 2 is ready!"/>
-        <Action Type="SetAction" Target="scene.ready2" Value="true"/>
+        <Action Type="SetAction" Target="scene.ready2" Value="[scene.ready2 == false]"/>
         <Condition If="scene.ready1">
           <Action Type="ChangeSceneAction" Target="game"/>
         </Condition>

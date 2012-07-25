@@ -9,6 +9,7 @@ using Kinectitude.Core.ComponentInterfaces;
 using Kinectitude.Core.Components;
 using Microsoft.Xna.Framework;
 using FarseerPhysics.Common;
+using Kinectitude.Core.Data;
 
 namespace Kinectitude.Physics
 {
@@ -25,36 +26,99 @@ namespace Kinectitude.Physics
         private Body body;
         private PhysicsManager pm;
         private TransformComponent tc;
- 
+
+        private string shape = "rectangle";
         [Preset("Bouncy Ball", "circle")]
         [Preset("Collision Event Line", "rectangle")]
         [Preset("Wall", "rectangle")]
         [Plugin("Shape", "")]
-        public string Shape { get; set; }
+        public string Shape 
+        {
+            get { return shape; }
+            set
+            {
+                if (shape != value)
+                {
+                    shape = value;
+                    Change("Shape");
+                }
+            }
+        }
 
+        private float restitution = 0;
         [Preset("Bouncy Ball", 1.0)]
         [Preset("Collision Event Line", 0.0)]
         [Preset("Wall", 0.0)]
         [Plugin("Restitution", "")]
-        public float Restitution { get; set; }
+        public float Restitution
+        {
+            get { return restitution; }
+            set
+            {
+                if (restitution != value)
+                {
+                    restitution = value;
+                    Change("Restitution");
+                }
+            }
+        }
 
+
+        private float mass = 1;
         [Preset("Bouncy Ball", 1.0)]
         [Preset("Collision Event Line", 1.0)]
         [Preset("Wall", 1.0)]
         [Plugin("Mass", "")]
-        public float Mass { get; set; }
+        public float Mass
+        {
+            get { return mass; }
+            set
+            {
+                if (mass != value)
+                {
+                    mass = value;
+                    Change("Mass");
+                }
+            }
+        }
 
+
+        private float friction = 0;
         [Preset("Bouncy Ball", 0.0)]
         [Preset("Collision Event Line", 0.0)]
         [Preset("Wall", 0.0)]
         [Plugin("Friction", "")]
-        public float Friction { get; set; }
+        public float Friction
+        {
+            get { return friction; }
+            set
+            {
+                if (friction != value)
+                {
+                    friction = value;
+                    Change("Friction");
+                }
+            }
+        }
 
+
+        private float linearDampining = 0;
         [Preset("Bouncy Ball", 0.0)]
         [Preset("Collision Event Line", 0.0)]
         [Preset("Wall", 0.0)]
         [Plugin("Linear Damping", "")]
-        public float LinearDamping { get; set; }
+        public float LinearDamping
+        {
+            get { return linearDampining; }
+            set
+            {
+                if (linearDampining != value)
+                {
+                    linearDampining = value;
+                    Change("LinearDampining");
+                }
+            }
+        }
 
         private float maximumVelocity = float.PositiveInfinity;
         [Plugin("Maximum velocity", "")]
@@ -63,7 +127,11 @@ namespace Kinectitude.Physics
             get { return maximumVelocity; }
             set
             {
-                maximumVelocity = value;
+                if (value != maximumVelocity)
+                {
+                    maximumVelocity = value;
+                    Change("MaximumVelocity");
+                }
             }
         }
 
@@ -74,7 +142,11 @@ namespace Kinectitude.Physics
             get { return minimumVelocity; }
             set
             {
-                minimumVelocity = value;
+                if (value != minimumVelocity)
+                {
+                    minimumVelocity = value;
+                    Change("MinimumVelocity");
+                }
             }
         }
 
@@ -93,39 +165,51 @@ namespace Kinectitude.Physics
             }
         }
 
-        private float xVelocity;
+        private float xVelocity = 0;
         [Plugin("X Velocity", "")]
         public float XVelocity
         {
             get { return xVelocity; }
             set 
             {
-                xVelocity = value;
-                setBodyVelocity(value);
+                if (value != xVelocity)
+                {
+                    xVelocity = value;
+                    setBodyVelocity(value);
+                    Change("XVelocity");
+                }
             }
         }
 
-        private float yVelocity;
+        private float yVelocity = 0;
         [Plugin("Y Velocity", "")]
         public float YVelocity
         {
             get { return yVelocity; }
             set
             {
-                yVelocity = value;
-                setBodyVelocity(value);
+                if (value != yVelocity)
+                {
+                    yVelocity = value;
+                    setBodyVelocity(value);
+                    Change("YVelocity");
+                }
             }
         }
 
-        private float angularVelocity;
+        private float angularVelocity = 0;
         [Plugin("Angular Velocity Velocity", "")]
         public float AngularVelocity
         {
             get { return angularVelocity; }
             set
             {
-                angularVelocity = value;
-                setBodyVelocity(value);
+                if (value != angularVelocity)
+                {
+                    angularVelocity = value;
+                    setBodyVelocity(value);
+                    Change("AngularVelocity");
+                }
             }
         }
 
@@ -138,17 +222,50 @@ namespace Kinectitude.Physics
             get { return movesWhenHit; }
             set
             {
-                movesWhenHit = value;
-                if (body != null && movesWhenHit && body.BodyType != BodyType.Dynamic) createBody();
+                if (value != movesWhenHit)
+                {
+                    movesWhenHit = value;
+                    if (body != null && movesWhenHit && body.BodyType != BodyType.Dynamic) createBody();
+                    Change("MovesWhenHit");
+                }
             }
  
         }
 
-        [Preset("Bouncy Ball", false)]
+        private bool fixedRotation = false;
+        [Preset("Bouncy Ball", true)]
         [Preset("Collision Event Line", false)]
         [Preset("Wall", false)]
         [Plugin("Object can rotate as it moves", "")]
-        public bool FixedRotation { get; set; }
+        public bool FixedRotation
+        {
+            get { return fixedRotation; }
+            set
+            {
+                if (value != fixedRotation)
+                {
+                    fixedRotation = value;
+                    Change("FixedRotation");
+                }
+            }
+        }
+
+        private ITypeMatcher ignoreCollisionsWith = null;
+
+        [Plugin("Ignores collisions with", "Any entities that match this type matcher will pass through this object")]
+        public ITypeMatcher IgnoreCollisionsWith
+        {
+            get { return ignoreCollisionsWith; }
+            set
+            {
+                if (ignoreCollisionsWith != value)
+                {
+                    //TODO override = operator for TypeMatcher
+                    ignoreCollisionsWith = value;
+                    Change("IgnoreCollisionsWith");
+                }
+            }
+        }
 
         private bool hasCollisions = false;
         private bool hasVelocity = false;
@@ -219,7 +336,7 @@ namespace Kinectitude.Physics
 
             tc.Rotation = body.Rotation;
 
-			float speed = body.LinearVelocity.Length();
+			float speed = body.LinearVelocity.Length() / speedRatio;
 
             if (speed > maximumVelocity)
             {
@@ -349,6 +466,8 @@ namespace Kinectitude.Physics
                     }
                 }
             }
+
+            if (ignoreCollisionsWith.MatchAndSet(collidedWith)) return false;
 
             //Allow the collison to occur
             return true;

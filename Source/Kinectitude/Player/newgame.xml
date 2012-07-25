@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Game Name="pong" Width="800" Height="600" FirstScene="Main Menu" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1">
+
+  <Using File="Kinectitude.Kinect.dll">
+    <Define Name="KinectFollowComponent" Class="Kinectitude.Kinect.KinectFollowComponent"/>
+    <Define Name="KinectManager" Class="Kinectitude.Kinect.KinectManager"/>
+    <Define Name="GestureEvent" Class="Kinectitude.Kinect.GestureEvent"/>
+  </Using>
+
+  <Using File="Kinectitude.Physics.dll">
+    <Define Name="PhysicsManager" Class="Kinectitude.Physics.PhysicsManager"/>
+    <Define Name="PhysicsComponent" Class="Kinectitude.Physics.PhysicsComponent"/>
+    <Define Name="CrossesLineEvent" Class="Kinectitude.Physics.CrossesLineEvent"/>
+    <Define Name="CollisionEvent" Class="Kinectitude.Physics.CollisionEvent"/>
+  </Using>
+
+  <Using File="Kinectitude.Render.dll">
+    <Define Name="RenderManager" Class="Kinectitude.Render.RenderManager"/>
+    <Define Name="RenderComponent" Class="Kinectitude.Render.RenderComponent"/>
+    <Define Name="TextRenderComponent" Class="Kinectitude.Render.TextRenderComponent"/>
+    <Define Name="ImageRenderComponent" Class="Kinectitude.Render.ImageRenderComponent" />
+  </Using>
+
+  <Using File="Kinectitude.DirectInput.dll">
+    <Define Name="KeyEvent" Class="Kinectitude.DirectInput.KeyEvent"/>
+    <Define Name="KeyboardManager" Class="Kinectitude.DirectInput.KeyboardManager"/>
+    <Define Name="MouseManager" Class="Kinectitude.DirectInput.MouseManager"/>
+    <Define Name="MouseFollowComponent" Class="Kinectitude.DirectInput.MouseFollowComponent"/>
+    <Define Name="MouseClickEvent" Class="Kinectitude.DirectInput.MouseClickEvent"/>
+  </Using>
+
+  <Prototype Name="ball">
+    <Component Type="RenderComponent" FillColor="Red" Shape="Ellipse" />
+    <Component Type="TransformComponent" X="400" Y="300" Width="24" Height="24"/>
+    <Component Type="PhysicsComponent" MinimumVelocity="30" MaximumVelocity="70" Shape="Ellipse" Restitution="1" Mass="1" Friction="0" MovesWhenHit="true" FixedRotation="true"/>
+    
+    <Event Type="TriggerOccursEvent" Trigger="create{scene.next}">
+      <Action Type="SetAction" Target="id" Value="{scene.next}"/>
+      <Action Type="SetAction" Target="right" Value="[random]"/>
+      <Action Type="SetAction" Target="top" Value="[random]"/>
+      <!--Since the magnitude of the velocity will be too small, the minimum will be used to scale it-->
+      <Action Type="SetAction" Target="PhysicsComponent.XVelocity" Value="[random]"/>
+      <Action Type="SetAction" Target="PhysicsComponent.YVelocity" Value="[rnd]"/>
+      
+      <Condition If="right > 0.5">
+        <Action Type="SetAction" Target="PhysicsComponent.XVelocity" Value="-PhysicsComponent.XVelocity"/>
+      </Condition>
+
+      <Condition If="top > 0.5">
+        <Action Type="SetAction" Target="PhysicsComponent.YVelocity" Value="-PhysicsComponent.YVelocity"/>
+      </Condition>
+      
+    </Event>
+  </Prototype>
+
+  <Prototype Name="wall">
+    <Component Type="TransformComponent" X="400" Y="10" Width="720" Height="20"/>
+    <Component Type="PhysicsComponent" Shape="Rectangle" Restitution="0" Friction="0" MovesWhenHit="false" IgnoreCollisionsWith="$wall"/>
+    <Component Type="RenderComponent" FillColor="Black" Shape="Rectangle"/>
+
+    <Event Type="CollisionEvent" CollidesWith="$ball">
+      <Action Type="FireTriggerAction" Name="decHealth"/>
+    </Event>
+    
+  </Prototype>
+
+  <Prototype Name="sideWall" Prototype="wall">
+    <Component Type="TransformComponent" X="10" Y="300" Width="20" Height="520"/>
+  </Prototype>
+
+  <Prototype Name="switchWall" Prototype="wall">
+    <Component Type="TransformComponent" X="20" Y="10" Width="40" Height="20"/>
+    <Component Type="RenderComponent" FillColor="Red"/>
+  </Prototype>
+
+  <Prototype Name="switchWallCC" Prototype="wall">
+    <Component Type="TransformComponent" X="20" Y="10" Width="40" Height="20"/>
+    <Component Type="RenderComponent" FillColor="Red"/>
+  </Prototype>
+
+  <Prototype Name="basePlayer" health="100" score="0">
+    <Component Type="TransformComponent" X="786.5" Y="562" Width="27" Height="36" />
+    <Component Type="ImageRenderComponent" Image="sonic.gif" Animated="false" Duration="2" />
+    <Component Type="PhysicsComponent" MaximumVelocity="70" Shape="Rectangle" Restitution="1" Friction="0" MovesWhenHit="false" FixedRotation="true"/>
+
+    <Event Type="AttributeChangesEvent" Target="PhysicsComponent.X">
+      <Action Type="FireTriggerAction" Name="motionChange"/>
+    </Event>
+
+    <Event Type="AttributeChangesEvent" Target="PhysicsComponent.Y">
+      <Action Type="FireTriggerAction" Name="motionChange"/>
+    </Event>
+    
+    <Event Type="TriggerOccursEvent" Trigger="motionChange">
+      <Condition If="PhysicsComponent.X == 0 and PhysicsComponent.Y == 0">
+        <Action Type="SetAction" Target="ImageRenderComponent.Animated" Value="false"/>
+      </Condition>
+      
+      <Condition If="PhysicsComponent.X != 0 or PhysicsComponent.Y != 0">
+        <Action Type="SetAction" Target="ImageRenderComponent.Animated" Value="true"/>
+      </Condition>
+    </Event>
+
+    <Event Type="TriggerOccursEvent" Trigger="decHealth">
+      <Action Type="SetAction" Target="health" Value="[health - 1]"/>
+      
+      <Condition If="health == 0">
+        <Action Type="ChangeSceneAction" Target="Game Over"/>
+      </Condition>
+    </Event>
+  </Prototype>
+
+
+  <Prototype Name="mousePlayer" Prototype="basePlayer">
+    <Component Type="MouseFollowComponent" Direction="X"/>
+  </Prototype>
+  
+  <Scene Name="Main Menu">
+    <Entity>
+      <Event Type="SceneStartsEvent">
+        <Action Type="SetAction" Target="game.player" Value="mouses"/>
+        <Action Type="ChangeSceneAction" Target="Game"/>
+      </Event>
+    </Entity>
+  </Scene>
+
+  <Scene Name="Game">
+    <!--Top, bottom, left, and right walls-->
+    <Entity Prototype="wall"/>
+    
+    <Entity Prototype="wall">
+      <Component Type="TransformComponent" Y="590"/>
+    </Entity>
+
+    <Entity Prototype="sideWall"/>
+    
+    <Entity Prototype="sideWall">
+      <Component Type="TransformComponent" X="790"/>
+    </Entity>
+    
+    <!--Top, bottom, left and right switch walls-->
+    <Entity Prototype="switchWall"/>
+
+    <Entity Prototype="switchWallCC">
+      <Component Type="TransformComponent" X="10" Y="20" Width="20" Height="40"/>
+    </Entity>
+
+    <Entity Prototype="switchWall">
+      <Component Type="TransformComponent" X="780"/>
+    </Entity>
+
+    <Entity Prototype="switchWallCC">
+      <Component Type="TransformComponent" X="790" Y="20" Width="20" Height="40"/>
+    </Entity>
+    
+    <!--
+
+    <Entity Prototype="switchWall">
+      <Component Type="TransformComponent" Y="590"/>
+    </Entity>
+
+
+    <Entity Prototype="switchWallCC">
+      <Component Type="TransformComponent" X="10" Y="20" Width="20" Height="40"/>
+    </Entity>
+
+    <Entity Prototype="switchWall">
+      <Component Type="TransformComponent" X="780" Y="590"/>
+    </Entity>
+
+    <Entity Prototype="switchWallCC">
+      <Component Type="TransformComponent" X="790" Y="590" Width="20" Height="40"/>
+    </Entity>-->
+  </Scene>
+
+  <Scene Name="Game Over">
+    
+  </Scene>
+
+</Game>

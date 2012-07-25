@@ -38,6 +38,11 @@ namespace Kinectitude.Core.Data
                     case "False":
                         args.Result = 0;
                         return;
+                    case "random":
+                    case "rnd":
+                        Random r = new Random();
+                        args.Result = (double)r.Next(1000) / 1000;
+                        return;
                 }
 
                 if(name.StartsWith("__"))

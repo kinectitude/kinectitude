@@ -51,7 +51,6 @@ namespace GesturesViewer
         TemplatedPostureDetector templatePostureDetector;
         private bool recordNextFrameForPosture;
         bool displayDepth;
-
         string circleKBPath;
         string letterT_KBPath;
 <<<<<<< HEAD
@@ -205,7 +204,7 @@ namespace GesturesViewer
 
             elevationSlider.DataContext = nuiCamera;
 
-            voiceCommander = new VoiceCommander("record", "stop");
+            voiceCommander = new VoiceCommander("record", "stop", "hello");
             voiceCommander.OrderDetected += voiceCommander_OrderDetected;
 
             StartVoiceCommander();
