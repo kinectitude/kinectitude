@@ -216,9 +216,13 @@ namespace Kinectitude.Core.Loaders
                     if (null != cond) cond.AddAction(loadedAction);
                     else loadedEvent.AddAction(loadedAction);
                 }
-                else
+                else if (null == cond)
                 {
                     loadedEvent.AddAction(createCondition(game, loadedEvent, action));
+                }
+                else
+                {
+                    cond.AddAction(createCondition(game, loadedEvent, action));
                 }
             }
         }

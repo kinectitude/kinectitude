@@ -22,7 +22,7 @@ namespace Kinectitude.Core.Loaders
         {
             BoolExpressionReader br = new BoolExpressionReader(ifValue, evt, evt.Entity);
             Condition condition = new Condition(br);
-            foreach (LoadedAction loadedAction in actions)
+            foreach (LoadedBaseAction loadedAction in actions)
             {
                 Action action = loadedAction.Create(evt);
                 condition.AddAction(action);
@@ -31,7 +31,7 @@ namespace Kinectitude.Core.Loaders
         }
 
 
-        internal void AddAction(LoadedAction action)
+        internal void AddAction(LoadedBaseAction action)
         {
             actions.Add(action);
         }
