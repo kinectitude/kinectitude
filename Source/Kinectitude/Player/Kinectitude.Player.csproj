@@ -106,10 +106,6 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="oldgame.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Kinectitude.Core.csproj">
@@ -120,6 +116,7 @@
     <ProjectReference Include="..\DirectInput\Kinectitude.DirectInput.csproj">
       <Project>{6F23FA79-3A6F-4D54-A099-336F90A719E7}</Project>
       <Name>Kinectitude.DirectInput</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Render\Kinectitude.Render.csproj">
       <Project>{E6DD6F76-999C-4B56-887C-347FAF50DAB3}</Project>

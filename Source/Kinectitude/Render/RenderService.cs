@@ -17,13 +17,12 @@ namespace Kinectitude.Render
         {
             Color convertedColor = (Color)ColorConverter.ConvertFromString(color);
             return new Color4((float)convertedColor.R / 255.0f, (float)convertedColor.G / 255.0f, (float)convertedColor.B / 255.0f);
-
         }
 
         private RenderTarget renderTarget;
         private SlimDX.Direct2D.Factory drawFactory;
         private Action<RenderTarget> renderAction;
-        private readonly Dictionary<Color4, SolidColorBrush> brushes;
+        private readonly Dictionary<Tuple<Color4, float>, SolidColorBrush> brushes;
         private readonly Dictionary<string, Bitmap> bitmaps;
         private readonly SlimDX.DirectWrite.Factory writeFactory;
         private readonly Color4 clearColor;
@@ -61,7 +60,7 @@ namespace Kinectitude.Render
         public RenderService()
         {
             bitmaps = new Dictionary<string, Bitmap>();
-            brushes = new Dictionary<Color4, SolidColorBrush>();
+            brushes = new Dictionary<Tuple<Color4, float>, SolidColorBrush>();
             writeFactory = new SlimDX.DirectWrite.Factory(SlimDX.DirectWrite.FactoryType.Shared);
             clearColor = new Color4(0.30f, 0.30f, 0.80f);
             PixelFormat pixelFormat = new PixelFormat(SlimDX.DXGI.Format.B8G8R8A8_UNorm, AlphaMode.Premultiplied);
@@ -79,12 +78,14 @@ namespace Kinectitude.Render
 
         public SolidColorBrush GetSolidColorBrush(Color4 color, float opacity)
         {
+            var key = new Tuple<Color4, float>(color, opacity);
+
             SolidColorBrush brush;
-            brushes.TryGetValue(color, out brush);
+            brushes.TryGetValue(key, out brush);
             if (null == brush)
             {
                 brush = new SolidColorBrush(renderTarget, color, new BrushProperties() { Opacity = opacity });
-                brushes[color] = brush;
+                brushes[key] = brush;
             }
             return brush;
         }

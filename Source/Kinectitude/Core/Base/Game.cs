@@ -16,12 +16,12 @@ namespace Kinectitude.Core.Base
         
         public int Width
         {
-            get { return null != this["width"] ? int.Parse(this["width"]) : 800; }
+            get { return null != this["Width"] ? int.Parse(this["Width"]) : 800; }
         }
 
         public int Height
         {
-            get { return null != this["height"] ? int.Parse(this["height"]) : 600; }
+            get { return null != this["Height"] ? int.Parse(this["Height"]) : 600; }
         }
 
         internal Game(GameLoader gameLoader) : base(-2)

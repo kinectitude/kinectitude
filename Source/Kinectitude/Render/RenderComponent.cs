@@ -77,7 +77,7 @@ namespace Kinectitude.Render
                 if (linecolor != value)
                 {
                     linecolor = value;
-                    Change("Linecolor");
+                    Change("LineColor");
                 }
             }
         }
@@ -90,6 +90,9 @@ namespace Kinectitude.Render
 
         protected override void OnRender(RenderTarget renderTarget)
         {
+            fillBrush = renderManager.GetSolidColorBrush(FillColor, Opacity);
+            lineBrush = renderManager.GetSolidColorBrush(LineColor, Opacity);
+
             if (Shape == ShapeType.Ellipse)
             {
                 ellipse.Center = new PointF(transformComponent.X, transformComponent.Y);
@@ -113,9 +116,6 @@ namespace Kinectitude.Render
 
         protected override void OnReady()
         {
-            fillBrush = renderManager.GetSolidColorBrush(FillColor, Opacity);
-            lineBrush = renderManager.GetSolidColorBrush(LineColor, 1.0f);
-
             if (Shape == ShapeType.Ellipse)
             {
                 ellipse = new Ellipse();

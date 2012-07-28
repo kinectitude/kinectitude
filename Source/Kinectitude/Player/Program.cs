@@ -11,7 +11,7 @@ namespace Kinectitude.Player
         [STAThread]
         static void Main()
         {
-            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
+            //AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
 
             using (Application app = new Application())
             {

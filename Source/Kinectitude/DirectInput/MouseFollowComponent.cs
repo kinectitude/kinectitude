@@ -7,6 +7,7 @@ using Kinectitude.Core.Attributes;
 
 namespace Kinectitude.DirectInput
 {
+    [Plugin("Mouse Motion Component", "")]
     [Provides(typeof(BasicFollowComponent))]
     public class MouseFollowComponent : BasicFollowComponent
     {
