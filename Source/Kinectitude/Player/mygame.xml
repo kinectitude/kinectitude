@@ -54,7 +54,7 @@
   </Prototype>
 
   <Prototype Name="wall">
-    <Component Type="TransformComponent" X="400" Y="10" Width="720" Height="20"/>
+    <Component Type="TransformComponent" X="400" Y="10" Width="680" Height="20"/>
     <Component Type="PhysicsComponent" Shape="Rectangle" Restitution="0" Friction="0" MovesWhenHit="false" IgnoreCollisionsWith="$wall"/>
     <Component Type="RenderComponent" FillColor="Black" Shape="Rectangle"/>
 
@@ -65,38 +65,33 @@
   </Prototype>
 
   <Prototype Name="sideWall" Prototype="wall">
-    <Component Type="TransformComponent" X="10" Y="300" Width="20" Height="520"/>
+    <Component Type="TransformComponent" X="10" Y="300" Width="20" Height="480"/>
   </Prototype>
 
   <Prototype Name="switchWall" Prototype="wall">
-    <Component Type="TransformComponent" X="20" Y="10" Width="40" Height="20"/>
-    <Component Type="RenderComponent" FillColor="Red"/>
-  </Prototype>
-
-  <Prototype Name="switchWallCC" Prototype="wall">
-    <Component Type="TransformComponent" X="20" Y="10" Width="40" Height="20"/>
+    <Component Type="TransformComponent" X="40" Y="10" Width="80" Height="20"/>
     <Component Type="RenderComponent" FillColor="Red"/>
   </Prototype>
 
   <Prototype Name="basePlayer" health="100" score="0">
-    <Component Type="TransformComponent" X="786.5" Y="562" Width="27" Height="36" />
-    <Component Type="ImageRenderComponent" Image="sonic.gif" Animated="false" Duration="2" />
+    <Component Type="TransformComponent" X="400" Y="560" Width="27" Height="36" />
+    <Component Type="ImageRenderComponent" Image="sonic.png" Animated="false" Duration="2" />
     <Component Type="PhysicsComponent" MaximumVelocity="70" Shape="Rectangle" Restitution="1" Friction="0" MovesWhenHit="false" FixedRotation="true"/>
 
-    <Event Type="AttributeChangesEvent" Target="PhysicsComponent.X">
+    <Event Type="AttributeChangesEvent" Target="{this.PhysicsComponent.XVelocity}">
       <Action Type="FireTriggerAction" Name="motionChange"/>
     </Event>
 
-    <Event Type="AttributeChangesEvent" Target="PhysicsComponent.Y">
+    <Event Type="AttributeChangesEvent" Target="{this.PhysicsComponent.YVelocity}">
       <Action Type="FireTriggerAction" Name="motionChange"/>
     </Event>
     
     <Event Type="TriggerOccursEvent" Trigger="motionChange">
-      <Condition If="PhysicsComponent.X == 0 and PhysicsComponent.Y == 0">
+      <Condition If="this.PhysicsComponent.XVelocity == 0 and this.PhysicsComponent.YVelocity == 0">
         <Action Type="SetAction" Target="ImageRenderComponent.Animated" Value="false"/>
       </Condition>
       
-      <Condition If="PhysicsComponent.X != 0 or PhysicsComponent.Y != 0">
+      <Condition If="this.PhysicsComponent.XVelocity != 0 or this.PhysicsComponent.YVelocity != 0">
         <Action Type="SetAction" Target="ImageRenderComponent.Animated" Value="true"/>
       </Condition>
     </Event>
@@ -108,17 +103,24 @@
         <Action Type="ChangeSceneAction" Target="Game Over"/>
       </Condition>
     </Event>
+
+    <!--<Event Type="TriggerOccursEvent" Trigger="switch">
+      
+    </Event>-->
   </Prototype>
 
-
   <Prototype Name="mousePlayer" Prototype="basePlayer">
-    <Component Type="MouseFollowComponent" Direction="X"/>
+    <Component Type="MouseFollowComponent" Direction="X" MinXFollow="43" MaxXFollow="759" MinYFollow="43" MaxYFollow="559"/>
+  </Prototype>
+
+  <Prototype Name="text">
+    <Component Type="TextRenderComponent" FontFamily="Arial" FontWeight="Normal" FontStyle="Normal" FontStretch="Normal" FontSize="36" FontColor="White" />
   </Prototype>
   
   <Scene Name="Main Menu">
     <Entity>
       <Event Type="SceneStartsEvent">
-        <Action Type="SetAction" Target="game.player" Value="mouses"/>
+        <Action Type="SetAction" Target="game.mouse" Value="true"/>
         <Action Type="ChangeSceneAction" Target="Game"/>
       </Event>
     </Entity>
@@ -139,38 +141,46 @@
     </Entity>
     
     <!--Top, bottom, left and right switch walls-->
+
+    <Entity Prototype="switchWall">
+      <Component Type="TransformComponent" X="10" Y="40" Width="20" Height="80"/>
+    </Entity>
+
     <Entity Prototype="switchWall"/>
 
-    <Entity Prototype="switchWallCC">
-      <Component Type="TransformComponent" X="10" Y="20" Width="20" Height="40"/>
+    <Entity Prototype="switchWall">
+      <Component Type="TransformComponent" X="790" Y="40" Width="20" Height="80"/>
     </Entity>
 
     <Entity Prototype="switchWall">
-      <Component Type="TransformComponent" X="780"/>
+      <Component Type="TransformComponent" X="760"/>
     </Entity>
-
-    <Entity Prototype="switchWallCC">
-      <Component Type="TransformComponent" X="790" Y="20" Width="20" Height="40"/>
-    </Entity>
-    
-    <!--
 
     <Entity Prototype="switchWall">
       <Component Type="TransformComponent" Y="590"/>
     </Entity>
+    
+    <Entity Prototype="switchWall">
+      <Component Type="TransformComponent" X="10" Y="560" Width="20" Height="80"/>
+    </Entity>
 
-
-    <Entity Prototype="switchWallCC">
-      <Component Type="TransformComponent" X="10" Y="20" Width="20" Height="40"/>
+    <Entity Prototype="switchWall">
+      <Component Type="TransformComponent" X="790" Y="560" Width="20" Height="80"/>
     </Entity>
 
     <Entity Prototype="switchWall">
       <Component Type="TransformComponent" X="780" Y="590"/>
     </Entity>
 
-    <Entity Prototype="switchWallCC">
-      <Component Type="TransformComponent" X="790" Y="590" Width="20" Height="40"/>
-    </Entity>-->
+    <!--This entity is used when the scene starts to create the main player-->
+    <Entity>
+      <Event Type="SceneStartsEvent">
+        <Condition If="game.mouse">
+          <Action Type="CreateEntityAction" Prototype="mousePlayer"/>
+        </Condition>
+      </Event>
+    </Entity>
+    
   </Scene>
 
   <Scene Name="Game Over">

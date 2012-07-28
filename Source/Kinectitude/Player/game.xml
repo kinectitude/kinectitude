@@ -13,7 +13,7 @@
     <Define Name="CrossesLineEvent" Class="Kinectitude.Physics.CrossesLineEvent"/>
     <Define Name="CollisionEvent" Class="Kinectitude.Physics.CollisionEvent"/>
   </Using>
-  
+
   <Using File="Kinectitude.Render.dll">
     <Define Name="RenderManager" Class="Kinectitude.Render.RenderManager"/>
     <Define Name="RenderComponent" Class="Kinectitude.Render.RenderComponent"/>
@@ -28,307 +28,34 @@
     <Define Name="MouseFollowComponent" Class="Kinectitude.DirectInput.MouseFollowComponent"/>
     <Define Name="MouseClickEvent" Class="Kinectitude.DirectInput.MouseClickEvent"/>
   </Using>
-  
-  <Prototype Name="paddle">
-    <Component Type="KinectFollowComponent" Direction="Y" Player="1" Joint="HandLeft"/>
-    <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Rectangle"/>
-    <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false" FixedRotation="true"/>
-    <Component Type="TransformComponent" Width="24" Height="128"/>
-  </Prototype>
 
-  <Prototype Name="paddle2">
-    <Component Type="MouseFollowComponent" Direction="Y"/>
-    <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Rectangle"/>
-    <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false" FixedRotation="true"/>
-    <Component Type="TransformComponent" Width="24" Height="128"/>
-  </Prototype>
 
-  <Prototype Name="text">
-    <Component Type="TextRenderComponent" FontFamily="Arial" FontWeight="Normal" FontStyle="Normal" FontStretch="Normal" FontSize="36" FontColor="White" />
-  </Prototype>
-  
-  <Prototype Name="score" Prototype="text">
-    <Component Type="TextRenderComponent" Value="0"/>
-  </Prototype>
-
-  <Prototype Name="bar">
-    <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Rectangle"/>
-    <Component Type="TransformComponent" Width="800" Height="10" X="400" Y="440"/>
-  </Prototype>
-  
   <Prototype Name="ball" Value="0">
     <Component Type="RenderComponent" FillColor="Red" Shape="Rectangle" />
     <Component Type="TransformComponent" X="250" Y="250" Width="24" Height="24"/>
-    <Component Type="PhysicsComponent" MinimumVelocity="45" MaximumVelocity="45"  XVelocity="40" YVelocity="20" Shape="Ellipse" Restitution="1" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="true" FixedRotation="true" AngularVelocity="1"/>
-    <Event Type="CollisionEvent" CollidesWith="left_wall">
+    <Component Type="PhysicsComponent" MinimumVelocity="5" MaximumVelocity="5" XVelocity="40" YVelocity="20" Shape="Ellipse" Restitution="1" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="true" FixedRotation="false" AngularVelocity="1"/>
+    <Event Type="CollisionEvent" CollidesWith="$block">
       <Action Type="SetPositionAction" X="400" Y="300" />
-      <Action Type="IncrementAction" Target="scene.player2Score" IncrementBy="scene.scoreValue"/>
-    </Event>
-    <Event Type="CollisionEvent" CollidesWith="right_wall">
-      <Action Type="SetPositionAction" X="400" Y="300" />
-      <Action Type="IncrementAction" Target="scene.player1Score" IncrementBy="scene.scoreValue"/>
-    </Event>
-    <Event Type="CollisionEvent" CollidesWith="$paddle">
-      <Action Type="SetAction" Target="scene.lastHit" Value="{!CollidesWith}"/>
-      <Action Type="SetAction" Target="scene.lastX" Value="{!CollidesWith.TransformComponent.X}"/>
-      <Action Type="SetAction" Target="scene.lastY" Value="{!CollidesWith.TransformComponent.Y}"/>
-      <Action Type="FireTriggerAction" Name="changeInfo"/>
+      <Action Type="IncrementAction" Target="scene.balls" IncrementBy="scene.decrementValue"/>
     </Event>
   </Prototype>
 
-  <Prototype Name="rightBall" Prototype="ball" Value="0.1">
-    <Event Type="CollisionEvent" CollidesWith="left_wall right_wall">
-      <Action Type="IncrementAction" Target="scene.player2Score" />
-      <Action Type="DestroyAction"/>
+  <Prototype Name="block">
+    <Component Type="RenderComponent" FillColor="LimeGreen" Shape="Rectangle"/>
+    <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false" FixedRotation="true"/>
+    <Component Type="TransformComponent" Width="80" Height="20"/>
+    <Event Type="CollisionEvent" CollidesWith="$ball">
+      <Action Type="DestroyAction" />
     </Event>
   </Prototype>
 
-  <Prototype Name="leftBall" Prototype="rightBall" Value="0.1">
-    <Component Type="PhysicsComponent" XVelocity="-40"/>
-  </Prototype>
-  
-  <!-- tests that it will inherit from paddle-->
-  <Prototype Name="endPaddle" Prototype="paddle">
-    <Event Type="CrossesLineEvent" Line="Y" Location="440"  Direction="Positive">
-      <Action Type="PopSceneAction"/>
-    </Event>
-    <Event Type="CrossesLineEvent" Line="Y" Location="150"  Direction="Negative">
-      <Action Type="ChangeSceneAction" Target="Main Menu"/>
-    </Event>
-  </Prototype>
-
-  <!--this is to test that muti-inheritance works and in the correct order it is stupid to actually do for this-->
-  <Prototype Name="highY">
-    <Component Type="TransformComponent" Y="100"/>
-  </Prototype>
-
-  <Scene Name="Main Menu">
-
-    <Entity Name="tennis">
-      <Component Type="TransformComponent" X="400.5" Y="300.5" Width="263" Height="263" />
-      <Component Type="ImageRenderComponent" Image="tennisball.png" />
-    </Entity>
-
-    <Entity Name="sonic">
-      <Component Type="TransformComponent" X="400.5" Y="155.5" Width="27" Height="36" />
-      <Component Type="ImageRenderComponent" Image="sonic.png" Animated="true" Duration="2" />
-    </Entity>
-
-    <Entity Name="topText" Prototype="text">
-      <Component Type="TransformComponent" X="0" Y="24" Width="800"/>
-      <Component Type="TextRenderComponent" Value="Kinect Wimbledon Deluxe" FontColor="Yellow" TextAlignment="Center" FontWeight="Bold" />
-    </Entity>
-
-    <Entity Name="instructions" Prototype="text">
-      <Component Type="TransformComponent" X="0" Y="80" Width="800"/>
-      <Component Type="TextRenderComponent" Value="Move below the line to start" FontColor="White" TextAlignment="Center" FontSize="24" />
-    </Entity>
-
-    <Entity Name="ready1" Prototype="text">
-      <Component Type="TransformComponent" X="200" Y="500" />
-      <Component Type="TextRenderComponent" Value="Player 1 Not ready!" TextAlignment="Center" FontColor="White" />
-      <Event Type="AttributeChangesEvent" Target="{scene.ready1txt}">
-        <Action Type="SetAction" Target="this.TextRenderComponent.Value" Value="{scene.ready1txt}"/>
-      </Event>
-    </Entity>
-
-    <Entity Name="ready2" Prototype="text">
-      <Component Type="TransformComponent" X="600" Y="500" />
-      <Component Type="TextRenderComponent" Value="Player 2 Not ready!" TextAlignment="Center" FontColor="White" />
-      <Event Type="AttributeChangesEvent" Target="{scene.ready2txt}">
-        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="{scene.ready2txt}"/>
-      </Event>
-    </Entity>
-
-    <Entity Name="player1" Prototype="paddle">
-      <Component Type="TransformComponent" X="17" Y="250"/>
-
-      <Event Type="GestureEvent" Player="1" Joint="HandLeft" GestureName="circle">
-        <Action Type="FireTriggerAction" Name="rdy1"/>
-      </Event>
-      
-      <!--<Event Type="CrossesLineEvent" Line="Y" Location="450"  Direction="Positive">
-        <Action Type="FireTriggerAction" Name="rdy1"/>
-      </Event>-->
-      
-      <Event Type="TriggerOccursEvent" Trigger="rdy1">
-        <Action Type="SetAction" Target="scene.ready1txt" Value="player 1 is ready!"/>
-        <Action Type="SetAction" Target="scene.ready1" Value="True"/>
-        <Condition If="scene.ready2 and scene.ready1 or scene.ready1 and scene.ready2">
-          <Action Type="ChangeSceneAction" Target="game"/>
-        </Condition>
-      </Event>
-    </Entity>
-
-    <Entity Name="player2" Prototype="paddle2">
-      <Component Type="TransformComponent" X="782" Y="250"/>
-      <!--this is testing to see that I can ovrride things in a Prototype-->
-      <!--<Component Type="KinectFollowComponent" Player="1" Joint="HandRight" />-->
-      
-      <Event Type="CrossesLineEvent" Line="Y" Location="450"  Direction="Positive">
-        <Action Type="FireTriggerAction" Name="rdy2"/>
-      </Event>
-
-      <Event Type="MouseClickEvent" Button="Left">
-        <Action Type="FireTriggerAction" Name="rdy2"/>
-      </Event>
-      
-      <Event Type="TriggerOccursEvent" Trigger="rdy2">
-        <Action Type="SetAction" Target="scene.ready2txt" Value="player 2 is ready!"/>
-        <Action Type="SetAction" Target="scene.ready2" Value="[scene.ready2 == false]"/>
-        <Condition If="scene.ready1">
-          <Action Type="ChangeSceneAction" Target="game"/>
-        </Condition>
-      </Event>
-    </Entity>
-
-    <Entity Name="readybar" Prototype="bar"/>
-  </Scene>
-
-  <Scene Name="game" player1Score="0" player2Score="0" scoreValue="1">
-    
-    <Entity Name="player1" Prototype="paddle">
-      <Component Type="TransformComponent" X="17" Y="250"/>
-      <Event Type="CollisionEvent" CollidesWith="$ball">
-        <Action Type="IncrementAction" Target="scene.player1Score" IncrementBy="!CollidesWith.Value"/>
-      </Event>
-    </Entity>
-
-    <Entity Name="player2" Prototype="paddle">
-      <Component Type="KinectFollowComponent" Player="1" Joint="HandRight" />
-      <Component Type="TransformComponent" X="782" Y="250"/>
-      <Event Type="CollisionEvent" CollidesWith="$ball">
-        <Action Type="IncrementAction" Target="scene.player2Score" IncrementBy="!CollidesWith.Value"/>
-      </Event>
-    </Entity>
-
-    <Entity Name="top_wall">
-      <Component Type="TransformComponent" X="400" Y="0" Width="800" Height="2"/>
-      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false" FixedRotation="true"/>
-    </Entity>
-
-    <Entity Name="bottom_wall">
-      <Component Type="TransformComponent" X="400" Y="600" Width="800" Height="2"/>
-      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false" FixedRotation="true"/>
-    </Entity>
-
-    <Entity Name="left_wall">
-      <Component Type="TransformComponent" X="0" Y="300" Width="2" Height="600"/>
-      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false" FixedRotation="true"/>
-    </Entity>
-
-    <Entity Name="right_wall">
-      <Component Type="TransformComponent" X="800" Y="300" Width="2" Height="600"/>
-      <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false"/>
-    </Entity>
-
-    <Entity Name="mainBall" Prototype="ball">
-      <Component Type="RenderComponent" FillColor="LimeGreen"/>
-    </Entity>
-
-    <Entity>
+  <Scene Name="game" balls="3" decrementValue="-1">
+    <Entity Name="test" someVal="World!">
+      <Component Type="TransformComponent" X="80" Y="80" />
+      <Component Type="TextRenderComponent" Value="" FontColor="Yellow" />
       <Event Type="SceneStartsEvent">
-        <Action Type="CreateTimerAction" Name="scoreTimer" Duration="10" Recurring="true" Trigger="moreScore"/>
+        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="Hello {this.someVal}" />
       </Event>
     </Entity>
-
-    <Entity Prototype="score">
-      <Component Type="TransformComponent" X="56" Y="24"/>
-      <Event Type="AttributeChangesEvent" Target="{scene.player1Score}">
-        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="{scene.player1Score}"/>
-        <Condition If="scene.player1Score >= 20">
-          <Action Type="SetAction" Target="game.winner" Value="player 1 wins"/>
-          <Action Type="ChangeSceneAction" Target="Game Over"/>
-        </Condition>
-        <Condition If="scene.player1Score >= 10 and not scene.ball1">
-          <Action Type="CreateEntityAction" Prototype="leftBall"/>
-          <Action Type="SetAction" Target="scene.ball1" Value="true"/>
-        </Condition>
-      </Event>
-    </Entity>
-
-    <Entity Prototype="score">
-      <Component Type="TransformComponent"  X="724" Y="24"/>
-      <Event Type="AttributeChangesEvent" Target="{scene.player2Score}">
-        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="{scene.player2Score}"/>
-        <Condition If="scene.player2Score >= 20">
-          <Action Type="SetAction" Target="game.winner" Value="player 2 wins"/>
-          <Action Type="ChangeSceneAction" Target="Game Over"/>
-        </Condition>
-        <Condition If="scene.player2Score >= 10 and not scene.ball2">
-          <Action Type="CreateEntityAction" Prototype="rightBall"/>
-          <Action Type="SetAction" Target="scene.ball2" Value="true"/>
-        </Condition>
-      </Event>
-    </Entity>
-
-    <Entity Prototype="text">
-      <Component Type="TransformComponent" X="0" Y="75" Width="800"/>
-      <Component Type="TextRenderComponent" Value="" FontSize="12" TextAlignment="Center"/>
-      <Event Type="TriggerOccursEvent" Trigger="changeInfo">
-        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="Last hit by {scene.lastHit} At \{X,Y\} \{{scene.lastX},{scene.lastY}\} gravity was ({scene.PhysicsManager.XGravity},{scene.PhysicsManager.YGravity}) total score was [scene.player1Score + scene.player2Score] and player 1 was winning by at least 3 is [3 + scene.player1Score >= scene.player2Score]"/>
-      </Event>
-    </Entity>
-
-    <Entity Prototype="text">
-      <Component Type="TransformComponent" X="0" Y="500" Width="800"/>
-      <Component Type="TextRenderComponent" Value="" FontSize="12" TextAlignment="Center"/>
-      <Event Type="TriggerOccursEvent" Trigger="moreScore">
-        <Action Type="IncrementAction" Target="scene.scoreValue"/>
-        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="Next goal is worth {scene.scoreValue}"/>
-      </Event>
-    </Entity>
-
-    <Entity Prototype="text">
-      <Component Type="TransformComponent" X="0" Y="300" Width="800"/>
-      <Component Type="TextRenderComponent" Value="" FontSize="12" TextAlignment="Center"/>
-      <Event Type="AttributeChangesEvent" Target="{mainBall.TransformComponent.Y}">
-        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="main ball y is {mainBall.TransformComponent.Y}"/>
-      </Event>
-    </Entity>
-
-    <Entity Prototype="text">
-      <Component Type="TransformComponent" X="0" Y="325" Width="800"/>
-      <Component Type="TextRenderComponent" Value="" FontSize="12" TextAlignment="Center"/>
-      <Event Type="AttributeChangesEvent" Target="{mainBall.TransformComponent.X}">
-        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="mainBall x is {mainBall.TransformComponent.X}"/>
-      </Event>
-    </Entity>
-
-  </Scene>
-
-  <Scene Name="Game Over">
-    
-    <Entity Name="gameOver" Prototype="text">
-      <Component Type="TransformComponent" X="300" Y="20"/>
-      <!-- we should make this work later so it can have at least an inital value of what it is
-      <Component Type="TextRenderComponent" Value="={game.winner}" FontColor="White" />-->
-      <!--This can simply have Value=game.winner, since it won't change, but I needed somewhere to test Scene StartEvent-->
-      <Component Type="TextRenderComponent" Value="" FontColor="White" />
-      <Event Type="SceneStartsEvent">
-        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="{game.winner}"/>
-      </Event>
-    </Entity>
-
-    <Entity Name="instructions" Prototype="text">
-      <Component Type="TransformComponent" X="100" Y="100"/>
-      <Component Type="TextRenderComponent" Value="Top line to for menu bottom to quit" FontColor="White" />
-    </Entity>
-
-    <Entity Name="player1" Prototype="endPaddle">
-      <Component Type="TransformComponent" X="17" Y="250"/>
-    </Entity>
-
-    <Entity Name="player2" Prototype="endPaddle">
-      <Component Type="TransformComponent" X="782" Y="250"/>
-      <Component Type="KinectFollowComponent" Joint="HandRight" />
-    </Entity>
-
-    <Entity Name="bottomBar" Prototype="bar">
-      <Component Type="TransformComponent" Y="500"/>
-    </Entity>
-
-    <Entity Name="topBar" Prototype="highY bar"/>
-
   </Scene>
 </Game>

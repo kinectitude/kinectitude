@@ -15,8 +15,9 @@ namespace Kinectitude.Core.Data
 
         internal ExpressionEval(string expressionStr, Event evt, Entity entity)
         {
-
-            expressionStr = expressionStr.Replace('.', '_').Replace("s:", "_").Replace("!","__").Replace("$","___");
+            
+            expressionStr = expressionStr.Replace("!=", "***").Replace('.', '_').Replace("s:", "_")
+                .Replace("!","__").Replace("$","___").Replace("***", "!=");
             Expression expression = new Expression(expressionStr);
 
             //TODO check if sin and stuff is already in expression, if not put it there.

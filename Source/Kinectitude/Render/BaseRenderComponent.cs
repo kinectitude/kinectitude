@@ -6,6 +6,7 @@ using Kinectitude.Core.Attributes;
 
 namespace Kinectitude.Render
 {
+    [Requires(typeof(TransformComponent))]
     public abstract class BaseRenderComponent : Component, IRender
     {
         protected TransformComponent transformComponent;

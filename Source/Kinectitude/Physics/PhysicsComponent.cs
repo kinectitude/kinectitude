@@ -467,7 +467,7 @@ namespace Kinectitude.Physics
                 }
             }
 
-            if (ignoreCollisionsWith.MatchAndSet(collidedWith)) return false;
+            if (ignoreCollisionsWith != null && ignoreCollisionsWith.MatchAndSet(collidedWith)) return false;
 
             //Allow the collison to occur
             return true;

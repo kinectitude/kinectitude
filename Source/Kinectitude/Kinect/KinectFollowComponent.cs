@@ -20,8 +20,8 @@ namespace Kinectitude.Kinect
             {
                 if (joint != value)
                 {
-                    Change("Joint");
                     joint = value;
+                    Change("Joint");
                 }
             }
         }
@@ -35,8 +35,8 @@ namespace Kinectitude.Kinect
             {
                 if (player != value)
                 {
-                    Change("Player");
                     player = value;
+                    Change("Player");
                 }
             }
         }

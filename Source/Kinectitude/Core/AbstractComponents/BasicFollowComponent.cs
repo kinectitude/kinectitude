@@ -28,8 +28,68 @@ namespace Kinectitude.Core.AbstractComponents
             {
                 if (direction != value)
                 {
-                    Change("Direction");
                     direction = value;
+                    Change("Direction");
+                }
+            }
+        }
+
+        private float minXFollow = float.NegativeInfinity;
+        [Plugin("Minimum X position to follow to","")]
+        public float MinXFollow
+        {
+            get {return minXFollow;}
+            set 
+            {
+                if (minXFollow != value)
+                {
+                    minXFollow = value;
+                    Change("MinXFollow");
+                }
+            }
+        }
+
+        private float minYFollow = float.NegativeInfinity;
+        [Plugin("Minimum Y position to follow to", "")]
+        public float MinYFollow
+        {
+            get { return minYFollow; }
+            set
+            {
+                if (minYFollow != value)
+                {
+                    minYFollow = value;
+                    Change("MinYFollow");
+                }
+            }
+        }
+
+        private float maxXFollow = float.PositiveInfinity;
+        [Plugin("Maximum X position to follow to", "")]
+        public float MaxXFollow
+        {
+            get { return maxXFollow; }
+            set
+            {
+                if (maxXFollow != value)
+                {
+                    maxXFollow = value;
+                    Change("MaxXFollow");
+                }
+            }
+        }
+
+        private float maxYFollow = float.PositiveInfinity;
+        [Plugin("Maximum Y position to follow to", "")]
+        public float MaxYFollow
+        {
+            get { return maxYFollow; }
+            set
+            {
+                if (maxYFollow != value)
+                {
+                    maxYFollow = value;
+                    Change("MaxYFollow");
                 }
             }
         }
@@ -45,8 +105,18 @@ namespace Kinectitude.Core.AbstractComponents
             nextDy = dy;
         }
 
+        private float getNextValue(float posision, float max, float min, float velocity)
+        {
+            if (velocity == 0) return 0;
+            if (posision < min && velocity < 0 || posision > max && velocity > 0) return 0;
+            return velocity;
+        }
+
         public override void OnUpdate(float t)
         {
+            nextDx = getNextValue(transform.X, maxXFollow, minXFollow, nextDx);
+            nextDy = getNextValue(transform.Y, maxYFollow, minYFollow, nextDy);
+
             //if they are following with physics, we will set a velocity
             if (null != physics)
             {

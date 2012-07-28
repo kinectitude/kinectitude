@@ -94,6 +94,8 @@ namespace Kinectitude.Core.Loaders
                 evt.Initialize();
             }
 
+            foreach (Tuple<string, string> value in Values) entity[value.Item1] = value.Item2;
+
             return entity;
         }
 

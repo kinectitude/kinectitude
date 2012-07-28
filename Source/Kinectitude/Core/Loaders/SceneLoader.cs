@@ -85,7 +85,7 @@ namespace Kinectitude.Core.Loaders
                 string entityName = null;
                 entityProperties.TryGetValue(lang.Name, out entityName);
 
-                List<Tuple<string, string>> entityValues = loaderUtility.GetValues(scene, entityWords);
+                List<Tuple<string, string>> entityValues = loaderUtility.GetValues(entity, entityWords);
 
                 LoadedEntity loadedEntity = new LoadedEntity(entityName, entityValues, Onid++, isType, isExactType);
                 LoadedScene.addLoadedEntity(loadedEntity);
