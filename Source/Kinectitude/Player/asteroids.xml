@@ -32,7 +32,7 @@
   <Prototype Name="asteroid">
     <Component Type="TransformComponent" X="100" Y="300" Width="36" Height="38"/>
     <Component Type="ImageRenderComponent" Image="asteroid.png" />
-    <Component Type="PhysicsComponent" MinimumVelocity="10" MaximumVelocity="10" XVelocity="10" YVelocity="0" Shape="Ellipse" Mass="1" Restitution="1" Friction="0" LinearDamping="0" MovesWhenHit="true" FixedRotation="true"/>
+    <Component Type="PhysicsComponent" MinimumVelocity="10" MaximumVelocity="10" XVelocity="10" YVelocity="0" Shape="Ellipse" Mass="1" Restitution="1" Friction="0" LinearDamping="0" MovesWhenHit="true" FixedRotation="false"/>
     <Event Type="CollisionEvent" CollidesWith="$earth">
       <Action Type="IncrementAction" Target="scene.health" IncrementBy="-1"/>
       <Action Type="DestroyAction"/>
@@ -45,7 +45,7 @@
   </Prototype>
 
   <Prototype Name="text">
-    <Component Type="TextRenderComponent" FontFamily="Arial" FontWeight="Normal" FontStyle="Normal" FontStretch="Normal" FontSize="36" FontColor="White" />
+    <Component Type="TextRenderComponent" FontFamily="Courier New" FontWeight="Bold" FontStyle="Normal" FontStretch="Normal" FontSize="36" FontColor="White" />
   </Prototype>
 
   <Scene Name="Game" health="10">
@@ -68,7 +68,7 @@
     </Entity>
 
     <Entity Prototype="text">
-      <Component Type="TransformComponent" X="0" Y="0" Width="800"/>
+      <Component Type="TransformComponent" X="0" Y="20" Width="150"/>
       <Component Type="TextRenderComponent" Value="" FontSize="20" TextAlignment="Center"/>
       <Event Type="AttributeChangesEvent" Target="{scene.health}">
         <Action Type="SetAction" Target="TextRenderComponent.Value" Value="Health: {scene.health}"/>

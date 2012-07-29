@@ -414,16 +414,16 @@ namespace Kinectitude.Physics
         {
             if ("Ellipse" == Shape)
             {
-                float xRadius = (tc.Width / 2) * sizeRatio;
-                float yRadius = (tc.Height / 2) * sizeRatio;
+                float xRadius = ((float)tc.Width / 2.0f) * sizeRatio;
+                float yRadius = ((float)tc.Height / 2.0f) * sizeRatio;
 
                 //Using 5000 vertices for the ellipse for now.
                 body = BodyFactory.CreateEllipse(pm.PhysicsWorld, xRadius, yRadius, 5000, 1f);
             }
             else
             {
-                float width = tc.Width * sizeRatio;
-                float height = tc.Height * sizeRatio;
+                float width = (float)tc.Width * sizeRatio;
+                float height = (float)tc.Height * sizeRatio;
                 body = BodyFactory.CreateRectangle(pm.PhysicsWorld, width, height, 1f);
             }
 
