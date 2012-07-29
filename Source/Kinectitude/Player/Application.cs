@@ -25,7 +25,7 @@ namespace Kinectitude.Player
         {
             Assembly renderAssembly = Assembly.GetAssembly(typeof(RenderService));
             Assembly directAssemdly = Assembly.GetAssembly(typeof(DirectInputService));
-            GameLoader gameLoader = new GameLoader("game.xml", new Assembly[] { renderAssembly, directAssemdly });
+            GameLoader gameLoader = new GameLoader("asteroids.xml", new Assembly[] { renderAssembly, directAssemdly });
             game = gameLoader.CreateGame();
 
             Factory drawFactory = new SlimDX.Direct2D.Factory();

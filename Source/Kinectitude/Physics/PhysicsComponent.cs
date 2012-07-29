@@ -391,8 +391,7 @@ namespace Kinectitude.Physics
 
         public void SetSize()
         {
-            //Vertices vertices =
-            throw new NotImplementedException("THE PHYSICS COMPONENT WON'T SET THE SIZE CURRENTLY");
+            createBody();
         }
 
         public override void Ready()
@@ -413,9 +412,13 @@ namespace Kinectitude.Physics
 
         private void createBody()
         {
-            if ("circle" == Shape)
+            if ("Ellipse" == Shape)
             {
-                body = BodyFactory.CreateCircle(pm.PhysicsWorld, tc.Width * sizeRatio, 1f);
+                float xRadius = (tc.Width / 2) * sizeRatio;
+                float yRadius = (tc.Height / 2) * sizeRatio;
+
+                //Using 5000 vertices for the ellipse for now.
+                body = BodyFactory.CreateEllipse(pm.PhysicsWorld, xRadius, yRadius, 5000, 1f);
             }
             else
             {

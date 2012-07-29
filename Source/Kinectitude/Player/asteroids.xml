@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Game Name="Asteroids" Width="1280" Height="720" FirstScene="Game" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1">
+
+  <Using File="Kinectitude.Kinect.dll">
+    <Define Name="KinectFollowComponent" Class="Kinectitude.Kinect.KinectFollowComponent"/>
+    <Define Name="KinectManager" Class="Kinectitude.Kinect.KinectManager"/>
+    <Define Name="GestureEvent" Class="Kinectitude.Kinect.GestureEvent"/>
+  </Using>
+
+  <Using File="Kinectitude.Physics.dll">
+    <Define Name="PhysicsManager" Class="Kinectitude.Physics.PhysicsManager"/>
+    <Define Name="PhysicsComponent" Class="Kinectitude.Physics.PhysicsComponent"/>
+    <Define Name="CrossesLineEvent" Class="Kinectitude.Physics.CrossesLineEvent"/>
+    <Define Name="CollisionEvent" Class="Kinectitude.Physics.CollisionEvent"/>
+  </Using>
+
+  <Using File="Kinectitude.Render.dll">
+    <Define Name="RenderManager" Class="Kinectitude.Render.RenderManager"/>
+    <Define Name="RenderComponent" Class="Kinectitude.Render.RenderComponent"/>
+    <Define Name="TextRenderComponent" Class="Kinectitude.Render.TextRenderComponent"/>
+    <Define Name="ImageRenderComponent" Class="Kinectitude.Render.ImageRenderComponent" />
+  </Using>
+
+  <Using File="Kinectitude.DirectInput.dll">
+    <Define Name="KeyEvent" Class="Kinectitude.DirectInput.KeyEvent"/>
+    <Define Name="KeyboardManager" Class="Kinectitude.DirectInput.KeyboardManager"/>
+    <Define Name="MouseManager" Class="Kinectitude.DirectInput.MouseManager"/>
+    <Define Name="MouseFollowComponent" Class="Kinectitude.DirectInput.MouseFollowComponent"/>
+    <Define Name="MouseClickEvent" Class="Kinectitude.DirectInput.MouseClickEvent"/>
+  </Using>
+
+  <Prototype Name="asteroid">
+    <Component Type="TransformComponent" X="100" Y="300" Width="36" Height="38"/>
+    <Component Type="ImageRenderComponent" Image="asteroid.png" />
+    <Component Type="PhysicsComponent" MinimumVelocity="10" MaximumVelocity="10" XVelocity="10" YVelocity="0" Shape="Ellipse" Mass="1" Restitution="1" Friction="0" LinearDamping="0" MovesWhenHit="true" FixedRotation="true"/>
+    <Event Type="CollisionEvent" CollidesWith="$earth">
+      <Action Type="IncrementAction" Target="scene.health" IncrementBy="-1"/>
+      <Action Type="DestroyAction"/>
+    </Event>
+  </Prototype>
+
+  <Prototype Name="earth">
+    <Component Type="TransformComponent" X="640" Y="360" Width="350" Height="350" />
+    <Component Type="PhysicsComponent" Shape="Ellipse" Mass="1" Restitution="0" Friction="0" LinearDamping="0" MovesWhenHit="false" FixedRotation="true"/>
+  </Prototype>
+
+  <Prototype Name="text">
+    <Component Type="TextRenderComponent" FontFamily="Arial" FontWeight="Normal" FontStyle="Normal" FontStretch="Normal" FontSize="36" FontColor="White" />
+  </Prototype>
+
+  <Scene Name="Game" health="10">
+
+    <Entity Name="background">
+      <Component Type="TransformComponent" X="640" Y="360" Width="1280" Height="720" />
+      <Component Type="ImageRenderComponent" Image="asteroids_background.jpg" />
+    </Entity>
+
+    <Entity Prototype="asteroid">
+    </Entity>
+
+    <Entity Prototype="earth">
+    </Entity>
+
+    <Entity>
+      <Event Type="SceneStartsEvent">
+        <Action Type="IncrementAction" Target="scene.health" IncrementBy="0"/>
+      </Event>
+    </Entity>
+
+    <Entity Prototype="text">
+      <Component Type="TransformComponent" X="0" Y="0" Width="800"/>
+      <Component Type="TextRenderComponent" Value="" FontSize="20" TextAlignment="Center"/>
+      <Event Type="AttributeChangesEvent" Target="{scene.health}">
+        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="Health: {scene.health}"/>
+        <Condition If="scene.health == 0">
+          <Action Type="SetAction" Target="TextRenderComponent.Value" Value="You failed to save the earth."/>
+          <Action Type="FireTriggerAction" Name="gameOver"/>
+        </Condition>
+      </Event>
+    </Entity>
+    
+  </Scene>
+
+</Game>
