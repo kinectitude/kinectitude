@@ -105,10 +105,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="game.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="mygame.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -122,6 +118,7 @@
     <Content Include="reversi.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Ryangame.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Kinectitude.Core.csproj">

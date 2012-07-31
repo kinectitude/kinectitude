@@ -94,6 +94,21 @@ namespace Kinectitude.Core.AbstractComponents
             }
         }
 
+        private bool ignoresPhysics = false;
+        [Plugin("Ignore Physics", "Ignores physics component, use if motion should not care about physics")]
+        public bool IgnoresPhysics
+        {
+            get { return ignoresPhysics; }
+            set
+            {
+                if (value != ignoresPhysics)
+                {
+                    ignoresPhysics = value;
+                    Change("IgnoresPhysics");
+                }
+            }
+        }
+
         public void UpdatePosition(float x, float y)
         {
             UpdateDelta(x - transform.X, y - transform.Y);
@@ -105,20 +120,23 @@ namespace Kinectitude.Core.AbstractComponents
             nextDy = dy;
         }
 
-        private float getNextValue(float posision, float max, float min, float velocity)
+        private float getNextValue(float position, float max, float min, float velocity)
         {
             if (velocity == 0) return 0;
-            if (posision < min && velocity < 0 || posision > max && velocity > 0) return 0;
+            if (position < min && velocity < 0 || position > max && velocity > 0) return 0;
+            if (position + velocity < min) return min - position;
+            if (position + velocity > max) return max - position;
             return velocity;
         }
 
         public override void OnUpdate(float t)
         {
-            nextDx = getNextValue(transform.X, maxXFollow, minXFollow, nextDx);
-            nextDy = getNextValue(transform.Y, maxYFollow, minYFollow, nextDy);
+            bool usePhysics = null != physics && ignoresPhysics == false;
+            nextDx = getNextValue(transform.X, maxXFollow, minXFollow, usePhysics?nextDx/t:nextDx);
+            nextDy = getNextValue(transform.Y, maxYFollow, minYFollow, usePhysics?nextDy/t:nextDy);
 
             //if they are following with physics, we will set a velocity
-            if (null != physics)
+            if (usePhysics)
             {
                 switch (Direction)
                 {

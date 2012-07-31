@@ -32,36 +32,36 @@
   <Prototype Name="ball">
     <Component Type="RenderComponent" FillColor="Red" Shape="Ellipse" />
     <Component Type="TransformComponent" X="400" Y="300" Width="24" Height="24"/>
-    <Component Type="PhysicsComponent" MinimumVelocity="30" MaximumVelocity="70" Shape="Ellipse" Restitution="1" Mass="1" Friction="0" MovesWhenHit="true" FixedRotation="true"/>
+    <!--TODO min v-->
+    <Component Type="PhysicsComponent" MinimumVelocity="20" MaximumVelocity="70" Shape="Ellipse" Restitution="1" Mass="1" Friction="0" MovesWhenHit="true" FixedRotation="true"/>
     
     <Event Type="TriggerOccursEvent" Trigger="create{scene.next}">
       <Action Type="SetAction" Target="id" Value="{scene.next}"/>
-      <Action Type="SetAction" Target="right" Value="[random]"/>
-      <Action Type="SetAction" Target="top" Value="[random]"/>
+      <Action Type="SetAction" Target="right" Value="[random] * 10"/>
+      <Action Type="SetAction" Target="top" Value="[random] * 10"/>
       <!--Since the magnitude of the velocity will be too small, the minimum will be used to scale it-->
       <Action Type="SetAction" Target="PhysicsComponent.XVelocity" Value="[random]"/>
       <Action Type="SetAction" Target="PhysicsComponent.YVelocity" Value="[rnd]"/>
+      <Action Type="IncrementAction" Target="scene.next"/>
       
-      <Condition If="right > 0.5">
+      <Condition If="right > 5">
         <Action Type="SetAction" Target="PhysicsComponent.XVelocity" Value="-PhysicsComponent.XVelocity"/>
       </Condition>
 
-      <Condition If="top > 0.5">
+      <Condition If="top > 5">
         <Action Type="SetAction" Target="PhysicsComponent.YVelocity" Value="-PhysicsComponent.YVelocity"/>
       </Condition>
-      
+    </Event>
+
+    <Event Type="CollisionEvent" CollidesWith="$wall">
+      <Action Type="FireTriggerAction" Name="decHealth"/>
     </Event>
   </Prototype>
 
   <Prototype Name="wall">
     <Component Type="TransformComponent" X="400" Y="10" Width="680" Height="20"/>
-    <Component Type="PhysicsComponent" Shape="Rectangle" Restitution="0" Friction="0" MovesWhenHit="false" IgnoreCollisionsWith="$wall"/>
+    <Component Type="PhysicsComponent" Shape="Rectangle" Restitution="0" Friction="0" MovesWhenHit="false"/>
     <Component Type="RenderComponent" FillColor="Black" Shape="Rectangle"/>
-
-    <Event Type="CollisionEvent" CollidesWith="$ball">
-      <Action Type="FireTriggerAction" Name="decHealth"/>
-    </Event>
-    
   </Prototype>
 
   <Prototype Name="sideWall" Prototype="wall">
@@ -73,10 +73,10 @@
     <Component Type="RenderComponent" FillColor="Red"/>
   </Prototype>
 
-  <Prototype Name="basePlayer" health="100" score="0">
+  <Prototype Name="basePlayer" health="100" score="0" lr="true">
     <Component Type="TransformComponent" X="400" Y="560" Width="27" Height="36" />
-    <Component Type="ImageRenderComponent" Image="sonic.png" Animated="false" Duration="2" />
-    <Component Type="PhysicsComponent" MaximumVelocity="70" Shape="Rectangle" Restitution="1" Friction="0" MovesWhenHit="false" FixedRotation="true"/>
+    <Component Type="ImageRenderComponent" Image="sonic.png" Animated="false" Duration="1.4" />
+    <Component Type="PhysicsComponent" MaximumVelocity="70" Shape="Rectangle" Restitution="1" Friction="0" MovesWhenHit="false" FixedRotation="true" IgnoreCollisionsWith="$wall"/>
 
     <Event Type="AttributeChangesEvent" Target="{this.PhysicsComponent.XVelocity}">
       <Action Type="FireTriggerAction" Name="motionChange"/>
@@ -104,13 +104,64 @@
       </Condition>
     </Event>
 
-    <!--<Event Type="TriggerOccursEvent" Trigger="switch">
+    <Event Type="TriggerOccursEvent" Trigger="switch">
+      <!--Top and bottom wall, left side-->
+      <Condition If="80 + this.TransformComponent.Width/2 > this.TransformComponent.X and lr">
+        <Action Type="FireTriggerAction" Name="switchUpDown"/>
+        <Action Type="SetAction" Target="this.TransformComponent.Rotation" Value="90"/>
+        <Action Type="SetAction" Target="this.TransformComponent.X" Value="40"/>
+        <Action Type="SetAction" Target="lr" Value="false"/>
+        <Action Type="SetAction" Target="done" Value="true"/>
+      </Condition>
       
-    </Event>-->
+      <!--Top and bottom wall, right side-->
+      <Condition If="this.TransformComponent.X > 720 - this.TransformComponent.Width/2 and lr and not done">
+        <Action Type="FireTriggerAction" Name="switchUpDown"/>
+        <Action Type="SetAction" Target="this.TransformComponent.Rotation" Value="270"/>
+        <Action Type="SetAction" Target="this.TransformComponent.X" Value="760"/>
+        <Action Type="SetAction" Target="lr" Value="false"/>
+        <Action Type="SetAction" Target="done" Value="true"/>
+      </Condition>
+
+      <!--Side walls, going up-->
+      <Condition If="80 + this.TransformComponent.Width/2 > this.TransformComponent.Y and not lr and not done">
+        <Action Type="FireTriggerAction" Name="switchLeftRight"/>
+        <Action Type="SetAction" Target="this.TransformComponent.Rotation" Value="180"/>
+        <Action Type="SetAction" Target="this.TransformComponent.Y" Value="40"/>
+        <Action Type="SetAction" Target="lr" Value="true"/>
+        <Action Type="SetAction" Target="done" Value="true"/>
+      </Condition>
+      
+      <!--Side walls going down-->
+      <Condition If="this.TransformComponent.Y > 520 - this.TransformComponent.Width/2 and not lr and not done">
+        <Action Type="FireTriggerAction" Name="switchLeftRight"/>
+        <Action Type="SetAction" Target="this.TransformComponent.Rotation" Value="0"/>
+        <Action Type="SetAction" Target="this.TransformComponent.Y" Value="560"/>
+        <Action Type="SetAction" Target="lr" Value="true"/>
+      </Condition>
+      
+      <Action Type="SetAction" Target="done" Value="false"/>
+    </Event>
+
+    <Event Type="CollisionEvent" CollidesWith="$wall">
+      <Action Type="SetAction" Target="Rotate" Value="!CollidesWith.Rotation"/>
+    </Event>
   </Prototype>
 
   <Prototype Name="mousePlayer" Prototype="basePlayer">
-    <Component Type="MouseFollowComponent" Direction="X" MinXFollow="43" MaxXFollow="759" MinYFollow="43" MaxYFollow="559"/>
+    <Component Type="MouseFollowComponent" Direction="X" MinXFollow="40" MaxXFollow="760" MinYFollow="40" MaxYFollow="560"/>
+
+    <Event Type="MouseClickEvent" Button="Left">
+      <Action Type="FireTriggerAction" Name="switch"/>
+    </Event>
+
+    <Event Type="TriggerOccursEvent" Trigger="switchUpDown">
+      <Action Type="SetAction" Target="this.MouseFollowComponent.Direction" Value="Y"/>
+    </Event>
+
+    <Event Type="TriggerOccursEvent" Trigger="switchLeftRight">
+      <Action Type="SetAction" Target="this.MouseFollowComponent.Direction" Value="X"/>
+    </Event>
   </Prototype>
 
   <Prototype Name="text">
@@ -126,7 +177,7 @@
     </Entity>
   </Scene>
 
-  <Scene Name="Game">
+  <Scene Name="Game" next="1">
     <!--Top, bottom, left, and right walls-->
     <Entity Prototype="wall"/>
     
@@ -169,7 +220,7 @@
     </Entity>
 
     <Entity Prototype="switchWall">
-      <Component Type="TransformComponent" X="780" Y="590"/>
+      <Component Type="TransformComponent" X="760" Y="590"/>
     </Entity>
 
     <!--This entity is used when the scene starts to create the main player-->
@@ -178,13 +229,14 @@
         <Condition If="game.mouse">
           <Action Type="CreateEntityAction" Prototype="mousePlayer"/>
         </Condition>
+        
+        <Action Type="CreateEntityAction" Prototype="ball"/>
+        <Action Type="FireTriggerAction" Name="create{scene.next}"/>
       </Event>
     </Entity>
-    
   </Scene>
 
   <Scene Name="Game Over">
     
   </Scene>
-
 </Game>

@@ -62,7 +62,15 @@ namespace Kinectitude.Core.Data
                         switch (vals.Length)
                         {
                             case 1:
-                                expressions.Add(new ParameterValueReader(evt, matchStr.Substring(1)));
+                                if ('1' == matchStr[0])
+                                {
+                                    expressions.Add(new ParameterValueReader(evt, matchStr.Substring(1)));
+                                }
+                                else
+                                {
+                                    expressions.Add(new EntityValueReader
+                                        (matchStr, TypeMatcher.CreateTypeMatcher("this", evt, entity), entity));
+                                }
                                 break;
                             case 2:
                                 expressions.Add(new EntityValueReader
