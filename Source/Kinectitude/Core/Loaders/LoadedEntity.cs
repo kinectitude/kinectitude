@@ -20,8 +20,8 @@ namespace Kinectitude.Core.Loaders
 
         private readonly List<LoadedEvent> events = new List<LoadedEvent>();
         private readonly string Name;
-        internal readonly List<string> IsType;
-        internal readonly List<string> IsExactType;
+        private readonly List<string> isType;
+        private readonly List<string> isExactType;
 
         private bool firstCreate = true;
 
@@ -32,8 +32,8 @@ namespace Kinectitude.Core.Loaders
         {
             Name = name;
             this.id = id;
-            this.IsExactType = isExactType;
-            this.IsType = isType;
+            this.isExactType = isExactType;
+            this.isType = isType;
         }
 
         internal void AddLoadedComponent(LoadedComponent component)
@@ -96,6 +96,13 @@ namespace Kinectitude.Core.Loaders
 
             foreach (Tuple<string, string> value in Values) entity[value.Item1] = value.Item2;
 
+
+            scene.EntityById[entity.Id] = entity;
+            entity.Scene = scene;
+            if (null != entity.Name) scene.EntityByName.Add(entity.Name, entity);
+            foreach (string type in isType) addToType(scene.IsType, type, entity.Id);
+            foreach (string type in isExactType) addToType(scene.IsExactType, type, entity.Id);
+
             return entity;
         }
 
@@ -107,6 +114,17 @@ namespace Kinectitude.Core.Loaders
         internal void AddLoadedEvent(LoadedEvent evt)
         {
             events.Add(evt);
+        }
+
+        private void addToType(Dictionary<string, HashSet<int>> addTo, string type, int id)
+        {
+            HashSet<int> addSet = null;
+            if (!addTo.TryGetValue(type, out addSet))
+            {
+                addSet = new HashSet<int>();
+                addTo.Add(type, addSet);
+            }
+            addSet.Add(id);
         }
 
     }

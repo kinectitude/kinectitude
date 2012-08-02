@@ -95,7 +95,7 @@ namespace Kinectitude.Core.Loaders
 
         }
 
-        protected LoadedEntity PrototypeMaker(string name)
+        protected LoadedEntity PrototypeMaker(string name, bool isMaking = false)
         {
             object prototype = GameLoader.Prototypes[name];
             HashSet<string> words = new HashSet<string>() { lang.Prototype, lang.Name };
@@ -108,18 +108,21 @@ namespace Kinectitude.Core.Loaders
 
             if (properties.TryGetValue(lang.Prototype, out prototypes))
             {
+                if (isMaking) isExactType.Add(name);
                 if (prototypes.Contains(' '))
                 {
                     string[] names = name.Split(' ');
+                    isType.AddRange(names);
                     foreach (string n in names)
                     {
-                        isExactType.Add(n);
+                        if(!isMaking) isExactType.Add(n);
                         isType.AddRange(GameLoader.PrototypeIs[n]);
                     }
                 }
                 else
                 {
-                    isExactType.Add(prototypes);
+                    if (!isMaking) isExactType.Add(prototypes);
+                    isType.Add(name);
                     isType.AddRange(GameLoader.PrototypeIs[prototypes]);
                 }
             }
@@ -134,32 +137,15 @@ namespace Kinectitude.Core.Loaders
             LoadedEntity loadedEntity;
             if (!loadedPrototypes.TryGetValue(name, out loadedEntity))
             {
-                loadedEntity = PrototypeMaker(name);
+                loadedEntity = PrototypeMaker(name, true);
                 loadedPrototypes.Add(name, loadedEntity);
             }
-            addToHashSet(Onid, name, scene.IsType);
-            addToHashSet(Onid, name, scene.IsExactType);
             Entity entity = loadedEntity.Create(Onid, scene);
             entity.Scene = scene;
             entity.Ready();
 #if TEST
             EntityCreated = entity;
 #endif
-        }
-
-        private static void addToHashSet(int value, string name, Dictionary<string, HashSet<int>> dictionary)
-        {
-            HashSet<int> addTo;
-            if (!dictionary.ContainsKey(name))
-            {
-                addTo = new HashSet<int>();
-                dictionary[name] = addTo;
-            }
-            else
-            {
-                addTo = dictionary[name];
-            }
-            addTo.Add(value);
         }
 
         private void entityParse(object e, LoadedEntity entity)
