@@ -357,7 +357,6 @@ namespace Kinectitude.Physics
                 tc.Y = y;
                 checkCrossesLine(x, y);
             }
-
             setVelocity();
         }
 
@@ -414,8 +413,14 @@ namespace Kinectitude.Physics
                 float xRadius = ((float)tc.Width / 2.0f) * sizeRatio;
                 float yRadius = ((float)tc.Height / 2.0f) * sizeRatio;
 
-                if (xRadius != yRadius) body = BodyFactory.CreateEllipse(pm.PhysicsWorld, xRadius, yRadius, 12, 1f);
-                else body = BodyFactory.CreateCircle(pm.PhysicsWorld, xRadius, 1f);
+                if (xRadius != yRadius)
+                {
+                    body = BodyFactory.CreateEllipse(pm.PhysicsWorld, xRadius, yRadius, 12, 1f);
+                }
+                else
+                {
+                    body = BodyFactory.CreateCircle(pm.PhysicsWorld, xRadius, 1f);
+                }
             }
             else
             {
