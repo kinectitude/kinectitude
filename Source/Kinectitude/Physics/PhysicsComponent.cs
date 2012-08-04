@@ -55,7 +55,7 @@ namespace Kinectitude.Physics
             get { return restitution; }
             set
             {
-                if (restitution != value)
+                if (restitution != value && value > 0)
                 {
                     restitution = value;
                     Change("Restitution");
@@ -74,7 +74,7 @@ namespace Kinectitude.Physics
             get { return mass; }
             set
             {
-                if (mass != value)
+                if (mass != value && value > 0)
                 {
                     mass = value;
                     Change("Mass");
@@ -93,7 +93,7 @@ namespace Kinectitude.Physics
             get { return friction; }
             set
             {
-                if (friction != value)
+                if (friction != value && value > 0)
                 {
                     friction = value;
                     Change("Friction");
@@ -102,20 +102,20 @@ namespace Kinectitude.Physics
         }
 
 
-        private float linearDampining = 0;
+        private float linearDamping = 0;
         [Preset("Bouncy Ball", 0.0)]
         [Preset("Collision Event Line", 0.0)]
         [Preset("Wall", 0.0)]
         [Plugin("Linear Damping", "")]
         public float LinearDamping
         {
-            get { return linearDampining; }
+            get { return linearDamping; }
             set
             {
-                if (linearDampining != value)
+                if (linearDamping != value && value > 0)
                 {
-                    linearDampining = value;
-                    Change("LinearDampining");
+                    linearDamping = value;
+                    Change("LinearDamping");
                 }
             }
         }
@@ -127,7 +127,7 @@ namespace Kinectitude.Physics
             get { return maximumVelocity; }
             set
             {
-                if (value != maximumVelocity)
+                if (value != maximumVelocity && value > 0)
                 {
                     maximumVelocity = value;
                     Change("MaximumVelocity");
@@ -135,14 +135,14 @@ namespace Kinectitude.Physics
             }
         }
 
-        private float minimumVelocity = 0;
+        private float minimumVelocity = 0f;
         [Plugin("Minimum velocity", "")]
         public float MinimumVelocity
         {
             get { return minimumVelocity; }
             set
             {
-                if (value != minimumVelocity)
+                if (value != minimumVelocity && value > 0)
                 {
                     minimumVelocity = value;
                     Change("MinimumVelocity");
@@ -155,11 +155,7 @@ namespace Kinectitude.Physics
             hasVelocity |= velocity != 0;
             if (null != body)
             {
-                if (velocity != 0 && body.BodyType == BodyType.Static)
-                {
-                    pm.PhysicsWorld.RemoveBody(body);
-                    createBody();
-                }
+                if (velocity != 0 && body.BodyType == BodyType.Static) createBody();
                 body.LinearVelocity = new Vector2(XVelocity * speedRatio, YVelocity * speedRatio);
                 body.AngularVelocity = AngularVelocity;
             }
@@ -324,28 +320,25 @@ namespace Kinectitude.Physics
 
         private void setVelocity()
         {
-            //the body needs to be moved because of a set position that was triggered
-            if (prevX == tc.X && prevY == tc.Y)
-            {
-                float x = body.Position.X / sizeRatio;
-                float y = body.Position.Y / sizeRatio;
-                tc.X = x;
-                tc.Y = y;
-                checkCrossesLine(x, y);
-            }
-
             tc.Rotation = body.Rotation;
 
 			float speed = body.LinearVelocity.Length() / speedRatio;
 
-            if (speed > maximumVelocity)
+            if (maximumVelocity == 0 || speed == 0)
             {
-                body.LinearVelocity = body.LinearVelocity / speed * maximumVelocity;
+                body.LinearVelocity = new Vector2(0f, 0f);
             }
-
-            if (speed < minimumVelocity)
+            else
             {
-                body.LinearVelocity = body.LinearVelocity / speed * minimumVelocity;
+                if (speed > maximumVelocity)
+                {
+                    body.LinearVelocity = body.LinearVelocity / speed * maximumVelocity;
+                }
+
+                if (speed < minimumVelocity)
+                {
+                    body.LinearVelocity = body.LinearVelocity / speed * minimumVelocity;
+                }
             }
 
             //no need to use the setters here, they will add extra overhead to things that don't need to be checked
@@ -356,7 +349,6 @@ namespace Kinectitude.Physics
 
         public override void OnUpdate(float t)
         {
-            //the body needs to be moved because of a set position that was triggered
             if (prevX == tc.X && prevY == tc.Y)
             {
                 float x = body.Position.X / sizeRatio;
@@ -382,11 +374,14 @@ namespace Kinectitude.Physics
 
         public void SetPosition()
         {
-            body.Awake = true;
-            prevX = tc.X;
-            prevY = tc.Y;
-            body.Rotation = tc.Rotation;
-            body.Position = new Vector2(prevX * sizeRatio, prevY * sizeRatio);
+            if (prevX != tc.X || prevY != tc.Y || body.Rotation != tc.Rotation)
+            {
+                //body.Awake = true;
+                prevX = tc.X;
+                prevY = tc.Y;
+                body.Position = new Vector2(prevX * sizeRatio, prevY * sizeRatio);
+                body.Rotation = tc.Rotation;
+            }
         }
 
         public void SetSize()
@@ -412,13 +407,15 @@ namespace Kinectitude.Physics
 
         private void createBody()
         {
+            if (null != body) pm.PhysicsWorld.RemoveBody(body);
+
             if ("Ellipse" == Shape)
             {
                 float xRadius = ((float)tc.Width / 2.0f) * sizeRatio;
                 float yRadius = ((float)tc.Height / 2.0f) * sizeRatio;
 
-                //Using 5000 vertices for the ellipse for now.
-                body = BodyFactory.CreateEllipse(pm.PhysicsWorld, xRadius, yRadius, 5000, 1f);
+                if (xRadius != yRadius) body = BodyFactory.CreateEllipse(pm.PhysicsWorld, xRadius, yRadius, 12, 1f);
+                else body = BodyFactory.CreateCircle(pm.PhysicsWorld, xRadius, 1f);
             }
             else
             {
@@ -430,6 +427,7 @@ namespace Kinectitude.Physics
             if (hasCollisions)
             {
                 body.BodyType = BodyType.Dynamic;
+                body.Mass = MovesWhenHit ? body.Mass = Mass : (float)int.MaxValue;
             }
             else if (hasVelocity)
             {
@@ -442,7 +440,6 @@ namespace Kinectitude.Physics
 
             body.FixedRotation = FixedRotation;
             body.AngularVelocity = AngularVelocity;
-            body.Mass = MovesWhenHit ? body.Mass = Mass : (float)int.MaxValue;
             body.Restitution = Restitution;
             body.Friction = Friction;
             body.LinearDamping = LinearDamping;
