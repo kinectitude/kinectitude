@@ -38,12 +38,13 @@
       <Action Type="SetAction" Target="id" Value="{scene.next}"/>
       <Action Type="SetAction" Target="right" Value="[rnd * 10]"/>
       <Action Type="SetAction" Target="top" Value="[random * 10]"/>
+      <Action Type="IncrementAction" Target="scene.next"/>
+
       <!--Since the magnitude of the velocity will be too small, the minimum will be used to scale it-->
       <Action Type="SetAction" Target="PhysicsComponent.XVelocity" Value="[random]"/>
       <Action Type="SetAction" Target="PhysicsComponent.YVelocity" Value="[rnd]"/>
-      <Action Type="IncrementAction" Target="scene.next"/>
       
-      <Condition If="right > 5">
+     <Condition If="right > 5">
         <Action Type="SetAction" Target="PhysicsComponent.XVelocity" Value="[-this.PhysicsComponent.XVelocity]"/>
       </Condition>
 
@@ -52,7 +53,7 @@
       </Condition>
     </Event>
 
-    <Event Type="CollisionEvent" CollidesWith="$wall">
+   <Event Type="CollisionEvent" CollidesWith="$wall">
       <Action Type="FireTriggerAction" Name="decHealth"/>
     </Event>
 
@@ -80,7 +81,7 @@
   <Prototype Name="basePlayer" health="100" score="0" lr="true">
     <Component Type="TransformComponent" X="400" Y="560" Width="27" Height="36" />
     <Component Type="ImageRenderComponent" Image="sonic.png" Animated="false" Duration="1.4" />
-    <Component Type="PhysicsComponent" MaximumVelocity="70" Shape="Rectangle" Restitution="1" Friction="0" MovesWhenHit="false" FixedRotation="true" IgnoreCollisionsWith="$wall"/>
+    <Component Type="PhysicsComponent" MaximumVelocity="70" Shape="Rectangle" Restitution="1" Friction="0" MovesWhenHit="false" FixedRotation="true"/>
 
     <Event Type="AttributeChangesEvent" Target="{this.PhysicsComponent.XVelocity}">
       <Action Type="FireTriggerAction" Name="motionChange"/>
@@ -236,6 +237,14 @@
         
         <Action Type="CreateEntityAction" Prototype="ball"/>
         <Action Type="FireTriggerAction" Name="create{scene.next}"/>
+        <Action Type="CreateTimerAction" Name="createTimer" Duration="1" Trigger="create" Recurring="true"/>
+      </Event>
+
+      <Event Type="TriggerOccursEvent" Trigger="create">
+        <Condition If="scene.next < 7">
+          <Action Type="CreateEntityAction" Prototype="ball"/>
+          <Action Type="FireTriggerAction" Name="create{scene.next}"/>
+        </Condition>
       </Event>
     </Entity>
   </Scene>

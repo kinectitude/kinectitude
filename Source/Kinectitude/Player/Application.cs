@@ -14,7 +14,7 @@ namespace Kinectitude.Player
 {
     internal sealed class Application : IDisposable
     {
-        private const float TimeStep = 1.0f / 60.0f;
+        private const float TimeStep = 1.0f / 30.0f;
 
         private readonly RenderService renderService;
         private readonly RenderForm form;

@@ -84,7 +84,7 @@ namespace Kinectitude.Core.Base
                 m.OnUpdate(frameDelta);
 
             }
-            
+          
             foreach (KeyValuePair<string, List<Timer>> pair in runningTimers)
             {
                 List<Timer> timers = pair.Value;

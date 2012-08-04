@@ -155,11 +155,7 @@ namespace Kinectitude.Physics
             hasVelocity |= velocity != 0;
             if (null != body)
             {
-                if (velocity != 0 && body.BodyType == BodyType.Static)
-                {
-                    pm.PhysicsWorld.RemoveBody(body);
-                    createBody();
-                }
+                if (velocity != 0 && body.BodyType == BodyType.Static) createBody();
                 body.LinearVelocity = new Vector2(XVelocity * speedRatio, YVelocity * speedRatio);
                 body.AngularVelocity = AngularVelocity;
             }
@@ -324,16 +320,6 @@ namespace Kinectitude.Physics
 
         private void setVelocity()
         {
-            //the body needs to be moved because of a set position that was triggered
-            if (prevX == tc.X && prevY == tc.Y)
-            {
-                float x = body.Position.X / sizeRatio;
-                float y = body.Position.Y / sizeRatio;
-                tc.X = x;
-                tc.Y = y;
-                checkCrossesLine(x, y);
-            }
-
             tc.Rotation = body.Rotation;
 
 			float speed = body.LinearVelocity.Length() / speedRatio;
@@ -356,7 +342,6 @@ namespace Kinectitude.Physics
 
         public override void OnUpdate(float t)
         {
-            //the body needs to be moved because of a set position that was triggered
             if (prevX == tc.X && prevY == tc.Y)
             {
                 float x = body.Position.X / sizeRatio;
@@ -365,7 +350,6 @@ namespace Kinectitude.Physics
                 tc.Y = y;
                 checkCrossesLine(x, y);
             }
-
             setVelocity();
         }
 
@@ -382,11 +366,14 @@ namespace Kinectitude.Physics
 
         public void SetPosition()
         {
-            body.Awake = true;
-            prevX = tc.X;
-            prevY = tc.Y;
-            body.Rotation = tc.Rotation;
-            body.Position = new Vector2(prevX * sizeRatio, prevY * sizeRatio);
+            if (prevX != tc.X || prevY != tc.Y || body.Rotation != tc.Rotation)
+            {
+                //body.Awake = true;
+                prevX = tc.X;
+                prevY = tc.Y;
+                body.Position = new Vector2(prevX * sizeRatio, prevY * sizeRatio);
+                body.Rotation = tc.Rotation;
+            }
         }
 
         public void SetSize()
@@ -412,13 +399,14 @@ namespace Kinectitude.Physics
 
         private void createBody()
         {
+            if (null != body) pm.PhysicsWorld.RemoveBody(body);
             if ("Ellipse" == Shape)
             {
                 float xRadius = ((float)tc.Width / 2.0f) * sizeRatio;
                 float yRadius = ((float)tc.Height / 2.0f) * sizeRatio;
-
-                //Using 5000 vertices for the ellipse for now.
-                body = BodyFactory.CreateEllipse(pm.PhysicsWorld, xRadius, yRadius, 5000, 1f);
+                
+                if(xRadius != yRadius) body = BodyFactory.CreateEllipse(pm.PhysicsWorld, xRadius, yRadius, 12, 1f);
+                else body = BodyFactory.CreateCircle(pm.PhysicsWorld, xRadius, 1f);
             }
             else
             {
@@ -430,6 +418,7 @@ namespace Kinectitude.Physics
             if (hasCollisions)
             {
                 body.BodyType = BodyType.Dynamic;
+                body.Mass = MovesWhenHit ? body.Mass = Mass : (float)int.MaxValue;
             }
             else if (hasVelocity)
             {
@@ -442,7 +431,6 @@ namespace Kinectitude.Physics
 
             body.FixedRotation = FixedRotation;
             body.AngularVelocity = AngularVelocity;
-            body.Mass = MovesWhenHit ? body.Mass = Mass : (float)int.MaxValue;
             body.Restitution = Restitution;
             body.Friction = Friction;
             body.LinearDamping = LinearDamping;
