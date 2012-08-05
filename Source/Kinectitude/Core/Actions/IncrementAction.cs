@@ -21,7 +21,8 @@ namespace Kinectitude.Core.Actions
             {
                 IncrementBy = new DoubleExpressionReader("1", Event, Event.Entity);
             }
-            Target.Value = (double.Parse(Target.Value) + IncrementBy.GetValue()).ToString();
+            if (null != Target.Value) Target.Value = (double.Parse(Target.Value) + IncrementBy.GetValue()).ToString();
+            else Target.Value = "1";
         }
     }
 }

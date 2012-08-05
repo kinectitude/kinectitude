@@ -209,7 +209,7 @@ namespace Kinectitude.Physics
             }
         }
 
-        private bool movesWhenHit;
+        private bool movesWhenHit = true;
         [Preset("Bouncy Ball", true)]
         [Preset("Collision Event Line", false)]
         [Preset("Wall", false)]
@@ -267,12 +267,6 @@ namespace Kinectitude.Physics
         private bool hasVelocity = false;
         private float prevX;
         private float prevY;
-
-        public PhysicsComponent()
-        {
-            MovesWhenHit = true;
-            FixedRotation = true;
-        }
 
         private void checkCrossesLine(float x, float y)
         {
@@ -371,9 +365,9 @@ namespace Kinectitude.Physics
             collisionEvents.Add(evt);
         }
 
-        public void SetPosition()
+        public void SetPosition(bool forceUpdate = false)
         {
-            if (prevX != tc.X || prevY != tc.Y || body.Rotation != tc.Rotation)
+            if (prevX != tc.X || prevY != tc.Y || body.Rotation != tc.Rotation || forceUpdate)
             {
                 //body.Awake = true;
                 prevX = tc.X;
@@ -396,12 +390,6 @@ namespace Kinectitude.Physics
             tc = GetComponent<TransformComponent>();
 
             createBody();
-            
-            //Add a listener for collisions
-            body.OnCollision += OnCollision;
-
-            SetPosition();
-            body.LinearVelocity = new Vector2(xVelocity * speedRatio, yVelocity * speedRatio);
         }
 
         private void createBody()
@@ -449,6 +437,11 @@ namespace Kinectitude.Physics
             body.Friction = Friction;
             body.LinearDamping = LinearDamping;
             body.UserData = IEntity;
+            //Add a listener for collisions
+            body.OnCollision += OnCollision;
+
+            SetPosition(true);
+            body.LinearVelocity = new Vector2(xVelocity * speedRatio, yVelocity * speedRatio);
         }
 
         private bool OnCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
@@ -472,7 +465,7 @@ namespace Kinectitude.Physics
                 }
             }
 
-            if (ignoreCollisionsWith != null && ignoreCollisionsWith.MatchAndSet(collidedWith)) return false;
+            if (ignoreCollisionsWith != null && ignoreCollisionsWith.MatchAndSet(collidedWith))return false;
 
             //Allow the collison to occur
             return true;
