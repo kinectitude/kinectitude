@@ -30,8 +30,9 @@
   </Using>
 
   <Prototype Name="ball">
-    <Component Type="RenderComponent" FillColor="Red" Shape="Ellipse" />
-    <Component Type="TransformComponent" X="400" Y="300" Width="24" Height="24"/>
+    <Component Type="RenderComponent" FillColor="Yellow" Shape="Ellipse" />
+    <!--<Component Type="ImageRenderComponent" Image="tennisball.png" Animated="false"/>-->
+    <Component Type="TransformComponent" X="400" Y="300" Width="32" Height="32"/>
     <Component Type="PhysicsComponent" MinimumVelocity="10" MaximumVelocity="25" Shape="Ellipse" Restitution="1" Mass="1" Friction="0" FixedRotation="true"/>
     
     <Event Type="TriggerOccursEvent" Trigger="create{scene.next}">
@@ -59,6 +60,7 @@
     <Event Type="CollisionEvent" CollidesWith="$basePlayer">
       <Action Type="SetAction" Target="TransformComponent.X" Value="400"/>
       <Action Type="SetAction" Target="TransformComponent.Y" Value="300"/>
+      <Action Type="FireTriggerAction" Name="givePoint"/>
     </Event>
   </Prototype>
 
@@ -77,7 +79,7 @@
     <Component Type="RenderComponent" FillColor="Red"/>
   </Prototype>
 
-  <Prototype Name="basePlayer" health="100" score="0" lr="true">
+  <Prototype Name="basePlayer" lr="true">
     <Component Type="TransformComponent" X="400" Y="560" Width="27" Height="36" />
     <Component Type="ImageRenderComponent" Image="sonic.png" Animated="false" Duration="1.4" />
     <Component Type="PhysicsComponent" MaximumVelocity="70" Shape="Rectangle" Restitution="1" Friction="0" MovesWhenHit="false" FixedRotation="true" IgnoreCollisionsWith="$wall"/>
@@ -97,14 +99,6 @@
       
       <Condition If="this.PhysicsComponent.XVelocity != 0 or this.PhysicsComponent.YVelocity != 0">
         <Action Type="SetAction" Target="ImageRenderComponent.Animated" Value="true"/>
-      </Condition>
-    </Event>
-
-    <Event Type="TriggerOccursEvent" Trigger="decHealth">
-      <Action Type="SetAction" Target="health" Value="[health - 1]"/>
-      
-      <Condition If="health == 0">
-        <Action Type="ChangeSceneAction" Target="Game Over"/>
       </Condition>
     </Event>
 
@@ -146,10 +140,6 @@
       
       <Action Type="SetAction" Target="done" Value="false"/>
     </Event>
-
-    <Event Type="CollisionEvent" CollidesWith="$wall">
-      <Action Type="SetAction" Target="Rotate" Value="!CollidesWith.Rotation"/>
-    </Event>
   </Prototype>
 
   <Prototype Name="mousePlayer" Prototype="basePlayer">
@@ -166,10 +156,6 @@
     <Event Type="TriggerOccursEvent" Trigger="switchLeftRight">
       <Action Type="SetAction" Target="this.MouseFollowComponent.Direction" Value="X"/>
     </Event>
-  </Prototype>
-
-  <Prototype Name="text">
-    <Component Type="TextRenderComponent" FontFamily="Arial" FontWeight="Normal" FontStyle="Normal" FontStretch="Normal" FontSize="36" FontColor="White" />
   </Prototype>
   
   <Scene Name="Main Menu">
@@ -236,11 +222,53 @@
         
         <Action Type="CreateEntityAction" Prototype="ball"/>
         <Action Type="FireTriggerAction" Name="create{scene.next}"/>
+        <Action Type="CreateTimerAction" Name="createTimer" Duration="2" Trigger="create" Recurring="true"/>
+      </Event>
+
+      <Event Type="TriggerOccursEvent" Trigger="create">
+        <Condition If="5 > scene.next">
+          <Action Type="CreateEntityAction" Prototype="ball"/>
+          <Action Type="FireTriggerAction" Name="create{scene.next}"/>
+        </Condition>
+      </Event>
+    </Entity>
+    
+    <Entity health="50">
+      <Component Type="TransformComponent" X="0" Y="300" Width="800" Height="50"/>
+      <Component Type="TextRenderComponent" FontFamily="Arial" FontWeight="Normal" FontStyle="Normal" FontStretch="Normal" FontSize="36" FontColor="Black" TextAlignment="Center"/>
+      <Event Type="TriggerOccursEvent" Trigger="decHealth">
+        <Action Type="SetAction" Target="health" Value="[health - 1]"/>
+        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="Health: [health]"/>
+
+        <Condition If="health == 0">
+          <Action Type="ChangeSceneAction" Target="Game Over"/>
+        </Condition>
+      </Event>
+    </Entity>
+
+    <Entity>
+      <Component Type="TransformComponent" X="0" Y="350" Width="800" Height="50"/>
+      <Component Type="TextRenderComponent" FontFamily="Arial" FontWeight="Normal" FontStyle="Normal" FontStretch="Normal" FontSize="36" FontColor="Black" TextAlignment="Center"/>
+      <Event Type="TriggerOccursEvent" Trigger="givePoint">
+        <Action Type="IncrementAction" Target="game.score"/>
+        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="score: [game.score]"/>
       </Event>
     </Entity>
   </Scene>
-
+  
   <Scene Name="Game Over">
-    
+    <Entity>
+      <Component Type="TransformComponent" X="0" Y="350" Width="800" Height="50"/>
+      <Component Type="TextRenderComponent" FontFamily="Arial" FontWeight="Normal" FontStyle="Normal" FontStretch="Normal" FontSize="36" FontColor="Black" TextAlignment="Center"/>
+      <Event Type="SceneStartsEvent">
+        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="game over, final score: [game.score]"/>
+        <Action Type="CreateTimerAction" Name="restart" Duration="2" Trigger="restart" Recurring="false"/>
+      </Event>
+
+      <Event Type="TriggerOccursEvent" Trigger="restart">
+        <Action Type="SetAction" Target="game.score" Value="0"/>
+        <Action Type="ChangeSceneAction" Target="Main Menu"/>
+      </Event>
+    </Entity>
   </Scene>
 </Game>

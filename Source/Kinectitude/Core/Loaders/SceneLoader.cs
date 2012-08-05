@@ -95,7 +95,7 @@ namespace Kinectitude.Core.Loaders
 
         }
 
-        protected LoadedEntity PrototypeMaker(string name, bool isMaking = false)
+        protected LoadedEntity PrototypeMaker(string name)
         {
             object prototype = GameLoader.Prototypes[name];
             HashSet<string> words = new HashSet<string>() { lang.Prototype, lang.Name };
@@ -104,28 +104,8 @@ namespace Kinectitude.Core.Loaders
             List<string> isType = new List<string>();
             List<string> isExactType = new List<string>();
 
-            string prototypes;
-
-            if (properties.TryGetValue(lang.Prototype, out prototypes))
-            {
-                if (isMaking) isExactType.Add(name);
-                if (prototypes.Contains(' '))
-                {
-                    string[] names = name.Split(' ');
-                    isType.AddRange(names);
-                    foreach (string n in names)
-                    {
-                        if(!isMaking) isExactType.Add(n);
-                        isType.AddRange(GameLoader.PrototypeIs[n]);
-                    }
-                }
-                else
-                {
-                    if (!isMaking) isExactType.Add(prototypes);
-                    isType.Add(name);
-                    isType.AddRange(GameLoader.PrototypeIs[prototypes]);
-                }
-            }
+            isExactType.Add(name);
+            isType.AddRange(GameLoader.PrototypeIs[name]);
 
             LoadedEntity entity = new LoadedEntity(null, values, Onid, isType, isExactType);
             entityParse(prototype, entity);
@@ -137,10 +117,10 @@ namespace Kinectitude.Core.Loaders
             LoadedEntity loadedEntity;
             if (!loadedPrototypes.TryGetValue(name, out loadedEntity))
             {
-                loadedEntity = PrototypeMaker(name, true);
-                loadedPrototypes.Add(name, loadedEntity);
+                loadedEntity = PrototypeMaker(name);
+                loadedPrototypes[name] = loadedEntity;
             }
-            Entity entity = loadedEntity.Create(Onid, scene);
+            Entity entity = loadedEntity.Create(Onid++, scene);
             entity.Scene = scene;
             entity.Ready();
 #if TEST
