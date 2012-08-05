@@ -324,14 +324,13 @@ namespace Kinectitude.Physics
             }
             else
             {
-                if (speed > maximumVelocity)
-                {
-                    body.LinearVelocity = body.LinearVelocity / speed * maximumVelocity;
-                }
+                if (speed > maximumVelocity) body.LinearVelocity = body.LinearVelocity / speed * maximumVelocity;
 
                 if (speed < minimumVelocity)
                 {
-                    body.LinearVelocity = body.LinearVelocity / speed * minimumVelocity;
+                    //TODO decide what is good to do here
+                    if (0 == speed) body.LinearVelocity = new Vector2(minimumVelocity, 0);
+                    else body.LinearVelocity = body.LinearVelocity / speed * minimumVelocity;
                 }
             }
 

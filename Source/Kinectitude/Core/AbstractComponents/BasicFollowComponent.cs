@@ -142,9 +142,11 @@ namespace Kinectitude.Core.AbstractComponents
                 {
                     case FollowType.X:
                         physics.XVelocity = nextDx;
+                        physics.YVelocity = 0;
                         break;
                     case FollowType.Y:
                         physics.YVelocity = nextDy;
+                        physics.XVelocity = 0;
                         break;
                     case FollowType.Both:
                         physics.XVelocity = nextDx;

@@ -11,7 +11,7 @@ namespace Kinectitude.DirectInput
     public enum KeyState { Pressed, Released, Down }
 
     [Plugin("Event for keys on the keyboard","")]
-    public class KeyEvent : Event
+    public class KeyEvent : Event, IKeyChange
     {
         [Plugin("State of the key","Down, Pressed or Released")]
         public KeyState KeyState { get; set; }
@@ -20,7 +20,7 @@ namespace Kinectitude.DirectInput
 
         public override void OnInitialize()
         {
-            GetManager<KeyboardManager>().RegisterKeyEvent(this);
+            GetManager<KeyboardManager>().RegisterIKeyChange(this);
         }
     }
 }

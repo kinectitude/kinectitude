@@ -14,9 +14,9 @@ namespace Kinectitude.DirectInput
 
         private bool[] keysDown = new bool[Enum.GetNames(typeof(Key)).Length];
 
-        private readonly List<KeyEvent> KeyPressed = new List<KeyEvent>();
-        private readonly List<KeyEvent> KeyReleased = new List<KeyEvent>();
-        private readonly List<KeyEvent> KeyDown = new List<KeyEvent>();
+        private readonly List<IKeyChange> KeyPressed = new List<IKeyChange>();
+        private readonly List<IKeyChange> KeyReleased = new List<IKeyChange>();
+        private readonly List<IKeyChange> KeyDown = new List<IKeyChange>();
 
         public KeyboardManager()
         {
@@ -25,6 +25,10 @@ namespace Kinectitude.DirectInput
                 DirectInputService service = GetService<DirectInputService>();
                 keyboard = new Keyboard(service.DirectInput);
                 service.InitDevice<Keyboard>(keyboard);
+            }
+            for (int i = 0; i < keysDown.Length; i++)
+            {
+                keysDown[i] = false;
             }
         }
 
@@ -36,27 +40,23 @@ namespace Kinectitude.DirectInput
 
             foreach (Key key in state.PressedKeys)
             {
+                foreach (IKeyChange evt in KeyDown.Where(input => input.Button == key)) evt.DoActions();
+                if (keysDown[(int)key]) continue;
+                foreach (IKeyChange evt in KeyPressed.Where(input => input.Button == key)) evt.DoActions();
                 keysDown[(int)key] = true;
-                foreach (KeyEvent evt in KeyPressed.Where(input => input.Button == key)) evt.DoActions();
             }
 
             foreach (Key key in state.ReleasedKeys)
             {
+                if (!keysDown[(int)key]) continue;
+                foreach (IKeyChange evt in KeyReleased.Where(input => input.Button == key)) evt.DoActions();
                 keysDown[(int)key] = false;
-                foreach (KeyEvent evt in KeyReleased.Where(input => input.Button == key)) evt.DoActions();
             }
 
-            for (int i = 0; i < keysDown.Length; i++)
-            {
-                if (keysDown[i])
-                {
-                    foreach (KeyEvent evt in KeyDown.Where(input => (int)input.Button == i)) evt.DoActions();
-                }
-            }
-
+            foreach (Component child in Children){child.OnUpdate(frameDelta);}
         }
 
-        public void RegisterKeyEvent(KeyEvent keyEvent)
+        public void RegisterIKeyChange(IKeyChange keyEvent)
         {
             switch (keyEvent.KeyState)
             {
@@ -72,7 +72,7 @@ namespace Kinectitude.DirectInput
             }
         }
 
-        public void RemoveKeyEvent(KeyEvent keyEvent)
+        public void RemoveIKeyChange(IKeyChange keyEvent)
         {
             switch (keyEvent.KeyState)
             {

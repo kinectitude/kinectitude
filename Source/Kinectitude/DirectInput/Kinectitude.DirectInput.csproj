@@ -44,7 +44,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DirectInputService.cs" />
+    <Compile Include="IKeyChange.cs" />
+    <Compile Include="KeyboardFollowComponent.cs" />
     <Compile Include="KeyboardManager.cs" />
+    <Compile Include="KeyChangeCallback.cs" />
     <Compile Include="KeyEvent.cs" />
     <Compile Include="MouseClickEvent.cs" />
     <Compile Include="MouseFollowComponent.cs" />
