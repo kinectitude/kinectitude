@@ -19,6 +19,8 @@ namespace Kinectitude.Core.AbstractComponents
         private TransformComponent transform;
         private IPhysics physics = null;
 
+        private bool exactMove = false;
+
         private FollowType direction;
         [Plugin("Axis", "")]
         public FollowType Direction
@@ -112,12 +114,15 @@ namespace Kinectitude.Core.AbstractComponents
         public void UpdatePosition(float x, float y)
         {
             UpdateDelta(x - transform.X, y - transform.Y);
+            //this is an amount to move.
+            exactMove = true;
         }
 
         public void UpdateDelta(float dx, float dy)
         {
             nextDx = dx;
             nextDy = dy;
+            exactMove = false;
         }
 
         private float getNextValue(float position, float max, float min, float velocity)
@@ -132,8 +137,8 @@ namespace Kinectitude.Core.AbstractComponents
         public override void OnUpdate(float t)
         {
             bool usePhysics = null != physics && ignoresPhysics == false;
-            nextDx = getNextValue(transform.X, maxXFollow, minXFollow, usePhysics?nextDx/t:nextDx);
-            nextDy = getNextValue(transform.Y, maxYFollow, minYFollow, usePhysics?nextDy/t:nextDy);
+            nextDx = getNextValue(transform.X, maxXFollow, minXFollow, usePhysics && !exactMove ? nextDx / t : nextDx);
+            nextDy = getNextValue(transform.Y, maxYFollow, minYFollow, usePhysics && !exactMove ? nextDy / t : nextDy);
 
             //if they are following with physics, we will set a velocity
             if (usePhysics)
