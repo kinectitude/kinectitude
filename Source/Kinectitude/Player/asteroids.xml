@@ -32,7 +32,7 @@
   <Prototype Name="asteroid">
     <Component Type="TransformComponent" X="-100" Y="-100" Width="36" Height="38"/>
     <Component Type="ImageRenderComponent" Image="asteroid.png" />
-    <Component Type="PhysicsComponent" MinimumVelocity="6" MaximumVelocity="6" XVelocity="0" YVelocity="0" Shape="Ellipse" Mass="1" Restitution="1" Friction="0" LinearDamping="0" MovesWhenHit="true" FixedRotation="false" IgnoreCollisionsWith="$shield_boundary"/>
+    <Component Type="PhysicsComponent" MinimumVelocity="3" MaximumVelocity="3" XVelocity="0" YVelocity="0" Shape="Ellipse" Mass="1" Restitution="1" Friction="0" LinearDamping="0" MovesWhenHit="true" FixedRotation="false" IgnoreCollisionsWith="$shield_boundary"/>
 
     <Event Type="TriggerOccursEvent" Trigger="spawn_asteroid{scene.next}">
       <Condition If="scene.edge &gt;= 0 and scene.edge &lt; 1">
@@ -184,7 +184,7 @@
         <Condition If="scene.asteroidsDeflected % 7 == 0 and scene.interval &gt;=3">
           <Action Type="IncrementAction" Target="scene.interval" IncrementBy="-1"/>
           <Action Type="IncrementAction" Target="scene.wave"/>
-          <Action Type="CreateTimerAction" Name="spawnTimer{scene.wave}" Duration="{scene.interval}" Recurring="true" Trigger="create"/>
+          <Action Type="CreateTimerAction" Name="spawnTimer{scene.wave}" Duration="scene.interval" Recurring="true" Trigger="create"/>
         </Condition>
       </Event>
     </Entity>
