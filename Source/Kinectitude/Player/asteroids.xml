@@ -32,35 +32,35 @@
   <Prototype Name="asteroid">
     <Component Type="TransformComponent" X="-100" Y="-100" Width="36" Height="38"/>
     <Component Type="ImageRenderComponent" Image="asteroid.png" />
-    <Component Type="PhysicsComponent" MinimumVelocity="10" MaximumVelocity="10" XVelocity="0" YVelocity="0" Shape="Ellipse" Mass="1" Restitution="1" Friction="0" LinearDamping="0" MovesWhenHit="true" FixedRotation="false" IgnoreCollisionsWith="$shield_boundary"/>
+    <Component Type="PhysicsComponent" MinimumVelocity="6" MaximumVelocity="6" XVelocity="0" YVelocity="0" Shape="Ellipse" Mass="1" Restitution="1" Friction="0" LinearDamping="0" MovesWhenHit="true" FixedRotation="false" IgnoreCollisionsWith="$shield_boundary"/>
 
     <Event Type="TriggerOccursEvent" Trigger="spawn_asteroid{scene.next}">
       <Condition If="scene.edge &gt;= 0 and scene.edge &lt; 1">
-        <Action Type="SetAction" Target="TransformComponent.X" Value="640" />
+        <Action Type="SetAction" Target="TransformComponent.X" Value="[random * 1280]" />
         <Action Type="SetAction" Target="TransformComponent.Y" Value="0" />
-        <Action Type="SetAction" Target="PhysicsComponent.XVelocity" Value="0" />
-        <Action Type="SetAction" Target="PhysicsComponent.YVelocity" Value="10" />
+        <Action Type="SetAction" Target="PhysicsComponent.XVelocity" Value="[640 - this.TransformComponent.X]" />
+        <Action Type="SetAction" Target="PhysicsComponent.YVelocity" Value="[360 - this.TransformComponent.Y]" />
       </Condition>
 
       <Condition If="scene.edge &gt;= 1 and scene.edge &lt; 2">
         <Action Type="SetAction" Target="TransformComponent.X" Value="0" />
-        <Action Type="SetAction" Target="TransformComponent.Y" Value="360" />
-        <Action Type="SetAction" Target="PhysicsComponent.XVelocity" Value="10" />
-        <Action Type="SetAction" Target="PhysicsComponent.YVelocity" Value="0" />
+        <Action Type="SetAction" Target="TransformComponent.Y" Value="[random * 720]" />
+        <Action Type="SetAction" Target="PhysicsComponent.XVelocity" Value="[640 - this.TransformComponent.X]" />
+        <Action Type="SetAction" Target="PhysicsComponent.YVelocity" Value="[360 - this.TransformComponent.Y]" />
       </Condition>
 
       <Condition If="scene.edge &gt;= 2 and scene.edge &lt; 3">
         <Action Type="SetAction" Target="TransformComponent.X" Value="1280" />
-        <Action Type="SetAction" Target="TransformComponent.Y" Value="360" />
-        <Action Type="SetAction" Target="PhysicsComponent.XVelocity" Value="-10" />
-        <Action Type="SetAction" Target="PhysicsComponent.YVelocity" Value="0" />
+        <Action Type="SetAction" Target="TransformComponent.Y" Value="[random * 720]" />
+        <Action Type="SetAction" Target="PhysicsComponent.XVelocity" Value="[640 - this.TransformComponent.X]" />
+        <Action Type="SetAction" Target="PhysicsComponent.YVelocity" Value="[360 - this.TransformComponent.Y]" />
       </Condition>
 
       <Condition If="scene.edge &gt;= 3 and scene.edge &lt; 4">
-        <Action Type="SetAction" Target="TransformComponent.X" Value="640" />
+        <Action Type="SetAction" Target="TransformComponent.X" Value="[random * 1280]" />
         <Action Type="SetAction" Target="TransformComponent.Y" Value="720" />
-        <Action Type="SetAction" Target="PhysicsComponent.XVelocity" Value="0" />
-        <Action Type="SetAction" Target="PhysicsComponent.YVelocity" Value="-10" />
+        <Action Type="SetAction" Target="PhysicsComponent.XVelocity" Value="[640 - this.TransformComponent.X]" />
+        <Action Type="SetAction" Target="PhysicsComponent.YVelocity" Value="[360 - this.TransformComponent.Y]" />
       </Condition>
     </Event>
 
@@ -76,10 +76,11 @@
   </Prototype>
 
   <Prototype Name="shield">
-    <Component Type="MouseFollowComponent" Direction="Both"/>
-    <Component Type="TransformComponent" X="240" Y="360" Width="70" Height="70" />
+    <!--<Component Type="MouseFollowComponent" Direction="Both"/>-->
+    <Component Type="KinectFollowComponent" Direction="Both" Player="1" Joint="HandRight"/>
+    <Component Type="TransformComponent" X="240" Y="360" Width="100" Height="100" />
     <Component Type="RenderComponent" Shape="Ellipse" FillColor="Blue" Opacity="0.5"/>
-    <Component Type="PhysicsComponent" MinimumVelocity="1" MaximumVelocity="1" XVelocity="0" YVelocity="0" Shape="Ellipse" Mass="1" Restitution="0" Friction="0" LinearDamping="0" MovesWhenHit="false" FixedRotation="true"/>
+    <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Ellipse" Mass="1" Restitution="0" Friction="0" LinearDamping="0" MovesWhenHit="false" FixedRotation="true"/>
     <Event Type="CollisionEvent" CollidesWith="$asteroid">
       <Action Type="IncrementAction" Target="scene.deflections"/>
     </Event>
@@ -107,7 +108,7 @@
     <Entity Name="background">
       <Component Type="TransformComponent" X="640" Y="360" Width="1280" Height="720" />
       <Component Type="ImageRenderComponent" Image="asteroids_background.jpg" />
-    </Entity> 
+    </Entity>
 
     <Entity Prototype="shield">
     </Entity>
@@ -215,8 +216,8 @@
     </Entity>
 
     <Entity Prototype="text">
-      <Component Type="TransformComponent" X="640" Y="360" Width="0"/>
-      <Component Type="TextRenderComponent" Value="" FontSize="75" TextAlignment="Center" FontColor ="Red"/>
+      <Component Type="TransformComponent" X="640" Y="310" Width="0" Height="0"/>
+      <Component Type="TextRenderComponent" Value="" FontSize="75" TextAlignment="Center" FontColor="Red"/>
       <Event Type="SceneStartsEvent">
         <Action Type="SetAction" Target="TextRenderComponent.Value" Value="GAME OVER"/>
       </Event>

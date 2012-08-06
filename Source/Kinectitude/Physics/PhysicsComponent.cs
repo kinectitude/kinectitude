@@ -157,6 +157,7 @@ namespace Kinectitude.Physics
             {
                 if (velocity != 0 && body.BodyType == BodyType.Static) createBody();
                 body.LinearVelocity = new Vector2(XVelocity * speedRatio, YVelocity * speedRatio);
+                //clampVelocity();
                 body.AngularVelocity = AngularVelocity;
             }
         }
@@ -316,7 +317,17 @@ namespace Kinectitude.Physics
         {
             tc.Rotation = body.Rotation;
 
-			float speed = body.LinearVelocity.Length() / speedRatio;
+            clampVelocity();
+
+            //no need to use the setters here, they will add extra overhead to things that don't need to be checked
+            xVelocity = body.LinearVelocity.X / speedRatio;
+            yVelocity = body.LinearVelocity.Y / speedRatio;
+            angularVelocity = body.AngularVelocity;
+        }
+
+        private void clampVelocity()
+        {
+            float speed = body.LinearVelocity.Length() / speedRatio;
 
             if (maximumVelocity == 0 || speed == 0)
             {
@@ -333,11 +344,6 @@ namespace Kinectitude.Physics
                     else body.LinearVelocity = body.LinearVelocity / speed * minimumVelocity;
                 }
             }
-
-            //no need to use the setters here, they will add extra overhead to things that don't need to be checked
-            xVelocity = body.LinearVelocity.X / speedRatio;
-            yVelocity = body.LinearVelocity.Y / speedRatio;
-            angularVelocity = body.AngularVelocity;
         }
 
         public override void OnUpdate(float t)
