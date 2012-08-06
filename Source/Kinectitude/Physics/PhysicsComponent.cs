@@ -157,7 +157,7 @@ namespace Kinectitude.Physics
             {
                 if (velocity != 0 && body.BodyType == BodyType.Static) createBody();
                 body.LinearVelocity = new Vector2(XVelocity * speedRatio, YVelocity * speedRatio);
-                //clampVelocity();
+                clampVelocity();
                 body.AngularVelocity = AngularVelocity;
             }
         }

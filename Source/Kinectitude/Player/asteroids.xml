@@ -78,7 +78,7 @@
   <Prototype Name="shield">
     <!--<Component Type="MouseFollowComponent" Direction="Both"/>-->
     <Component Type="KinectFollowComponent" Direction="Both" Player="1" Joint="HandRight"/>
-    <Component Type="TransformComponent" X="240" Y="360" Width="100" Height="100" />
+    <Component Type="TransformComponent" X="640" Y="360" Width="100" Height="100" />
     <Component Type="RenderComponent" Shape="Ellipse" FillColor="Blue" Opacity="0.5"/>
     <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Ellipse" Mass="1" Restitution="0" Friction="0" LinearDamping="0" MovesWhenHit="false" FixedRotation="true"/>
     <Event Type="CollisionEvent" CollidesWith="$asteroid">
