@@ -3,6 +3,7 @@ using Kinectitude.Core.Base;
 using Kinectitude.Tests.Core.TestMocks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using Kinectitude.Core.Data;
 
 namespace Kinectitude.Tests.Core.Base
 {
@@ -64,6 +65,20 @@ namespace Kinectitude.Tests.Core.Base
             test.Entity = entity;
             test.Initialize();
             Assert.IsTrue(test.hasInit);
+        }
+
+        [TestMethod]
+        public void TestAccessEvent()
+        {
+            Entity testEntity = new Entity(10);
+            EventMock testEvent = new EventMock();
+            testEvent.TypeMatcher = new SingleTypeMatcher(testEntity);
+            ActionMock testAction = new ActionMock();
+            testAction.Event = testEvent;
+            testEvent.Entity = testEntity;
+            testAction.TypeMatcher = 
+                TypeMatcher.CreateTypeMatcher(TypeMatcher.parentChar + "TypeMatcher", testEvent, testEntity);
+            Assert.IsTrue(testAction.TypeMatcher == testEvent.TypeMatcher);
         }
     }
 }

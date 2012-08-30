@@ -5,6 +5,7 @@ using Kinectitude.Tests.Core.TestMocks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Reflection;
 using Kinectitude.Core.Components;
+using Kinectitude.Core.Data;
 
 namespace Kinectitude.Tests.Core.Base
 {
@@ -62,11 +63,11 @@ namespace Kinectitude.Tests.Core.Base
         {
             ComponentMock component = ClassFactory.Create<ComponentMock>("component");
             ClassFactory.SetParam(component, "I", "100", null, null);
-            Assert.IsTrue(component.I == 100);
+            Assert.AreEqual(100, component.I);
             ClassFactory.SetParam(component, "D", "10.1", null, null);
-            Assert.IsTrue(component.D == 10.1);
+            Assert.AreEqual(10.1, component.D);
             ClassFactory.SetParam(component, "F", "11.2", null, null);
-            Assert.IsTrue(component.F == 11.2f);
+            Assert.AreEqual(11.2f, component.F);
             ClassFactory.SetParam(component, "B", "True", null, null);
             Assert.IsTrue(component.B);
         }
@@ -74,17 +75,16 @@ namespace Kinectitude.Tests.Core.Base
         [TestMethod]
         public void SetExpressionTest()
         {
-            ClassFactory.SetParam(evt, "Expression", "this", evt, null);
-            Assert.IsTrue(evt.Expression.GetValue() == "this");
-            ClassFactory.SetParam(action, "Expression", "{!Expression}", evt, null);
-            Assert.IsTrue(evt.Expression.GetValue() == action.Expression.GetValue());
+            Entity e = new Entity(10);
+            ClassFactory.SetParam(evt, "Expression", "this", evt, e);
+            Assert.AreEqual("this", evt.Expression.GetValue());
+            ClassFactory.SetParam(action, "Expression", "{" + TypeMatcher.parentChar +"Expression}", evt, e);
+            Assert.AreEqual(evt.Expression.GetValue(), action.Expression.GetValue());
         }
 
         [TestMethod]
         public void SetTypeExpressionTest()
         {
-
-
             scene.IsType["ball"] = new HashSet<int>() { 0 };
             evt.AddAction(action);
 
@@ -97,7 +97,7 @@ namespace Kinectitude.Tests.Core.Base
             ClassFactory.SetParam(action, "TypeMatcher", "!TypeMatcher", evt, entity);
             Assert.IsTrue(evt.TypeMatcher == action.TypeMatcher);
             ClassFactory.SetParam(action, "Expression", "{!TypeMatcher.x}", evt, entity);
-            Assert.IsTrue(action.Expression.GetValue() == "lol");
+            Assert.AreEqual("lol", action.Expression.GetValue());
         }
 
         [TestMethod]

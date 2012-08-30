@@ -12,6 +12,9 @@ namespace Kinectitude.Tests.Core.Base
     [TestClass]
     public class EntityTests
     {
+        private const string xmlFile = "sample.xml";
+
+        private static Scene scene;
 
         static EntityTests()
         {

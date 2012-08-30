@@ -1,0 +1,338 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Game Name="pong" Width="800" Height="600" FirstScene="Main Menu" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1">
+  <Using File="Kinectitude.Physics.dll">
+    <Define Name="PhysicsManager" Class="Kinectitude.Physics.PhysicsManager"/>
+    <Define Name="PhysicsComponent" Class="Kinectitude.Physics.PhysicsComponent"/>
+    <Define Name="CrossesLineEvent" Class="Kinectitude.Physics.CrossesLineEvent"/>
+    <Define Name="CollisionEvent" Class="Kinectitude.Physics.CollisionEvent"/>
+  </Using>
+
+  <Using File="Kinectitude.Render.dll">
+    <Define Name="RenderManager" Class="Kinectitude.Render.RenderManager"/>
+    <Define Name="RenderComponent" Class="Kinectitude.Render.RenderComponent"/>
+    <Define Name="TextRenderComponent" Class="Kinectitude.Render.TextRenderComponent"/>
+    <Define Name="ImageRenderComponent" Class="Kinectitude.Render.ImageRenderComponent" />
+  </Using>
+
+  <Using File="Kinectitude.DirectInput.dll">
+    <Define Name="KeyEvent" Class="Kinectitude.DirectInput.KeyEvent"/>
+    <Define Name="KeyboardManager" Class="Kinectitude.DirectInput.KeyboardManager"/>
+    <Define Name="MouseManager" Class="Kinectitude.DirectInput.MouseManager"/>
+    <Define Name="KeyboardFollowComponent" Class="Kinectitude.DirectInput.KeyboardFollowComponent"/>
+    <Define Name="MouseFollowComponent" Class="Kinectitude.DirectInput.MouseFollowComponent"/>
+    <Define Name="MouseClickEvent" Class="Kinectitude.DirectInput.MouseClickEvent"/>
+  </Using>
+
+  <Prototype Name="ball">
+    <Component Type="RenderComponent" FillColor="Yellow" Shape="Ellipse" />
+    <!--<Component Type="ImageRenderComponent" Image="tennisball.png" Animated="false"/>-->
+    <Component Type="TransformComponent" X="400" Y="300" Width="32" Height="32"/>
+    <Component Type="PhysicsComponent" MinimumVelocity="10" MaximumVelocity="25" Shape="Ellipse" Restitution="1" Mass="1" Friction="0" FixedRotation="true"/>
+    
+    <Event Type="TriggerOccursEvent" Trigger="create{scene.next}">
+      <Action Type="SetAction" Target="id" Value="{scene.next}"/>
+      <Action Type="SetAction" Target="right" Value="[rnd * 10]"/>
+      <Action Type="SetAction" Target="top" Value="[random * 10]"/>
+      <!--Since the magnitude of the velocity will be too small, the minimum will be used to scale it-->
+      <Action Type="SetAction" Target="PhysicsComponent.XVelocity" Value="[random]"/>
+      <Action Type="SetAction" Target="PhysicsComponent.YVelocity" Value="[rnd]"/>
+      <Action Type="IncrementAction" Target="scene.next"/>
+      
+      <Condition If="right > 5">
+        <Action Type="SetAction" Target="PhysicsComponent.XVelocity" Value="[-this.PhysicsComponent.XVelocity]"/>
+      </Condition>
+
+      <Condition If="top > 5">
+        <Action Type="SetAction" Target="PhysicsComponent.YVelocity" Value="[-this.PhysicsComponent.YVelocity]"/>
+      </Condition>
+    </Event>
+
+    <Event Type="CollisionEvent" CollidesWith="$wall">
+      <Action Type="FireTriggerAction" Name="decHealth"/>
+    </Event>
+
+    <Event Type="CollisionEvent" CollidesWith="$basePlayer">
+      <Action Type="SetAction" Target="TransformComponent.X" Value="400"/>
+      <Action Type="SetAction" Target="TransformComponent.Y" Value="300"/>
+      <Action Type="FireTriggerAction" Name="givePoint"/>
+    </Event>
+  </Prototype>
+
+  <Prototype Name="wall">
+    <Component Type="TransformComponent" X="400" Y="10" Width="680" Height="20"/>
+    <Component Type="PhysicsComponent" Shape="Rectangle" Restitution="0" Friction="0" MovesWhenHit="false"/>
+    <Component Type="RenderComponent" FillColor="Black" Shape="Rectangle"/>
+  </Prototype>
+
+  <Prototype Name="sideWall" Prototype="wall">
+    <Component Type="TransformComponent" X="10" Y="300" Width="20" Height="480"/>
+  </Prototype>
+
+  <Prototype Name="switchWall" Prototype="wall">
+    <Component Type="TransformComponent" X="40" Y="10" Width="80" Height="20"/>
+    <Component Type="RenderComponent" FillColor="Red"/>
+  </Prototype>
+
+  <Prototype Name="basePlayer" lr="true" positive="true">
+    <Component Type="TransformComponent" X="400" Y="558" Width="39" Height="44" />
+    <Component Type="ImageRenderComponent" Image="sonicSprites.png" Animated="false" Duration="1.4" />
+    <Component Type="PhysicsComponent" MaximumVelocity="70" Shape="Rectangle" Restitution="1" Friction="0" MovesWhenHit="false" FixedRotation="true" IgnoreCollisionsWith="$wall $basePlayer"/>
+
+    <Event Type="AttributeChangesEvent" Target="{this.PhysicsComponent.XVelocity}">
+      <Action Type="FireTriggerAction" Name="motionChange"/>
+    </Event>
+
+    <Event Type="AttributeChangesEvent" Target="{this.PhysicsComponent.YVelocity}">
+      <Action Type="FireTriggerAction" Name="motionChange"/>
+    </Event>
+    
+    <Event Type="TriggerOccursEvent" Trigger="motionChange">
+      <Condition If="this.PhysicsComponent.XVelocity == 0 and this.PhysicsComponent.YVelocity == 0">
+        <Action Type="SetAction" Target="ImageRenderComponent.Animated" Value="false"/>
+        <Action Type="SetAction" Target="done" Value="true"/>
+      </Condition>
+      
+      <Condition If="not done and (positive and (this.PhysicsComponent.XVelocity > 0 or this.PhysicsComponent.YVelocity > 0)
+                 or not positive and (0 > this.PhysicsComponent.XVelocity or 0 > this.PhysicsComponent.YVelocity))">
+        <Action Type="SetAction" Target="ImageRenderComponent.Row" Value="1"/>
+        <Action Type="SetAction" Target="ImageRenderComponent.Animated" Value="true"/>
+        <Action Type="SetAction" Target="done" Value="true"/>
+      </Condition>
+
+      <Condition If="not done">
+        <Action Type="SetAction" Target="ImageRenderComponent.Row" Value="2"/>
+        <Action Type="SetAction" Target="ImageRenderComponent.Animated" Value="true"/>
+      </Condition>
+      <Action Type="SetAction" Target="done" Value="false"/>
+    </Event>
+
+    <Event Type="TriggerOccursEvent" Trigger="switch">
+      <!--Top and bottom wall, left side-->
+      <Condition If="80 + this.TransformComponent.Width/2 > this.TransformComponent.X and lr">
+        <Action Type="FireTriggerAction" Name="switchUpDown"/>
+        <Action Type="SetAction" Target="this.TransformComponent.Rotation" Value="90"/>
+        <Action Type="SetAction" Target="this.TransformComponent.X" Value="[20 + this.TransformComponent.Height/2]"/>
+        <Action Type="SetAction" Target="lr" Value="false"/>
+        <Action Type="SetAction" Target="done" Value="true"/>
+        <Action Type="SetAction" Target="positive" Value="true"/>
+      </Condition>
+      
+      <!--Top and bottom wall, right side-->
+      <Condition If="this.TransformComponent.X > 720 - this.TransformComponent.Width/2 and lr and not done">
+        <Action Type="FireTriggerAction" Name="switchUpDown"/>
+        <Action Type="SetAction" Target="this.TransformComponent.Rotation" Value="270"/>
+        <Action Type="SetAction" Target="this.TransformComponent.X" Value="[780 - this.TransformComponent.Height/2]"/>
+        <Action Type="SetAction" Target="lr" Value="false"/>
+        <Action Type="SetAction" Target="done" Value="true"/>
+        <Action Type="SetAction" Target="positive" Value="false"/>
+      </Condition>
+
+      <!--Side walls, going up-->
+      <Condition If="80 + this.TransformComponent.Width/2 > this.TransformComponent.Y and not lr and not done">
+        <Action Type="FireTriggerAction" Name="switchLeftRight"/>
+        <Action Type="SetAction" Target="this.TransformComponent.Rotation" Value="180"/>
+        <Action Type="SetAction" Target="this.TransformComponent.Y" Value="[20 + this.TransformComponent.Height/2]"/>
+        <Action Type="SetAction" Target="lr" Value="true"/>
+        <Action Type="SetAction" Target="done" Value="true"/>
+        <Action Type="SetAction" Target="positive" Value="false"/>
+      </Condition>
+      
+      <!--Side walls going down-->
+      <Condition If="this.TransformComponent.Y > 520 - this.TransformComponent.Width/2 and not lr and not done">
+        <Action Type="FireTriggerAction" Name="switchLeftRight"/>
+        <Action Type="SetAction" Target="this.TransformComponent.Rotation" Value="0"/>
+        <Action Type="SetAction" Target="this.TransformComponent.Y" Value="[580 - this.TransformComponent.Height/2]"/>
+        <Action Type="SetAction" Target="lr" Value="true"/>
+        <Action Type="SetAction" Target="positive" Value="true"/>
+      </Condition>
+      
+      <Action Type="SetAction" Target="done" Value="false"/>
+    </Event>
+  </Prototype>
+
+  <Prototype Name="mousePlayer" Prototype="basePlayer">
+    <Component Type="MouseFollowComponent" Direction="X" MinXFollow="42" MaxXFollow="758" MinYFollow="42" MaxYFollow="558"/>
+
+    <Event Type="MouseClickEvent" Button="Left">
+      <Action Type="FireTriggerAction" Name="switch"/>
+    </Event>
+
+    <Event Type="TriggerOccursEvent" Trigger="switchUpDown">
+      <Action Type="SetAction" Target="this.MouseFollowComponent.Direction" Value="Y"/>
+    </Event>
+
+    <Event Type="TriggerOccursEvent" Trigger="switchLeftRight">
+      <Action Type="SetAction" Target="this.MouseFollowComponent.Direction" Value="X"/>
+    </Event>
+  </Prototype>
+
+  <Prototype Name="keyboardPlayer" Prototype="basePlayer">
+    <Component Type="KeyboardFollowComponent" Direction="X" MinXFollow="43" MaxXFollow="758" MinYFollow="42" MaxYFollow="558" Speed="1.5"/>
+
+    <Event Type="TriggerOccursEvent" Trigger="switchUpDown">
+      <Action Type="SetAction" Target="this.KeyboardFollowComponent.Direction" Value="Y"/>
+    </Event>
+
+    <Event Type="TriggerOccursEvent" Trigger="switchLeftRight">
+      <Action Type="SetAction" Target="this.KeyboardFollowComponent.Direction" Value="X"/>
+    </Event>
+
+    <Event Type="KeyEvent" Button="Space" KeyState="Pressed">
+      <Action Type="FireTriggerAction" Name="switch"/>
+    </Event>
+  </Prototype>
+
+  <Prototype Name="keyboardPlayer2" Prototype="keyboardPlayer">
+    <Component Type="KeyboardFollowComponent" MinXFollow="45" MaxXFollow="755" MinYFollow="45" MaxYFollow="555"/>
+    <Component Type="TransformComponent" X="400" Y="558" Width="45" Height="35" />
+    <Component Type="ImageRenderComponent" Image="tailsSprites.png" Animated="false" Duration="0.7" />
+  </Prototype>
+    
+  <Scene Name="Main Menu">
+    <Entity>
+      <Component Type="TransformComponent" X="0" Y="200" Width="800" Height="50"/>
+      <Component Type="TextRenderComponent" FontFamily="Arial" FontSize="36" FontColor="Black" TextAlignment="Center" Value="Click to play with mouse. 
+                 &#13;&#10;Press space to play with keyboard
+                 &#13;&#10;To play two player (sonic mouse tails keyboard)
+                 &#13;&#10;right click, or press Z"/>
+      
+      <Event Type="KeyEvent" Button="Space" KeyState="Pressed">
+        <Action Type="SetAction" Target="game.mouse" Value="false"/>
+        <Action Type="SetAction" Target="game.keyboard" Value="true"/>
+        <Action Type="ChangeSceneAction" Target="Game"/>
+      </Event>
+
+      <Event Type="MouseClickEvent" Button="Left">
+        <Action Type="SetAction" Target="game.mouse" Value="true"/>
+        <Action Type="SetAction" Target="game.keyboard" Value="false"/>
+        <Action Type="ChangeSceneAction" Target="Game"/>
+      </Event>
+
+      <Event Type="MouseClickEvent" Button="Right">
+        <Action Type="SetAction" Target="game.mouse" Value="true"/>
+        <Action Type="SetAction" Target="game.keyboard" Value="true"/>
+        <Action Type="ChangeSceneAction" Target="Game"/>
+      </Event>
+
+      <Event Type="KeyEvent" Button="Z" KeyState="Pressed">
+        <Action Type="SetAction" Target="game.mouse" Value="true"/>
+        <Action Type="SetAction" Target="game.keyboard" Value="true"/>
+        <Action Type="ChangeSceneAction" Target="Game"/>
+      </Event>
+      
+    </Entity> 
+  </Scene>
+
+  <Scene Name="Game" next="1">
+    <!--Top, bottom, left, and right walls-->
+    <Entity Prototype="wall"/>
+    
+    <Entity Prototype="wall">
+      <Component Type="TransformComponent" Y="590"/>
+    </Entity>
+
+    <Entity Prototype="sideWall"/>
+    
+    <Entity Prototype="sideWall">
+      <Component Type="TransformComponent" X="790"/>
+    </Entity>
+    
+    <!--Top, bottom, left and right switch walls-->
+
+    <Entity Prototype="switchWall">
+      <Component Type="TransformComponent" X="10" Y="40" Width="20" Height="80"/>
+    </Entity>
+
+    <Entity Prototype="switchWall"/>
+
+    <Entity Prototype="switchWall">
+      <Component Type="TransformComponent" X="790" Y="40" Width="20" Height="80"/>
+    </Entity>
+
+    <Entity Prototype="switchWall">
+      <Component Type="TransformComponent" X="760"/>
+    </Entity>
+
+    <Entity Prototype="switchWall">
+      <Component Type="TransformComponent" Y="590"/>
+    </Entity>
+    
+    <Entity Prototype="switchWall">
+      <Component Type="TransformComponent" X="10" Y="560" Width="20" Height="80"/>
+    </Entity>
+
+    <Entity Prototype="switchWall">
+      <Component Type="TransformComponent" X="790" Y="560" Width="20" Height="80"/>
+    </Entity>
+
+    <Entity Prototype="switchWall">
+      <Component Type="TransformComponent" X="760" Y="590"/>
+    </Entity>
+
+    <!--This entity is used when the scene starts to create the main player-->
+    <Entity>
+      <Event Type="SceneStartsEvent">
+        <Condition If="game.mouse">
+          <Action Type="CreateEntityAction" Prototype="mousePlayer"/>
+        </Condition>
+
+        <Condition If="game.keyboard and not game.mouse">
+          <Action Type="CreateEntityAction" Prototype="keyboardPlayer"/>
+        </Condition>
+
+        <Condition If="game.keyboard and game.mouse">
+          <Action Type="CreateEntityAction" Prototype="keyboardPlayer2"/>
+        </Condition>
+        
+        <Action Type="CreateEntityAction" Prototype="ball"/>
+        <Action Type="FireTriggerAction" Name="create{scene.next}"/>
+        <Action Type="CreateTimerAction" Name="createTimer" Duration="2" Trigger="create" Recurring="true"/>
+      </Event>
+
+      <Event Type="TriggerOccursEvent" Trigger="create">
+        <Condition If="5 > scene.next">
+          <Action Type="CreateEntityAction" Prototype="ball"/>
+          <Action Type="FireTriggerAction" Name="create{scene.next}"/>
+        </Condition>
+      </Event>
+    </Entity>
+    
+    <Entity health="50">
+      <Component Type="TransformComponent" X="0" Y="300" Width="800" Height="50"/>
+      <Component Type="TextRenderComponent" FontFamily="Arial" FontSize="36" FontColor="Black" TextAlignment="Center"/>
+      <Event Type="TriggerOccursEvent" Trigger="decHealth">
+        <Action Type="SetAction" Target="health" Value="[health - 1]"/>
+        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="Health: [health]"/>
+
+        <Condition If="health == 0">
+          <Action Type="ChangeSceneAction" Target="Game Over"/>
+        </Condition>
+      </Event>
+    </Entity>
+
+    <Entity>
+      <Component Type="TransformComponent" X="0" Y="350" Width="800" Height="50"/>
+      <Component Type="TextRenderComponent" FontFamily="Arial" FontSize="36" FontColor="Black" TextAlignment="Center"/>
+      <Event Type="TriggerOccursEvent" Trigger="givePoint">
+        <Action Type="IncrementAction" Target="game.score"/>
+        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="score: [game.score]"/>
+      </Event>
+    </Entity>
+  </Scene>
+  
+  <Scene Name="Game Over">
+    <Entity>
+      <Component Type="TransformComponent" X="0" Y="350" Width="800" Height="50"/>
+      <Component Type="TextRenderComponent" FontFamily="Arial" FontWeight="Normal" FontStyle="Normal" FontStretch="Normal" FontSize="36" FontColor="Black" TextAlignment="Center"/>
+      <Event Type="SceneStartsEvent">
+        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="game over, final score: [game.score]"/>
+        <Action Type="CreateTimerAction" Name="restart" Duration="2" Trigger="restart" Recurring="false"/>
+      </Event>
+
+      <Event Type="TriggerOccursEvent" Trigger="restart">
+        <Action Type="SetAction" Target="game.score" Value="0"/>
+        <Action Type="ChangeSceneAction" Target="Main Menu"/>
+      </Event>
+    </Entity>
+  </Scene>
+</Game>

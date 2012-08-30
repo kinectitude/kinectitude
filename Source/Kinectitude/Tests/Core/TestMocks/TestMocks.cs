@@ -148,6 +148,8 @@ namespace Kinectitude.Tests.Core.TestMocks
         public ITypeMatcher TypeMatcher { get; set; }
         [Plugin("", "")]
         public IExpressionReader Expression { get; set; }
+        [Plugin("", "")]
+        public string Sexpr { get; set; }
         public bool hasInit = false;
         public override void OnInitialize() { hasInit = true; }
     }

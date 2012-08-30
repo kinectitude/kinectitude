@@ -8,29 +8,24 @@ namespace Kinectitude.Core.Base
 {    
     internal class Scene : DataContainer
     {
-        internal readonly Dictionary<Type, IManager> ManagersDictionary;
-        internal readonly List<IManager> Managers;
         private readonly Dictionary<string, List<TriggerOccursEvent>> triggers;
         private readonly SceneLoader seceneLoader;
-
         private readonly Dictionary<string, List<Timer>> runningTimers = new Dictionary<string, List<Timer>>();
         private readonly Dictionary<string, List<Timer>> pausedTimers = new Dictionary<string, List<Timer>>();
 
+        internal readonly Dictionary<Type, IManager> ManagersDictionary;
+        internal readonly List<IManager> Managers;
+
         private bool started = false;
+        private bool running = false;
 
         internal List<SceneStartsEvent> OnStart { get; private set; }
-
         internal Game Game { get; private set; }
-
         internal Dictionary<string, HashSet<int>> IsType { get; private set; }
-
         internal Dictionary<string, HashSet<int>> IsExactType { get; private set; }
-
         internal Dictionary<int, Entity> EntityById { get; private set; }
-
         internal Dictionary<string, Entity> EntityByName { get; private set; }
 
-        private bool running = false;
         internal bool Running
         {
             get { return running; }

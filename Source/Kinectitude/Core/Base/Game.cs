@@ -9,7 +9,11 @@ namespace Kinectitude.Core.Base
     {
         //public to see if types exist
         public readonly GameLoader GameLoader;
+#if TEST
+        internal readonly Stack<Scene> currentScenes = new Stack<Scene>();
+#else
         private readonly Stack<Scene> currentScenes = new Stack<Scene>();
+#endif
         private readonly Dictionary<Type, Service> services = new Dictionary<Type, Service>();
 
         internal static Game CurrentGame { get; private set; }

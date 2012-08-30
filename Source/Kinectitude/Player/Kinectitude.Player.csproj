@@ -113,6 +113,10 @@
     </Content>
     <Content Include="breakout.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="game.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="oldgame.xml">
       <SubType>Designer</SubType>
@@ -120,7 +124,7 @@
     <Content Include="reversi.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="game.xml">
+    <Content Include="mygame.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
