@@ -26,6 +26,8 @@ namespace Kinectitude.Core.Base
         internal Dictionary<int, Entity> EntityById { get; private set; }
         internal Dictionary<string, Entity> EntityByName { get; private set; }
 
+        internal readonly List<TimerEvt> TimerEvts = new List<TimerEvt>();
+
         internal bool Running
         {
             get { return running; }
@@ -73,6 +75,47 @@ namespace Kinectitude.Core.Base
 
         internal void OnUpdate(float frameDelta)
         {
+            foreach (TimerEvt timeEvt in TimerEvts)
+            {
+                string name = timeEvt.Name;
+                Dictionary<string, List<Timer>> inDict;
+                Dictionary<string, List<Timer>> otherDict;
+
+                if (timeEvt.Type == EType.Pause)
+                {
+                    inDict = pausedTimers;
+                    otherDict = runningTimers;
+                }
+                else
+                {
+                    inDict = runningTimers;
+                    otherDict = pausedTimers;
+                }
+
+                List<Timer> timerList;
+                if (!inDict.TryGetValue(name, out timerList))
+                {
+                    timerList = new List<Timer>();
+                    inDict.Add(name, timerList);
+                }
+
+                if (EType.Create == timeEvt.Type)
+                {
+                    timerList.Add(timeEvt.Timer);
+                }
+                else
+                {
+                    List<Timer> fromOther;
+                    if (otherDict.TryGetValue(name, out fromOther))
+                    {
+                        timerList.AddRange(fromOther);
+                        fromOther.Clear();
+                    }
+                }
+            }
+
+            TimerEvts.Clear();
+
             //should not be updated if not running
             foreach (IManager m in Managers)
             {
@@ -89,10 +132,7 @@ namespace Kinectitude.Core.Base
                     if (timer.tick(frameDelta))
                     {
                         FireTrigger(timer.ExpressionReader.GetValue());
-                        if (!timer.Recurring)
-                        {
-                            remove.Add(timer);
-                        }
+                        if (!timer.Recurring) remove.Add(timer);
                     }
                 }
                 foreach (Timer timer in remove)
@@ -170,41 +210,17 @@ namespace Kinectitude.Core.Base
         }
         internal void AddTimer(string name, float time, IExpressionReader expressionReader, bool recurring)
         {
-            Timer t = new Timer(expressionReader, time, recurring);
-            List<Timer> timerList;
-            if (!runningTimers.TryGetValue(name, out timerList))
-            {
-                if (!pausedTimers.TryGetValue(name, out timerList))
-                {
-                    timerList = new List<Timer>();
-                }
-                else
-                {
-                    pausedTimers.Remove(name);
-                }
-            }
-            timerList.Add(t);
-            runningTimers.Add(name, timerList);
+            TimerEvts.Add(new TimerEvt(EType.Create, name, new Timer(expressionReader, time, recurring)));
         }
 
         internal void ResumeTimers(string name)
         {
-            List<Timer> timerList;
-            if (pausedTimers.TryGetValue(name, out timerList))
-            {
-                pausedTimers.Remove(name);
-                runningTimers.Add(name, timerList);
-            }
+            TimerEvts.Add(new TimerEvt(EType.Resume, name));
         }
 
         internal void PauseTimers(string name)
         {
-            List<Timer> timerList;
-            if (runningTimers.TryGetValue(name, out timerList))
-            {
-                runningTimers.Remove(name);
-                pausedTimers.Add(name, timerList);
-            }
+            TimerEvts.Add(new TimerEvt(EType.Pause, name));
         }
 
         internal void DeleteEntity(Entity delete)

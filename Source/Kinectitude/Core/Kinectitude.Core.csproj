@@ -91,6 +91,7 @@
     <Compile Include="Base\Service.cs" />
     <Compile Include="Base\Scene.cs" />
     <Compile Include="Base\Timer.cs" />
+    <Compile Include="Base\TimerEvt.cs" />
     <Compile Include="ComponentInterfaces\IPhysicsComponent.cs" />
     <Compile Include="Base\IUpdateable.cs" />
     <Compile Include="Base\Manager.cs" />
