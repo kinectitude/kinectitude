@@ -14,7 +14,6 @@ namespace IronlyLangTest
     {
         private IdentifierTerminal identifier = TerminalFactory.CreateCSharpIdentifier("identifier");
         private RegexBasedTerminal name = new RegexBasedTerminal("name", "[a-zA-Z][a-zA-Z0-9_]*");
-        private RegexBasedTerminal anything = new RegexBasedTerminal("value", @"[^ {}]+");
 
         private void createDefinitionsRules(NonTerminal many, NonTerminal single, string type, BnfTerm definedAs)
         {
@@ -24,6 +23,24 @@ namespace IronlyLangTest
 
         public TestGrammar()
         {
+            Terminal openBrace = ToTerm("{");
+            Terminal closeBrace = ToTerm("}");
+            Terminal equals = ToTerm("=");
+            Terminal colon = ToTerm(":");
+            Terminal eql = ToTerm("==");
+            Terminal lt = ToTerm("<");
+            Terminal gt = ToTerm(">");
+            Terminal le = ToTerm("<=");
+            Terminal ge = ToTerm(">=");
+            Terminal ne = ToTerm("!=");
+            Terminal plus = ToTerm("+");
+            Terminal minus = ToTerm("-");
+            Terminal mult = ToTerm("*");
+            Terminal div = ToTerm("/");
+            Terminal rem = ToTerm("%");
+            Terminal openBrac = ToTerm("(");
+            Terminal closeBrac = ToTerm(")");
+
             NonTerminal game = new NonTerminal("game");
 
             NonTerminal scenes = new NonTerminal("scenes");
@@ -63,22 +80,58 @@ namespace IronlyLangTest
             NonTerminal definitions = new NonTerminal("definitions");
             NonTerminal define = new NonTerminal("define");
 
-            Terminal openBrace = ToTerm("{");
-            Terminal closeBrace = ToTerm("}");
-            Terminal equals = ToTerm("=");
-            Terminal colon = ToTerm(":");
-            Terminal eql = ToTerm("==");
-            Terminal lt = ToTerm("<");
-            Terminal gt = ToTerm(">");
-            Terminal le = ToTerm("<=");
-            Terminal ge = ToTerm(">=");
-            Terminal ne = ToTerm("!=");
-            Terminal openBrac = ToTerm("(");
-            Terminal closeBrac = ToTerm(")");
+            NonTerminal value = new NonTerminal("value");
 
-            MarkPunctuation(colon, eql, lt, gt, le, ge, ne, openBrac, closeBrac);
+            Terminal numericValue = TerminalFactory.CreateCSharpNumber("number");
+
+            NonTerminal boolVal = new NonTerminal("boolVal");
+            boolVal.Rule = ToTerm("true") | ToTerm("false");
+
+            Terminal and = new RegexBasedTerminal("and", @"and|&&");
+            Terminal or = new RegexBasedTerminal("or", @"or|\|\|");
+
+            NonTerminal threeVal = new NonTerminal("threeVal");
+            threeVal.Rule = name + "." + identifier + "." + identifier;
+
+            NonTerminal twoVal = new NonTerminal("twoVal");
+            twoVal.Rule = identifier + "." + identifier;
+
+            NonTerminal isType = new NonTerminal("isType");
+            isType.Rule = "$" + twoVal | "$" + threeVal;
+
+            NonTerminal isExactType = new NonTerminal("isExactType");
+            isExactType.Rule = "#" + twoVal | "#" + threeVal;
+
+            NonTerminal parentVal = new NonTerminal("parentVal");
+            parentVal.Rule = "@" + twoVal | "@" + threeVal;
+
+            NonTerminal parentLiteral = new NonTerminal("parentLiteral");
+            parentLiteral.Rule = "@" + identifier;
+
+            Terminal number = TerminalFactory.CreateCSharpNumber("number");
+
+            NonTerminal numericExpr = new NonTerminal("numericExpr");
+            //TODO numeric
+            numericExpr.Rule = number | "-" + number;
+
+            NonTerminal boolExpr = new NonTerminal("boolExpr");
+            //TODO bool
+            boolExpr.Rule = ToTerm("true") | ToTerm("false");
+
+            NonTerminal strExpr = new NonTerminal("strExpr");
+            Terminal str = TerminalFactory.CreateCSharpString("str");
+            strExpr.Rule = str | str + plus + strExpr;
+
+            NonTerminal typeMatcher = new NonTerminal("typeMatcher");
+            typeMatcher.Rule = isType | isExactType | identifier + plus + typeMatcher 
+                | isType + plus + typeMatcher | isExactType + plus + typeMatcher;
+
+            MarkPunctuation(colon, eql, lt, gt, le, ge, ne, openBrac, closeBrac, plus, minus, div, mult, rem);
             RegisterBracePair("(", ")");
             RegisterBracePair("{", "}");
+
+            value.Rule = identifier | twoVal | threeVal | isType | isExactType
+                | parentVal | parentLiteral | numericExpr | boolExpr | strExpr | identifier;
 
             names.Rule = names + name | name;
             isPrototype.Rule = colon + names | Empty;
@@ -86,9 +139,8 @@ namespace IronlyLangTest
             basicDefinition.Rule = openBrace + properties + closeBrace;
 
             //TODO make this better
-            properties.Rule = properties + identifier + equals + anything | Empty;
+            properties.Rule = properties + identifier + equals + value | Empty;
             entityDefinition.Rule = isPrototype + openBrace + properties + components + evts + closeBrace;
-
 
             createDefinitionsRules(prototypes, prototype, "Prototype", entityDefinition);
             createDefinitionsRules(managers, manager, "Manager", basicDefinition);
@@ -110,10 +162,13 @@ namespace IronlyLangTest
             scenes.Rule = scene + scenes | scene;
             scene.Rule = "Scene" + name + openBrace + properties + managers + entities + closeBrace;
 
+            NonTerminal className = new NonTerminal("className");
+            className.Rule = identifier | identifier + "." + className;
+
             uses.Rule = files + uses | Empty;
-            files.Rule = "using" + anything + openBrace + definitions + closeBrace;
+            files.Rule = "using" + className + openBrace + definitions + closeBrace;
             //TODO this may need better logic?
-            define.Rule = "define" + identifier + "as" + anything;
+            define.Rule = "define" + identifier + "as" + className;
             definitions.Rule = define + definitions | define;
 
             game.Rule = uses + "Game" + name + openBrace  + properties + prototypes + scenes + closeBrace;

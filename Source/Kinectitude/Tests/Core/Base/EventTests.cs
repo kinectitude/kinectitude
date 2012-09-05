@@ -53,7 +53,7 @@ namespace Kinectitude.Tests.Core.Base
 
             foreach (ActionMock action in actionList)
             {
-                Assert.IsTrue(action.hasRun);
+                Assert.IsTrue(action.HasRun);
             }
         }
 

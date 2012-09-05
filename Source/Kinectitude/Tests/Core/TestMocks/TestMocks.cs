@@ -138,8 +138,8 @@ namespace Kinectitude.Tests.Core.TestMocks
         public ITypeMatcher TypeMatcher { get; set; }
         [Plugin("", "")]
         public IValueWriter Writer { get; set; }
-        public bool hasRun { get; private set; }
-        public override void Run() { hasRun = true; }
+        public bool HasRun { get; set; }
+        public override void Run() { HasRun = true; }
     }
 
     public class EventMock : Event
