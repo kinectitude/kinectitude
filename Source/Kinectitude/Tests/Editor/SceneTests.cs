@@ -1,16 +1,17 @@
 ﻿using System.Linq;
 using Kinectitude.Editor.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Kinectitude.Editor.Models;
 
 namespace Kinectitude.Editor.Tests
 {
     [TestClass]
-    public class SceneViewModelTests
+    public class SceneTests
     {
         [TestMethod]
         public void SetName()
         {
-            SceneViewModel scene = new SceneViewModel("Test Scene");
+            Scene scene = new Scene("Test Scene");
 
             Assert.AreEqual(scene.Name, "Test Scene");
         }
@@ -18,9 +19,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AddAttribute()
         {
-            SceneViewModel scene = new SceneViewModel("Test Scene");
+            Scene scene = new Scene("Test Scene");
             
-            AttributeViewModel attribute = new AttributeViewModel("test");
+            Attribute attribute = new Attribute("test");
             scene.AddAttribute(attribute);
 
             Assert.AreEqual(1, scene.Attributes.Count(x => x.Key == "test"));
@@ -29,9 +30,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void RemoveAttribute()
         {
-            SceneViewModel scene = new SceneViewModel("Test Scene");
+            Scene scene = new Scene("Test Scene");
             
-            AttributeViewModel attribute = new AttributeViewModel("test");
+            Attribute attribute = new Attribute("test");
             scene.AddAttribute(attribute);
             scene.RemoveAttribute(attribute);
 
@@ -41,9 +42,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AddEntity()
         {
-            SceneViewModel scene = new SceneViewModel("Test Scene");
+            Scene scene = new Scene("Test Scene");
             
-            EntityViewModel entity = new EntityViewModel();
+            Entity entity = new Entity();
             scene.AddEntity(entity);
 
             Assert.AreEqual(1, scene.Entities.Count());
@@ -52,9 +53,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void RemoveEntity()
         {
-            SceneViewModel scene = new SceneViewModel("Test Scene");
+            Scene scene = new Scene("Test Scene");
             
-            EntityViewModel entity = new EntityViewModel();
+            Entity entity = new Entity();
             scene.AddEntity(entity);
             scene.RemoveEntity(entity);
 
@@ -64,9 +65,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void SceneAttributeCannotInherit()
         {
-            SceneViewModel scene = new SceneViewModel("Test Scene");
+            Scene scene = new Scene("Test Scene");
 
-            AttributeViewModel attribute = new AttributeViewModel("test");
+            Attribute attribute = new Attribute("test");
             scene.AddAttribute(attribute);
 
             Assert.IsFalse(attribute.CanInherit);

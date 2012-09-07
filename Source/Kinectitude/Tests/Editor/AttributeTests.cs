@@ -1,16 +1,17 @@
 ﻿using System.Linq;
 using Kinectitude.Editor.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Kinectitude.Editor.Models;
 
 namespace Kinectitude.Editor.Tests
 {
     [TestClass]
-    public class AttributeViewModelTests
+    public class AttributeTests
     {
         [TestMethod]
         public void SetKey()
         {
-            AttributeViewModel attribute = new AttributeViewModel("test");
+            Attribute attribute = new Attribute("test");
             attribute.Key = "test2";
 
             Assert.AreEqual("test2", attribute.Key);
@@ -19,7 +20,7 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void SetValue()
         {
-            AttributeViewModel attribute = new AttributeViewModel("test");
+            Attribute attribute = new Attribute("test");
             attribute.Value = "value";
 
             Assert.AreEqual("value", attribute.Value);
@@ -28,15 +29,15 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void KeyFollowsInheritedAttribute()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
             
-            AttributeViewModel parentAttribute = new AttributeViewModel("test");
+            Attribute parentAttribute = new Attribute("test");
             parent.AddAttribute(parentAttribute);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
-            AttributeViewModel childAttribute = child.GetAttribute("test");
+            Attribute childAttribute = child.GetAttribute("test");
 
             parentAttribute.Key = "test2";
 
@@ -48,15 +49,15 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void ValueFollowsInheritedAttribute()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
             
-            AttributeViewModel parentAttribute = new AttributeViewModel("test");
+            Attribute parentAttribute = new Attribute("test");
             parent.AddAttribute(parentAttribute);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
-            AttributeViewModel childAttribute = child.GetAttribute("test");
+            Attribute childAttribute = child.GetAttribute("test");
 
             parentAttribute.Value = "value";
 
@@ -66,17 +67,17 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void SetInheritedAttributeToLocal()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
             
-            AttributeViewModel parentAttribute = new AttributeViewModel("test");
+            Attribute parentAttribute = new Attribute("test");
             parent.AddAttribute(parentAttribute);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
             Assert.AreEqual(1, child.Attributes.Count(x => x.IsInherited));
 
-            AttributeViewModel childAttribute = child.GetAttribute("test");
+            Attribute childAttribute = child.GetAttribute("test");
 
             Assert.IsTrue(childAttribute.CanInherit);
 
@@ -89,15 +90,15 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void SetLocalAttributeToInherited()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
             
-            AttributeViewModel parentAttribute = new AttributeViewModel("test");
+            Attribute parentAttribute = new Attribute("test");
             parent.AddAttribute(parentAttribute);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
-            AttributeViewModel childAttribute = child.GetAttribute("test");
+            Attribute childAttribute = child.GetAttribute("test");
 
             Assert.IsTrue(childAttribute.CanInherit);
             

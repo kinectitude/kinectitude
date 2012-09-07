@@ -1,16 +1,17 @@
 ﻿using System.Linq;
 using Kinectitude.Editor.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Kinectitude.Editor.Models;
 
 namespace Kinectitude.Editor.Tests
 {
     [TestClass]
-    public class EntityViewModelTests
+    public class EntityTests
     {
         [TestMethod]
         public void SetName()
         {
-            EntityViewModel entity = new EntityViewModel();
+            Entity entity = new Entity();
             entity.Name = "entity";
 
             Assert.AreEqual("entity", entity.Name);
@@ -19,9 +20,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AddPrototype()
         {
-            EntityViewModel entity = new EntityViewModel();
+            Entity entity = new Entity();
 
-            EntityViewModel prototype = new EntityViewModel() { Name = "prototype" };
+            Entity prototype = new Entity() { Name = "prototype" };
             entity.AddPrototype(prototype);
 
             Assert.AreEqual(1, entity.Prototypes.Where(x => x.Name == "prototype").Count());
@@ -30,9 +31,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void RemovePrototype()
         {
-            EntityViewModel entity = new EntityViewModel();
+            Entity entity = new Entity();
             
-            EntityViewModel prototype = new EntityViewModel() { Name = "prototype" };
+            Entity prototype = new Entity() { Name = "prototype" };
             entity.AddPrototype(prototype);
             entity.RemovePrototype(prototype);
 
@@ -42,9 +43,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void PrototypeMustHaveName()
         {
-            EntityViewModel entity = new EntityViewModel();
+            Entity entity = new Entity();
 
-            EntityViewModel prototype = new EntityViewModel();
+            Entity prototype = new Entity();
             entity.AddPrototype(prototype);
 
             Assert.AreEqual(0, entity.Prototypes.Count());
@@ -53,9 +54,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AddLocalAttribute()
         {
-            EntityViewModel entity = new EntityViewModel();
+            Entity entity = new Entity();
             
-            AttributeViewModel attribute = new AttributeViewModel("test");
+            Attribute attribute = new Attribute("test");
             entity.AddAttribute(attribute);
 
             Assert.AreEqual(1, entity.Attributes.Where(x => x.Key == "test").Count());
@@ -64,10 +65,10 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void EntityInheritsAttributeFromPrototype()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
-            parent.AddAttribute(new AttributeViewModel("test"));
+            Entity parent = new Entity() { Name = "parent" };
+            parent.AddAttribute(new Attribute("test"));
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
             Assert.AreEqual(1, parent.Attributes.Where(x => x.Key == "test").Count());
@@ -77,9 +78,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void RemoveLocalAttribute()
         {
-            EntityViewModel entity = new EntityViewModel();
+            Entity entity = new Entity();
             
-            AttributeViewModel attribute = new AttributeViewModel("test");
+            Attribute attribute = new Attribute("test");
             entity.AddAttribute(attribute);
             entity.RemoveAttribute(attribute);
 
@@ -89,10 +90,10 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void CannotAddDuplicateAttributeKey()
         {
-            EntityViewModel entity = new EntityViewModel();
+            Entity entity = new Entity();
 
-            entity.AddAttribute(new AttributeViewModel("test"));
-            entity.AddAttribute(new AttributeViewModel("test"));
+            entity.AddAttribute(new Attribute("test"));
+            entity.AddAttribute(new Attribute("test"));
 
             Assert.AreEqual(1, entity.Attributes.Where(x => x.Key == "test").Count());
         }
@@ -100,13 +101,13 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void CannotRemoveInheritedAttribute()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
-            parent.AddAttribute(new AttributeViewModel("test"));
+            Entity parent = new Entity() { Name = "parent" };
+            parent.AddAttribute(new Attribute("test"));
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
-            AttributeViewModel childAttribute = child.GetAttribute("test");
+            Attribute childAttribute = child.GetAttribute("test");
             child.RemoveAttribute(childAttribute);
 
             Assert.AreEqual(1, child.Attributes.Where(x => x.Key == "test").Count());
@@ -115,15 +116,15 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AttributeBecomesInheritableAfterParentKeyChange()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
             
-            AttributeViewModel attribute = new AttributeViewModel("test") { Value = "value" };
+            Attribute attribute = new Attribute("test") { Value = "value" };
             parent.AddAttribute(attribute);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
             
-            AttributeViewModel childAttribute = new AttributeViewModel("test2") { Value = "new value" };
+            Attribute childAttribute = new Attribute("test2") { Value = "new value" };
             child.AddAttribute(childAttribute);
 
             Assert.IsFalse(childAttribute.CanInherit);
@@ -138,10 +139,10 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void CannotSetExistingAttributeKeyToDuplicate()
         {
-            EntityViewModel entity = new EntityViewModel();
-            entity.AddAttribute(new AttributeViewModel("test1"));
+            Entity entity = new Entity();
+            entity.AddAttribute(new Attribute("test1"));
 
-            AttributeViewModel attribute = new AttributeViewModel("test2");
+            Attribute attribute = new Attribute("test2");
             entity.AddAttribute(attribute);
 
             attribute.Key = "test1";
@@ -153,17 +154,17 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AttributeBecomesInheritableAfterAddToParent()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
             
-            AttributeViewModel attribute = new AttributeViewModel("test") { Value = "value" };
+            Attribute attribute = new Attribute("test") { Value = "value" };
             child.AddAttribute(attribute);
 
             Assert.IsFalse(attribute.CanInherit);
 
-            AttributeViewModel parentAttribute = new AttributeViewModel("test") { Value = "new value" };
+            Attribute parentAttribute = new Attribute("test") { Value = "new value" };
             parent.AddAttribute(parentAttribute);
 
             Assert.IsTrue(attribute.CanInherit);
@@ -174,17 +175,17 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AttributeBecomesInheritableAfterPrototypeChange()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
 
-            EntityViewModel parentWithAttribute = new EntityViewModel() { Name = "parentWithAttribute" };
+            Entity parentWithAttribute = new Entity() { Name = "parentWithAttribute" };
             
-            AttributeViewModel attribute = new AttributeViewModel("test") { Value = "new value" };
+            Attribute attribute = new Attribute("test") { Value = "new value" };
             parentWithAttribute.AddAttribute(attribute);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
             
-            AttributeViewModel childAttribute = new AttributeViewModel("test") { Value = "value" };
+            Attribute childAttribute = new Attribute("test") { Value = "value" };
             child.AddAttribute(childAttribute);
 
             Assert.IsFalse(childAttribute.CanInherit);
@@ -199,15 +200,15 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AttributesBecomesNonInheritableAfterParentKeyChange()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
             
-            AttributeViewModel attribute = new AttributeViewModel("test") { Value = "value" };
+            Attribute attribute = new Attribute("test") { Value = "value" };
             parent.AddAttribute(attribute);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
             
-            AttributeViewModel childAttribute = child.GetAttribute("test");
+            Attribute childAttribute = child.GetAttribute("test");
             childAttribute.IsInherited = false;
             childAttribute.Value = "new value";
 
@@ -222,15 +223,15 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AttributeBecomesNonInheritableAfterLocalKeyChange()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
             
-            AttributeViewModel attribute = new AttributeViewModel("test") { Value = "value" };
+            Attribute attribute = new Attribute("test") { Value = "value" };
             parent.AddAttribute(attribute);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
             
-            AttributeViewModel childAttribute = child.GetAttribute("test");
+            Attribute childAttribute = child.GetAttribute("test");
             childAttribute.IsInherited = false;
             childAttribute.Value = "new value";
 
@@ -246,15 +247,15 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AttributeBecomesNonInheritableAfterRemoveFromParent()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
             
-            AttributeViewModel attribute = new AttributeViewModel("test") { Value = "value" };
+            Attribute attribute = new Attribute("test") { Value = "value" };
             parent.AddAttribute(attribute);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
-            AttributeViewModel childAttribute = child.GetAttribute("test");
+            Attribute childAttribute = child.GetAttribute("test");
             childAttribute.IsInherited = false;
             childAttribute.Value = "new value";
 
@@ -270,17 +271,17 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AttributeBecomesNonInheritableAfterPrototypeChange()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
 
-            EntityViewModel parentWithAttribute = new EntityViewModel() { Name = "parentWithAttribute" };
+            Entity parentWithAttribute = new Entity() { Name = "parentWithAttribute" };
             
-            AttributeViewModel attribute = new AttributeViewModel("test") { Value = "new value" };
+            Attribute attribute = new Attribute("test") { Value = "new value" };
             parentWithAttribute.AddAttribute(attribute);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parentWithAttribute);
 
-            AttributeViewModel childAttribute = child.GetAttribute("test");
+            Attribute childAttribute = child.GetAttribute("test");
             childAttribute.IsInherited = false;
             childAttribute.Value = "value";
 
@@ -296,15 +297,15 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void InheritableAttributeExposesParentAttributeAfterKeyChange()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
-            parent.AddAttribute(new AttributeViewModel("test") { Value = "value" });
+            Entity parent = new Entity() { Name = "parent" };
+            parent.AddAttribute(new Attribute("test") { Value = "value" });
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
             Assert.AreEqual(child.Attributes.Count, 1);
 
-            AttributeViewModel childAttribute = child.GetAttribute("test");
+            Attribute childAttribute = child.GetAttribute("test");
             childAttribute.IsInherited = false;
             childAttribute.Key = "test2";
 
@@ -316,15 +317,15 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void ParentAttributeAvailableInChildAfterKeyChange()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
             
-            AttributeViewModel parentAttribute = new AttributeViewModel("test") { Value = "value" };
+            Attribute parentAttribute = new Attribute("test") { Value = "value" };
             parent.AddAttribute(parentAttribute);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
-            AttributeViewModel childAttribute = child.GetAttribute("test");
+            Attribute childAttribute = child.GetAttribute("test");
             childAttribute.IsInherited = false;
             parentAttribute.Key = "test2";
 
@@ -336,13 +337,13 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void CannotAddDuplicateNameInSameScope()
         {
-            GameViewModel game = new GameViewModel("Test Game");
-            game.AddPrototype(new EntityViewModel() { Name = "TestEntity" });
+            Game game = new Game("Test Game");
+            game.AddPrototype(new Entity() { Name = "TestEntity" });
 
-            SceneViewModel scene = new SceneViewModel("Test Scene");
+            Scene scene = new Scene("Test Scene");
             game.AddScene(scene);
 
-            EntityViewModel entity = new EntityViewModel() { Name = "TestEntity" };
+            Entity entity = new Entity() { Name = "TestEntity" };
             scene.AddEntity(entity);
 
             Assert.AreEqual(0, scene.Entities.Count);
@@ -351,9 +352,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AnonymousEntitiesDoNotHaveEqualNames()
         {
-            SceneViewModel scene = new SceneViewModel("Test Scene");
-            scene.AddEntity(new EntityViewModel());
-            scene.AddEntity(new EntityViewModel());
+            Scene scene = new Scene("Test Scene");
+            scene.AddEntity(new Entity());
+            scene.AddEntity(new Entity());
 
             Assert.AreEqual(2, scene.Entities.Count);
         }
@@ -361,12 +362,12 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void CannotRenameToDuplicateNameInSameScope()
         {
-            GameViewModel game = new GameViewModel("Test Game");
-            game.AddPrototype(new EntityViewModel() { Name = "TestEntity" });
+            Game game = new Game("Test Game");
+            game.AddPrototype(new Entity() { Name = "TestEntity" });
 
-            SceneViewModel scene = new SceneViewModel("Test Scene");
+            Scene scene = new Scene("Test Scene");
             
-            EntityViewModel entity = new EntityViewModel() { Name = "TestEntity2" };
+            Entity entity = new Entity() { Name = "TestEntity2" };
             scene.AddEntity(entity);
             
             game.AddScene(scene);
@@ -380,18 +381,18 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void CanAddDuplicateNameInDifferentScope()
         {
-            GameViewModel game = new GameViewModel("Test Game");
+            Game game = new Game("Test Game");
 
-            SceneViewModel scene1 = new SceneViewModel("Test Scene");
+            Scene scene1 = new Scene("Test Scene");
 
-            EntityViewModel entity1 = new EntityViewModel() { Name = "TestEntity" };
+            Entity entity1 = new Entity() { Name = "TestEntity" };
             scene1.AddEntity(entity1);
 
             game.AddScene(scene1);
 
-            SceneViewModel scene2 = new SceneViewModel("Test Scene 2");
+            Scene scene2 = new Scene("Test Scene 2");
 
-            EntityViewModel entity2 = new EntityViewModel() { Name = "TestEntity" };
+            Entity entity2 = new Entity() { Name = "TestEntity" };
             scene2.AddEntity(entity2);
             
             game.AddScene(scene2);

@@ -319,7 +319,7 @@ namespace Kinectitude.Editor.Models
 
         string IPluginNamespace.GetDefinedName(Plugin plugin)
         {
-            return null != scope ? scope.GetDefinedName(plugin) : null;
+            return null != scope ? scope.GetDefinedName(plugin) : plugin.ClassName;
         }
 
         bool IAttributeScope.HasInheritedAttribute(string key)

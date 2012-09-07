@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Kinectitude.Editor.Models.Interfaces;
+using System;
 
 namespace Kinectitude.Editor.Models
 {
@@ -40,6 +41,11 @@ namespace Kinectitude.Editor.Models
 
         public Event(Plugin plugin)
         {
+            if (plugin.Type != PluginType.Event)
+            {
+                throw new ArgumentException("Plugin is not an event");
+            }
+
             this.plugin = plugin;
 
             foreach (string property in plugin.Properties)

@@ -69,6 +69,11 @@ namespace Kinectitude.Editor.Models
 
         public Component(Plugin plugin)
         {
+            if (plugin.Type != PluginType.Component)
+            {
+                throw new ArgumentException("Plugin is not a component");
+            }
+
             this.plugin = plugin;
             
             properties = new List<Property>();

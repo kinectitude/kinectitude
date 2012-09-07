@@ -635,7 +635,7 @@ namespace Kinectitude.Editor.Models
                 }
             }
 
-            return null;
+            return plugin.ClassName;
         }
     }
 }

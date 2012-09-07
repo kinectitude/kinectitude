@@ -2,6 +2,7 @@
 using System.Linq;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Base;
+using System;
 
 namespace Kinectitude.Editor.Models
 {
@@ -34,6 +35,11 @@ namespace Kinectitude.Editor.Models
 
         public Manager(Plugin plugin)
         {
+            if (plugin.Type != PluginType.Manager)
+            {
+                throw new ArgumentException("Plugin is not an manager");
+            }
+
             this.plugin = plugin;
 
             Properties = new ObservableCollection<Property>();

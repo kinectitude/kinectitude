@@ -555,8 +555,13 @@ namespace Kinectitude.Editor.Models
             {
                 foreach (string require in component.Requires)
                 {
-                    Component requiredComponent = new Component(GetPlugin(require));
-                    AddComponent(requiredComponent);
+                    Plugin plugin = GetPlugin(require);
+
+                    if (plugin.Type == PluginType.Component)
+                    {
+                        Component requiredComponent = new Component(plugin);
+                        AddComponent(requiredComponent);
+                    }
                 }
 
                 component.SetScope(this);

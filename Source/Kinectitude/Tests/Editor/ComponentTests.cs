@@ -1,17 +1,18 @@
 ﻿using System.Linq;
 using Kinectitude.Core.Attributes;
-using Kinectitude.Core.Base;
 using Kinectitude.Core.Components;
 using Kinectitude.Editor.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Kinectitude.Editor.Models;
+using System;
 
 namespace Kinectitude.Editor.Tests
 {
     [TestClass]
-    public class ComponentViewModelTests
+    public class ComponentTests
     {
         [Plugin("Dependent Manager", "")]
-        private class DependentManager : Manager<DependentComponent>
+        private class DependentManager : Kinectitude.Core.Base.Manager<DependentComponent>
         {
             public override void OnUpdate(float frameDelta) { }
         }
@@ -19,7 +20,7 @@ namespace Kinectitude.Editor.Tests
         [Plugin("Dependent Component", "")]
         [Requires(typeof(TransformComponent))]
         [Requires(typeof(DependentManager))]
-        private class DependentComponent : Component
+        private class DependentComponent : Kinectitude.Core.Base.Component
         {
             public override void Destroy() { }
         }
@@ -29,17 +30,17 @@ namespace Kinectitude.Editor.Tests
         private static readonly string DependentComponentType = typeof(DependentComponent).FullName;
         private static readonly string DependentManagerType = typeof(DependentManager).FullName;
 
-        public ComponentViewModelTests()
+        public ComponentTests()
         {
-            Workspace.Instance.AddPlugin(new PluginViewModel(typeof(DependentComponent)));
-            Workspace.Instance.AddPlugin(new PluginViewModel(typeof(DependentManager)));
+            Workspace.Instance.AddPlugin(new Plugin(typeof(DependentComponent)));
+            Workspace.Instance.AddPlugin(new Plugin(typeof(DependentManager)));
         }
 
         [TestMethod]
         public void AddLocalComponent()
         {
-            EntityViewModel entity = new EntityViewModel();
-            entity.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
+            Entity entity = new Entity();
+            entity.AddComponent(new Component(Workspace.Instance.GetPlugin(TransformComponentType)));
 
             Assert.AreEqual(1, entity.Components.Count(x => x.Type == TransformComponentType));
         }
@@ -47,9 +48,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void RemoveLocalComponent()
         {
-            EntityViewModel entity = new EntityViewModel();
+            Entity entity = new Entity();
             
-            ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            Component component = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             entity.AddComponent(component);
             entity.RemoveComponent(component);
 
@@ -59,12 +60,12 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void RemoveRootComponent()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
             
-            ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            Component component = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             parent.AddComponent(component);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
             parent.RemoveComponent(component);
@@ -76,16 +77,16 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void RemoveRootComponentWhenInheritedComponentHasProperties()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
             
-            ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            Component component = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             parent.AddComponent(component);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
-            ComponentViewModel childComponent = child.GetComponentByType(TransformComponentType);
-            PropertyViewModel childProperty = childComponent.GetProperty("X");
+            Component childComponent = child.GetComponentByType(TransformComponentType);
+            Property childProperty = childComponent.GetProperty("X");
             childProperty.IsInherited = false;
             childProperty.Value = 500;
 
@@ -99,13 +100,13 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void CannotRemoveInheritedComponent()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
-            parent.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
+            Entity parent = new Entity() { Name = "parent" };
+            parent.AddComponent(new Component(Workspace.Instance.GetPlugin(TransformComponentType)));
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
-            ComponentViewModel inheritedComponent = child.GetComponentByType(TransformComponentType);
+            Component inheritedComponent = child.GetComponentByType(TransformComponentType);
             child.RemoveComponent(inheritedComponent);
 
             Assert.AreEqual(1, parent.Components.Count(x => x.Type == TransformComponentType));
@@ -115,12 +116,12 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void CannotAddMultipleComponentsPerRole()
         {
-            EntityViewModel entity = new EntityViewModel();
+            Entity entity = new Entity();
             
-            ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            Component component = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             entity.AddComponent(component);
             
-            entity.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
+            entity.AddComponent(new Component(Workspace.Instance.GetPlugin(TransformComponentType)));
 
             Assert.AreEqual(component, entity.Components.Single());
         }
@@ -128,10 +129,10 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void CannotRemoveComponentWithDependency()
         {
-            EntityViewModel entity = new EntityViewModel();
-            entity.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(DependentComponentType)));
+            Entity entity = new Entity();
+            entity.AddComponent(new Component(Workspace.Instance.GetPlugin(DependentComponentType)));
 
-            ComponentViewModel transform = entity.GetComponentByType(TransformComponentType);
+            Component transform = entity.GetComponentByType(TransformComponentType);
             entity.RemoveComponent(transform);
 
             Assert.AreEqual(1, entity.Components.Count(x => x.Type == TransformComponentType));
@@ -140,12 +141,12 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void EntityInheritsComponentFromPrototype()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
             
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
-            parent.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
+            parent.AddComponent(new Component(Workspace.Instance.GetPlugin(TransformComponentType)));
 
             Assert.AreEqual(1, parent.Components.Count(x => x.Type == TransformComponentType));
             Assert.AreEqual(1, child.Components.Count(x => x.Type == TransformComponentType));
@@ -154,10 +155,10 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void EntityInheritsExistingComponentFromPrototype()
         {
-            /*EntityViewModel parent = new EntityViewModel() { Name = "parent" };
-            parent.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
+            /*Entity parent = new Entity() { Name = "parent" };
+            parent.AddComponent(new Component(Workspace.Instance.GetPlugin(TransformComponentType)));
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
             Assert.AreEqual(1, parent.Components.Count(x => x.Type == TransformComponentType));
@@ -165,32 +166,35 @@ namespace Kinectitude.Editor.Tests
             Assert.AreEqual(1, child.Components.Count(x => x.Type == TransformComponentType));
             Assert.AreEqual(0, child.Entity.Components.Count(x => x.Type == TransformComponentType));*/
 
-            GameViewModel game = new GameViewModel("Test Game")
+            Game game = new Game("Test Game")
             {
                 Width = 800,
                 Height = 600,
                 IsFullScreen = false
             };
 
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
             
-            ComponentViewModel parentComponent = new ComponentViewModel(game.GetPlugin(typeof(TransformComponent).FullName));
+            Component parentComponent = new Component(game.GetPlugin(typeof(TransformComponent).FullName));
             
-            PropertyViewModel x = parentComponent.GetProperty("X");
+            Property x = parentComponent.GetProperty("X");
             x.IsInherited = false;
             x.Value = 400;
+
+            string loc = Environment.CurrentDirectory;
+
             parent.AddComponent(parentComponent);
             
             game.AddPrototype(parent);
 
-            SceneViewModel scene = new SceneViewModel("Test Scene");
+            Scene scene = new Scene("Test Scene");
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
             
-            ComponentViewModel childComponent = child.Components[0];
+            Component childComponent = child.Components[0];
             
-            PropertyViewModel y = childComponent.GetProperty("Y");
+            Property y = childComponent.GetProperty("Y");
             y.IsInherited = false;
             y.Value = 300;
             
@@ -203,19 +207,19 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void ComponentFollowsDefineChange()
         {
-            GameViewModel game = new GameViewModel("Test Game");
+            Game game = new Game("Test Game");
 
-            UsingViewModel use = new UsingViewModel() { File = "Kinectitude.Core.dll" };
+            Using use = new Using() { File = "Kinectitude.Core.dll" };
 
-            DefineViewModel define = new DefineViewModel(TransformComponentShort, TransformComponentType);
+            Define define = new Define(TransformComponentShort, TransformComponentType);
             use.AddDefine(define);
             
             game.AddUsing(use);
 
-            EntityViewModel entity = new EntityViewModel() { Name = "parent" };
+            Entity entity = new Entity() { Name = "parent" };
             game.AddPrototype(entity);
 
-            ComponentViewModel component = new ComponentViewModel(game.GetPlugin(TransformComponentShort));
+            Component component = new Component(game.GetPlugin(TransformComponentShort));
             entity.AddComponent(component);
 
             Assert.AreEqual(TransformComponentShort, component.Type);
@@ -228,16 +232,16 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void ComponentBecomesInheritedAfterAddToParent()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
 
-            EntityViewModel child = new EntityViewModel();
-            ComponentViewModel childComponent = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            Entity child = new Entity();
+            Component childComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             child.AddComponent(childComponent);
             child.AddPrototype(parent);
 
             Assert.IsFalse(childComponent.IsInherited);
 
-            parent.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
+            parent.AddComponent(new Component(Workspace.Instance.GetPlugin(TransformComponentType)));
 
             Assert.IsTrue(childComponent.IsInherited);
         }
@@ -245,11 +249,11 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void ComponentBecomesInheritableAfterPrototypeChange()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
-            parent.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
+            Entity parent = new Entity() { Name = "parent" };
+            parent.AddComponent(new Component(Workspace.Instance.GetPlugin(TransformComponentType)));
 
-            EntityViewModel child = new EntityViewModel();
-            ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            Entity child = new Entity();
+            Component component = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             child.AddComponent(component);
 
             Assert.IsFalse(component.IsInherited);
@@ -262,16 +266,16 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void ComponentBecomesNonInheritableAfterRemoveFromParent()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
             
-            ComponentViewModel parentComponent = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            Component parentComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             parent.AddComponent(parentComponent);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             
-            ComponentViewModel childComponent = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            Component childComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             
-            PropertyViewModel property = childComponent.GetProperty("X");
+            Property property = childComponent.GetProperty("X");
             property.Value = 500;
             
             child.AddComponent(childComponent);
@@ -287,14 +291,14 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void ComponentBecomesNonInheritableAfterPrototypeChange()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
-            parent.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType)));
+            Entity parent = new Entity() { Name = "parent" };
+            parent.AddComponent(new Component(Workspace.Instance.GetPlugin(TransformComponentType)));
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             
-            ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            Component component = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             
-            PropertyViewModel property = component.GetProperty("X");
+            Property property = component.GetProperty("X");
             property.Value = 500;
             
             child.AddComponent(component);
@@ -310,8 +314,8 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AddingComponentAddsRequiredComponent()
         {
-            EntityViewModel entity = new EntityViewModel();
-            entity.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(DependentComponentType)));
+            Entity entity = new Entity();
+            entity.AddComponent(new Component(Workspace.Instance.GetPlugin(DependentComponentType)));
 
             Assert.AreEqual(1, entity.Components.Count(x => x.Type == DependentComponentType));
             Assert.AreEqual(1, entity.Components.Count(x => x.Type == TransformComponentType));
@@ -320,12 +324,16 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AddingComponentAddsRequiredManagers()
         {
-            SceneViewModel scene = new SceneViewModel("Test Scene");
+            Scene scene = new Scene("Test Scene");
             
-            EntityViewModel entity = new EntityViewModel();
-            entity.AddComponent(new ComponentViewModel(Workspace.Instance.GetPlugin(DependentComponentType)));
+            Entity entity = new Entity();
+            entity.AddComponent(new Component(Workspace.Instance.GetPlugin(DependentComponentType)));
 
             scene.AddEntity(entity);
+
+            string t1 = scene.Managers.Single().Type;
+            string t2 = DependentManagerType;
+            bool t3 = t1 == t2;
 
             Assert.AreEqual(1, scene.Managers.Count(x => x.Type == DependentManagerType));
         }

@@ -15,8 +15,6 @@
 
             <v:FolderConverter x:Key="folderConverter" />
             
-            <v:PropertyViewModelConverter x:Key="propertyConverter" />
-            
         </ResourceDictionary>
     </Application.Resources>
 </Application>

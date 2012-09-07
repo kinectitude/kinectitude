@@ -3,6 +3,7 @@ using System.Linq;
 using Kinectitude.Core.Components;
 using Kinectitude.Editor.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Kinectitude.Editor.Models;
 
 namespace Kinectitude.Editor.Tests
 {
@@ -15,7 +16,7 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void SetName()
         {
-            GameViewModel game = new GameViewModel("Test Game");
+            Game game = new Game("Test Game");
 
             Assert.AreEqual(game.Name, "Test Game");
         }
@@ -23,7 +24,7 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void SetWidth()
         {
-            GameViewModel game = new GameViewModel("Test Game") { Width = 800 };
+            Game game = new Game("Test Game") { Width = 800 };
 
             Assert.AreEqual(game.Width, 800);
         }
@@ -31,7 +32,7 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void SetHeight()
         {
-            GameViewModel game = new GameViewModel("Test Game") { Height = 600 };
+            Game game = new Game("Test Game") { Height = 600 };
 
             Assert.AreEqual(game.Height, 600);
         }
@@ -39,7 +40,7 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void SetIsFullScreen()
         {
-            GameViewModel game = new GameViewModel("Test Game") { IsFullScreen = true };
+            Game game = new Game("Test Game") { IsFullScreen = true };
 
             Assert.AreEqual(game.IsFullScreen, true);
         }
@@ -47,9 +48,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void SetFirstScene()
         {
-            SceneViewModel scene = new SceneViewModel("Test Scene");
+            Scene scene = new Scene("Test Scene");
             
-            GameViewModel game = new GameViewModel("Test Game");
+            Game game = new Game("Test Game");
             game.FirstScene = scene;
 
             Assert.AreEqual(game.FirstScene.Name, "Test Scene");
@@ -58,9 +59,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AddUsing()
         {
-            GameViewModel game = new GameViewModel("Test Game");
+            Game game = new Game("Test Game");
             
-            UsingViewModel use = new UsingViewModel() { File = "Test.dll" };
+            Using use = new Using() { File = "Test.dll" };
             game.AddUsing(use);
 
             Assert.AreEqual(game.Usings.Count(), 1);
@@ -70,9 +71,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void RemoveUsing()
         {
-            GameViewModel game = new GameViewModel("Test Game");
+            Game game = new Game("Test Game");
             
-            UsingViewModel use = new UsingViewModel() { File = "Test.dll" };
+            Using use = new Using() { File = "Test.dll" };
             game.AddUsing(use);
             game.RemoveUsing(use);
 
@@ -82,11 +83,11 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AddComponentWithoutExistingDefine()
         {
-            GameViewModel game = new GameViewModel("Test Game");
+            Game game = new Game("Test Game");
             
-            EntityViewModel entity = new EntityViewModel() { Name = "entity" };
+            Entity entity = new Entity() { Name = "entity" };
             
-            ComponentViewModel component = new ComponentViewModel(game.GetPlugin(TransformComponentType));
+            Component component = new Component(game.GetPlugin(TransformComponentType));
             entity.AddComponent(component);
             game.AddPrototype(entity);
 
@@ -98,17 +99,17 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AddComponentWithExistingDefine()
         {
-            GameViewModel game = new GameViewModel("Test Game");
+            Game game = new Game("Test Game");
 
-            UsingViewModel use = new UsingViewModel() { File = Path.GetFileName(typeof(TransformComponent).Assembly.Location) };
+            Using use = new Using() { File = Path.GetFileName(typeof(TransformComponent).Assembly.Location) };
             game.AddUsing(use);
 
-            DefineViewModel define = new DefineViewModel(TransformComponentShort, TransformComponentType);
+            Define define = new Define(TransformComponentShort, TransformComponentType);
             use.AddDefine(define);
 
-            EntityViewModel entity = new EntityViewModel() { Name = "entity" };
+            Entity entity = new Entity() { Name = "entity" };
             
-            ComponentViewModel component = new ComponentViewModel(game.GetPlugin(TransformComponentShort));
+            Component component = new Component(game.GetPlugin(TransformComponentShort));
             entity.AddComponent(component);
             game.AddPrototype(entity);
             
@@ -120,9 +121,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AddPrototype()
         {
-            GameViewModel game = new GameViewModel("Test Game");
+            Game game = new Game("Test Game");
             
-            EntityViewModel entity = new EntityViewModel() { Name = "TestPrototype" };
+            Entity entity = new Entity() { Name = "TestPrototype" };
             game.AddPrototype(entity);
 
             Assert.AreEqual(game.Prototypes.Count(), 1);
@@ -132,9 +133,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void RemovePrototype()
         {
-            GameViewModel game = new GameViewModel("Test Game");
+            Game game = new Game("Test Game");
             
-            EntityViewModel entity = new EntityViewModel() { Name = "TestPrototype" };
+            Entity entity = new Entity() { Name = "TestPrototype" };
             game.AddPrototype(entity);
             game.RemovePrototype(entity);
 
@@ -144,9 +145,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AddAttribute()
         {
-            GameViewModel game = new GameViewModel("Test Game");
+            Game game = new Game("Test Game");
             
-            AttributeViewModel attribute = new AttributeViewModel("test");
+            Attribute attribute = new Attribute("test");
             game.AddAttribute(attribute);
 
             Assert.AreEqual(game.Attributes.Count(x => x.Key == "test"), 1);
@@ -155,9 +156,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void RemoveAttribute()
         {
-            GameViewModel game = new GameViewModel("Test Game");
+            Game game = new Game("Test Game");
             
-            AttributeViewModel attribute = new AttributeViewModel("test");
+            Attribute attribute = new Attribute("test");
             game.AddAttribute(attribute);
             game.RemoveAttribute(attribute);
 
@@ -167,9 +168,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AddScene()
         {
-            GameViewModel game = new GameViewModel("Test Game");
+            Game game = new Game("Test Game");
             
-            SceneViewModel scene = new SceneViewModel("Test Scene");
+            Scene scene = new Scene("Test Scene");
             game.AddScene(scene);
 
             Assert.AreEqual(game.Scenes.Count(), 1);
@@ -179,9 +180,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void RemoveScene()
         {
-            GameViewModel game = new GameViewModel("Test Game");
+            Game game = new Game("Test Game");
             
-            SceneViewModel scene = new SceneViewModel("Test Scene");
+            Scene scene = new Scene("Test Scene");
             game.AddScene(scene);
             game.RemoveScene(scene);
 
@@ -191,32 +192,32 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AddAsset()
         {
-            GameViewModel game = new GameViewModel("Test Game");
+            Game game = new Game("Test Game");
             
-            AssetViewModel asset = new AssetViewModel("Test Asset");
+            Asset asset = new Asset("Test Asset");
             game.AddAsset(asset);
 
-            Assert.AreEqual(game.Assets.Count(x => x.Name == "Test Asset"), 1);
+            Assert.AreEqual(game.Assets.Count(x => x.FileName == "Test Asset"), 1);
         }
 
         [TestMethod]
         public void RemoveAsset()
         {
-            GameViewModel game = new GameViewModel("Test Game");
+            Game game = new Game("Test Game");
             
-            AssetViewModel asset = new AssetViewModel("Test Asset");
+            Asset asset = new Asset("Test Asset");
             game.AddAsset(asset);
             game.RemoveAsset(asset);
 
-            Assert.AreEqual(game.Assets.Count(x => x.Name == "Test Asset"), 0);
+            Assert.AreEqual(game.Assets.Count(x => x.FileName == "Test Asset"), 0);
         }
 
         [TestMethod]
         public void GameAttributeCannotInherit()
         {
-            GameViewModel game = new GameViewModel("Test Game");
+            Game game = new Game("Test Game");
             
-            AttributeViewModel attribute = new AttributeViewModel("test");
+            Attribute attribute = new Attribute("test");
             game.AddAttribute(attribute);
 
             Assert.IsFalse(attribute.CanInherit);
@@ -225,13 +226,13 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void GetDefinedPlugin()
         {
-            GameViewModel game = new GameViewModel("Test Game");
+            Game game = new Game("Test Game");
 
-            UsingViewModel use = new UsingViewModel() { File = "Kinectitude.Core.dll" };
-            use.AddDefine(new DefineViewModel(TransformComponentShort, TransformComponentType));
+            Using use = new Using() { File = "Kinectitude.Core.dll" };
+            use.AddDefine(new Define(TransformComponentShort, TransformComponentType));
             game.AddUsing(use);
 
-            PluginViewModel plugin = game.GetPlugin(TransformComponentShort);
+            Plugin plugin = game.GetPlugin(TransformComponentShort);
 
             Assert.IsNotNull(plugin);
             Assert.AreEqual(TransformComponentType, plugin.ClassName);
@@ -240,8 +241,8 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void GetPluginByFullName()
         {
-            GameViewModel game = new GameViewModel("Test Game");
-            PluginViewModel plugin = game.GetPlugin(TransformComponentType);
+            Game game = new Game("Test Game");
+            Plugin plugin = game.GetPlugin(TransformComponentType);
 
             Assert.IsNotNull(plugin);
             Assert.AreEqual(TransformComponentType, plugin.ClassName);
@@ -250,8 +251,8 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void PrototypeMustHaveName()
         {
-            GameViewModel game = new GameViewModel("Test Game");
-            game.AddPrototype(new EntityViewModel());
+            Game game = new Game("Test Game");
+            game.AddPrototype(new Entity());
 
             Assert.AreEqual(0, game.Prototypes.Count);
         }
@@ -259,9 +260,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void CannotAddDuplicatePrototypeName()
         {
-            GameViewModel game = new GameViewModel("Test Game");
-            game.AddPrototype(new EntityViewModel() { Name = "prototype" });
-            game.AddPrototype(new EntityViewModel() { Name = "prototype" });
+            Game game = new Game("Test Game");
+            game.AddPrototype(new Entity() { Name = "prototype" });
+            game.AddPrototype(new Entity() { Name = "prototype" });
 
             Assert.AreEqual(1, game.Prototypes.Count(x => x.Name == "prototype" ));
         }

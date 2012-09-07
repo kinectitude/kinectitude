@@ -1,17 +1,18 @@
 ﻿using System.Linq;
 using Kinectitude.Core.Attributes;
-using Kinectitude.Core.Base;
 using Kinectitude.Core.Components;
 using Kinectitude.Editor.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Kinectitude.Editor.Models;
+using Component = Kinectitude.Editor.Models.Component;
 
 namespace Kinectitude.Editor.Tests
 {
     [TestClass]
-    public class PropertyViewModelTests
+    public class PropertyTests
     {
         [Plugin("Dependent Manager", "")]
-        private class DependentManager : Manager<DependentComponent>
+        private class DependentManager : Kinectitude.Core.Base.Manager<DependentComponent>
         {
             public override void OnUpdate(float frameDelta) { }
         }
@@ -19,7 +20,7 @@ namespace Kinectitude.Editor.Tests
         [Plugin("Dependent Component", "")]
         [Requires(typeof(TransformComponent))]
         [Requires(typeof(DependentManager))]
-        private class DependentComponent : Component
+        private class DependentComponent : Kinectitude.Core.Base.Component
         {
             public override void Destroy() { }
         }
@@ -31,9 +32,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void SetValue()
         {
-            ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            Component component = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             
-            PropertyViewModel property = component.GetProperty("X");
+            Property property = component.GetProperty("X");
             property.Value = 500;
 
             Assert.AreEqual(500, component.Properties.Single(x => x.Name == "X").Value);
@@ -44,9 +45,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void DefaultPropertyOnRootComponent()
         {
-            ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            Component component = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
 
-            PropertyViewModel property = component.GetProperty("X");
+            Property property = component.GetProperty("X");
 
             Assert.AreEqual(0, component.Properties.Count(x => x.IsLocal));
             Assert.IsTrue(property.IsRoot);
@@ -56,20 +57,20 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void DefaultPropertyBecomesInheritedOnPrototypeChange()
         {
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             
-            ComponentViewModel childComponent = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            Component childComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             child.AddComponent(childComponent);
 
-            PropertyViewModel childProperty = childComponent.GetProperty("X");
+            Property childProperty = childComponent.GetProperty("X");
 
             Assert.IsFalse(childProperty.CanInherit);
 
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
 
-            ComponentViewModel parentComponent = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            Component parentComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
 
-            PropertyViewModel parentProperty = parentComponent.GetProperty("X");
+            Property parentProperty = parentComponent.GetProperty("X");
             parentProperty.Value = 500;
 
             parent.AddComponent(parentComponent);
@@ -85,20 +86,20 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void CannotSetValueForInheritedProperty()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
             
-            ComponentViewModel parentComponent = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            Component parentComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             
-            PropertyViewModel parentProperty = parentComponent.GetProperty("X");
+            Property parentProperty = parentComponent.GetProperty("X");
             parentProperty.Value = 500;
             parent.AddComponent(parentComponent);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
-            ComponentViewModel childComponent = child.GetComponentByType(TransformComponentType);
+            Component childComponent = child.GetComponentByType(TransformComponentType);
             
-            PropertyViewModel childProperty = childComponent.GetProperty("X");
+            Property childProperty = childComponent.GetProperty("X");
             childProperty.Value = 250;
 
             Assert.IsTrue(childProperty.IsInherited);
@@ -110,20 +111,20 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void ValueFollowsInheritedProperty()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
             
-            ComponentViewModel parentComponent = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            Component parentComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             
-            PropertyViewModel parentProperty = parentComponent.GetProperty("X");
+            Property parentProperty = parentComponent.GetProperty("X");
             parentProperty.Value = 500;
             parent.AddComponent(parentComponent);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
             
-            ComponentViewModel childComponent = child.GetComponentByType(TransformComponentType);
+            Component childComponent = child.GetComponentByType(TransformComponentType);
             
-            PropertyViewModel childProperty = childComponent.GetProperty("X");
+            Property childProperty = childComponent.GetProperty("X");
 
             Assert.AreEqual(500, childProperty.Value);
 
@@ -135,28 +136,28 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void ValueFollowsInheritedComponentChange()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
             
-            ComponentViewModel parentComponent = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            Component parentComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             
-            PropertyViewModel parentProperty = parentComponent.GetProperty("X");
+            Property parentProperty = parentComponent.GetProperty("X");
             parentProperty.Value = 500;
             parent.AddComponent(parentComponent);
 
-            EntityViewModel otherParent = new EntityViewModel() { Name = "otherParent" };
+            Entity otherParent = new Entity() { Name = "otherParent" };
             
-            ComponentViewModel otherParentComponent = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            Component otherParentComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             
-            PropertyViewModel otherParentProperty = otherParentComponent.GetProperty("X");
+            Property otherParentProperty = otherParentComponent.GetProperty("X");
             otherParentProperty.Value = 250;
             otherParent.AddComponent(otherParentComponent);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
-            ComponentViewModel childComponent = child.GetComponentByType(TransformComponentType);
+            Component childComponent = child.GetComponentByType(TransformComponentType);
             
-            PropertyViewModel childProperty = childComponent.GetProperty("X");
+            Property childProperty = childComponent.GetProperty("X");
 
             Assert.AreEqual(500, childProperty.Value);
 
@@ -171,9 +172,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void SetInheritedPropertyToLocal()
         {
-            ComponentViewModel component = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            Component component = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             
-            PropertyViewModel property = component.GetProperty("X");
+            Property property = component.GetProperty("X");
 
             Assert.IsTrue(property.IsInherited);
 
@@ -185,17 +186,17 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void SetLocalPropertyToInherited()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
 
-            ComponentViewModel parentComponent = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
+            Component parentComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             parentComponent.SetProperty("X", 500);
 
             parent.AddComponent(parentComponent);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
 
-            ComponentViewModel childComponent = new ComponentViewModel(Workspace.Instance.GetPlugin(TransformComponentType));
-            PropertyViewModel childProperty = childComponent.GetProperty("X");
+            Component childComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
+            Property childProperty = childComponent.GetProperty("X");
             childProperty.Value = 250;
 
             child.AddComponent(childComponent);

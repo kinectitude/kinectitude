@@ -62,15 +62,15 @@
     <Compile Include="Core\Data\StringDataTests.cs" />
     <Compile Include="Core\Loaders\GameLoaderTests.cs" />
     <Compile Include="Core\TestMocks\TestMocks.cs" />
-    <Compile Include="Editor\ActionViewModelTests.cs" />
-    <Compile Include="Editor\AttributeViewModelTests.cs" />
-    <Compile Include="Editor\ComponentViewModelTests.cs" />
-    <Compile Include="Editor\ConditionViewModelTests.cs" />
-    <Compile Include="Editor\EntityViewModelTests.cs" />
-    <Compile Include="Editor\EventViewModelTests.cs" />
-    <Compile Include="Editor\GameViewModelTests.cs" />
-    <Compile Include="Editor\PropertyViewModelTests.cs" />
-    <Compile Include="Editor\SceneViewModelTests.cs" />
+    <Compile Include="Editor\ActionTests.cs" />
+    <Compile Include="Editor\AttributeTests.cs" />
+    <Compile Include="Editor\ComponentTests.cs" />
+    <Compile Include="Editor\ConditionTests.cs" />
+    <Compile Include="Editor\EntityTests.cs" />
+    <Compile Include="Editor\EventTests.cs" />
+    <Compile Include="Editor\GameTests.cs" />
+    <Compile Include="Editor\PropertyTests.cs" />
+    <Compile Include="Editor\SceneTests.cs" />
     <Compile Include="Editor\WorkspaceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -82,6 +82,11 @@
     <ProjectReference Include="..\Editor\Kinectitude.Editor.csproj">
       <Project>{541AF93B-398E-463E-9C11-BC957BE0DB19}</Project>
       <Name>Kinectitude.Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Render\Kinectitude.Render.csproj">
+      <Project>{E6DD6F76-999C-4B56-887C-347FAF50DAB3}</Project>
+      <Name>Kinectitude.Render</Name>
+      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

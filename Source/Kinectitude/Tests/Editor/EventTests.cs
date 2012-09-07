@@ -1,20 +1,21 @@
 ﻿using System.Linq;
 using Kinectitude.Editor.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Kinectitude.Editor.Models;
 
 namespace Kinectitude.Editor.Tests
 {
     [TestClass]
-    public class EventViewModelTests
+    public class EventTests
     {
         private static readonly string TriggerOccursEventType = "Kinectitude.Core.Events.TriggerOccursEvent";
 
         [TestMethod]
         public void AddLocalEvent()
         {
-            EntityViewModel entity = new EntityViewModel();
+            Entity entity = new Entity();
 
-            EventViewModel evt = new EventViewModel(Workspace.Instance.GetPlugin(TriggerOccursEventType));
+            Event evt = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
             entity.AddEvent(evt);
 
             Assert.IsTrue(evt.IsLocal);
@@ -24,9 +25,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void RemoveLocalEvent()
         {
-            EntityViewModel entity = new EntityViewModel();
+            Entity entity = new Entity();
 
-            EventViewModel evt = new EventViewModel(Workspace.Instance.GetPlugin(TriggerOccursEventType));
+            Event evt = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
             entity.AddEvent(evt);
             entity.RemoveEvent(evt);
 
@@ -36,10 +37,10 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AddMultipleEventsOfSameType()
         {
-            EntityViewModel entity = new EntityViewModel();
+            Entity entity = new Entity();
 
-            entity.AddEvent(new EventViewModel(Workspace.Instance.GetPlugin(TriggerOccursEventType)));
-            entity.AddEvent(new EventViewModel(Workspace.Instance.GetPlugin(TriggerOccursEventType)));
+            entity.AddEvent(new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType)));
+            entity.AddEvent(new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType)));
 
             Assert.AreEqual(2, entity.Events.Count);
         }
@@ -47,7 +48,7 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void SetEventProperty()
         {
-            EventViewModel evt = new EventViewModel(Workspace.Instance.GetPlugin(TriggerOccursEventType));
+            Event evt = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
             evt.SetProperty("Trigger", "test");
 
             Assert.AreEqual("test", evt.GetProperty("Trigger").Value);
@@ -56,12 +57,12 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void EventsInheritedFromPrototype()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
-            EventViewModel parentEvent = new EventViewModel(Workspace.Instance.GetPlugin(TriggerOccursEventType));
+            Event parentEvent = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
             parent.AddEvent(parentEvent);
 
             Assert.AreEqual(1, parent.Events.Count(x => x.IsLocal));
@@ -71,15 +72,15 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void EventsInheritedFromAllPrototypes()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
-            EntityViewModel otherParent = new EntityViewModel() { Name = "otherParent" };
+            Entity parent = new Entity() { Name = "parent" };
+            Entity otherParent = new Entity() { Name = "otherParent" };
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
             child.AddPrototype(otherParent);
 
-            parent.AddEvent(new EventViewModel(Workspace.Instance.GetPlugin(TriggerOccursEventType)));
-            otherParent.AddEvent(new EventViewModel(Workspace.Instance.GetPlugin(TriggerOccursEventType)));
+            parent.AddEvent(new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType)));
+            otherParent.AddEvent(new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType)));
 
             Assert.AreEqual(1, parent.Events.Count(x => x.IsLocal));
             Assert.AreEqual(1, otherParent.Events.Count(x => x.IsLocal));
@@ -89,12 +90,12 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void RemoveInheritedEvent()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
-            EventViewModel parentEvent = new EventViewModel(Workspace.Instance.GetPlugin(TriggerOccursEventType));
+            Event parentEvent = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
             parent.AddEvent(parentEvent);
             parent.RemoveEvent(parentEvent);
 
@@ -105,12 +106,12 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void EventRemovedAfterRemovePrototype()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
-            EventViewModel parentEvent = new EventViewModel(Workspace.Instance.GetPlugin(TriggerOccursEventType));
+            Event parentEvent = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
             parent.AddEvent(parentEvent);
 
             child.RemovePrototype(parent);
@@ -122,12 +123,12 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void EventsAddedAfterAddPrototype()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
 
-            EventViewModel parentEvent = new EventViewModel(Workspace.Instance.GetPlugin(TriggerOccursEventType));
+            Event parentEvent = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
             parent.AddEvent(parentEvent);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
             Assert.AreEqual(1, parent.Events.Count(x => x.IsLocal));
@@ -137,16 +138,16 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void CannotSetInheritedEventProperty()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
 
-            EventViewModel parentEvent = new EventViewModel(Workspace.Instance.GetPlugin(TriggerOccursEventType));
+            Event parentEvent = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
             parentEvent.SetProperty("Trigger", "test");
             parent.AddEvent(parentEvent);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
-            AbstractPropertyViewModel childProperty = child.Events.Single().GetProperty("Trigger");
+            AbstractProperty childProperty = child.Events.Single().GetProperty("Trigger");
             childProperty.Value = "test2";
 
             Assert.AreEqual("test", childProperty.Value);
@@ -155,16 +156,16 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void CannotRemoveInheritedEventFromInheritingEntity()
         {
-            EntityViewModel parent = new EntityViewModel() { Name = "parent" };
+            Entity parent = new Entity() { Name = "parent" };
 
-            EventViewModel parentEvent = new EventViewModel(Workspace.Instance.GetPlugin(TriggerOccursEventType));
+            Event parentEvent = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
             parentEvent.SetProperty("Trigger", "test");
             parent.AddEvent(parentEvent);
 
-            EntityViewModel child = new EntityViewModel();
+            Entity child = new Entity();
             child.AddPrototype(parent);
 
-            AbstractEventViewModel childEvent = child.Events.Single();
+            AbstractEvent childEvent = child.Events.Single();
             child.RemoveEvent(childEvent);
 
             Assert.AreEqual(1, child.Events.Count);
