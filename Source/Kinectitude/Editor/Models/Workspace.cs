@@ -229,8 +229,6 @@ namespace Kinectitude.Editor.Models
 
         private void RegisterPlugins(Assembly assembly)
         {
-            StreamWriter sw = new StreamWriter(@"C:\\Users\\Brandon\\Desktop\\Plugin Types.txt", true);
-
             var types = from type in assembly.GetTypes()
                         where System.Attribute.IsDefined(type, typeof(PluginAttribute)) &&
                         (
@@ -243,19 +241,8 @@ namespace Kinectitude.Editor.Models
 
             foreach (Plugin plugin in types)
             {
-                sw.WriteLine(plugin.ClassName);
-
-                foreach (string property in plugin.Properties)
-                {
-                    sw.WriteLine("    " + property);
-                }
-
-                sw.WriteLine(sw.NewLine);
-
                 AddPlugin(plugin);
             }
-
-            sw.Close();
         }
 
         public void AddPlugin(Plugin plugin)
