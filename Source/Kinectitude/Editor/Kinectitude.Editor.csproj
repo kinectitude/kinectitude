@@ -86,43 +86,50 @@
     <Compile Include="Commands\IUndoableCommand.cs" />
     <Compile Include="Storage\IGameStorage.cs" />
     <Compile Include="Storage\XmlGameStorage.cs" />
-    <Compile Include="ViewModels\AbstractActionViewModel.cs" />
-    <Compile Include="ViewModels\AbstractConditionViewModel.cs" />
-    <Compile Include="ViewModels\AbstractEventViewModel.cs" />
-    <Compile Include="ViewModels\AbstractPropertyViewModel.cs" />
-    <Compile Include="ViewModels\ActionViewModel.cs" />
-    <Compile Include="ViewModels\AssetViewModel.cs" />
-    <Compile Include="ViewModels\AttributeViewModel.cs" />
-    <Compile Include="ViewModels\BaseViewModel.cs" />
-    <Compile Include="ViewModels\ComponentViewModel.cs" />
-    <Compile Include="ViewModels\ConditionViewModel.cs" />
-    <Compile Include="ViewModels\DefineViewModel.cs" />
+    <Compile Include="Models\AbstractAction.cs" />
+    <Compile Include="Models\AbstractCondition.cs" />
+    <Compile Include="Models\AbstractEvent.cs" />
+    <Compile Include="Models\AbstractProperty.cs" />
+    <Compile Include="Models\Action.cs" />
+    <Compile Include="Models\Asset.cs" />
+    <Compile Include="Models\Attribute.cs" />
+    <Compile Include="Base\BaseModel.cs" />
+    <Compile Include="Models\Component.cs" />
+    <Compile Include="Models\Condition.cs" />
+    <Compile Include="Models\Define.cs" />
+    <Compile Include="ViewModels\BasicEntityViewModel.cs" />
+    <Compile Include="Models\Entity.cs" />
+    <Compile Include="Models\Event.cs" />
+    <Compile Include="Models\Game.cs" />
+    <Compile Include="Models\InheritedAction.cs" />
+    <Compile Include="Models\InheritedCondition.cs" />
+    <Compile Include="Models\InheritedEvent.cs" />
+    <Compile Include="Models\InheritedProperty.cs" />
+    <Compile Include="Models\Interfaces\IActionScope.cs" />
+    <Compile Include="Models\Interfaces\IAttributeScope.cs" />
+    <Compile Include="Models\Interfaces\IComponentScope.cs" />
+    <Compile Include="Models\Interfaces\IEntityNamespace.cs" />
+    <Compile Include="Models\Interfaces\IEntityScope.cs" />
+    <Compile Include="Models\Interfaces\IEventScope.cs" />
+    <Compile Include="Models\Interfaces\IManagerScope.cs" />
+    <Compile Include="Models\Interfaces\IPluginNamespace.cs" />
+    <Compile Include="Models\Interfaces\IPropertyScope.cs" />
+    <Compile Include="Models\Interfaces\ISceneScope.cs" />
+    <Compile Include="Models\Interfaces\IScope.cs" />
+    <Compile Include="Models\Manager.cs" />
+    <Compile Include="Models\Plugin.cs" />
+    <Compile Include="Models\Property.cs" />
+    <Compile Include="Models\Scene.cs" />
+    <Compile Include="Models\Using.cs" />
+    <Compile Include="Models\Workspace.cs" />
     <Compile Include="ViewModels\EntityViewModel.cs" />
-    <Compile Include="ViewModels\EventViewModel.cs" />
-    <Compile Include="ViewModels\GameViewModel.cs" />
-    <Compile Include="ViewModels\InheritedActionViewModel.cs" />
-    <Compile Include="ViewModels\InheritedConditionViewModel.cs" />
-    <Compile Include="ViewModels\InheritedEventViewModel.cs" />
-    <Compile Include="ViewModels\InheritedPropertyViewModel.cs" />
-    <Compile Include="ViewModels\Interfaces\IActionScope.cs" />
-    <Compile Include="ViewModels\Interfaces\IAttributeScope.cs" />
-    <Compile Include="ViewModels\Interfaces\IComponentScope.cs" />
-    <Compile Include="ViewModels\Interfaces\IEntityNamespace.cs" />
-    <Compile Include="ViewModels\Interfaces\IEntityScope.cs" />
-    <Compile Include="ViewModels\Interfaces\IEventScope.cs" />
-    <Compile Include="ViewModels\Interfaces\IManagerScope.cs" />
-    <Compile Include="ViewModels\Interfaces\IPluginNamespace.cs" />
-    <Compile Include="ViewModels\Interfaces\IPropertyScope.cs" />
-    <Compile Include="ViewModels\Interfaces\ISceneScope.cs" />
-    <Compile Include="ViewModels\Interfaces\IScope.cs" />
-    <Compile Include="ViewModels\ManagerViewModel.cs" />
-    <Compile Include="ViewModels\PluginViewModel.cs" />
-    <Compile Include="ViewModels\PropertyViewModel.cs" />
-    <Compile Include="ViewModels\SceneViewModel.cs" />
-    <Compile Include="ViewModels\UsingViewModel.cs" />
-    <Compile Include="ViewModels\Workspace.cs" />
+    <Compile Include="ViewModels\SpriteEntityViewModel.cs" />
+    <Compile Include="ViewModels\TextEntityViewModel.cs" />
     <Compile Include="Views\ComponentDialog.xaml.cs">
       <DependentUpon>ComponentDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EntityCanvas.xaml.cs">
+      <DependentUpon>EntityCanvas.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\FolderConverter.cs" />
     <Compile Include="Views\EntityDialog.xaml.cs">
@@ -161,6 +168,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\ComponentDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EntityCanvas.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -215,7 +226,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -271,6 +284,11 @@
     <ProjectReference Include="..\Core\Kinectitude.Core.csproj">
       <Project>{AEAB17EC-574C-4177-9204-FE48F4C3F429}</Project>
       <Name>Kinectitude.Core</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Render\Kinectitude.Render.csproj">
+      <Project>{E6DD6F76-999C-4B56-887C-347FAF50DAB3}</Project>
+      <Name>Kinectitude.Render</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

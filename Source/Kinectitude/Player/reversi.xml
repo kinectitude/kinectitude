@@ -6,14 +6,7 @@
     <Define Name="KinectManager" Class="Kinectitude.Kinect.KinectManager"/>
     <Define Name="GestureEvent" Class="Kinectitude.Kinect.GestureEvent"/>
   </Using>
-
-  <Using File="Kinectitude.Physics.dll">
-    <Define Name="PhysicsManager" Class="Kinectitude.Physics.PhysicsManager"/>
-    <Define Name="PhysicsComponent" Class="Kinectitude.Physics.PhysicsComponent"/>
-    <Define Name="CrossesLineEvent" Class="Kinectitude.Physics.CrossesLineEvent"/>
-    <Define Name="CollisionEvent" Class="Kinectitude.Physics.CollisionEvent"/>
-  </Using>
-
+  
   <Using File="Kinectitude.Render.dll">
     <Define Name="RenderManager" Class="Kinectitude.Render.RenderManager"/>
     <Define Name="RenderComponent" Class="Kinectitude.Render.RenderComponent"/>
@@ -763,14 +756,6 @@
       <Component Type="TextRenderComponent" Value="Player 1 Score: 2" FontColor="#ffffff" FontSize="24" />
       <Event Type="AttributeChangesEvent" Target="{scene.player1Score}">
         <Action Type="SetAction" Target="TextRenderComponent.Value" Value="Player 1 Score: {scene.player1Score}" />
-      </Event>
-    </Entity>
-
-    <Entity>
-      <Component Type="TransformComponent" X="700" Y="190" />
-      <Component Type="TextRenderComponent" Value="" FontColor="#ffffff" FontSize="24" />
-      <Event Type="AttributeChangesEvent" Target="{scene.scansPerformed} {scene.flipsPerformed}">
-        <Action Type="SetAction" Target="TextRenderComponent.Value" Value="Scans: {scene.scansPerformed}, Flips: {scene.flipsPerformed}" />
       </Event>
     </Entity>
 

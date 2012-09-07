@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:v="clr-namespace:Kinectitude.Editor.Views"
-        xmlns:vm="clr-namespace:Kinectitude.Editor.ViewModels"
+        xmlns:vm="clr-namespace:Kinectitude.Editor.Models"
         Title="Kinectitude Editor v1.0 Beta"
         Name="window"
         WindowState="Maximized"
@@ -58,50 +58,39 @@
                 <ColumnDefinition Width="300" />
             </Grid.ColumnDefinitions>
 
-            <DockPanel Grid.Column="0">
-                
-                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Height="32">
-                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" Text="{Binding Name}" FontWeight="Bold" />
-                </StackPanel>
+            <TabControl Grid.Column="0" ItemsSource="{Binding OpenItems}" Name="tabItems" SelectedItem="{Binding ActiveItem}">
+                <TabControl.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel MinWidth="64">
+                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                            <Button HorizontalAlignment="Right" Margin="8,4,0,2" Width="16" Height="16" Command="{Binding ElementName=window, Path=DataContext.CloseItemCommand}" CommandParameter="{Binding}">
+                                <Image Source="{StaticResource icoClose}" />
+                            </Button>
+                        </DockPanel>
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+                <TabControl.ContentTemplate>
+                    <DataTemplate>
+                        <ContentPresenter Content="{Binding}">
+                            <ContentPresenter.Resources>
 
-                <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Width="32">
+                                <DataTemplate DataType="{x:Type vm:Game}">
+                                    <v:GameView />
+                                </DataTemplate>
 
-                </StackPanel>
+                                <DataTemplate DataType="{x:Type vm:Scene}">
+                                    <v:SceneView />
+                                </DataTemplate>
 
-                <TabControl ItemsSource="{Binding OpenItems}" Name="tabItems" SelectedItem="{Binding ActiveItem}">
-                    <TabControl.ItemTemplate>
-                        <DataTemplate>
-                            <DockPanel MinWidth="64">
-                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
-                                <Button HorizontalAlignment="Right" Margin="8,4,0,2" Width="16" Height="16" Command="{Binding ElementName=window, Path=DataContext.CloseItemCommand}" CommandParameter="{Binding}">
-                                    <Image Source="{StaticResource icoClose}" />
-                                </Button>
-                            </DockPanel>
-                        </DataTemplate>
-                    </TabControl.ItemTemplate>
-                    <TabControl.ContentTemplate>
-                        <DataTemplate>
-                            <ContentPresenter Content="{Binding}">
-                                <ContentPresenter.Resources>
+                                <DataTemplate DataType="{x:Type vm:Entity}">
+                                    <v:EntityView />
+                                </DataTemplate>
 
-                                    <DataTemplate DataType="{x:Type vm:GameViewModel}">
-                                        <v:GameView />
-                                    </DataTemplate>
-
-                                    <DataTemplate DataType="{x:Type vm:SceneViewModel}">
-                                        <v:SceneView />
-                                    </DataTemplate>
-
-                                    <DataTemplate DataType="{x:Type vm:EntityViewModel}">
-                                        <v:EntityView />
-                                    </DataTemplate>
-
-                                </ContentPresenter.Resources>
-                            </ContentPresenter>
-                        </DataTemplate>
-                    </TabControl.ContentTemplate>
-                </TabControl>
-            </DockPanel>
+                            </ContentPresenter.Resources>
+                        </ContentPresenter>
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
 
             <GridSplitter Width="4" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Style="{StaticResource gridSplitter}" />
 
@@ -138,7 +127,7 @@
                             
                             <TreeView.Resources>
                                 
-                                <HierarchicalDataTemplate DataType="{x:Type vm:GameViewModel}">
+                                <HierarchicalDataTemplate DataType="{x:Type vm:Game}">
                                     <HierarchicalDataTemplate.ItemsSource>
                                         <MultiBinding Converter="{StaticResource folderConverter}" ConverterParameter="Prototypes, Scenes, Assets">
                                             <Binding Path="Prototypes" />
@@ -160,7 +149,7 @@
                                         <TextBlock Text="{Binding Name}" Padding="3" />
                                     </StackPanel>
                                 </HierarchicalDataTemplate>
-                                <DataTemplate DataType="{x:Type vm:SceneViewModel}">
+                                <DataTemplate DataType="{x:Type vm:Scene}">
                                     <StackPanel Orientation="Horizontal">
                                         <StackPanel.InputBindings>
                                             <MouseBinding Gesture="LeftDoubleClick" Command="{Binding ElementName=window, Path=DataContext.OpenItemCommand, Mode=OneWay}" CommandParameter="{Binding}" />
@@ -169,7 +158,7 @@
                                         <TextBlock Text="{Binding Name}" Padding="3" />
                                     </StackPanel>
                                 </DataTemplate>
-                                <DataTemplate DataType="{x:Type vm:EntityViewModel}">
+                                <DataTemplate DataType="{x:Type vm:Entity}">
                                     <StackPanel Orientation="Horizontal">
                                         <StackPanel.InputBindings>
                                             <MouseBinding Gesture="LeftDoubleClick" Command="{Binding ElementName=window, Path=DataContext.OpenItemCommand, Mode=OneWay}" CommandParameter="{Binding}" />
@@ -225,7 +214,7 @@
                             </Expander>
                             <CollectionContainer Collection="{Binding DataContext.Components, Source={x:Reference dockDetails}}" />
                         </CompositeCollection>
-                        <DataTemplate DataType="{x:Type vm:ComponentViewModel}">
+                        <DataTemplate DataType="{x:Type vm:Component}">
                             <Expander IsExpanded="True">
                                 <Expander.Header>
                                     <Border Padding="8">

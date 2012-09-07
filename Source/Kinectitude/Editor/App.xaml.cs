@@ -1,5 +1,8 @@
 ﻿using System.Windows;
 using Kinectitude.Editor.Views;
+using System;
+using System.Reflection;
+using System.IO;
 
 namespace Kinectitude.Editor
 {

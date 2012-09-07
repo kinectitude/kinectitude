@@ -123,6 +123,7 @@
     </Content>
     <Content Include="reversi.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="game.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

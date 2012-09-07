@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:vm="clr-namespace:Kinectitude.Editor.ViewModels"
+             xmlns:vm="clr-namespace:Kinectitude.Editor.Models"
              xmlns:v="clr-namespace:Kinectitude.Editor.Views"
              mc:Ignorable="d">
 
@@ -33,7 +33,7 @@
                 <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,0,8,8" HorizontalAlignment="Right">First Scene</TextBlock>
                 <ComboBox Grid.Row="2" Grid.Column="1" Margin="0,0,0,8" ItemsSource="{Binding Scenes}" SelectedItem="{Binding FirstScene}">
                     <ComboBox.Resources>
-                        <DataTemplate DataType="{x:Type vm:SceneViewModel}">
+                        <DataTemplate DataType="{x:Type vm:Scene}">
                             <TextBlock Text="{Binding Name}" />
                         </DataTemplate>
                     </ComboBox.Resources>
@@ -102,7 +102,7 @@
                 <ScrollViewer VerticalScrollBarVisibility="Visible">
                     <ListBox Name="lstScenes" ItemsSource="{Binding Scenes}">
                         <ListBox.Resources>
-                            <DataTemplate DataType="{x:Type vm:SceneViewModel}">
+                            <DataTemplate DataType="{x:Type vm:Scene}">
                                 <v:SceneThumbnail />
                             </DataTemplate>
                         </ListBox.Resources>

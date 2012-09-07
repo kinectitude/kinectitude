@@ -4,53 +4,31 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:v="clr-namespace:Kinectitude.Editor.Views"
-             xmlns:vm="clr-namespace:Kinectitude.Editor.ViewModels"
+             xmlns:vm="clr-namespace:Kinectitude.Editor.Models"
              mc:Ignorable="d">
 
     <ScrollViewer Background="Gray" HorizontalScrollBarVisibility="Visible">
         <ItemsControl ItemsSource="{Binding Entities}">
+            
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <Canvas Width="{Binding Source={x:Static vm:Workspace.Instance}, Path=Game.Width}" Height="{Binding Source={x:Static vm:Workspace.Instance}, Path=Game.Height}" Margin="16">
-                        <Canvas.Background>
-                            <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                                <GradientStop Color="#D9040833" Offset="0" />
-                                <GradientStop Color="#E61747B2" Offset="1" />
-                            </LinearGradientBrush>
-                        </Canvas.Background>
-                    </Canvas>
+                    <Canvas Background="White" Width="{Binding Source={x:Static vm:Workspace.Instance}, Path=Game.Width}" Height="{Binding Source={x:Static vm:Workspace.Instance}, Path=Game.Height}" Margin="500" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
+            
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <DataTemplate.Resources>
-                        <BooleanToVisibilityConverter x:Key="boolToVis" />
-                    </DataTemplate.Resources>
-                    <Canvas>
-                        <Rectangle Width="{Binding Width}" Height="{Binding Height}" Visibility="{Binding IsRectangular, Converter={StaticResource boolToVis}}">
-                            <Rectangle.Fill>
-                                <SolidColorBrush Color="Cyan" />
-                            </Rectangle.Fill>
-                        </Rectangle>
-                        <Ellipse Width="{Binding Width}" Height="{Binding Height}" Visibility="{Binding IsElliptical, Converter={StaticResource boolToVis}}">
-                            <Ellipse.Fill>
-                                <SolidColorBrush Color="Cyan" />
-                            </Ellipse.Fill>
-                        </Ellipse>
-                        <TextBlock Text="{Binding Name}" FontSize="36" Visibility="{Binding HasText, Converter={StaticResource boolToVis}}">
-                    <TextBlock.Foreground>
-                        <SolidColorBrush Color="{Binding Color}" />
-                    </TextBlock.Foreground>
-                        </TextBlock>
-                    </Canvas>
+                    <v:EntityCanvas DataContext="{Binding ViewModel}" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
+
             <ItemsControl.ItemContainerStyle>
                 <Style>
-                    <Setter Property="Canvas.Top" Value="{Binding Y}" />
-                    <Setter Property="Canvas.Left" Value="{Binding X}" />
+                    <Setter Property="Canvas.Left" Value="{Binding ViewModel.X}" />
+                    <Setter Property="Canvas.Top" Value="{Binding ViewModel.Y}" />
                 </Style>
             </ItemsControl.ItemContainerStyle>
+
         </ItemsControl>
     </ScrollViewer>
 </UserControl>

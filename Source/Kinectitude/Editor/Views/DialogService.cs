@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Kinectitude.Editor.ViewModels;
+using Kinectitude.Editor.Models;
 using System.Windows;
 
 namespace Kinectitude.Editor.Views
