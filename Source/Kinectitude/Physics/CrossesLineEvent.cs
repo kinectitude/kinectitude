@@ -5,7 +5,7 @@ using Kinectitude.Core.Base;
 
 namespace Kinectitude.Physics
 {
-    [Plugin("Crosses a line", "")]
+    [Plugin("Entity crosses axis {Line} at location {Location} in direction {Direction}", "")]
     public class CrossesLineEvent : Event
     {
         public enum LineType

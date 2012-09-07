@@ -4,7 +4,7 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Physics
 {
-    [Plugin("Fire an event when a collision between bodies occurs", "")]
+    [Plugin("Entity collides with {CollidesWith}", "")]
     public class CollisionEvent : Event
     {
         [Plugin("Collides with","")]

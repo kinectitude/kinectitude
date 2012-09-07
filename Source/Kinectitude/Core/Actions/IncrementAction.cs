@@ -4,7 +4,7 @@ using Action = Kinectitude.Core.Base.Action;
 
 namespace Kinectitude.Core.Actions
 {
-    [Plugin("Increment an attribute", "")]
+    [Plugin("Increment value {Target} by {IncrementBy}", "")]
     internal sealed class IncrementAction : Action
     {
         [Plugin("Key", "")]

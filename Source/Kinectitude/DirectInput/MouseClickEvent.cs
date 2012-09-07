@@ -7,16 +7,15 @@ using Kinectitude.Core.Attributes;
 
 namespace Kinectitude.DirectInput
 {
-    [Plugin("Mouse clicking event","")]
+    [Plugin("Mouse button is clicked: (Button: {Button}, Button Number: {ButtonNumber})", "")]
     public class MouseClickEvent : Event
     {
-
         private MouseManager mouseManager;
 
-        [Plugin("Button to create evt with", "")]
+        [Plugin("Button", "Button to create evt with")]
         public Button Button { get; set; }
 
-        [Plugin("Button number for other buttons", "If button type is other, the button with id ButtonNumber is used")]
+        [Plugin("Button Number", "Button number for other buttons. If button type is other, the button with id ButtonNumber is used")]
         public int ButtonNumber { get; set; }
 
         public override void OnInitialize()
@@ -27,7 +26,7 @@ namespace Kinectitude.DirectInput
 
         public override void Destroy()
         {
-            mouseManager.RegisterMouseClick(this);
+            mouseManager.RemoveMouseClick(this);
         }
     }
 }

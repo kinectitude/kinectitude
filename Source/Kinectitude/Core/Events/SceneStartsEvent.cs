@@ -3,7 +3,7 @@ using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Events
 {
-    [Plugin("LoadedScene starts", "")]
+    [Plugin("Scene starts", "")]
     internal sealed class SceneStartsEvent : Event
     {
         public SceneStartsEvent() { }

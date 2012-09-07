@@ -7,19 +7,19 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Actions
 {
-    [Plugin("Creates a timer", "")]
+    [Plugin("Create timer {Name}: (Duration: {Duration}, Trigger: {Trigger}, Recurring? {Recurring})", "")]
     internal class CreateTimerAction : Action
     {
-        [Plugin("Name of the timer to create", "")]
+        [Plugin("Name", "Name of the timer to create")]
         public IExpressionReader Name { get; set; }
 
-        [Plugin("Duration, in seconds, to wait before triggering the trigger", "")]
+        [Plugin("Duration", "Duration, in seconds, to wait before triggering the trigger")]
         public IDoubleExpressionReader Duration { get; set; }
 
-        [Plugin("Trigger to fire", "")]
+        [Plugin("Trigger", "Trigger to fire")]
         public IExpressionReader Trigger { get; set; }
 
-        [Plugin("Determins if the timer should start again when it has finished", "")]
+        [Plugin("Recurring", "Determines if the timer should start again when it has finished")]
         public IBoolExpressionReader Recurring { get; set; }
 
         public CreateTimerAction()

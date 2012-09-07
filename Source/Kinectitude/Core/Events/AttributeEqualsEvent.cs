@@ -4,13 +4,13 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Events
 {
-    [Plugin("Attribute equals a value", "Triggers when the target becomes equal to the value")]
+    [Plugin("Expression {Value} equals {Target}", "Triggers when two expressions are equal")]
     internal sealed class AttributeEqualsEvent : Event
     {
-        [Plugin("Value", "")]
+        [Plugin("Left", "")]
         public IExpressionReader Value { get; set; }
 
-        [Plugin("Target", "")]
+        [Plugin("Right", "")]
         public IExpressionReader Target { get; set; }
 
         public AttributeEqualsEvent() { }

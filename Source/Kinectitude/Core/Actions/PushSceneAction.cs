@@ -4,10 +4,10 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Actions
 {
-    [Plugin("Push a scene", "")]
+    [Plugin("Push scene {Target}", "")]
     public sealed class PushSceneAction : Action
     {
-        [Plugin("LoadedScene", "")]
+        [Plugin("Scene", "")]
         public IExpressionReader Target { get; set; }
 
         public PushSceneAction() { }

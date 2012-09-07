@@ -10,7 +10,7 @@ using System.IO;
 
 namespace Kinectitude.Kinect
 {
-    [Plugin("Detects a gesture","")]
+    [Plugin("Player {Player} performs gesture {GestureName} with joint {Joint}", "")]
     public class GestureEvent : Event
     {
         private KinectManager manager;
@@ -19,13 +19,13 @@ namespace Kinectitude.Kinect
 
         public TemplatedGestureDetector GestureDetector { get; private set; }
 
-        [Plugin("Name of the gesture to detect", "")]
+        [Plugin("Gesture", "Name of the gesture to detect")]
         public string GestureName { get; set; }
 
-        [Plugin("Joint to detect gesture on", "")]
+        [Plugin("Joint", "Joint to detect gesture on")]
         public JointType Joint { get; set; }
 
-        [Plugin("player to detect gesture from", "")]
+        [Plugin("Player", "player to detect gesture from")]
         public int Player { get; set; }
 
         public override void OnInitialize()

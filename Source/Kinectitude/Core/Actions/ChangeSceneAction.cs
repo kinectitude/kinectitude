@@ -4,10 +4,10 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Actions
 {
-    [Plugin("Change the scene", "")]
+    [Plugin("Change scene to {Target}", "")]
     internal sealed class ChangeSceneAction : Action
     {
-        [Plugin("LoadedScene", "")]
+        [Plugin("Scene", "")]
         public IExpressionReader Target { get; set; }
 
         public ChangeSceneAction() { }

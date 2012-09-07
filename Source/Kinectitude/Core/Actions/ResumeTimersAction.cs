@@ -7,10 +7,10 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Actions
 {
-    [Plugin("Resume timers with a given Name", "")]
+    [Plugin("Resume timers {Name}", "")]
     internal class ResumeTimersAction : Action
     {
-        [Plugin("Name of the timers to resume", "")]
+        [Plugin("Name", "Name of the timers to resume")]
         public IExpressionReader Name { get; set; }
 
         public override void Run()

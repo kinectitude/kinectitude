@@ -4,13 +4,13 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Actions
 {
-    [Plugin("Set an attribute", "")]
+    [Plugin("Set value {Target} to {Value}", "")]
     public sealed class SetAction : Action
     {
-        [Plugin("Value", "Value to set the attribute to")]
+        [Plugin("Value", "Value to set with")]
         public IExpressionReader Value { get; set; }
 
-        [Plugin("Key", "Attribute to change")]
+        [Plugin("Key", "Attribute or property to change")]
         public IValueWriter Target { get; set; }
 
         public SetAction() { }

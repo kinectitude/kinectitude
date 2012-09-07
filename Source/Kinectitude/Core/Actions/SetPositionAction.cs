@@ -5,7 +5,7 @@ using Kinectitude.Core.Components;
 
 namespace Kinectitude.Core.Actions
 {
-    [Plugin("Set position", "")]
+    [Plugin("Set position to ({X}, {Y})", "")]
     internal sealed class SetPositionAction : Action
     {
         [Plugin("X", "The new X position for the Entity")]
