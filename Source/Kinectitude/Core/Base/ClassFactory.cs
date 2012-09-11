@@ -278,10 +278,7 @@ namespace Kinectitude.Core.Base
                 Expression getterBody = Expression.Property(cast, pi);
                 return Expression.Lambda<Func<object, T>>(getterBody, parameter).Compile();
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
         private static void createIValueWriter
@@ -452,10 +449,15 @@ namespace Kinectitude.Core.Base
                     ),
                     propertyType
                 );
-                //can't use object because enums are not nullable, not sure what to do.
-                //TODO ENUMS getter?
-                //getters may not be needed, since the attributes must take a primative type.
-                getter = stringGetter = null;
+
+                ParameterExpression parameter = Expression.Parameter(typeof(object));
+                UnaryExpression cast = Expression.Convert(parameter, pi.DeclaringType);
+                Expression getterBody = Expression.Convert(Expression.Property(cast, pi), typeof(Enum));
+
+                Func<object, Enum> objGetter =  Expression.Lambda<Func<object, Enum>>(getterBody, parameter).Compile();
+
+                getter = objGetter;
+                stringGetter = new Func<object, string>(input => objGetter(input).ToString());
             }
             else
             {

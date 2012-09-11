@@ -24,21 +24,21 @@
   </Using>
 
   <Scene Name="test">
-    <Entity Name="e">
+
+    <Entity Name ="e">
+      <Component Type="TransformComponent" X="400" Y="300" Width="32" Height="32"/>
+      <Component Type="TextRenderComponent" FontFamily="Arial" FontSize="36" FontColor="Black" TextAlignment="Trailing" ParagraphAlignment="Far" Value="fall"/>
+    </Entity>
+    
+    <Entity>
       <Component Type="TransformComponent" X="10" Y="10" Width="10" Height="11"/>
       <Component Type="MouseFollowComponent" Direction="Both"/>
       <Component Type="RenderComponent" FillColor="Yellow" Shape="Ellipse" />
-    </Entity>
-
-    <Entity>
-      <Component Type="TransformComponent" X="400" Y="300" Width="32" Height="32"/>
-      <Component Type="TextRenderComponent" FontFamily="Arial" FontSize="36" FontColor="Black" TextAlignment="Center"/>
-      <Event Type="AttributeChangesEvent" Target="e.TransformComponent.X">
-        <!--<Condition If="@Target.TransformComponent.X > 10">-->
-          <Action Type="SetAction" Target="this.TextRenderComponent.Value" Value="{!Target.TransformComponent.X}"/>
-        <!--</Condition>-->
+      <Component Type="TextRenderComponent" FontFamily="Arial" FontSize="36" FontColor="Black" TextAlignment="Center" ParagraphAlignment="Near" Value="test"/>
+      <Event Type="SceneStartsEvent">
+        <Action Type="SetAction" Target="this.TextRenderComponent.Value" Value="{e.TextRenderComponent.Value}"/>
+        <Action Type="SetAction" Target="this.TextRenderComponent.TextAlignment" Value="{e.TextRenderComponent.TextAlignment}"/>
       </Event>
     </Entity>
-    
   </Scene>
 </Game>

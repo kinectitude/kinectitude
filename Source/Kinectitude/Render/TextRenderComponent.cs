@@ -274,6 +274,8 @@ namespace Kinectitude.Render
 
         protected override void OnRender(RenderTarget renderTarget)
         {
+            OnReady();
+
             layoutRectangle.X = transformComponent.X + OffsetX;
             layoutRectangle.Y = transformComponent.Y + OffsetY;
             layoutRectangle.Width = transformComponent.Width;
