@@ -39,11 +39,10 @@ namespace Kinectitude.Core.Loaders
             return loadedManager;
         }
 
-        internal static IManager CreateManagers(LoadedScene scene, string type)
+        internal IManager CreateManager()
         {
-            LoadedManager loadedManager = ManagerMap[scene][type];
-            IManager manager = ClassFactory.Create<IManager>(type);
-            loadedManager.setValues(manager, null, null);
+            IManager manager = ClassFactory.Create<IManager>(Type);
+            setValues(manager, null, null);
             return manager;
         }
     }

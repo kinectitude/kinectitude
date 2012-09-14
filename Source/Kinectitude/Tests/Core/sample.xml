@@ -22,6 +22,7 @@
   <Prototype Name="prototype4" Prototype="prototype1 prototype2"/>
 
   <Scene Name="test" score="0">
+    
     <Entity Name="myName" Prototype="prototype2 prototype3">
       <Component Type="TransformComponent" X="15"/>
 

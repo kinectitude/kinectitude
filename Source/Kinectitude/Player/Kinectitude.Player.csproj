@@ -117,6 +117,7 @@
     </Content>
     <Content Include="game.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="oldgame.xml">
       <SubType>Designer</SubType>

@@ -13,6 +13,15 @@ namespace Kinectitude.Core.Base
 
         private readonly string change;
 
+        public static float ScaleX(float X) { return X * Game.CurrentGame.ScaleX; }
+        public static float ScaleY(float Y) { return Y * Game.CurrentGame.ScaleY; }
+
+        public void OffsetByWindow(ref int x, ref int y){
+            Tuple<int, int> offset = Game.CurrentGame.GetWidowOffset();
+            x -= offset.Item1;
+            y -= offset.Item2;
+        }
+
         protected Changeable()
         {
             change = ClassFactory.GetReferedName(GetType());

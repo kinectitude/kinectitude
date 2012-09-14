@@ -32,6 +32,7 @@ namespace Kinectitude.Core.Loaders
             lang = loaderUtility.Lang;
 
             HashSet<string> nameSet = new HashSet<string>() { lang.Name };
+            HashSet<string> typeSet = new HashSet<string>() { lang.Type };
 
             List<Tuple<string, string>> sceneValues = loaderUtility.GetValues(scene, nameSet);
 
@@ -41,9 +42,10 @@ namespace Kinectitude.Core.Loaders
 
             foreach (object manager in managers)
             {
-                List<Tuple<string, string>> managerValues = loaderUtility.GetValues(manager, nameSet);
-                Dictionary<string, string> managerProperties = loaderUtility.GetProperties(manager, nameSet);
-                LoadedManager.GetLoadedManager(managerProperties[lang.Name], LoadedScene, managerValues);
+                List<Tuple<string, string>> managerValues = loaderUtility.GetValues(manager, typeSet);
+                Dictionary<string, string> managerProperties = loaderUtility.GetProperties(manager, typeSet);
+                LoadedManager lm = LoadedManager.GetLoadedManager(managerProperties[lang.Type], LoadedScene, managerValues);
+                LoadedScene.addLoadedManager(lm);
             }
 
             IEnumerable<object> entities = loaderUtility.GetOfType(scene, loaderUtility.EntityType);

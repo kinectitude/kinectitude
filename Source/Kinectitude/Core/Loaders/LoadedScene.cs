@@ -8,7 +8,7 @@ namespace Kinectitude.Core.Loaders
 {
     internal class LoadedScene : LoadedObject
     {
-        private readonly List<string> Managers = new List<string>();
+        private readonly List<LoadedManager> Managers = new List<LoadedManager>();
 
         private readonly List<LoadedEntity> loadedEntities = new List<LoadedEntity>();
         private readonly SceneLoader Loader;
@@ -28,9 +28,9 @@ namespace Kinectitude.Core.Loaders
             Scene scene = new Scene(Loader, Game);
             scene.Name = Name;
             setValues(scene);
-            foreach (string type in Managers)
+            foreach (LoadedManager loadedManager in Managers)
             {
-                IManager manager = LoadedManager.CreateManagers(this, type);
+                IManager manager = loadedManager.CreateManager();
                 scene.Managers.Add(manager);
                 scene.ManagersDictionary[manager.GetType()] =  manager;
             }
@@ -49,9 +49,9 @@ namespace Kinectitude.Core.Loaders
             loadedEntities.Add(entity);
         }
 
-        internal void addManagerName(string type)
+        internal void addLoadedManager(LoadedManager manager)
         {
-            if(!Managers.Contains(type)) Managers.Add(type);
+            Managers.Add(manager);
         }
 
     }

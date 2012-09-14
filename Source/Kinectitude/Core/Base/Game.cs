@@ -17,6 +17,8 @@ namespace Kinectitude.Core.Base
         private readonly Dictionary<Type, Service> services = new Dictionary<Type, Service>();
 
         internal static Game CurrentGame { get; private set; }
+
+        private readonly Func<Tuple<int, int>> WindowOffset;
         
         public int Width
         {
@@ -28,10 +30,18 @@ namespace Kinectitude.Core.Base
             get { return null != this["Height"] ? int.Parse(this["Height"]) : 600; }
         }
 
-        internal Game(GameLoader gameLoader) : base(-2)
+        internal float ScaleX { get; private set; }
+        internal float ScaleY { get; private set; }
+
+        internal Tuple<int, int> GetWidowOffset() { return WindowOffset(); }
+
+        internal Game(GameLoader gameLoader, float scaleX, float scaleY, Func<Tuple<int, int>> windowOffset) : base(-2)
         {
             this.GameLoader = gameLoader;
             CurrentGame = this;
+            ScaleX = scaleX;
+            ScaleY = scaleY;
+            WindowOffset = windowOffset;
         }
 
         public void Start()

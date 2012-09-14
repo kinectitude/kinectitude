@@ -6,6 +6,7 @@ using Kinectitude.Core.Base;
 using SlimDX.DirectInput;
 using SlimDX;
 using System.Windows.Forms;
+using Kinectitude.Core.Attributes;
 
 namespace Kinectitude.DirectInput
 {
@@ -19,6 +20,22 @@ namespace Kinectitude.DirectInput
 
         private readonly List<MouseClickEvent> mouseClickEvens = new List<MouseClickEvent>();
 
+        private bool visibleCursor = true;
+        [Plugin("Cursor is shown when true", "")]
+        public bool VisibleCursor {
+            get { return visibleCursor; }
+            set
+            {
+                if (visibleCursor != value)
+                {
+                    visibleCursor = value;
+                    Change("VisibleCursor");
+                    if (value) Cursor.Show();
+                    else Cursor.Hide();
+                }
+            }
+        }
+
         public MouseManager()
         {
             if (mouse == null)
@@ -27,20 +44,23 @@ namespace Kinectitude.DirectInput
                 mouse = new Mouse(service.DirectInput);
                 service.InitDevice<Mouse>(mouse);
             }
-            Cursor.Hide();
         }
 
         public override void OnUpdate(float frameDelta)
         {
+            foreach (MouseFollowComponent mfc in Children)
+            {
+                //mfc.UpdateDelta(state.X, state.Y);
+                int x = Cursor.Position.X;
+                int y = Cursor.Position.Y;
+                OffsetByWindow(ref x, ref y);
+                mfc.UpdatePosition(ScaleX(x), ScaleY(y));
+                mfc.OnUpdate(frameDelta);
+            }
+
             if (mouse.Acquire().IsFailure || mouse.Poll().IsFailure) return;
             MouseState state = mouse.GetCurrentState();
             if (Result.Last.IsFailure) return;
-
-            foreach (MouseFollowComponent mfc in Children)
-            {
-                mfc.UpdateDelta(state.X, state.Y);
-                mfc.OnUpdate(frameDelta);
-            }
 
             bool [] buttonsPressed = state.GetButtons();
             for (int i = 0; i < 3 && i < buttonsPressed.Length; i++)

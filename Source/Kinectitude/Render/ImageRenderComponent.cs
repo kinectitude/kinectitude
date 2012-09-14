@@ -117,11 +117,6 @@ namespace Kinectitude.Render
             sourceRectangle.Height = transformComponent.Height / scaleY;
 
             renderTarget.DrawBitmap(bitmap, destRectangle, Opacity, SlimDX.Direct2D.InterpolationMode.Linear, sourceRectangle);
-
-            //if (Animated)
-            //{
-            //    currentFrame = (currentFrame + 1) % totalFrames;
-            //}
         }
 
         public override void OnUpdate(float frameDelta)

@@ -24,6 +24,7 @@
   </Using>
 
   <Scene Name="test">
+    <Manager Type="MouseManager" VisibleCursor="true"/>
 
     <Entity Name ="e">
       <Component Type="TransformComponent" X="400" Y="300" Width="32" Height="32"/>

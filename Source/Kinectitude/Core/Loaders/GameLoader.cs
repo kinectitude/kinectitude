@@ -97,9 +97,11 @@ namespace Kinectitude.Core.Loaders
             return Game;
         }
 
-        public GameLoader(string fileName, Assembly [] preloads)
+        public GameLoader
+            (string fileName, Assembly [] preloads, float scaleX, float scaleY, Func<Tuple<int, int>> windowOffset)
         {
-            Game = new Game(this);
+
+            Game = new Game(this, scaleX, scaleY, windowOffset);
 
             string extention = fileName.Substring(fileName.IndexOf('.'));
             if (".xml" == extention)

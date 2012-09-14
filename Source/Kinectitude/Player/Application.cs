@@ -25,12 +25,17 @@ namespace Kinectitude.Player
         {
             Assembly renderAssembly = Assembly.GetAssembly(typeof(RenderService));
             Assembly directAssemdly = Assembly.GetAssembly(typeof(DirectInputService));
-            GameLoader gameLoader = new GameLoader("game.xml", new Assembly[] { renderAssembly, directAssemdly });
-            game = gameLoader.CreateGame();
 
             Factory drawFactory = new SlimDX.Direct2D.Factory();
             SizeF dpi = drawFactory.DesktopDpi;
 
+
+            Func<Tuple<int, int>> windowOffset = new Func<Tuple<int, int>>(() => new Tuple<int, int>(form.Left, form.Top));
+
+            GameLoader gameLoader = new GameLoader("game.xml", 
+                new Assembly[] { renderAssembly, directAssemdly }, 96 / dpi.Width, 90 / dpi.Height, windowOffset);
+
+            game = gameLoader.CreateGame();
             Size size = new Size((int)(game.Width * dpi.Width / 96.0f), (int)(game.Height * dpi.Height / 96.0f));
 
             form = new RenderForm(game.Name)
