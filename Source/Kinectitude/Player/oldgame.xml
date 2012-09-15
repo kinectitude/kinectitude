@@ -69,9 +69,9 @@
       <Action Type="IncrementAction" Target="scene.player1Score" IncrementBy="scene.scoreValue"/>
     </Event>
     <Event Type="CollisionEvent" CollidesWith="$paddle">
-      <Action Type="SetAction" Target="scene.lastHit" Value="{!CollidesWith}"/>
-      <Action Type="SetAction" Target="scene.lastX" Value="{!CollidesWith.TransformComponent.X}"/>
-      <Action Type="SetAction" Target="scene.lastY" Value="{!CollidesWith.TransformComponent.Y}"/>
+      <Action Type="SetAction" Target="scene.lastHit" Value="{@CollidesWith}"/>
+      <Action Type="SetAction" Target="scene.lastX" Value="{@CollidesWith.TransformComponent.X}"/>
+      <Action Type="SetAction" Target="scene.lastY" Value="{@CollidesWith.TransformComponent.Y}"/>
       <Action Type="FireTriggerAction" Name="changeInfo"/>
     </Event>
   </Prototype>
@@ -114,7 +114,7 @@
       <Component Type="ImageRenderComponent" Image="sonic.png" Animated="true" Duration="2" />
     </Entity>
 
-    <Entity Name="topText" Prototype="text">
+    <Entity Name="topText" Prototype="text">g
       <Component Type="TransformComponent" X="0" Y="24" Width="800"/>
       <Component Type="TextRenderComponent" Value="Kinect Wimbledon Deluxe" FontColor="Yellow" TextAlignment="Center" FontWeight="Bold" />
     </Entity>
@@ -190,7 +190,7 @@
     <Entity Name="player1" Prototype="paddle">
       <Component Type="TransformComponent" X="17" Y="250"/>
       <Event Type="CollisionEvent" CollidesWith="$ball">
-        <Action Type="IncrementAction" Target="scene.player1Score" IncrementBy="!CollidesWith.Value"/>
+        <Action Type="IncrementAction" Target="scene.player1Score" IncrementBy="@CollidesWith.Value"/>
       </Event>
     </Entity>
 
@@ -198,7 +198,7 @@
       <Component Type="KinectFollowComponent" Player="1" Joint="HandRight" />
       <Component Type="TransformComponent" X="782" Y="250"/>
       <Event Type="CollisionEvent" CollidesWith="$ball">
-        <Action Type="IncrementAction" Target="scene.player2Score" IncrementBy="!CollidesWith.Value"/>
+        <Action Type="IncrementAction" Target="scene.player2Score" IncrementBy="@CollidesWith.Value"/>
       </Event>
     </Entity>
 
@@ -240,7 +240,7 @@
           <Action Type="SetAction" Target="game.winner" Value="player 1 wins"/>
           <Action Type="ChangeSceneAction" Target="Game Over"/>
         </Condition>
-        <Condition If="scene.player1Score >= 10 and not scene.ball1">
+        <Condition If="scene.player1Score >= 10 and !scene.ball1">
           <Action Type="CreateEntityAction" Prototype="leftBall"/>
           <Action Type="SetAction" Target="scene.ball1" Value="true"/>
         </Condition>
@@ -255,7 +255,7 @@
           <Action Type="SetAction" Target="game.winner" Value="player 2 wins"/>
           <Action Type="ChangeSceneAction" Target="Game Over"/>
         </Condition>
-        <Condition If="scene.player2Score >= 10 and not scene.ball2">
+        <Condition If="scene.player2Score >= 10 and !scene.ball2">
           <Action Type="CreateEntityAction" Prototype="rightBall"/>
           <Action Type="SetAction" Target="scene.ball2" Value="true"/>
         </Condition>

@@ -75,7 +75,7 @@ namespace Kinectitude.Tests.Core.Actions
         public void CreateEntity()
         {
             GameLoaderMock gameLoader = new GameLoaderMock();
-            Game game = new Game(gameLoader);
+            Game game = new Game(new GameLoaderMock(), 1, 1, new Func<Tuple<int, int>>(() => new Tuple<int, int>(0, 0)));
             LoaderUtilityMock loadermock = new LoaderUtilityMock();
             loadermock.Lang = new EnglishLanguageKeywords();
             loadermock.Properties = new Dictionary<string, string>() { {"Name", "a" }};

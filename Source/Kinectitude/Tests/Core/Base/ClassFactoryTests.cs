@@ -12,10 +12,10 @@ namespace Kinectitude.Tests.Core.Base
     [TestClass]
     public class ClassFactoryTests
     {
-
-        private Scene scene = new Scene(new SceneLoaderMock(new GameLoaderMock(), new LoaderUtilityMock()), new Game(new GameLoaderMock()));
-        private EventMock evt = new EventMock();
-        private ActionMock action = new ActionMock();
+        private static Game game = new Game(new GameLoaderMock(), 1, 1, new Func<Tuple<int, int>>(() => new Tuple<int, int>(0, 0)));
+        private static Scene scene = new Scene(new SceneLoaderMock(new GameLoaderMock(), new LoaderUtilityMock()), game);
+        private static EventMock evt = new EventMock();
+        private static ActionMock action = new ActionMock();
 
         static ClassFactoryTests()
         {
@@ -78,7 +78,7 @@ namespace Kinectitude.Tests.Core.Base
             Entity e = new Entity(10);
             ClassFactory.SetParam(evt, "Expression", "this", evt, e);
             Assert.AreEqual("this", evt.Expression.GetValue());
-            ClassFactory.SetParam(action, "Expression", "{" + TypeMatcher.parentChar +"Expression}", evt, e);
+            ClassFactory.SetParam(action, "Expression", "{" + TypeMatcher.ParentChar +"Expression}", evt, e);
             Assert.AreEqual(evt.Expression.GetValue(), action.Expression.GetValue());
         }
 
@@ -94,9 +94,9 @@ namespace Kinectitude.Tests.Core.Base
             
             ClassFactory.SetParam(evt, "TypeMatcher", "$ball", evt, entity);
             Assert.IsTrue(evt.TypeMatcher.MatchAndSet(entity));
-            ClassFactory.SetParam(action, "TypeMatcher", "!TypeMatcher", evt, entity);
+            ClassFactory.SetParam(action, "TypeMatcher", "@TypeMatcher", evt, entity);
             Assert.IsTrue(evt.TypeMatcher == action.TypeMatcher);
-            ClassFactory.SetParam(action, "Expression", "{!TypeMatcher.x}", evt, entity);
+            ClassFactory.SetParam(action, "Expression", "{@TypeMatcher.x}", evt, entity);
             Assert.AreEqual("lol", action.Expression.GetValue());
         }
 
@@ -122,7 +122,7 @@ namespace Kinectitude.Tests.Core.Base
         public void LoadServices()
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
-            Game game = new Game(new GameLoaderMock());
+            Game game = new Game(new GameLoaderMock(), 1, 1, new Func<Tuple<int, int>>(() => new Tuple<int, int>(0, 0)));
             ClassFactory.LoadServices(assembly);
             Assert.IsTrue(game.GetService<MockServiceToRun>().Started);
             Assert.IsFalse(game.GetService<MockServiceNotToRun>().Started);

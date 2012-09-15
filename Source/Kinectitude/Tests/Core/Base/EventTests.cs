@@ -77,7 +77,7 @@ namespace Kinectitude.Tests.Core.Base
             testAction.Event = testEvent;
             testEvent.Entity = testEntity;
             testAction.TypeMatcher = 
-                TypeMatcher.CreateTypeMatcher(TypeMatcher.parentChar + "TypeMatcher", testEvent, testEntity);
+                TypeMatcher.CreateTypeMatcher(TypeMatcher.ParentChar + "TypeMatcher", testEvent, testEntity);
             Assert.IsTrue(testAction.TypeMatcher == testEvent.TypeMatcher);
         }
     }

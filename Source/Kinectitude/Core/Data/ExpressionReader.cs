@@ -52,17 +52,17 @@ namespace Kinectitude.Core.Data
                     else
                     {
                         string[] vals = matchStr.Split('.');
-                        if (TypeMatcher.parentChar == matchStr[0])
+                        if (TypeMatcher.ParentChar == matchStr[0])
                         {
                             if (evt == null)
                             {
-                                throw new IllegalPlacementException(TypeMatcher.parentChar.ToString(), "events or actions");
+                                throw new IllegalPlacementException(TypeMatcher.ParentChar.ToString(), "events or actions");
                             }
                         }
                         switch (vals.Length)
                         {
                             case 1:
-                                if (TypeMatcher.parentChar == matchStr[0])
+                                if (TypeMatcher.ParentChar == matchStr[0])
                                 {
                                     expressions.Add(new ParameterValueReader(evt, matchStr.Substring(1)));
                                 }

@@ -2,6 +2,7 @@
 using Kinectitude.Core.Data;
 using Kinectitude.Tests.Core.TestMocks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 namespace Kinectitude.Tests.Core.Base
 {
@@ -18,7 +19,8 @@ namespace Kinectitude.Tests.Core.Base
             one["true"] = "true";
             one["one"] = "one";
             one["false"] = "false";
-            scene = new Scene(slm, new Game(new GameLoaderMock()));
+            Game game = new Game(new GameLoaderMock(), 1, 1, new Func<Tuple<int, int>>(() => new Tuple<int, int>(0, 0)));
+            scene = new Scene(slm, game);
             scene.EntityByName["one"] = one;
             one.Scene = scene;
         }

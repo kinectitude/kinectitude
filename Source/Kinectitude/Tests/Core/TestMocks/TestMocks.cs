@@ -16,7 +16,7 @@ namespace Kinectitude.Tests.Core.TestMocks
     {
         internal SceneLoader mockScene = null;
 
-        public GameLoaderMock() : base("test.xml", new Assembly[] { }) { }
+        public GameLoaderMock() : base("test.xml", new Assembly[] { }, 1, 1, new Func<Tuple<int,int>>(() => new Tuple<int,int>(0,0))) { }
 
         public void addType(string name)
         {

@@ -121,6 +121,7 @@
     </Content>
     <Content Include="oldgame.xml">
       <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="reversi.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

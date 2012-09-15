@@ -17,7 +17,7 @@ namespace Kinectitude.Tests.Core.Data
         private const string gameTest = "game test";
         private const string managerTest = "manager test";
 
-        Game game = new Game(new GameLoaderMock());
+        private static Game game = new Game(new GameLoaderMock(), 1, 1, new Func<Tuple<int, int>>(() => new Tuple<int, int>(0, 0)));
         Scene scene;
         Entity entity = new Entity(0);
         ComponentMock component = new ComponentMock();
@@ -79,8 +79,8 @@ namespace Kinectitude.Tests.Core.Data
             list.Add(values);
             GameLoaderMock glm = new GameLoaderMock();
             LoadedScene tmp = new LoadedScene("name", new List<Tuple<string,string>>(), new SceneLoaderMock(glm, new LoaderUtilityMock()), glm.Game);
-            LoadedManager.GetLoadedManager("manager", tmp, new List<Tuple<string, string>>() { new Tuple<string,string>("Value", managerTest) });
-            IManager manager = LoadedManager.CreateManagers(tmp, "manager");
+            LoadedManager lm = LoadedManager.GetLoadedManager("manager", tmp, new List<Tuple<string, string>>() { new Tuple<string,string>("Value", managerTest) });
+            IManager manager = lm.CreateManager();
             scene.Managers.Add(manager);
             scene.ManagersDictionary.Add(typeof(ManagerMock), manager);
         }

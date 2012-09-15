@@ -66,7 +66,8 @@ namespace Kinectitude.Tests.Core.Base
             e.Name = name;
             GameLoaderMock glm = new GameLoaderMock();
             SceneLoaderMock slm = new SceneLoaderMock(glm, new LoaderUtilityMock());
-            Scene s = new Scene(slm, new Game(glm));
+            Game game = new Game(new GameLoaderMock(), 1, 1, new Func<Tuple<int, int>>(() => new Tuple<int, int>(0, 0)));
+            Scene s = new Scene(slm, game);
             s.EntityById[0] = e;
             s.EntityByName[name] = e;
             e.Scene = s;

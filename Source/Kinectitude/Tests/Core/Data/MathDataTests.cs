@@ -9,7 +9,7 @@ namespace Kinectitude.Tests.Core.Data
     [TestClass]
     public class MathDataTests
     {
-        Game game = new Game(new GameLoaderMock());
+        Game game = new Game(new GameLoaderMock(), 1, 1, new Func<Tuple<int, int>>(() => new Tuple<int, int>(0, 0)));
         Scene scene;
         Entity entity = new Entity(0);
         ComponentMock component = new ComponentMock();

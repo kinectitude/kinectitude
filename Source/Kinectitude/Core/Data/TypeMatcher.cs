@@ -9,9 +9,9 @@ namespace Kinectitude.Core.Data
 {
     internal abstract class TypeMatcher : ITypeMatcher
     {
-        internal const char typeChar = '$';
-        internal const char exactTypeChar = '#';
-        internal const char parentChar = '!';
+        internal const char TypeChar = '$';
+        internal const char ExactTypeChar = '#';
+        internal const char ParentChar = '@';
 
         internal DataContainer DataContainer { get; set; }
 
@@ -53,11 +53,11 @@ namespace Kinectitude.Core.Data
                 }
                 return new ListedTypeMatcher(readableList);
             }
-            if (parentChar == value[0])
+            if (ParentChar == value[0])
             {
                 if (null == evt)
                 {
-                    throw new IllegalPlacementException(parentChar.ToString(), "events or actions");
+                    throw new IllegalPlacementException(ParentChar.ToString(), "events or actions");
                 }
                 value = value.Substring(1);
                 TypeMatcher matcher = ClassFactory.GetParam<ITypeMatcher>(evt, value) as TypeMatcher;
@@ -68,11 +68,11 @@ namespace Kinectitude.Core.Data
                 }
                 return matcher;
             }
-            if (typeChar == value[0])
+            if (TypeChar == value[0])
             {
                 return CreationHelper(value, scene.IsType, scene.Game.GameLoader);
             }
-            if (exactTypeChar == value[0])
+            if (ExactTypeChar == value[0])
             {
                 return CreationHelper(value, scene.IsExactType, scene.Game.GameLoader);
             }

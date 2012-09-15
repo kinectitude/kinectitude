@@ -92,8 +92,8 @@
         <Action Type="SetAction" Target="done" Value="true"/>
       </Condition>
       
-      <Condition If="not done and (positive and (this.PhysicsComponent.XVelocity > 0 or this.PhysicsComponent.YVelocity > 0)
-                 or not positive and (0 > this.PhysicsComponent.XVelocity or 0 > this.PhysicsComponent.YVelocity))">
+      <Condition If="!done and (positive and (this.PhysicsComponent.XVelocity > 0 or this.PhysicsComponent.YVelocity > 0)
+                 or !positive and (0 > this.PhysicsComponent.XVelocity or 0 > this.PhysicsComponent.YVelocity))">
         <Action Type="SetAction" Target="ImageRenderComponent.Row" Value="1"/>
         <Action Type="SetAction" Target="ImageRenderComponent.Animated" Value="true"/>
         <Action Type="SetAction" Target="done" Value="true"/>

@@ -2,6 +2,7 @@
 using Kinectitude.Core.Loaders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Xml.Schema;
+using System;
 
 namespace Kinectitude.Tests.Core.Loaders
 {
@@ -15,7 +16,7 @@ namespace Kinectitude.Tests.Core.Loaders
         static GameLoaderTests()
         {
             XMLLoaderUtility.schemas = new XmlSchemaSet();
-            gameLoader = new GameLoader(xmlFile, new Assembly[] { });
+            gameLoader = new GameLoader(xmlFile, new Assembly[] { }, 1, 1, new Func<Tuple<int,int>>(() => new Tuple<int, int>(0,0)));
             gameLoader.CreateGame();
         }
 

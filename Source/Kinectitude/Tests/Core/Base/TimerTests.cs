@@ -18,7 +18,7 @@ namespace Kinectitude.Tests.Core.Base
         public void BasicTimer()
         {
             GameLoaderMock gameLoader = new GameLoaderMock();
-            Game game = new Game(gameLoader);
+            Game game = new Game(new GameLoaderMock(), 1, 1, new Func<Tuple<int, int>>(() => new Tuple<int, int>(0, 0)));
             SceneLoaderMock sceneLoader = new SceneLoaderMock(gameLoader, new LoaderUtilityMock());
             Scene scene = new Scene(sceneLoader, game);
             Entity entity = new Entity(0);
@@ -46,7 +46,7 @@ namespace Kinectitude.Tests.Core.Base
         public void PauseAndResumeTimer()
         {
             GameLoaderMock gameLoader = new GameLoaderMock();
-            Game game = new Game(gameLoader);
+            Game game = new Game(new GameLoaderMock(), 1, 1, new Func<Tuple<int, int>>(() => new Tuple<int, int>(0, 0)));
             SceneLoaderMock sceneLoader = new SceneLoaderMock(gameLoader, new LoaderUtilityMock());
             Scene scene = new Scene(sceneLoader, game);
             Entity entity = new Entity(0);
@@ -86,7 +86,7 @@ namespace Kinectitude.Tests.Core.Base
         public void StopTimerInTimer()
         {
             GameLoaderMock gameLoader = new GameLoaderMock();
-            Game game = new Game(gameLoader);
+            Game game = new Game(new GameLoaderMock(), 1, 1, new Func<Tuple<int, int>>(() => new Tuple<int, int>(0, 0)));
             SceneLoaderMock sceneLoader = new SceneLoaderMock(gameLoader, new LoaderUtilityMock());
             Scene scene = new Scene(sceneLoader, game);
             Entity entity = new Entity(0);
