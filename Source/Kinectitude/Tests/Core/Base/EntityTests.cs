@@ -6,6 +6,7 @@ using Kinectitude.Tests.Core.TestMocks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Kinectitude.Core.Loaders;
 using System.Collections.Generic;
+using Kinectitude.Core.Events;
 
 namespace Kinectitude.Tests.Core.Base
 {
@@ -78,6 +79,20 @@ namespace Kinectitude.Tests.Core.Base
             Assert.IsTrue(cm.Destroyed);
             Assert.IsFalse(s.EntityById.ContainsKey(0));
             Assert.IsFalse(s.EntityByName.ContainsKey(name));
+        }
+
+        [TestMethod]
+        public void TestOnCreate()
+        {
+            Entity e = new Entity(0);
+            OnCreateEvent evt = new OnCreateEvent();
+            ActionMock action = new ActionMock();
+            evt.AddAction(action);
+            e.addOnCreate(evt);
+            evt.Entity = e;
+            Assert.IsFalse(action.HasRun);
+            e.Ready();
+            Assert.IsTrue(action.HasRun);
         }
     }
 }

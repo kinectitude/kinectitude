@@ -12,6 +12,7 @@ namespace IronlyLangTest
     [Language("test", "1.0", "Sample test grammar")]
     public class TestGrammar : Grammar
     {
+        //TODO known issue is that all terminals can have a space entity.component == entity . component
         private IdentifierTerminal identifier = TerminalFactory.CreateCSharpIdentifier("identifier");
         private RegexBasedTerminal name = new RegexBasedTerminal("name", "[a-zA-Z][a-zA-Z0-9_]*");
 
@@ -38,8 +39,11 @@ namespace IronlyLangTest
             Terminal mult = ToTerm("*");
             Terminal div = ToTerm("/");
             Terminal rem = ToTerm("%");
+            Terminal pow = ToTerm("**");
             Terminal openBrac = ToTerm("(");
             Terminal closeBrac = ToTerm(")");
+            Terminal and = ToTerm("&&");
+            Terminal or = ToTerm("||");
 
             NonTerminal game = new NonTerminal("game");
 
@@ -82,63 +86,81 @@ namespace IronlyLangTest
 
             NonTerminal value = new NonTerminal("value");
 
-            Terminal numericValue = TerminalFactory.CreateCSharpNumber("number");
-
-            NonTerminal boolVal = new NonTerminal("boolVal");
-            boolVal.Rule = ToTerm("true") | ToTerm("false");
-
-            Terminal and = new RegexBasedTerminal("and", @"and|&&");
-            Terminal or = new RegexBasedTerminal("or", @"or|\|\|");
-
             NonTerminal threeVal = new NonTerminal("threeVal");
             threeVal.Rule = name + "." + identifier + "." + identifier;
 
             NonTerminal twoVal = new NonTerminal("twoVal");
-            twoVal.Rule = identifier + "." + identifier;
+            twoVal.Rule = name + "." + identifier;
+
 
             NonTerminal isType = new NonTerminal("isType");
-            isType.Rule = "$" + twoVal | "$" + threeVal;
+            isType.Rule = "$" + name;
 
             NonTerminal isExactType = new NonTerminal("isExactType");
-            isExactType.Rule = "#" + twoVal | "#" + threeVal;
+            isExactType.Rule = "#" + name;
 
             NonTerminal parentVal = new NonTerminal("parentVal");
-            parentVal.Rule = "@" + twoVal | "@" + threeVal;
+            parentVal.Rule = "@" + twoVal | "@" + threeVal | "@" + identifier;
 
-            NonTerminal parentLiteral = new NonTerminal("parentLiteral");
-            parentLiteral.Rule = "@" + identifier;
-
-            Terminal number = TerminalFactory.CreateCSharpNumber("number");
-
-            NonTerminal numericExpr = new NonTerminal("numericExpr");
-            //TODO numeric
-            numericExpr.Rule = number | "-" + number;
-
-            NonTerminal boolExpr = new NonTerminal("boolExpr");
-            //TODO bool
-            boolExpr.Rule = ToTerm("true") | ToTerm("false");
-
-            NonTerminal strExpr = new NonTerminal("strExpr");
-            Terminal str = TerminalFactory.CreateCSharpString("str");
-            strExpr.Rule = str | str + plus + strExpr;
-
-            NonTerminal typeMatcher = new NonTerminal("typeMatcher");
-            typeMatcher.Rule = isType | isExactType | identifier + plus + typeMatcher 
-                | isType + plus + typeMatcher | isExactType + plus + typeMatcher;
-
-            MarkPunctuation(colon, eql, lt, gt, le, ge, ne, openBrac, closeBrac, plus, minus, div, mult, rem);
+            MarkPunctuation(colon, eql, lt, gt, le, ge, ne, openBrac, closeBrac, plus, minus, div, mult, rem, pow, and, or);
             RegisterBracePair("(", ")");
             RegisterBracePair("{", "}");
 
-            value.Rule = identifier | twoVal | threeVal | isType | isExactType
-                | parentVal | parentLiteral | numericExpr | boolExpr | strExpr | identifier;
+            NonTerminal exactValue = new NonTerminal("exactValue");
+            exactValue.Rule = name | twoVal | threeVal | parentVal;
+
+            NonTerminal typeMatcher = new NonTerminal("typeMatcher");
+            typeMatcher.Rule = isType | isExactType | isType + plus + typeMatcher | isExactType + plus + typeMatcher;
+
+            #region math
+
+            Terminal number = TerminalFactory.CreateCSharpNumber("number");
+            NonTerminal mathExpr = new NonTerminal("mathExpr");
+            NonTerminal mathTerm = new NonTerminal("mathTerm");
+            NonTerminal mathFactor = new NonTerminal("mathFactor");
+
+            mathExpr.Rule = mathTerm | mathExpr + plus + mathTerm | mathExpr + minus + mathTerm;
+            mathTerm.Rule = mathFactor | mathTerm + mult + mathFactor | mathTerm + div + mathFactor | mathTerm + rem + mathFactor;
+            //TODO think of a way to make this not ambigious with values
+            mathFactor.Rule = "n:" + exactValue | number | "-" + number | openBrac + mathExpr + closeBrac;
+            
+            #endregion
+
+            #region string
+
+            NonTerminal strExpr = new NonTerminal("strExpr");
+            Terminal str = TerminalFactory.CreateCSharpString("str");
+            strExpr.Rule = str | str + plus + strExpr | exactValue | exactValue + plus + strExpr;
+
+            #endregion
+            
+            #region bool
+
+            NonTerminal boolExpr = new NonTerminal("boolExpr");
+            NonTerminal boolTerm = new NonTerminal("boolTerm");
+            NonTerminal boolFactor = new NonTerminal("boolFactor");
+            NonTerminal test = new NonTerminal("test");
+
+            boolExpr.Rule = boolTerm | boolExpr + or + boolTerm | boolExpr + "or" + boolTerm;
+            boolTerm.Rule = boolFactor | boolTerm + and + boolFactor | boolTerm + "and" + boolFactor;
+            
+            test.Rule = mathExpr + lt + mathExpr | mathExpr + gt + mathExpr | mathExpr + eql + mathExpr |
+                mathExpr + le + mathExpr | mathExpr + ge + mathExpr | mathExpr + ne + mathExpr |
+                //TODO this should be allowed look into why it causes shift red conflicts
+                /*boolExpr + eql + boolExpr | boolExpr + ne + boolExpr |*/ strExpr + eql + strExpr | strExpr + ne + strExpr;
+
+            //TODO think of a way to make this not ambigious with values
+            boolFactor.Rule = "b:" + exactValue | "true" | "false" | openBrac + boolExpr + closeBrac | test;
+
+            #endregion
+
+            value.Rule = typeMatcher | mathExpr | boolExpr | strExpr;
 
             names.Rule = names + name | name;
             isPrototype.Rule = colon + names | Empty;
 
             basicDefinition.Rule = openBrace + properties + closeBrace;
 
-            //TODO make this better
             properties.Rule = properties + identifier + equals + value | Empty;
             entityDefinition.Rule = isPrototype + openBrace + properties + components + evts + closeBrace;
 
@@ -146,8 +168,7 @@ namespace IronlyLangTest
             createDefinitionsRules(managers, manager, "Manager", basicDefinition);
             createDefinitionsRules(components, component, "Component", basicDefinition);
 
-            //TODO make this is temp
-            condition.Rule = "if" + openBrac + name + closeBrac + openBrace + optionalActions + closeBrace;
+            condition.Rule = "if" + openBrac + boolExpr + closeBrac + openBrace + optionalActions + closeBrace;
 
             action.Rule = "Action" + identifier + basicDefinition;
             actions.Rule = action + optionalActions | condition + optionalActions;
@@ -172,7 +193,7 @@ namespace IronlyLangTest
             definitions.Rule = define + definitions | define;
 
             game.Rule = uses + "Game" + name + openBrace  + properties + prototypes + scenes + closeBrace;
-            base.Root = game;
+            Root = game;
         }
     }
 }

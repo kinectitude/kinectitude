@@ -125,6 +125,7 @@
     <Compile Include="Data\ValueWriter.cs" />
     <Compile Include="Events\AttributeChangesEvent.cs" />
     <Compile Include="Events\AttributeEqualsEvent.cs" />
+    <Compile Include="Events\OnCreateEvent.cs" />
     <Compile Include="Events\SceneStartsEvent.cs" />
     <Compile Include="Events\TriggerOccursEvent.cs" />
     <Compile Include="Exceptions\IllegalPlacementException.cs" />

@@ -28,10 +28,7 @@ namespace Kinectitude.Core.Base
         {
             //don't run events if the entity is destroyed
             if (Entity.Deleted) return;
-            foreach (Action a in actions)
-            {
-                a.Run();
-            }
+            foreach (Action a in actions) a.Run();
         }
 
         /// <summary>

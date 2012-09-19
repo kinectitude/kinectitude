@@ -38,7 +38,10 @@
       <Component Type="TextRenderComponent" FontFamily="Arial" FontSize="36" FontColor="Black" TextAlignment="Center" ParagraphAlignment="Near" Value="test"/>
       <Event Type="SceneStartsEvent">
         <Action Type="SetAction" Target="this.TextRenderComponent.Value" Value="{e.TextRenderComponent.Value}"/>
-        <Action Type="SetAction" Target="this.TextRenderComponent.TextAlignment" Value="{e.TextRenderComponent.TextAlignment}"/>
+        <Action Type="SetAction" Target="TextRenderComponent.TextAlignment" Value="{e.TextRenderComponent.TextAlignment}"/>
+      </Event>
+      <Event Type="OnCreateEvent">
+        <Action Type="SetAction" Target="RenderComponent.FillColor" Value="Red"/>
       </Event>
     </Entity>
   </Scene>
