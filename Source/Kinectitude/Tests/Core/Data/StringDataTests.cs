@@ -17,7 +17,8 @@ namespace Kinectitude.Tests.Core.Data
         private const string gameTest = "game test";
         private const string managerTest = "manager test";
 
-        private static Game game = new Game(new GameLoaderMock(), 1, 1, new Func<Tuple<int, int>>(() => new Tuple<int, int>(0, 0)));
+        private Game game = new Game(new GameLoaderMock(), 1, 1, new Func<Tuple<int, int>>(() => new Tuple<int, int>(0, 0)));
+
         Scene scene;
         Entity entity = new Entity(0);
         ComponentMock component = new ComponentMock();
@@ -96,17 +97,19 @@ namespace Kinectitude.Tests.Core.Data
         public void BasicReaders()
         {
             ExpressionReader reader = ExpressionReader.CreateExpressionReader("{this.etest}", evt, entity);
-            Assert.IsTrue(reader.GetValue() == entityTest);
+            Assert.AreEqual(entityTest, reader.GetValue());
 
             reader = ExpressionReader.CreateExpressionReader("{scene.stest}", evt, entity);
-            Assert.IsTrue(reader.GetValue() == sceneTest);
+            Assert.AreEqual(sceneTest, reader.GetValue());
 
+            //This is static so it may change pending on tests ordering :(
+            Game.CurrentGame = game;
             reader = ExpressionReader.CreateExpressionReader("{game.gtest}", evt, entity);
-            Assert.IsTrue(reader.GetValue() == gameTest);
+            Assert.AreEqual(gameTest, reader.GetValue());
 
 
             reader = ExpressionReader.CreateExpressionReader("{this.component.I}", evt, entity);
-            Assert.IsTrue(reader.GetValue() == component.I.ToString());
+            Assert.AreEqual(component.I.ToString(), reader.GetValue());
 
         }
 

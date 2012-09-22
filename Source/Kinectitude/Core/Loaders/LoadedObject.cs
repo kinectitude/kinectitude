@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Kinectitude.Core.Base;
+using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Loaders
 {
@@ -20,20 +21,10 @@ namespace Kinectitude.Core.Loaders
             foreach (Tuple<string, string> val in Values)
             {
                 string param = val.Item1;
-                string value = val.Item2;
+                string value = ExpressionReader.CreateExpressionReader(val.Item2, evt, entity).GetValue();
+
                 ClassFactory.SetParam(obj, param, value, evt, entity);
             }
         }
-
-        protected void setValues(DataContainer dc)
-        {
-            foreach (Tuple<string, string> val in Values)
-            {
-                string param = val.Item1;
-                string value = val.Item2;
-                dc[param] = value;
-            }
-        }
-
     }
 }

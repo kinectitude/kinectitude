@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Kinectitude.Core.Base;
+using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Loaders
 {
@@ -27,7 +28,10 @@ namespace Kinectitude.Core.Loaders
         {
             Scene scene = new Scene(Loader, Game);
             scene.Name = Name;
-            setValues(scene);
+
+            foreach (Tuple<string, string> value in Values)
+                scene[value.Item1] = ExpressionReader.CreateExpressionReader(value.Item2, null, null).GetValue();
+            
             foreach (LoadedManager loadedManager in Managers)
             {
                 IManager manager = loadedManager.CreateManager();

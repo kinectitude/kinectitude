@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Game Name="test" Width="800" Height="600" FirstScene="test" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1">
+<Game Name="test" Width="800" Height="600" FirstScene="test" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1" X="15">
   
   <Prototype Name="prototype1" score="100">
     <Component Type="TransformComponent" X="1000" Y="2000"/>
@@ -21,14 +21,18 @@
 
   <Prototype Name="prototype4" Prototype="prototype1 prototype2"/>
 
-  <Scene Name="test" score="0">
+  <Scene Name="test" score="0" X="{game.X}">
     
     <Entity Name="myName" Prototype="prototype2 prototype3">
-      <Component Type="TransformComponent" X="15"/>
+      <Component Type="TransformComponent" X="{scene.X}"/>
 
       <Event Type="SceneStartsEvent">
         <Action Type="CreateEntityAction" Prototype="prototype4"/>
       </Event>
+    </Entity>
+
+    <Entity Name="testEnum">
+      <Component Type="TransformComponent" X="{myName.TransformComponent.Y}" Y="{myName.TransformComponent.Y}"/>
     </Entity>
   </Scene>
 </Game>

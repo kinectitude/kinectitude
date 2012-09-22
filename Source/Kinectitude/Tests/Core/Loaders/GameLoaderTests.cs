@@ -3,6 +3,7 @@ using Kinectitude.Core.Loaders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Xml.Schema;
 using System;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Tests.Core.Loaders
 {
@@ -12,12 +13,13 @@ namespace Kinectitude.Tests.Core.Loaders
         private const string xmlFile = "sample.xml";
 
         private static readonly GameLoader gameLoader;
+        private static readonly Game game;
 
         static GameLoaderTests()
         {
             XMLLoaderUtility.schemas = new XmlSchemaSet();
             gameLoader = new GameLoader(xmlFile, new Assembly[] { }, 1, 1, new Func<Tuple<int,int>>(() => new Tuple<int, int>(0,0)));
-            gameLoader.CreateGame();
+            game = gameLoader.CreateGame();
         }
 
         [TestMethod]
@@ -47,7 +49,7 @@ namespace Kinectitude.Tests.Core.Loaders
         [DeploymentItem("Core\\" + xmlFile)]
         public void TestAvaliblePrototypes()
         {
-            Assert.IsTrue(gameLoader.AvaliblePrototypes.Count == 4, gameLoader.AvaliblePrototypes.Count.ToString());
+            Assert.AreEqual(4, gameLoader.AvaliblePrototypes.Count);
         }
     }
 }

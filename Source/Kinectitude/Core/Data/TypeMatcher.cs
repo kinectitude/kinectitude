@@ -42,7 +42,7 @@ namespace Kinectitude.Core.Data
 
         internal static TypeMatcher CreateTypeMatcher(string value, Event evt, Entity entity)
         {
-            Scene scene = entity.Scene;
+            Scene scene = null == entity ? null : entity.Scene;
             if (value.Contains(' '))
             {
                 List<ITypeMatcher> readableList = new List<ITypeMatcher>();
@@ -78,7 +78,7 @@ namespace Kinectitude.Core.Data
             }
             if ("game" == value)
             {
-                return new SingleTypeMatcher(entity.Scene.Game);
+                return new SingleTypeMatcher(Game.CurrentGame);
             }
             if ("scene" == value)
             {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Exceptions;
+using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Loaders
 {
@@ -80,8 +81,6 @@ namespace Kinectitude.Core.Loaders
             entity.Name = Name;
             entity.Scene = scene;
 
-            setValues(entity);
-
             foreach (LoadedComponent loadedComponent in components)
             {
                 entity.AddComponent(loadedComponent.Create(entity), loadedComponent.Name);
@@ -94,7 +93,8 @@ namespace Kinectitude.Core.Loaders
                 evt.Initialize();
             }
 
-            foreach (Tuple<string, string> value in Values) entity[value.Item1] = value.Item2;
+            foreach (Tuple<string, string> value in Values) 
+                entity[value.Item1] = ExpressionReader.CreateExpressionReader(value.Item2, null, entity).GetValue();
 
 
             scene.EntityById[entity.Id] = entity;

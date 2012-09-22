@@ -11,12 +11,12 @@ namespace Kinectitude.Core.Base
         public readonly GameLoader GameLoader;
 #if TEST
         internal readonly Stack<Scene> currentScenes = new Stack<Scene>();
+        internal static Game CurrentGame { get; set; }
 #else
         private readonly Stack<Scene> currentScenes = new Stack<Scene>();
+        internal static Game CurrentGame { get; private set; }
 #endif
         private readonly Dictionary<Type, Service> services = new Dictionary<Type, Service>();
-
-        internal static Game CurrentGame { get; private set; }
 
         private readonly Func<Tuple<int, int>> WindowOffset;
         
