@@ -126,6 +126,7 @@
       <Event Type="SceneStartsEvent">
         <Action Type="IncrementAction" Target="scene.blocks" IncrementBy="0"/>
         <!--Increment value by 0 just so the text shows up initially-->
+        
         <!--first line-->
         <Action Type="FireTriggerAction" Name="CreateBlock"/>
         <Action Type="SetAction" Target="scene.line" Value="[scene.line + 1]"/>
@@ -138,22 +139,22 @@
 
         <!--third line-->
         <Action Type="SetAction" Target="scene.spot" Value="0"/>
-        <Action Type="SetAction" Target="scene.finalSpot" Value="7"/>
         <Action Type="FireTriggerAction" Name="CreateBlock"/>
         <Action Type="SetAction" Target="scene.line" Value="[scene.line + 1]"/>
       </Event>
 
       <Event Type="TriggerOccursEvent" Trigger="CreateBlock">
-        <Action Type="SetAction" Target="scene.spot" Value="[scene.spot + 1]"/>
-        <Condition If="scene.finalSpot > scene.spot">
-          <Condition If="scene.line != 3 || scene.next % 2 == 0">
+        <Condition If="scene.finalSpot >= scene.spot">
+          <Condition If="scene.line != 3 || scene.next % 2 == 1">
             <Action Type="CreateEntityAction" Prototype="block"/>
           </Condition>
-          <Condition If="scene.line == 3 || scene.next % 2 == 1">
+           <Condition If="scene.line == 3 and scene.next % 2 == 0">
             <Action Type="CreateEntityAction" Prototype="spawn1Block"/>
           </Condition>
           <Action Type="FireTriggerAction" Name="create{scene.next}"/>
           <Action Type="SetAction" Target="scene.next" Value="[scene.next + 1]"/>
+          <Action Type="SetAction" Target="scene.spot" Value="[scene.spot + 1]"/>
+          <Action Type="FireTriggerAction" Name="CreateBlock"/>
         </Condition>
       </Event>
     </Entity>

@@ -118,7 +118,7 @@
     <Content Include="newgame.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="SimpleBricks.xml">
+    <Content Include="loopBreakout.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
