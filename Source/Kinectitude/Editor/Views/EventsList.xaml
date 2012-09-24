@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="Kinectitude.Editor.Views.EventsList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:m="clr-namespace:Kinectitude.Editor.Models"
+             mc:Ignorable="d">
+
+    <UserControl.Resources>
+
+        <DataTemplate DataType="{x:Type m:AbstractAction}">
+            <TextBlock Text="{Binding DisplayName}" FontWeight="Bold" Padding="8" />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type m:AbstractCondition}">
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="{Binding If}" FontWeight="Bold" Padding="8" Background="DarkGray" />
+                <ItemsControl ItemsSource="{Binding Actions}" Padding="16,0,0,0"></ItemsControl>
+                <TextBlock AllowDrop="True" Text="Drop here to add actions" Padding="16" Margin="16,0,0,0" Background="Cyan" Drop="ActionTarget_Drop" />
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type m:AbstractEvent}">
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="{Binding Header}" FontWeight="Bold" Padding="8" Background="DarkGray" />
+
+                <ItemsControl ItemsSource="{Binding Actions}" Padding="16,0,0,0">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical" Background="White" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+
+                <TextBlock AllowDrop="True" Text="Drop here to add actions" Padding="16" Margin="16,0,0,0" Background="Cyan" Drop="ActionTarget_Drop" />
+
+            </StackPanel>
+        </DataTemplate>
+
+    </UserControl.Resources>
+    
+    <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="16" Background="LightGray">
+
+        <ItemsControl ItemsSource="{Binding Events}" Margin="8">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Vertical" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+
+        <TextBlock AllowDrop="True" Text="Drop here to add events" Padding="16" Margin="8,0,0,0" Background="Cyan" Drop="EventTarget_Drop" />
+
+    </StackPanel>
+
+</UserControl>

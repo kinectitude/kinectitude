@@ -10,7 +10,7 @@ using Kinectitude.Editor.Models;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    internal sealed class BasicEntityViewModel : EntityViewModel
+    internal sealed class BasicEntityVisualViewModel : EntityVisualViewModel
     {
         public string Shape
         {
@@ -66,6 +66,6 @@ namespace Kinectitude.Editor.ViewModels
             }
         }
 
-        public BasicEntityViewModel(Entity entity) : base(entity) { }
+        public BasicEntityVisualViewModel(Entity entity) : base(entity) { }
     }
 }

@@ -9,6 +9,8 @@ using Kinectitude.Editor.Commands;
 using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.Views;
 using System.Windows.Input;
+using System.Collections.Specialized;
+using Kinectitude.Editor.ViewModels;
 
 namespace Kinectitude.Editor.Models
 {
@@ -25,10 +27,10 @@ namespace Kinectitude.Editor.Models
             get { return instance.Value; }
         }
 
-        private Game game;
+        private GameViewModel game;
         private BaseModel activeItem;
 
-        public Game Game
+        public GameViewModel Game
         {
             get { return game; }
             set
@@ -61,6 +63,24 @@ namespace Kinectitude.Editor.Models
         }
 
         public ObservableCollection<Plugin> Plugins
+        {
+            get;
+            private set;
+        }
+
+        public ObservableCollection<Plugin> Actions
+        {
+            get;
+            private set;
+        }
+
+        public ObservableCollection<Plugin> Events
+        {
+            get;
+            private set;
+        }
+
+        public ObservableCollection<Plugin> Components
         {
             get;
             private set;
@@ -111,6 +131,10 @@ namespace Kinectitude.Editor.Models
         {
             OpenItems = new ObservableCollection<BaseModel>();
             Plugins = new ObservableCollection<Plugin>();
+
+            Actions = new FilteredObservableCollection<Plugin>(Plugins, (plugin) => plugin.Type == PluginType.Action);
+            Events = new FilteredObservableCollection<Plugin>(Plugins, (plugin) => plugin.Type == PluginType.Event);
+            Components = new FilteredObservableCollection<Plugin>(Plugins, (plugin) => plugin.Type == PluginType.Component);
 
             commandHistory = new Lazy<CommandHistory>();
 
@@ -191,20 +215,24 @@ namespace Kinectitude.Editor.Models
 
         public void NewGame()
         {
-            Game = new Game("Untitled Game") { Width = 800, Height = 600 };
-            Game.AddScene(new Scene("Scene 1"));
+            Game game = new Game("Untitled Game") { Width = 800, Height = 600 };
+            game.AddScene(new Scene("Scene 1"));
+
+            Game = new GameViewModel(game);
         }
 
         public void LoadGame(string fileName)
         {
             IGameStorage storage = new XmlGameStorage(fileName);
-            Game = storage.LoadGame();
+            Game game = storage.LoadGame();
+
+            Game = new GameViewModel(game);
         }
 
         public void SaveGame()
         {
             IGameStorage storage = new XmlGameStorage(Game.FileName);
-            storage.SaveGame(Game);
+            storage.SaveGame(Game.Model);
         }
 
         public void OpenItem(BaseModel item)

@@ -23,7 +23,9 @@ namespace Kinectitude.Editor.Models
         [DependsOn("Scope")]
         public abstract string Type { get; }
 
-        public abstract string DisplayName { get; }
+        public abstract string Header { get; }
+
+        public abstract string Description { get; }
 
         [DependsOn("IsInherited")]
         public abstract bool IsLocal { get; }

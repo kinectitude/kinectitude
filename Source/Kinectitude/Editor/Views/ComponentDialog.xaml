@@ -17,7 +17,7 @@
 
         <Separator DockPanel.Dock="Bottom" />
 
-        <ListBox ItemsSource="{Binding Source={x:Static vm:Workspace.Instance}, Path=ComponentPlugins}" SelectedItem="{Binding SelectedComponent}">
+        <ListBox ItemsSource="{Binding Source={x:Static vm:Workspace.Instance}, Path=Components}" SelectedItem="{Binding SelectedComponent}">
             <ListBox.Resources>
                 <DataTemplate DataType="{x:Type vm:Plugin}">
                     <TextBlock Text="{Binding Name}" />

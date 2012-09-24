@@ -179,60 +179,6 @@ namespace Kinectitude.Editor.Models
             private set;
         }
 
-        public ICommand AddPrototypeCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand RemovePrototypeCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand AddAttributeCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand RemoveAttributeCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand AddSceneCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand RemoveSceneCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand AddAssetCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand RemoveAssetCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand RemoveItemCommand
-        {
-            get;
-            private set;
-        }
-
         public Game(string name)
         {
             this.name = name;
@@ -242,162 +188,6 @@ namespace Kinectitude.Editor.Models
             Prototypes = new ObservableCollection<Entity>();
             Scenes = new ObservableCollection<Scene>();
             Attributes = new ObservableCollection<Attribute>();
-
-            AddPrototypeCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Entity prototype = new Entity();
-
-                    DialogService.ShowDialog(DialogService.Constants.EntityDialog, prototype,
-                        (result) =>
-                        {
-                            if (result == true)
-                            {
-                                Workspace.Instance.CommandHistory.Log(
-                                    "add prototype '" + prototype.Name + "'",
-                                    () => AddPrototype(prototype),
-                                    () => RemovePrototype(prototype)
-                                );
-
-                                AddPrototype(prototype);
-                            }
-                        }
-                    ); 
-                }
-            );
-
-            RemovePrototypeCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Entity prototype = parameter as Entity;
-
-                    Workspace.Instance.CommandHistory.Log(
-                        "remove prototype '" + prototype.Name + "'",
-                        () => RemovePrototype(prototype),
-                        () => AddPrototype(prototype)
-                    );
-
-                    RemovePrototype(prototype);
-                }
-            );
-
-            AddSceneCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Scene scene = new Scene(GetNextSceneName());
-
-                    DialogService.ShowDialog(DialogService.Constants.SceneDialog, scene,
-                        (result) =>
-                        {
-                            if (result == true)
-                            {
-                                Workspace.Instance.CommandHistory.Log(
-                                    "add scene '" + scene.Name + "'",
-                                    () => AddScene(scene),
-                                    () => RemoveScene(scene)
-                                );
-
-                                AddScene(scene);
-                            }
-                        }
-                    );
-                }
-            );
-
-            RemoveSceneCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Scene scene = parameter as Scene;
-
-                    Workspace.Instance.CommandHistory.Log(
-                        "remove scene '" + scene.Name + "'",
-                        () => RemoveScene(scene),
-                        () => AddScene(scene)
-                    );
-
-                    RemoveScene(scene);
-                }
-            );
-
-            AddAttributeCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Attribute attribute = new Attribute(GetNextAttributeKey());
-
-                    Workspace.Instance.CommandHistory.Log(
-                        "add attribute '" + attribute.Key + "'",
-                        () => AddAttribute(attribute),
-                        () => RemoveAttribute(attribute)
-                    );
-
-                    AddAttribute(attribute);
-                }
-            );
-
-            RemoveAttributeCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Attribute attribute = parameter as Attribute;
-
-                    Workspace.Instance.CommandHistory.Log(
-                        "remove attribute '" + attribute.Key + "'",
-                        () => RemoveAttribute(attribute),
-                        () => AddAttribute(attribute)
-                    );
-
-                    RemoveAttribute(attribute);
-                }
-            );
-
-            AddAssetCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    // TODO: File Chooser
-                    Asset asset = new Asset("An Asset");
-
-                    Workspace.Instance.CommandHistory.Log(
-                        "add asset '" + asset.FileName + "'",
-                        () => AddAsset(asset),
-                        () => RemoveAsset(asset)
-                    );
-
-                    AddAsset(asset);
-                }
-            );
-
-            RemoveAssetCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Asset asset = parameter as Asset;
-
-                    Workspace.Instance.CommandHistory.Log(
-                        "remove asset '" + asset.FileName + "'",
-                        () => RemoveAsset(asset),
-                        () => AddAsset(asset)
-                    );
-
-                    RemoveAsset(asset);
-                }
-            );
-
-            RemoveItemCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Entity prototype = parameter as Entity;
-                    if (null != prototype)
-                    {
-                        RemovePrototype(prototype);
-                    }
-                    else
-                    {
-                        Scene scene = parameter as Scene;
-                        if (null != scene)
-                        {
-                            RemoveScene(scene);
-                        }
-                    }
-                }
-            );
         }
 
         public void AddUsing(Using use)
@@ -432,6 +222,12 @@ namespace Kinectitude.Editor.Models
                 }
 
                 Prototypes.Add(prototype);
+
+                Workspace.Instance.CommandHistory.Log(
+                    "add prototype '" + prototype.Name + "'",
+                    () => AddPrototype(prototype),
+                    () => RemovePrototype(prototype)
+                );
             }
         }
 
@@ -440,6 +236,12 @@ namespace Kinectitude.Editor.Models
             prototype.SetScope(null);
             prototype.PluginAdded -= OnPluginAdded;
             Prototypes.Remove(prototype);
+
+            Workspace.Instance.CommandHistory.Log(
+                "remove prototype '" + prototype.Name + "'",
+                () => RemovePrototype(prototype),
+                () => AddPrototype(prototype)
+            );
         }
 
         public Entity GetPrototype(string name)
@@ -463,6 +265,12 @@ namespace Kinectitude.Editor.Models
             }
 
             Scenes.Add(scene);
+
+            Workspace.Instance.CommandHistory.Log(
+                "add scene '" + scene.Name + "'",
+                () => AddScene(scene),
+                () => RemoveScene(scene)
+            );
         }
 
         public void RemoveScene(Scene scene)
@@ -470,6 +278,17 @@ namespace Kinectitude.Editor.Models
             scene.SetScope(null);
             scene.PluginAdded -= OnPluginAdded;
             Scenes.Remove(scene);
+
+            Workspace.Instance.CommandHistory.Log(
+                "remove scene '" + scene.Name + "'",
+                () => RemoveScene(scene),
+                () => AddScene(scene)
+            );
+        }
+
+        public Scene CreateScene()
+        {
+            return new Scene(GetNextSceneName());
         }
 
         public Scene GetScene(string name)
@@ -481,22 +300,52 @@ namespace Kinectitude.Editor.Models
         {
             attribute.SetScope(this);
             Attributes.Add(attribute);
+
+            Workspace.Instance.CommandHistory.Log(
+                "add attribute '" + attribute.Key + "'",
+                () => AddAttribute(attribute),
+                () => RemoveAttribute(attribute)
+            );
         }
 
         public void RemoveAttribute(Attribute attribute)
         {
             attribute.SetScope(null);
             Attributes.Remove(attribute);
+
+            Workspace.Instance.CommandHistory.Log(
+                "remove attribute '" + attribute.Key + "'",
+                () => RemoveAttribute(attribute),
+                () => AddAttribute(attribute)
+            );
+        }
+
+        public void CreateAttribute()
+        {
+            Attribute attribute = new Attribute(GetNextAttributeKey());
+            AddAttribute(attribute);
         }
 
         public void AddAsset(Asset asset)
         {
             Assets.Add(asset);
+
+            Workspace.Instance.CommandHistory.Log(
+                "add asset '" + asset.FileName + "'",
+                () => AddAsset(asset),
+                () => RemoveAsset(asset)
+            );
         }
 
         public void RemoveAsset(Asset asset)
         {
             Assets.Remove(asset);
+
+            Workspace.Instance.CommandHistory.Log(
+                "remove asset '" + asset.FileName + "'",
+                () => RemoveAsset(asset),
+                () => AddAsset(asset)
+            );
         }
 
         public Plugin GetPlugin(string name)

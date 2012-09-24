@@ -3,72 +3,74 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:vm="clr-namespace:Kinectitude.Editor.Models"
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             xmlns:m="clr-namespace:Kinectitude.Editor.Models"
+             xmlns:v="clr-namespace:Kinectitude.Editor.Views"
+             mc:Ignorable="d">
+    
     <UserControl.Resources>
-        <DataTemplate DataType="{x:Type vm:Attribute}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{Binding Key}" />
-                <TextBlock>: </TextBlock>
-                <TextBlock Text="{Binding StringValue}" />
-            </StackPanel>
+        
+        <DataTemplate DataType="{x:Type m:Plugin}">
+            <v:DraggableItem DataContext="{Binding}" />
         </DataTemplate>
-        <!--DataTemplate DataType="{x:Type vm:ComponentViewModel}">
-            <TextBlock Text="{Binding Type}" />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:EventViewModel}">
-            <TextBlock Text="{Binding Type}" />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:ActionViewModel}">
-            <TextBlock Text="{Binding Type}" />
-        </DataTemplate-->
+
     </UserControl.Resources>
 
-    <ScrollViewer Background="Gray" HorizontalScrollBarVisibility="Visible">
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="16" Background="LightGray">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <ScrollViewer>
+            <StackPanel Orientation="Vertical">
+                
+                <Expander IsExpanded="True">
+                    <Expander.Header>
+                        <Border Padding="8">
+                            <TextBlock FontWeight="Bold" Foreground="{StaticResource ForegroundBrush}">General</TextBlock>
+                        </Border>
+                    </Expander.Header>
+                    <Expander.Content>
+                        <ListBox>
+                            <TextBlock Text="Condition" Foreground="{StaticResource ForegroundBrush}" Padding="16" />
+                        </ListBox>
+                    </Expander.Content>
+                </Expander>
+
+                <Expander IsExpanded="True">
+                    <Expander.Header>
+                        <Border Padding="8">
+                            <TextBlock FontWeight="Bold" Foreground="{StaticResource ForegroundBrush}">Events</TextBlock>
+                        </Border>
+                    </Expander.Header>
+                    <Expander.Content>
+                        <ListBox ItemsSource="{Binding Source={x:Static m:Workspace.Instance}, Path=Events}" />
+                    </Expander.Content>
+                </Expander>
+
+                <Expander IsExpanded="True">
+                    <Expander.Header>
+                        <Border Padding="8">
+                            <TextBlock FontWeight="Bold" Foreground="{StaticResource ForegroundBrush}">Actions</TextBlock>
+                        </Border>
+                    </Expander.Header>
+                    <Expander.Content>
+                        <ListBox ItemsSource="{Binding Source={x:Static m:Workspace.Instance}, Path=Actions}" />
+                    </Expander.Content>
+                </Expander>
+                
+            </StackPanel>
             
-            <ItemsControl ItemsSource="{Binding Events}" Margin="8">
-                <ItemsControl.Resources>
-                    
-                    <DataTemplate DataType="{x:Type vm:AbstractEvent}">
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="{Binding DisplayName}" FontWeight="Bold" Padding="8" Background="DarkGray" />
-                            
-                            <ItemsControl ItemsSource="{Binding Actions}" Padding="16,0,0,0">
-                                <ItemsControl.Resources>
-                                    
-                                    <DataTemplate DataType="{x:Type vm:AbstractAction}">
-                                        <TextBlock Text="{Binding DisplayName}" />
-                                    </DataTemplate>
+            
+        </ScrollViewer>
+        
+        <GridSplitter Width="4" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Style="{StaticResource gridSplitter}" />
+        
+        <ScrollViewer Background="Gray" HorizontalScrollBarVisibility="Visible" Grid.Column="2">
+            <v:EventsList DataContext="{Binding}" />
+        </ScrollViewer>
 
-                                    <DataTemplate DataType="{x:Type vm:AbstractCondition}">
-                                        <StackPanel Orientation="Vertical">
-                                            <TextBlock Text="{Binding If}" FontWeight="Bold" Padding="8" Background="DarkGray" />
-                                            <ItemsControl ItemsSource="{Binding Actions}" Padding="16,0,0,0"></ItemsControl>
-                                        </StackPanel>
-                                    </DataTemplate>
-
-                                </ItemsControl.Resources>
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Vertical" Background="White" />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                            </ItemsControl>
-                            
-                        </StackPanel>
-                    </DataTemplate>
-                    
-                </ItemsControl.Resources>
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Vertical" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-
-        </StackPanel>
-    </ScrollViewer>
+    </Grid>
 
 </UserControl>

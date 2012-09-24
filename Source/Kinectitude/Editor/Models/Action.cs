@@ -21,7 +21,7 @@ namespace Kinectitude.Editor.Models
 
         public override string DisplayName
         {
-            get { return plugin.DisplayName; }
+            get { return plugin.Header; }
         }
 
         public override bool IsInherited

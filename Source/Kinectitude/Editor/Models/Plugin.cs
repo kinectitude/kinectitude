@@ -46,7 +46,7 @@ namespace Kinectitude.Editor.Models
             private set;
         }
 
-        public string DisplayName
+        public string Header
         {
             get;
             private set;
@@ -78,12 +78,11 @@ namespace Kinectitude.Editor.Models
 
         public Plugin(Type type)
         {
-            CoreType = type;
-            
             PluginAttribute pluginAttribute = System.Attribute.GetCustomAttribute(type, typeof(PluginAttribute)) as PluginAttribute;
 
+            CoreType = type;
             File = type.Module.Name;
-            DisplayName = pluginAttribute.Name;
+            Header = pluginAttribute.Name;
             Description = pluginAttribute.Description;
             ClassName = type.FullName;
             ShortName = type.Name;

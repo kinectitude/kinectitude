@@ -7,7 +7,7 @@ using Kinectitude.Render;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    internal class TextEntityViewModel : EntityViewModel
+    internal class TextEntityVisualViewModel : EntityVisualViewModel
     {
         public string Value
         {
@@ -39,6 +39,6 @@ namespace Kinectitude.Editor.ViewModels
             }
         }
 
-        public TextEntityViewModel(Entity entity) : base(entity) { }
+        public TextEntityVisualViewModel(Entity entity) : base(entity) { }
     }
 }

@@ -79,7 +79,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Base\ComputedObservableCollection.cs" />
     <Compile Include="Base\DelegateCommand.cs" />
+    <Compile Include="Base\FilteredObservableCollection.cs" />
     <Compile Include="Commands\CommandHistory.cs" />
     <Compile Include="Commands\DelegateUndoableCommand.cs" />
     <Compile Include="Commands\ICommandHistory.cs" />
@@ -97,7 +99,7 @@
     <Compile Include="Models\Component.cs" />
     <Compile Include="Models\Condition.cs" />
     <Compile Include="Models\Define.cs" />
-    <Compile Include="ViewModels\BasicEntityViewModel.cs" />
+    <Compile Include="ViewModels\BasicEntityVisualViewModel.cs" />
     <Compile Include="Models\Entity.cs" />
     <Compile Include="Models\Event.cs" />
     <Compile Include="Models\Game.cs" />
@@ -123,13 +125,24 @@
     <Compile Include="Models\Using.cs" />
     <Compile Include="Models\Workspace.cs" />
     <Compile Include="ViewModels\EntityViewModel.cs" />
-    <Compile Include="ViewModels\SpriteEntityViewModel.cs" />
-    <Compile Include="ViewModels\TextEntityViewModel.cs" />
+    <Compile Include="ViewModels\EntityVisualViewModel.cs" />
+    <Compile Include="ViewModels\EventViewModel.cs" />
+    <Compile Include="ViewModels\GameViewModel.cs" />
+    <Compile Include="ViewModels\SceneViewModel.cs" />
+    <Compile Include="ViewModels\SpriteEntityVisualViewModel.cs" />
+    <Compile Include="ViewModels\TextEntityVisualViewModel.cs" />
     <Compile Include="Views\ComponentDialog.xaml.cs">
       <DependentUpon>ComponentDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\DragDropData.cs" />
+    <Compile Include="Views\DraggableItem.xaml.cs">
+      <DependentUpon>DraggableItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\EntityCanvas.xaml.cs">
       <DependentUpon>EntityCanvas.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EventsList.xaml.cs">
+      <DependentUpon>EventsList.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\FolderConverter.cs" />
     <Compile Include="Views\EntityDialog.xaml.cs">
@@ -142,15 +155,14 @@
       <DependentUpon>GameView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\DialogService.cs" />
-    <Compile Include="Views\IDialogService.cs" />
     <Compile Include="Views\SceneDialog.xaml.cs">
       <DependentUpon>SceneDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\SceneEditor.xaml.cs">
+      <DependentUpon>SceneEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SceneThumbnail.xaml.cs">
       <DependentUpon>SceneThumbnail.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\SceneView.xaml.cs">
-      <DependentUpon>SceneView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\WorkspaceWindow.xaml.cs">
       <DependentUpon>WorkspaceWindow.xaml</DependentUpon>
@@ -171,6 +183,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\DraggableItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\EntityCanvas.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -187,6 +203,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\EventsList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\GameView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -195,11 +215,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\SceneThumbnail.xaml">
+    <Page Include="Views\SceneEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\SceneView.xaml">
+    <Page Include="Views\SceneThumbnail.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -279,7 +299,9 @@
     <Resource Include="Icons\page_copy.png" />
     <Resource Include="Icons\page_paste.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Views\WorkspaceWindow\" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Kinectitude.Core.csproj">
       <Project>{AEAB17EC-574C-4177-9204-FE48F4C3F429}</Project>

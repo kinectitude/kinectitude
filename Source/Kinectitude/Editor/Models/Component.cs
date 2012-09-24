@@ -26,7 +26,7 @@ namespace Kinectitude.Editor.Models
 
         public string DisplayName
         {
-            get { return plugin.DisplayName; }
+            get { return plugin.Header; }
         }
 
         [DependsOn("Scope")]

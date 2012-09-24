@@ -20,7 +20,6 @@ namespace Kinectitude.Editor.Models
         private string name;
         private IEntityScope scope;
         private int nextAttribute;
-        private EntityViewModel viewModel;
 
         public event ScopeChangedEventHandler ScopeChanged;
         public event PluginAddedEventHandler PluginAdded;
@@ -83,211 +82,12 @@ namespace Kinectitude.Editor.Models
             get { return Components.Select(x => x.Plugin).Union(Events.SelectMany(x => x.Plugins)).Distinct(); }
         }
 
-        public ICommand AddPrototypeCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand RemovePrototypeCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand AddAttributeCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand RemoveAttributeCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand AddComponentCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand RemoveComponentCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand AddEventCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand RemoveEventCommand
-        {
-            get;
-            private set;
-        }
-
-        public EntityViewModel ViewModel
-        {
-            get { return viewModel; }
-            set
-            {
-                if (value != viewModel)
-                {
-                    viewModel = value;
-                    NotifyPropertyChanged("ViewModel");
-                }
-            }
-        }
-
         public Entity()
         {
             Prototypes = new ObservableCollection<Entity>();
             Attributes = new ObservableCollection<Attribute>();
             Components = new ObservableCollection<Component>();
             Events = new ObservableCollection<AbstractEvent>();
-
-            viewModel = new EntityViewModel(this);
-
-            AddPrototypeCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Entity prototype = parameter as Entity;
-                    if (null != prototype)
-                    {
-                        Workspace.Instance.CommandHistory.Log(
-                            "change entity prototype",
-                            () => AddPrototype(prototype),
-                            () => RemovePrototype(prototype)
-                        );
-
-                        AddPrototype(prototype);
-                    }
-                }
-            );
-
-            RemovePrototypeCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Entity prototype = parameter as Entity;
-                    if (null != prototype)
-                    {
-                        Workspace.Instance.CommandHistory.Log(
-                            "change entity prototype",
-                            () => RemovePrototype(prototype),
-                            () => AddPrototype(prototype)
-                        );
-
-                        RemovePrototype(prototype);
-                    }
-                }
-            );
-
-            AddAttributeCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Attribute attribute = new Attribute(GetNextAttributeKey());
-
-                    Workspace.Instance.CommandHistory.Log(
-                        "add attribute '" + attribute.Key + "'",
-                        () => AddAttribute(attribute),
-                        () => RemoveAttribute(attribute)
-                    );
-
-                    AddAttribute(attribute);
-                }
-            );
-
-            RemoveAttributeCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Attribute attribute = parameter as Attribute;
-
-                    Workspace.Instance.CommandHistory.Log(
-                        "remove attribute '" + attribute.Key + "'",
-                        () => RemoveAttribute(attribute),
-                        () => AddAttribute(attribute)
-                    );
-
-                    RemoveAttribute(attribute);
-                }
-            );
-
-            AddComponentCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Plugin plugin = parameter as Plugin;
-                    if (null != plugin)
-                    {
-                        Component component = new Component(plugin);
-
-                        Workspace.Instance.CommandHistory.Log(
-                            "add component '" + component.DisplayName + "'",
-                            () => AddComponent(component),
-                            () => RemoveComponent(component)
-                        );
-
-                        AddComponent(component);
-                    }
-                }
-            );
-
-            RemoveComponentCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Component component = parameter as Component;
-                    if (null != component)
-                    {
-                        Workspace.Instance.CommandHistory.Log(
-                            "remove component '" + component.DisplayName + "'",
-                            () => RemoveComponent(component),
-                            () => AddComponent(component)
-                        );
-
-                        RemoveComponent(component);
-                    }
-                }
-            );
-
-            AddEventCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Plugin plugin = parameter as Plugin;
-                    if (null != plugin)
-                    {
-                        Event evt = new Event(plugin);
-
-                        Workspace.Instance.CommandHistory.Log(
-                            "add event '" + evt.DisplayName + "'",
-                            () => AddEvent(evt),
-                            () => RemoveEvent(evt)
-                        );
-
-                        AddEvent(evt);
-                    }
-                }
-            );
-
-            RemoveEventCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Event evt = parameter as Event;
-                    if (null != evt)
-                    {
-                        Workspace.Instance.CommandHistory.Log(
-                            "remove event '" + evt.DisplayName + "'",
-                            () => RemoveEvent(evt),
-                            () => AddEvent(evt)
-                        );
-
-                        RemoveEvent(evt);
-                    }
-                }
-            );
         }
 
         public void SetScope(IEntityScope scope)
@@ -334,6 +134,12 @@ namespace Kinectitude.Editor.Models
                 {
                     InheritEvent(inheritedEvent);
                 }
+
+                Workspace.Instance.CommandHistory.Log(
+                    "change entity prototype",
+                    () => AddPrototype(prototype),
+                    () => RemovePrototype(prototype)
+                );
             }
         }
 
@@ -358,6 +164,12 @@ namespace Kinectitude.Editor.Models
             {
                 DisinheritEvent(inheritedEvent);
             }
+
+            Workspace.Instance.CommandHistory.Log(
+                "change entity prototype",
+                () => RemovePrototype(prototype),
+                () => AddPrototype(prototype)
+            );
         }
 
         private void InheritAttribute(Attribute inheritedAttribute)
@@ -485,6 +297,12 @@ namespace Kinectitude.Editor.Models
                 attribute.SetScope(this);
                 attribute.KeyChanged += OnLocalAttributeKeyChanged;
                 Attributes.Add(attribute);
+
+                Workspace.Instance.CommandHistory.Log(
+                    "add attribute '" + attribute.Key + "'",
+                    () => AddAttribute(attribute),
+                    () => RemoveAttribute(attribute)
+                );
             }
         }
 
@@ -495,7 +313,19 @@ namespace Kinectitude.Editor.Models
                 attribute.SetScope(null);
                 attribute.KeyChanged -= OnLocalAttributeKeyChanged;
                 Attributes.Remove(attribute);
+
+                Workspace.Instance.CommandHistory.Log(
+                    "remove attribute '" + attribute.Key + "'",
+                    () => RemoveAttribute(attribute),
+                    () => AddAttribute(attribute)
+                );
             }
+        }
+
+        public void CreateAttribute()
+        {
+            Attribute attribute = new Attribute(GetNextAttributeKey());
+            AddAttribute(attribute);
         }
 
         private void InheritComponent(Component inheritedComponent)
@@ -569,10 +399,11 @@ namespace Kinectitude.Editor.Models
 
                 NotifyPluginAdded(component.Plugin);
 
-                if (component.Provides == typeof(IRender).FullName)
-                {
-                    ViewModel = EntityViewModel.Create(this, component);
-                }
+                Workspace.Instance.CommandHistory.Log(
+                    "add component '" + component.DisplayName + "'",
+                    () => AddComponent(component),
+                    () => RemoveComponent(component)
+                );
             }
         }
 
@@ -584,6 +415,12 @@ namespace Kinectitude.Editor.Models
                 {
                     component.SetScope(null);
                     Components.Remove(component);
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "remove component '" + component.DisplayName + "'",
+                        () => RemoveComponent(component),
+                        () => AddComponent(component)
+                    );
                 }
             }
         }
@@ -591,6 +428,11 @@ namespace Kinectitude.Editor.Models
         public Component GetComponentByRole(string provides)
         {
             return Components.FirstOrDefault(x => x.Provides == provides);
+        }
+
+        public Component GetComponentByRole(Type type)
+        {
+            return GetComponentByRole(type.FullName);
         }
 
         public Component GetComponentByType(string type)
@@ -608,6 +450,11 @@ namespace Kinectitude.Editor.Models
             return Components.Any(x => x.Provides == provides);
         }
 
+        public bool HasComponentWithRole(Type type)
+        {
+            return HasComponentWithRole(type.FullName);
+        }
+
         public bool HasComponentOfType(string type)
         {
             return Components.Any(x => x.Type == type);
@@ -623,6 +470,12 @@ namespace Kinectitude.Editor.Models
             evt.SetScope(this);
             evt.PluginAdded += OnEventPluginAdded;
             Events.Add(evt);
+
+            Workspace.Instance.CommandHistory.Log(
+                "add event '" + evt.Header + "'",
+                () => AddEvent(evt),
+                () => RemoveEvent(evt)
+            );
         }
 
         public void RemoveEvent(AbstractEvent evt)
@@ -630,6 +483,12 @@ namespace Kinectitude.Editor.Models
             if (evt.IsLocal)
             {
                 PrivateRemoveEvent(evt);
+
+                Workspace.Instance.CommandHistory.Log(
+                    "remove event '" + evt.Header + "'",
+                    () => RemoveEvent(evt),
+                    () => AddEvent(evt)
+                );
             }
         }
 

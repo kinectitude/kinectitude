@@ -17,6 +17,7 @@
     <Style x:Key="gridSplitter">
         <Setter Property="GridSplitter.ShowsPreview" Value="True" />
         <Setter Property="GridSplitter.ResizeBehavior" Value="PreviousAndNext" />
+        <Setter Property="Control.Background" Value="{DynamicResource WindowBackgroundBrush}" />
     </Style>
 	
 </ResourceDictionary>

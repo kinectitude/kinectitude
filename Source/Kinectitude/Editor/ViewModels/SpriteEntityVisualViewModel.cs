@@ -8,7 +8,7 @@ using System.IO;
 
 namespace Kinectitude.Editor.ViewModels
 {
-    internal class SpriteEntityViewModel : EntityViewModel
+    internal class SpriteEntityVisualViewModel : EntityVisualViewModel
     {
         public string File
         {
@@ -20,6 +20,6 @@ namespace Kinectitude.Editor.ViewModels
             }
         }
 
-        public SpriteEntityViewModel(Entity entity) : base(entity) { }
+        public SpriteEntityVisualViewModel(Entity entity) : base(entity) { }
     }
 }

@@ -26,9 +26,14 @@ namespace Kinectitude.Editor.Models
             get { return inheritedEvent.Type; }
         }
 
-        public override string DisplayName
+        public override string Header
         {
-            get { return inheritedEvent.DisplayName; }
+            get { return inheritedEvent.Header; }
+        }
+
+        public override string Description
+        {
+            get { return inheritedEvent.Description; }
         }
 
         public override bool IsLocal

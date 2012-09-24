@@ -6,6 +6,7 @@ using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
 using System.Windows.Input;
 using Kinectitude.Editor.ViewModels;
+using System;
 
 namespace Kinectitude.Editor.Models
 {
@@ -68,96 +69,13 @@ namespace Kinectitude.Editor.Models
             get { return Entities.SelectMany(x => x.Plugins).Union(Managers.Select(x => x.Plugin)).Distinct(); }
         }
 
-        public ICommand AddAttributeCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand RemoveAttributeCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand AddEntityCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand RemoveEntityCommand
-        {
-            get;
-            private set;
-        }
-
         public Scene(string name)
         {
             this.name = name;
+            
             Attributes = new ObservableCollection<Attribute>();
             Managers = new ObservableCollection<Manager>();
             Entities = new ObservableCollection<Entity>();
-
-            AddAttributeCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Attribute attribute = new Attribute(GetNextAttributeKey());
-
-                    Workspace.Instance.CommandHistory.Log(
-                        "add attribute '" + attribute.Key + "'",
-                        () => AddAttribute(attribute),
-                        () => RemoveAttribute(attribute)
-                    );
-
-                    AddAttribute(attribute);
-                }
-            );
-
-            RemoveAttributeCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Attribute attribute = parameter as Attribute;
-
-                    Workspace.Instance.CommandHistory.Log(
-                        "remove attribute '" + attribute.Key + "'",
-                        () => RemoveAttribute(attribute),
-                        () => AddAttribute(attribute)
-                    );
-
-                    RemoveAttribute(attribute);
-                }
-            );
-
-            AddEntityCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Entity entity = new Entity();
-
-                    Workspace.Instance.CommandHistory.Log(
-                        "add entity",
-                        () => AddEntity(entity),
-                        () => RemoveEntity(entity)
-                    );
-
-                    AddEntity(entity);
-                }
-            );
-
-            RemoveEntityCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Entity entity = parameter as Entity;
-
-                    Workspace.Instance.CommandHistory.Log(
-                        "remove entity",
-                        () => RemoveEntity(entity),
-                        () => AddEntity(entity)
-                    );
-
-                    RemoveEntity(entity);
-                }
-            );
         }
 
         public void SetScope(ISceneScope scope)
@@ -191,6 +109,18 @@ namespace Kinectitude.Editor.Models
         {
             attribute.SetScope(null);
             Attributes.Remove(attribute);
+
+            Workspace.Instance.CommandHistory.Log(
+                "remove attribute '" + attribute.Key + "'",
+                () => RemoveAttribute(attribute),
+                () => AddAttribute(attribute)
+            );
+        }
+
+        public void CreateAttribute()
+        {
+            Attribute attribute = new Attribute(GetNextAttributeKey());
+            AddAttribute(attribute);
         }
 
         public void AddManager(Manager manager)
@@ -220,6 +150,12 @@ namespace Kinectitude.Editor.Models
                 }
 
                 entity.PluginAdded += OnEntityPluginAdded;
+
+                Workspace.Instance.CommandHistory.Log(
+                    "add entity",
+                    () => AddEntity(entity),
+                    () => RemoveEntity(entity)
+                );
             }
         }
 
@@ -229,6 +165,12 @@ namespace Kinectitude.Editor.Models
             Entities.Remove(entity);
             entity.Components.CollectionChanged -= OnEntityComponentChanged;
             entity.PluginAdded -= OnEntityPluginAdded;
+
+            Workspace.Instance.CommandHistory.Log(
+                "remove entity",
+                () => RemoveEntity(entity),
+                () => AddEntity(entity)
+            );
         }
 
         private string GetNextAttributeKey()

@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 namespace Kinectitude.Editor.Views
 {
     /// <summary>
-    /// Interaction logic for SceneView.xaml
+    /// Interaction logic for SceneEditor.xaml
     /// </summary>
-    public partial class SceneView : UserControl
+    public partial class SceneEditor : UserControl
     {
-        public SceneView()
+        public SceneEditor()
         {
             InitializeComponent();
         }

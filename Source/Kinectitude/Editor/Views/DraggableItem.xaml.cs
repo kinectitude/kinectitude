@@ -11,30 +11,27 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Windows.Controls.Primitives;
 using Kinectitude.Editor.Models;
-using Kinectitude.Editor.ViewModels;
 
 namespace Kinectitude.Editor.Views
 {
     /// <summary>
-    /// Interaction logic for EntityCanvas.xaml
+    /// Interaction logic for DraggableItem.xaml
     /// </summary>
-    public partial class EntityCanvas : UserControl
+    public partial class DraggableItem : UserControl
     {
-        public EntityCanvas()
+        public DraggableItem()
         {
             InitializeComponent();
         }
 
-        private void Thumb_OnDragDelta(object sender, DragDeltaEventArgs args)
+        private void DraggableItem_MouseMove(object sender, MouseEventArgs args)
         {
-            EntityVisualViewModel entity = this.DataContext as EntityVisualViewModel;
+            DraggableItem item = sender as DraggableItem;
 
-            if (null != entity)
+            if (null != item && args.LeftButton == MouseButtonState.Pressed)
             {
-                entity.X += args.HorizontalChange;
-                entity.Y += args.VerticalChange;
+                DragDrop.DoDragDrop(item, new DragDropData(item.DataContext as Plugin), DragDropEffects.Copy);
             }
         }
     }

@@ -12,9 +12,9 @@
 
         <BooleanToVisibilityConverter x:Key="boolToVis" />
         
-        <DataTemplate DataType="{x:Type vm:EntityViewModel}" />
+        <DataTemplate DataType="{x:Type vm:EntityVisualViewModel}" />
 
-        <DataTemplate DataType="{x:Type vm:BasicEntityViewModel}">
+        <DataTemplate DataType="{x:Type vm:BasicEntityVisualViewModel}">
             <Grid>
                 <Rectangle Visibility="{Binding IsRectangular, Converter={StaticResource boolToVis}}" Width="{Binding Width}" Height="{Binding Height}">
                     <Rectangle.Fill>
@@ -29,9 +29,9 @@
             </Grid>
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type vm:SpriteEntityViewModel}" />
+        <DataTemplate DataType="{x:Type vm:SpriteEntityVisualViewModel}" />
 
-        <DataTemplate DataType="{x:Type vm:TextEntityViewModel}">
+        <DataTemplate DataType="{x:Type vm:TextEntityVisualViewModel}">
             <Canvas>
                 <TextBlock Text="{Binding Value}" FontSize="{Binding FontSize}" Foreground="{Binding FontColor}" />
             </Canvas>

@@ -2,12 +2,14 @@
 using System.Linq;
 using Kinectitude.Editor.Models.Interfaces;
 using System;
+using Kinectitude.Editor.ViewModels;
 
 namespace Kinectitude.Editor.Models
 {
     internal sealed class Event : AbstractEvent
     {
         private readonly Plugin plugin;
+        private EventViewModel viewModel;
 
         public override event DefineAddedEventHandler DefineAdded;
         public override event DefinedNameChangedEventHandler DefineChanged;
@@ -18,9 +20,14 @@ namespace Kinectitude.Editor.Models
             get { return null != scope ? scope.GetDefinedName(plugin) : plugin.ClassName; }
         }
 
-        public override string DisplayName
+        public override string Header
         {
-            get { return plugin.DisplayName; }
+            get { return plugin.Header; }
+        }
+
+        public override string Description
+        {
+            get { return plugin.Description; }
         }
 
         [DependsOn("IsInherited")]
@@ -51,6 +58,19 @@ namespace Kinectitude.Editor.Models
             foreach (string property in plugin.Properties)
             {
                 AddProperty(new Property(property));
+            }
+        }
+
+        public EventViewModel ViewModel
+        {
+            get
+            {
+                if (null == viewModel)
+                {
+                    viewModel = new EventViewModel(this);
+                }
+
+                return viewModel;
             }
         }
 
