@@ -441,7 +441,7 @@ namespace Kinectitude.Physics
             body.Restitution = Restitution;
             body.Friction = Friction;
             body.LinearDamping = LinearDamping;
-            body.UserData = IEntity;
+            body.UserData = this;
             //Add a listener for collisions
             body.OnCollision += OnCollision;
 
@@ -454,8 +454,11 @@ namespace Kinectitude.Physics
             Body bodyA = fixtureA.Body;
             Body bodyB = fixtureB.Body;
 
-            IEntity entityA = bodyA.UserData as IEntity;
-            IEntity entityB = bodyB.UserData as IEntity;
+            PhysicsComponent pcA = bodyA.UserData as PhysicsComponent;
+            PhysicsComponent pcB = bodyB.UserData as PhysicsComponent;
+
+            IEntity entityA = pcA.IEntity;
+            IEntity entityB = pcB.IEntity;
 
             IEntity collidedWith = (entityA == IEntity) ? entityB : entityA;
 
@@ -470,7 +473,13 @@ namespace Kinectitude.Physics
                 }
             }
 
-            if (ignoreCollisionsWith != null && ignoreCollisionsWith.MatchAndSet(collidedWith))return false;
+            if (ignoreCollisionsWith != null && ignoreCollisionsWith.MatchAndSet(collidedWith)) return false;
+
+            if (pcA.movesWhenHit == false && pcB.movesWhenHit == false &&
+                bodyA.BodyType == BodyType.Dynamic && bodyB.BodyType == BodyType.Dynamic)
+            {
+                return false;
+            }
 
             //Allow the collison to occur
             return true;
