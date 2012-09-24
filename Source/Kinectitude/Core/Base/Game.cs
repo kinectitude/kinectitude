@@ -34,6 +34,7 @@ namespace Kinectitude.Core.Base
         internal float ScaleY { get; private set; }
 
         internal Tuple<int, int> GetWidowOffset() { return WindowOffset(); }
+        internal Tuple<int, int> GetWinowSize() { return new Tuple<int, int>(Width, Height); }
 
         internal Game(GameLoader gameLoader, float scaleX, float scaleY, Func<Tuple<int, int>> windowOffset) : base(-2)
         {

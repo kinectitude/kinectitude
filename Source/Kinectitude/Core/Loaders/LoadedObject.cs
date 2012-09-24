@@ -21,7 +21,9 @@ namespace Kinectitude.Core.Loaders
             foreach (Tuple<string, string> val in Values)
             {
                 string param = val.Item1;
-                string value = ExpressionReader.CreateExpressionReader(val.Item2, evt, entity).GetValue();
+
+                string value = ClassFactory.PreEvaluate(obj, param) ? 
+                    ExpressionReader.CreateExpressionReader(val.Item2, evt, entity).GetValue() : val.Item2;
 
                 ClassFactory.SetParam(obj, param, value, evt, entity);
             }

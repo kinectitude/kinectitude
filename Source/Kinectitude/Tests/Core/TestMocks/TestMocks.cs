@@ -281,4 +281,16 @@ namespace Kinectitude.Tests.Core.TestMocks
         }
     }
 
+    public class ExpressionEventMock : Event
+    {
+        [Plugin("", "")]
+        public IDoubleExpressionReader Dexpr { get; set; }
+
+        [Plugin("", "")]
+        public double Dbl { get; set; }
+
+
+        public override void OnInitialize() { }
+    }
+
 }

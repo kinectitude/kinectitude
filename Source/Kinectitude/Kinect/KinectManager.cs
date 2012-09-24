@@ -57,7 +57,9 @@ namespace Kinectitude.Kinect
                     if (y < 0) y = 0;
                 }
 
-                kfc.UpdatePosition(x * 800, y * 600);
+                Tuple<int, int> windowSize = GetWindowSize();
+
+                kfc.UpdatePosition(x * windowSize.Item1, y * windowSize.Item2);
                 kfc.OnUpdate(frameDelta);
             }
 

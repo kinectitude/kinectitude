@@ -218,12 +218,20 @@ namespace Kinectitude.Core.Base
             return CreateHelper<T, Type>(type, ConstructorTypes);
         }
 
+        internal static bool PreEvaluate(object obj, string param)
+        {
+            Type setType = null;
+            if (!paramType[obj.GetType()].TryGetValue(param, out setType))
+            {
+                throw new InvalidAttributeException(param, referedDictionary[obj.GetType()]);
+            }
+            return !stringEventEntityConstruct.Contains(setType);
+        }
+
         internal static void SetParam(object obj, string param, string val, Event evt, Entity entity)
         {
             Type setType = null;
-            paramType[obj.GetType()].TryGetValue(param, out setType);
-
-            if (null == setType)
+            if(!paramType[obj.GetType()].TryGetValue(param, out setType))
             {
                 throw new InvalidAttributeException(param, referedDictionary[obj.GetType()]);
             }

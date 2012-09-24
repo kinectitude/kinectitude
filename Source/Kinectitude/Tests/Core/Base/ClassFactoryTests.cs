@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Reflection;
 using Kinectitude.Core.Components;
 using Kinectitude.Core.Data;
+using Kinectitude.Core.Loaders;
 
 namespace Kinectitude.Tests.Core.Base
 {
@@ -41,6 +42,14 @@ namespace Kinectitude.Tests.Core.Base
                 ClassFactory.RegisterType("action", typeof(ActionMock));
             }
             catch (ArgumentException)
+            {
+                //this is incase another test case registered this type already
+            }
+            try
+            {
+                ClassFactory.RegisterType("Dexpr", typeof(ExpressionEventMock));
+            }
+            catch
             {
                 //this is incase another test case registered this type already
             }
@@ -135,6 +144,43 @@ namespace Kinectitude.Tests.Core.Base
             Component component = ClassFactory.Create<Component>("GoodProvidesComponent");
             Assert.IsNotNull(component);
             Assert.IsTrue(ClassFactory.GetProvided(typeof(GoodProvidesComponent)).Contains(typeof(TransformComponent)));
+        }
+
+        [TestMethod]
+        public void TestExpressionsDontPreEval()
+        {
+            LoadedEntity entity = 
+                new LoadedEntity("testName", new List<Tuple<string,string>>(){new Tuple<string, string>("x", "100")}, 10, new List<string>(), new List<string>());
+
+
+            Entity ce = entity.Create(scene);
+            scene.EntityByName["testName"] = ce;
+
+            LoadedEvent le = new LoadedEvent("Dexpr", new List<Tuple<string, string>>() { new Tuple<string, string>("Dexpr", "{testName.x}") }, entity);
+            ExpressionEventMock evt = (ExpressionEventMock)le.Create(ce);
+
+            ce["x"] = "200";
+
+            Assert.AreEqual(200, evt.Dexpr.GetValue());
+        }
+
+
+        [TestMethod]
+        public void TestExpressionsDoPreEval()
+        {
+            LoadedEntity entity =
+                new LoadedEntity("testName2", new List<Tuple<string, string>>() { new Tuple<string, string>("x", "100") }, 10, new List<string>(), new List<string>());
+
+
+            Entity ce = entity.Create(scene);
+            scene.EntityByName["testName2"] = ce;
+
+            LoadedEvent le = new LoadedEvent("Dexpr", new List<Tuple<string, string>>() { new Tuple<string, string>("Dbl", "{testName2.x}") }, entity);
+            ExpressionEventMock evt = (ExpressionEventMock)le.Create(ce);
+
+            ce["x"] = "200";
+
+            Assert.AreEqual(100, evt.Dbl);
         }
     }
 }

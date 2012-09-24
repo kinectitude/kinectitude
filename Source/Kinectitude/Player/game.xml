@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Game Name="test" Width="800" Height="600" FirstScene="test" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1" size="36">
+<Game Name="test" Width="1280" Height="800" FirstScene="test" IsFullScreen="false" xmlns="http://www.kinectitude.com/2012/v1" size="36">
   <Using File="Kinectitude.Physics.dll">
     <Define Name="PhysicsManager" Class="Kinectitude.Physics.PhysicsManager"/>
     <Define Name="PhysicsComponent" Class="Kinectitude.Physics.PhysicsComponent"/>

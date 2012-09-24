@@ -100,7 +100,7 @@
   </Prototype>
 
   <Prototype Name="shield_boundary">
-    <Component Type="PhysicsComponent" Shape="Rectangle" Mass="1" Restitution="0" Friction="0" LinearDamping="0" FixedRotation="true" MovesWhenHit="false"/>
+    <Component Type="PhysicsComponent" Shape="Rectangler" Mass="1" Restitution="0" Friction="0" LinearDamping="0" FixedRotation="true" MovesWhenHit="false"/>
   </Prototype>
 
   <Scene Name="Game" health="10" asteroidsDeflected="0" edge="[random * 4]" next="0" deflections="0" interval="7" wave="0">

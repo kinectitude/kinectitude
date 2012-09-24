@@ -4,7 +4,7 @@ namespace Kinectitude.Core.Data
     /// <summary>
     /// Used to get double values
     /// </summary>
-    interface IDoubleExpressionReader
+    public interface IDoubleExpressionReader
     {
         /// <summary>
         /// Gets the value of an expression
