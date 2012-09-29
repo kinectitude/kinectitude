@@ -10,7 +10,10 @@ using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.Views;
 using System.Windows.Input;
 using System.Collections.Specialized;
-using Kinectitude.Editor.ViewModels;
+using Kinectitude.Editor.Presenters;
+using System.Collections.Generic;
+using Kinectitude.Core.Components;
+using Kinectitude.Render;
 
 namespace Kinectitude.Editor.Models
 {
@@ -27,10 +30,11 @@ namespace Kinectitude.Editor.Models
             get { return instance.Value; }
         }
 
-        private GameViewModel game;
+        private Game game;
         private BaseModel activeItem;
+        private List<EntityPreset> entityPresets;
 
-        public GameViewModel Game
+        public Game Game
         {
             get { return game; }
             set
@@ -84,6 +88,11 @@ namespace Kinectitude.Editor.Models
         {
             get;
             private set;
+        }
+
+        public IEnumerable<EntityPreset> EntityPresets
+        {
+            get { return entityPresets; }
         }
 
         public ICommand NewGameCommand
@@ -211,6 +220,12 @@ namespace Kinectitude.Editor.Models
                     RegisterPlugins(asm);
                 }
             }
+
+            entityPresets = new List<EntityPreset>();
+            entityPresets.Add(new EntityPreset("Blank Entity", GetPlugin(typeof(TransformComponent))));
+            entityPresets.Add(new EntityPreset("Image Entity", GetPlugin(typeof(TransformComponent)), GetPlugin(typeof(ImageRenderComponent))));
+            entityPresets.Add(new EntityPreset("Shape Entity", GetPlugin(typeof(TransformComponent)), GetPlugin(typeof(RenderComponent))));
+            entityPresets.Add(new EntityPreset("Text Entity", GetPlugin(typeof(TransformComponent)), GetPlugin(typeof(TextRenderComponent))));
         }
 
         public void NewGame()
@@ -218,21 +233,19 @@ namespace Kinectitude.Editor.Models
             Game game = new Game("Untitled Game") { Width = 800, Height = 600 };
             game.AddScene(new Scene("Scene 1"));
 
-            Game = new GameViewModel(game);
+            Game = game;
         }
 
         public void LoadGame(string fileName)
         {
             IGameStorage storage = new XmlGameStorage(fileName);
-            Game game = storage.LoadGame();
-
-            Game = new GameViewModel(game);
+            Game = storage.LoadGame();
         }
 
         public void SaveGame()
         {
             IGameStorage storage = new XmlGameStorage(Game.FileName);
-            storage.SaveGame(Game.Model);
+            storage.SaveGame(Game);
         }
 
         public void OpenItem(BaseModel item)
@@ -293,6 +306,11 @@ namespace Kinectitude.Editor.Models
             }
             
             return plugin;
+        }
+
+        public Plugin GetPlugin(Type type)
+        {
+            return GetPlugin(type.FullName);
         }
     }
 }

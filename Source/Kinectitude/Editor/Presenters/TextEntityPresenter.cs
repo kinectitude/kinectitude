@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Kinectitude.Editor.Models;
+﻿using Kinectitude.Editor.Models;
 using Kinectitude.Render;
 
-namespace Kinectitude.Editor.ViewModels
+namespace Kinectitude.Editor.Presenters
 {
-    internal class TextEntityVisualViewModel : EntityVisualViewModel
+    internal class TextEntityPresenter : EntityPresenter
     {
         public string Value
         {
@@ -39,6 +35,6 @@ namespace Kinectitude.Editor.ViewModels
             }
         }
 
-        public TextEntityVisualViewModel(Entity entity) : base(entity) { }
+        public TextEntityPresenter(Entity entity) : base(entity) { }
     }
 }

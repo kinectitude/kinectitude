@@ -2,14 +2,13 @@
 using System.Linq;
 using Kinectitude.Editor.Models.Interfaces;
 using System;
-using Kinectitude.Editor.ViewModels;
+using Kinectitude.Editor.Presenters;
 
 namespace Kinectitude.Editor.Models
 {
     internal sealed class Event : AbstractEvent
     {
         private readonly Plugin plugin;
-        private EventViewModel viewModel;
 
         public override event DefineAddedEventHandler DefineAdded;
         public override event DefinedNameChangedEventHandler DefineChanged;
@@ -58,19 +57,6 @@ namespace Kinectitude.Editor.Models
             foreach (string property in plugin.Properties)
             {
                 AddProperty(new Property(property));
-            }
-        }
-
-        public EventViewModel ViewModel
-        {
-            get
-            {
-                if (null == viewModel)
-                {
-                    viewModel = new EventViewModel(this);
-                }
-
-                return viewModel;
             }
         }
 

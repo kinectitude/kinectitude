@@ -9,7 +9,7 @@ using System.Windows.Input;
 using System;
 using Kinectitude.Core.Components;
 using Kinectitude.Render;
-using Kinectitude.Editor.ViewModels;
+using Kinectitude.Editor.Presenters;
 
 namespace Kinectitude.Editor.Models
 {
@@ -20,6 +20,7 @@ namespace Kinectitude.Editor.Models
         private string name;
         private IEntityScope scope;
         private int nextAttribute;
+        private EntityPresenter presenter;
 
         public event ScopeChangedEventHandler ScopeChanged;
         public event PluginAddedEventHandler PluginAdded;
@@ -53,34 +54,45 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        public ObservableCollection<Entity> Prototypes
-        {
-            get;
-            private set;
-        }
-
-        public ObservableCollection<Attribute> Attributes
-        {
-            get;
-            private set;
-        }
-
-        public ObservableCollection<Component> Components
-        {
-            get;
-            private set;
-        }
-
-        public ObservableCollection<AbstractEvent> Events
-        {
-            get;
-            private set;
-        }
+        public ObservableCollection<Entity> Prototypes { get; private set; }
+        public ObservableCollection<Attribute> Attributes { get; private set; }
+        public ObservableCollection<Component> Components { get; private set; }
+        public ObservableCollection<AbstractEvent> Events { get; private set; }
 
         public IEnumerable<Plugin> Plugins
         {
             get { return Components.Select(x => x.Plugin).Union(Events.SelectMany(x => x.Plugins)).Distinct(); }
         }
+
+        public EntityPresenter Presenter
+        {
+            get
+            {
+                if (null == presenter)
+                {
+                    presenter = EntityPresenter.Create(this);
+                }
+
+                return presenter;
+            }
+            set
+            {
+                if (presenter != value)
+                {
+                    presenter = value;
+                    NotifyPropertyChanged("Presenter");
+                }
+            }
+        }
+
+        public ICommand AddPrototypeCommand { get; private set; }
+        public ICommand RemovePrototypeCommand { get; private set; }
+        public ICommand AddAttributeCommand { get; private set; }
+        public ICommand RemoveAttributeCommand { get; private set; }
+        public ICommand AddComponentCommand { get; private set; }
+        public ICommand RemoveComponentCommand { get; private set; }
+        public ICommand AddEventCommand { get; private set; }
+        public ICommand RemoveEventCommand { get; private set; }
 
         public Entity()
         {
@@ -88,6 +100,89 @@ namespace Kinectitude.Editor.Models
             Attributes = new ObservableCollection<Attribute>();
             Components = new ObservableCollection<Component>();
             Events = new ObservableCollection<AbstractEvent>();
+
+            AddPrototypeCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    Entity prototype = parameter as Entity;
+                    if (null != prototype)
+                    {
+                        AddPrototype(prototype);
+                    }
+                }
+            );
+
+            RemovePrototypeCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    Entity prototype = parameter as Entity;
+                    if (null != prototype)
+                    {
+                        RemovePrototype(prototype);
+                    }
+                }
+            );
+
+            AddAttributeCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    CreateAttribute();
+                }
+            );
+
+            RemoveAttributeCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    Attribute attribute = parameter as Attribute;
+                    RemoveAttribute(attribute);
+                }
+            );
+
+            AddComponentCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    Plugin plugin = parameter as Plugin;
+                    if (null != plugin)
+                    {
+                        Component component = new Component(plugin);
+                        AddComponent(component);
+                    }
+                }
+            );
+
+            RemoveComponentCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    Component component = parameter as Component;
+                    if (null != component)
+                    {
+                        RemoveComponent(component);
+                    }
+                }
+            );
+
+            AddEventCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    Plugin plugin = parameter as Plugin;
+                    if (null != plugin)
+                    {
+                        Event evt = new Event(plugin);
+                        AddEvent(evt);
+                    }
+                }
+            );
+
+            RemoveEventCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    Event evt = parameter as Event;
+                    if (null != evt)
+                    {
+                        RemoveEvent(evt);
+                    }
+                }
+            );
         }
 
         public void SetScope(IEntityScope scope)
@@ -398,6 +493,8 @@ namespace Kinectitude.Editor.Models
                 Components.Add(component);
 
                 NotifyPluginAdded(component.Plugin);
+
+                Presenter = EntityPresenter.Create(this);
 
                 Workspace.Instance.CommandHistory.Log(
                     "add component '" + component.DisplayName + "'",

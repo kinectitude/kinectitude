@@ -9,19 +9,23 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace Kinectitude.Editor.Views
 {
     /// <summary>
-    /// Interaction logic for GameView.xaml
+    /// Interaction logic for AddEntityDialog.xaml
     /// </summary>
-    public partial class GameView : UserControl
+    public partial class AddEntityDialog : Window
     {
-        public GameView()
+        public AddEntityDialog()
         {
             InitializeComponent();
+        }
+
+        private void btnOK_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
         }
     }
 }

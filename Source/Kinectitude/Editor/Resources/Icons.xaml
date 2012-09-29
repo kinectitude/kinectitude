@@ -26,16 +26,31 @@
     <ImageSource x:Key="icoDelete">..\Icons\bin_closed.png</ImageSource>
     <ImageSource x:Key="icoNewScene">..\Icons\film_add.png</ImageSource>
     
-    <!-- Plugins -->
-    
-    <ImageSource x:Key="icoComponent">..\Icons\cog.png</ImageSource>
-    <ImageSource x:Key="icoEvent">..\Icons\clock.png</ImageSource>
-    <ImageSource x:Key="icoAction">..\Icons\lightning.png</ImageSource>
-    
     <!-- Details Viewer -->
     
     <ImageSource x:Key="icoLocked">..\Icons\lock.png</ImageSource>
     <ImageSource x:Key="icoAddComponent">..\Icons\cog_add.png</ImageSource>
     <ImageSource x:Key="icoAddAttribute">..\Icons\tag.png</ImageSource>
     
+    <!-- Scene Editor -->
+    
+    <ImageSource x:Key="icoCursor">..\Icons\cursor.png</ImageSource>
+    <ImageSource x:Key="icoSendToBack">..\Icons\shape_move_back.png</ImageSource>
+    <ImageSource x:Key="icoSendToFront">..\Icons\shape_move_front.png</ImageSource>
+    <ImageSource x:Key="icoSendBackward">..\Icons\shape_move_backwards.png</ImageSource>
+    <ImageSource x:Key="icoSendForward">..\Icons\shape_move_forwards.png</ImageSource>
+    <ImageSource x:Key="icoAlignLeft">..\Icons\shape_align_left.png</ImageSource>
+    <ImageSource x:Key="icoAlignCenter">..\Icons\shape_align_center.png</ImageSource>
+    <ImageSource x:Key="icoAlignRight">..\Icons\shape_align_right.png</ImageSource>
+    <ImageSource x:Key="icoAlignTop">..\Icons\shape_align_top.png</ImageSource>
+    <ImageSource x:Key="icoAlignMiddle">..\Icons\shape_align_middle.png</ImageSource>
+    <ImageSource x:Key="icoAlignBottom">..\Icons\shape_align_bottom.png</ImageSource>
+    
+    <!-- Entity Editor -->
+
+    <ImageSource x:Key="icoComponent">..\Icons\cog.png</ImageSource>
+    <ImageSource x:Key="icoEvent">..\Icons\clock.png</ImageSource>
+    <ImageSource x:Key="icoAction">..\Icons\lightning.png</ImageSource>
+    <ImageSource x:Key="icoLock">..\Icons\lock.png</ImageSource>
+
 </ResourceDictionary>

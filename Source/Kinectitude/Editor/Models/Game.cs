@@ -179,6 +179,16 @@ namespace Kinectitude.Editor.Models
             private set;
         }
 
+        public ICommand AddPrototypeCommand { get; private set; }
+        public ICommand RemovePrototypeCommand { get; private set; }
+        public ICommand AddAttributeCommand { get; private set; }
+        public ICommand RemoveAttributeCommand { get; private set; }
+        public ICommand AddSceneCommand { get; private set; }
+        public ICommand RemoveSceneCommand { get; private set; }
+        public ICommand AddAssetCommand { get; private set; }
+        public ICommand RemoveAssetCommand { get; private set; }
+        public ICommand RemoveItemCommand { get; private set; }
+
         public Game(string name)
         {
             this.name = name;
@@ -188,6 +198,107 @@ namespace Kinectitude.Editor.Models
             Prototypes = new ObservableCollection<Entity>();
             Scenes = new ObservableCollection<Scene>();
             Attributes = new ObservableCollection<Attribute>();
+
+            AddPrototypeCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    Entity prototype = new Entity();
+
+                    DialogService.ShowDialog(DialogService.Constants.EntityDialog, prototype,
+                        (result) =>
+                        {
+                            if (result == true)
+                            {
+                                AddPrototype(prototype);
+                            }
+                        }
+                    );
+                }
+            );
+
+            RemovePrototypeCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    Entity prototype = parameter as Entity;
+                    RemovePrototype(prototype);
+                }
+            );
+
+            AddSceneCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    Scene scene = CreateScene();
+
+                    DialogService.ShowDialog(DialogService.Constants.SceneDialog, scene,
+                        (result) =>
+                        {
+                            if (result == true)
+                            {
+                                AddScene(scene);
+                            }
+                        }
+                    );
+                }
+            );
+
+            RemoveSceneCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    Scene scene = parameter as Scene;
+                    RemoveScene(scene);
+                }
+            );
+
+            AddAttributeCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    CreateAttribute();
+                }
+            );
+
+            RemoveAttributeCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    Attribute attribute = parameter as Attribute;
+                    RemoveAttribute(attribute);
+                }
+            );
+
+            AddAssetCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    // TODO: File Chooser
+                    Asset asset = new Asset("An Asset");
+                    AddAsset(asset);
+                }
+            );
+
+            RemoveAssetCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    Asset asset = parameter as Asset;
+                    RemoveAsset(asset);
+                }
+            );
+
+            RemoveItemCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    Entity prototype = parameter as Entity;
+                    if (null != prototype)
+                    {
+                        RemovePrototype(prototype);
+                    }
+                    else
+                    {
+                        Scene scene = parameter as Scene;
+                        if (null != scene)
+                        {
+                            RemoveScene(scene);
+                        }
+                    }
+                }
+            );
         }
 
         public void AddUsing(Using use)

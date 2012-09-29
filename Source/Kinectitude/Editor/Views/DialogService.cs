@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Kinectitude.Editor.Models;
 using System.Windows;
+using Kinectitude.Editor.Views;
 
 namespace Kinectitude.Editor.Views
 {
@@ -17,6 +18,7 @@ namespace Kinectitude.Editor.Views
             public static readonly string SceneDialog = typeof(SceneDialog).Name;
             public static readonly string EntityDialog = typeof(EntityDialog).Name;
             public static readonly string ComponentDialog = typeof(ComponentDialog).Name;
+            public static readonly string AddEntityDialog = typeof(AddEntityDialog).Name;
         }
 
         private static readonly Dictionary<string, Type> views;

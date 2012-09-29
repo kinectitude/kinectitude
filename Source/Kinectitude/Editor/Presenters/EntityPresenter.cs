@@ -1,37 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Kinectitude.Editor.Models;
-using Kinectitude.Editor.Base;
 using Kinectitude.Core.Components;
+using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models;
 using Kinectitude.Render;
 
-namespace Kinectitude.Editor.ViewModels
+namespace Kinectitude.Editor.Presenters
 {
-    internal class EntityVisualViewModel : BaseModel
+    internal class EntityPresenter : BaseModel
     {
-        public static EntityVisualViewModel Create(Entity entity)
+        public static EntityPresenter Create(Entity entity)
         {
-            Component component = entity.GetComponentByRole(typeof(IRender).FullName);
+            Component component = entity.GetComponentByRole(typeof(IRender));
             
             if (null != component)
             {
                 if (component.IsOfType(typeof(RenderComponent)))
                 {
-                    return new BasicEntityVisualViewModel(entity);
+                    return new BasicEntityPresenter(entity);
                 }
                 else if (component.IsOfType(typeof(TextRenderComponent)))
                 {
-                    return new TextEntityVisualViewModel(entity);
+                    return new TextEntityPresenter(entity);
                 }
                 else if (component.IsOfType(typeof(ImageRenderComponent)))
                 {
-                    return new SpriteEntityVisualViewModel(entity);
+                    return new SpriteEntityPresenter(entity);
                 }
             }
 
-            return new EntityVisualViewModel(entity);
+            return new EntityPresenter(entity);
         }
 
         private readonly Entity entity;
@@ -91,7 +88,7 @@ namespace Kinectitude.Editor.ViewModels
             }
         }
 
-        public EntityVisualViewModel(Entity entity)
+        public EntityPresenter(Entity entity)
         {
             this.entity = entity;
         }

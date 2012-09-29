@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 namespace Kinectitude.Editor.Views
 {
     /// <summary>
-    /// Interaction logic for EntityView.xaml
+    /// Interaction logic for GameEditor.xaml
     /// </summary>
-    public partial class EntityView : UserControl
+    public partial class GameEditor : UserControl
     {
-        public EntityView()
+        public GameEditor()
         {
             InitializeComponent();
         }

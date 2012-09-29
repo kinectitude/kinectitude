@@ -3,6 +3,7 @@ using Kinectitude.Editor.Views;
 using System;
 using System.Reflection;
 using System.IO;
+using Kinectitude.Editor.Views;
 
 namespace Kinectitude.Editor
 {
@@ -16,6 +17,7 @@ namespace Kinectitude.Editor
             DialogService.RegisterWindow<SceneDialog>(DialogService.Constants.SceneDialog);
             DialogService.RegisterWindow<EntityDialog>(DialogService.Constants.EntityDialog);
             DialogService.RegisterWindow<ComponentDialog>(DialogService.Constants.ComponentDialog);
+            DialogService.RegisterWindow<AddEntityDialog>(DialogService.Constants.AddEntityDialog);
         }
     }
 }

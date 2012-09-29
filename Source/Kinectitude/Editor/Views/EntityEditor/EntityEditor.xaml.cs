@@ -9,21 +9,18 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Kinectitude.Editor.Models;
 
 namespace Kinectitude.Editor.Views
 {
     /// <summary>
-    /// Interaction logic for WorkspaceWindow.xaml
+    /// Interaction logic for EntityEditor.xaml
     /// </summary>
-    public partial class WorkspaceWindow : Window
+    public partial class EntityEditor : UserControl
     {
-        public WorkspaceWindow()
+        public EntityEditor()
         {
-            DataContext = Workspace.Instance;
-            Workspace.Instance.NewGame();
-
             InitializeComponent();
         }
     }

@@ -5,8 +5,9 @@ using System.Linq;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
 using System.Windows.Input;
-using Kinectitude.Editor.ViewModels;
+using Kinectitude.Editor.Presenters;
 using System;
+using Kinectitude.Editor.Views;
 
 namespace Kinectitude.Editor.Models
 {
@@ -64,10 +65,23 @@ namespace Kinectitude.Editor.Models
             private set;
         }
 
+        public ObservableCollection<Entity> SelectedEntities
+        {
+            get;
+            private set;
+        }
+
         public IEnumerable<Plugin> Plugins
         {
             get { return Entities.SelectMany(x => x.Plugins).Union(Managers.Select(x => x.Plugin)).Distinct(); }
         }
+
+        public ICommand SelectCommand { get; private set; }
+        public ICommand AddAttributeCommand { get; private set; }
+        public ICommand RemoveAttributeCommand { get; private set; }
+        public ICommand PromptAddEntityCommand { get; private set; }
+        public ICommand AddEntityCommand { get; private set; }
+        public ICommand RemoveEntityCommand { get; private set; }
 
         public Scene(string name)
         {
@@ -76,6 +90,51 @@ namespace Kinectitude.Editor.Models
             Attributes = new ObservableCollection<Attribute>();
             Managers = new ObservableCollection<Manager>();
             Entities = new ObservableCollection<Entity>();
+            SelectedEntities = new ObservableCollection<Entity>();
+
+            AddAttributeCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    CreateAttribute();
+                }
+            );
+
+            RemoveAttributeCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    Attribute attribute = parameter as Attribute;
+                    RemoveAttribute(attribute);
+                }
+            );
+
+            AddEntityCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    EntityPreset preset = parameter as EntityPreset;
+                    
+                    if (null != preset)
+                    {
+                        Entity entity = new Entity();
+
+                        foreach (Plugin plugin in preset.Plugins)
+                        {
+                            Component component = new Component(plugin);
+                            entity.AddComponent(component);
+                        }
+
+                        AddEntity(entity);
+                        SelectEntity(entity);
+                    }
+                }
+            );
+
+            RemoveEntityCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    Entity entity = parameter as Entity;
+                    RemoveEntity(entity);
+                }
+            );
         }
 
         public void SetScope(ISceneScope scope)
@@ -171,6 +230,17 @@ namespace Kinectitude.Editor.Models
                 () => RemoveEntity(entity),
                 () => AddEntity(entity)
             );
+        }
+
+        public void SelectEntity(Entity entity)
+        {
+            DeselectAll();
+            SelectedEntities.Add(entity);
+        }
+
+        public void DeselectAll()
+        {
+            SelectedEntities.Clear();
         }
 
         private string GetNextAttributeKey()

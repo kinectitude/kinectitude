@@ -14,7 +14,7 @@ using System.Windows.Shapes;
 using Kinectitude.Editor.Models;
 using Action = Kinectitude.Editor.Models.Action;
 using Condition = Kinectitude.Editor.Models.Condition;
-using Kinectitude.Editor.ViewModels;
+using Kinectitude.Editor.Presenters;
 
 namespace Kinectitude.Editor.Views
 {
@@ -67,7 +67,7 @@ namespace Kinectitude.Editor.Views
                 Plugin plugin = data.Plugin;
                 if (null != plugin)
                 {
-                    Entity entity = (DataContext as EntityViewModel).Model;
+                    Entity entity = DataContext as Entity;
                     if (null != entity)
                     {
                         entity.AddEvent(new Event(plugin));

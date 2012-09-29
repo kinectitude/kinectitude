@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Kinectitude.Core.Components;
+﻿using Kinectitude.Editor.Models;
 using Kinectitude.Render;
-using Kinectitude.Editor.Base;
-using Kinectitude.Editor.ViewModels;
-using Kinectitude.Editor.Models;
 
-namespace Kinectitude.Editor.ViewModels
+namespace Kinectitude.Editor.Presenters
 {
-    internal sealed class BasicEntityVisualViewModel : EntityVisualViewModel
+    internal sealed class BasicEntityPresenter : EntityPresenter
     {
         public string Shape
         {
@@ -66,6 +59,6 @@ namespace Kinectitude.Editor.ViewModels
             }
         }
 
-        public BasicEntityVisualViewModel(Entity entity) : base(entity) { }
+        public BasicEntityPresenter(Entity entity) : base(entity) { }
     }
 }

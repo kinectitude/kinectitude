@@ -13,7 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Controls.Primitives;
 using Kinectitude.Editor.Models;
-using Kinectitude.Editor.ViewModels;
+using Kinectitude.Editor.Presenters;
 
 namespace Kinectitude.Editor.Views
 {
@@ -29,7 +29,7 @@ namespace Kinectitude.Editor.Views
 
         private void Thumb_OnDragDelta(object sender, DragDeltaEventArgs args)
         {
-            EntityVisualViewModel entity = this.DataContext as EntityVisualViewModel;
+            EntityPresenter entity = this.DataContext as EntityPresenter;
 
             if (null != entity)
             {

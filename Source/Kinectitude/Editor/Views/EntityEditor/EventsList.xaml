@@ -8,11 +8,44 @@
 
     <UserControl.Resources>
 
-        <DataTemplate DataType="{x:Type m:AbstractAction}">
+        <DataTemplate DataType="{x:Type m:InheritedAction}">
             <TextBlock Text="{Binding DisplayName}" FontWeight="Bold" Padding="8" />
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type m:AbstractCondition}">
+        <DataTemplate DataType="{x:Type m:InheritedCondition}">
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="{Binding If}" FontWeight="Bold" Padding="8" Background="DarkGray" />
+                <ItemsControl ItemsSource="{Binding Actions}" Padding="16,0,0,0"></ItemsControl>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type m:InheritedEvent}">
+            <StackPanel Orientation="Vertical">
+
+                <StackPanel Orientation="Horizontal">
+                    <Border Padding="8,8,0,8">
+                        <Image Source="{StaticResource icoLock}" />
+                    </Border>
+
+                    <TextBlock Text="{Binding Header}" FontWeight="Bold" Padding="8" Background="DarkGray" />
+                </StackPanel>
+                
+                <ItemsControl ItemsSource="{Binding Actions}" Padding="16,0,0,0">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical" Background="White" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type m:Action}">
+            <TextBlock Text="{Binding DisplayName}" FontWeight="Bold" Padding="8" />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type m:Condition}">
             <StackPanel Orientation="Vertical">
                 <TextBlock Text="{Binding If}" FontWeight="Bold" Padding="8" Background="DarkGray" />
                 <ItemsControl ItemsSource="{Binding Actions}" Padding="16,0,0,0"></ItemsControl>
@@ -20,7 +53,7 @@
             </StackPanel>
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type m:AbstractEvent}">
+        <DataTemplate DataType="{x:Type m:Event}">
             <StackPanel Orientation="Vertical">
                 <TextBlock Text="{Binding Header}" FontWeight="Bold" Padding="8" Background="DarkGray" />
 
