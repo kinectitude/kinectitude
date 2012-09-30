@@ -21,13 +21,13 @@ namespace Kinectitude.Editor.Views
     /// </summary>
     public partial class SceneEditor : UserControl
     {
-        private Scene scene;
+        //private Scene scene;
 
         public SceneEditor()
         {
             InitializeComponent();
 
-            this.DataContextChanged += SceneEditor_DataContextChanged;
+            //this.DataContextChanged += SceneEditor_DataContextChanged;
         }
 
         private void AddEntity_Click(object sender, RoutedEventArgs e)
@@ -35,7 +35,7 @@ namespace Kinectitude.Editor.Views
             DialogService.ShowDialog(DialogService.Constants.AddEntityDialog, DataContext);
         }
 
-        private void SceneEditor_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        /*private void SceneEditor_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (null != this.scene)
             {
@@ -53,6 +53,6 @@ namespace Kinectitude.Editor.Views
         private void SelectedEntities_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
 
-        }
+        }*/
     }
 }

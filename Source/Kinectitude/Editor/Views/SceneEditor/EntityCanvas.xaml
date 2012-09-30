@@ -40,14 +40,14 @@
     </UserControl.Resources>
 
     <Grid>
-        <Thumb DragDelta="Thumb_OnDragDelta" Cursor="SizeAll" Width="{Binding Width}" Height="{Binding Height}">
+        <!--Thumb DragDelta="Thumb_OnDragDelta" Cursor="SizeAll" Width="{Binding Width}" Height="{Binding Height}">
             <Thumb.Template>
                 <ControlTemplate>
                     <ContentPresenter Content="{Binding}" />
                 </ControlTemplate>
             </Thumb.Template>
-        </Thumb>
-        
+        </Thumb-->
+        <ContentPresenter Content="{Binding}" />
     </Grid>
     
 </UserControl>

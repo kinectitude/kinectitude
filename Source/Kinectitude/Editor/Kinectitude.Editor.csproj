@@ -137,6 +137,7 @@
     <Compile Include="Views\SceneEditor\AddEntityDialog.xaml.cs">
       <DependentUpon>AddEntityDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\SceneEditor\DragThumb.cs" />
     <Compile Include="Views\SceneEditor\EntityCanvas.xaml.cs">
       <DependentUpon>EntityCanvas.xaml</DependentUpon>
     </Compile>
@@ -160,12 +161,18 @@
     <Compile Include="Views\MainWindow\SceneDialog.xaml.cs">
       <DependentUpon>SceneDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\SceneEditor\EntityItem.cs" />
+    <Compile Include="Views\SceneEditor\ISelectable.cs" />
+    <Compile Include="Views\SceneEditor\ResizeThumb.cs" />
+    <Compile Include="Views\SceneEditor\RubberBandAdorner.cs" />
+    <Compile Include="Views\SceneEditor\SceneCanvas.cs" />
     <Compile Include="Views\SceneEditor\SceneEditor.xaml.cs">
       <DependentUpon>SceneEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\GameEditor\SceneThumbnail.xaml.cs">
       <DependentUpon>SceneThumbnail.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\SceneEditor\SelectionService.cs" />
     <Page Include="Resources\Icons.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -288,17 +295,7 @@
     <Resource Include="Icons\clock.png" />
     <Resource Include="Icons\cog.png" />
     <Resource Include="Icons\lock.png" />
-    <Resource Include="Icons\align_bottom.png" />
-    <Resource Include="Icons\align_center.png" />
-    <Resource Include="Icons\align_left.png" />
-    <Resource Include="Icons\align_middle.png" />
-    <Resource Include="Icons\align_right.png" />
-    <Resource Include="Icons\align_top.png" />
     <Resource Include="Icons\cursor.png" />
-    <Resource Include="Icons\send_backward.png" />
-    <Resource Include="Icons\send_forward.png" />
-    <Resource Include="Icons\send_to_back.png" />
-    <Resource Include="Icons\send_to_front.png" />
     <Resource Include="Icons\shape_align_bottom.png" />
     <Resource Include="Icons\shape_align_center.png" />
     <Resource Include="Icons\shape_align_left.png" />
