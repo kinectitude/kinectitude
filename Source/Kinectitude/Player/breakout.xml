@@ -21,6 +21,13 @@
     <Define Name="ImageRenderComponent" Class="Kinectitude.Render.ImageRenderComponent" />
   </Using>
 
+  <Using File="Kinectitude.Sound.dll">
+    <Define Name="SoundManager" Class="Kinectitude.Sound.SoundManager"/>
+    <Define Name="SoundComponent" Class="Kinectitude.Sound.SoundComponent"/>
+    <Define Name="PlaySoundAction" Class="Kinectitude.Sound.PlaySoundAction"/>
+    <Define Name="StopSoundAction" Class="Kinectitude.Sound.StopSoundAction"/>
+  </Using>
+
   <Prototype Name="paddle">
     <Component Type="KinectFollowComponent" Direction="X" Player="1" Joint="HandRight"/>
     <Component Type="RenderComponent" FillColor="Black" Shape="Rectangle"/>
@@ -54,8 +61,10 @@
     <Component Type="RenderComponent" FillColor="Red" Shape="Rectangle"/>
     <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false" FixedRotation="true"/>
     <Component Type="TransformComponent" Width="95" Height="20"/>
+    <Component Type="SoundComponent" Filename="bottle_pop.wav" Looping="false"/>
     <Event Type="CollisionEvent" CollidesWith="$extraBall $primaryBall">
       <Action Type="IncrementAction" Target="scene.blocks" IncrementBy="-1"/>
+      <Action Type="PlaySoundAction"/>
       <Action Type="DestroyAction" />
     </Event>
   </Prototype>
