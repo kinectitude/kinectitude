@@ -11,7 +11,7 @@ namespace Kinectitude.Sound
 
         public override void Run()
         {
-            GetComponent<SoundComponent>().Play();
+            this.GetComponent<SoundComponent>().Play();
         }
     }
 }

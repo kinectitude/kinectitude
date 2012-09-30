@@ -18,6 +18,7 @@ namespace Kinectitude.Sound
         private XAudio2 device;
         private MasteringVoice masteringVoice;
         private SourceVoice currentlyPlaying;
+        private AudioBuffer buffer;
 
         public override void Ready()
         {
@@ -26,6 +27,16 @@ namespace Kinectitude.Sound
 
             soundManager = GetManager<SoundManager>();
             soundManager.Add(this);
+
+            // Add our sound to the sound library
+            var s = System.IO.File.OpenRead(Path.Combine("Sounds", filename));
+            WaveStream stream = new WaveStream(s);
+            s.Close();
+
+            if (!soundManager.SoundDictionary.ContainsKey(filename))
+            {
+                soundManager.SoundDictionary[filename] = stream;
+            }
         }
 
         private string filename;
@@ -72,29 +83,27 @@ namespace Kinectitude.Sound
 
         public void Play()
         {
-            var s = System.IO.File.OpenRead(Path.Combine("Sounds", filename));
-            WaveStream stream = new WaveStream(s);
-            s.Close();
+            /*WaveStream ws = soundManager.SoundDictionary[filename];
+            ws.Position = 0;
+            se.AudioData = ws;
+            se.AudioBytes = (int)ws.Length;
+            se.Flags = BufferFlags.None;
 
-            AudioBuffer buffer = new AudioBuffer();
+            SourceVoice sv = new SourceVoice(device, ws.Format);
+            sv.SubmitSourceBuffer(se); // Errors here
+            sv.Start();*/
+
+            WaveStream stream = soundManager.SoundDictionary[filename];
+            stream.Position = 0;
+
+            buffer = new AudioBuffer();
             buffer.AudioData = stream;
             buffer.AudioBytes = (int)stream.Length;
             buffer.Flags = BufferFlags.EndOfStream;
 
-            currentlyPlaying = new SourceVoice(device, stream.Format);
-            currentlyPlaying.SubmitSourceBuffer(buffer);
-            currentlyPlaying.Start();
-
-            // loop until the sound is done playing
-            while (currentlyPlaying.State.BuffersQueued > 0)
-            {
-                Thread.Sleep(10);
-            }
-
-            // cleanup the voice
-            buffer.Dispose();
-            currentlyPlaying.Dispose();
-            stream.Dispose();
+            //currentlyPlaying = new SourceVoice(device, stream.Format);
+            //currentlyPlaying.SubmitSourceBuffer(buffer);
+            //currentlyPlaying.Start();
         }
 
         public void Stop()
@@ -104,6 +113,21 @@ namespace Kinectitude.Sound
                 currentlyPlaying.Stop();
                 currentlyPlaying.FlushSourceBuffers();
             }
+        }
+
+        public void Update()
+        {
+            /*if (null != currentlyPlaying)
+            {
+                if (currentlyPlaying.State.BuffersQueued <= 0)
+                {
+                    // cleanup the voice
+                    buffer.Dispose();
+                    currentlyPlaying.Dispose();
+                    //stream.Dispose();
+                    //Stop();
+                }
+            }*/
         }
 
         public override void Destroy()
