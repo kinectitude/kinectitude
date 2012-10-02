@@ -15,28 +15,18 @@ namespace Kinectitude.Sound
     public class SoundComponent : Component, ISound
     {
         private SoundManager soundManager;
-        private XAudio2 device;
-        private MasteringVoice masteringVoice;
         private SourceVoice currentlyPlaying;
         private AudioBuffer buffer;
+        private bool playing;
 
-        public override void Ready()
+        public void Setup(SoundManager sm)
         {
-            device = new XAudio2();
-            masteringVoice = new MasteringVoice(device);
+            soundManager = sm;
+        }
 
-            soundManager = GetManager<SoundManager>();
-            soundManager.Add(this);
-
-            // Add our sound to the sound library
-            var s = System.IO.File.OpenRead(Path.Combine("Sounds", filename));
-            WaveStream stream = new WaveStream(s);
-            s.Close();
-
-            if (!soundManager.SoundDictionary.ContainsKey(filename))
-            {
-                soundManager.SoundDictionary[filename] = stream;
-            }
+        public bool Playing
+        {
+            get { return playing; }
         }
 
         private string filename;
@@ -83,27 +73,35 @@ namespace Kinectitude.Sound
 
         public void Play()
         {
-            /*WaveStream ws = soundManager.SoundDictionary[filename];
-            ws.Position = 0;
-            se.AudioData = ws;
-            se.AudioBytes = (int)ws.Length;
-            se.Flags = BufferFlags.None;
+            WaveStream stream;
 
-            SourceVoice sv = new SourceVoice(device, ws.Format);
-            sv.SubmitSourceBuffer(se); // Errors here
-            sv.Start();*/
+            if (!soundManager.SoundDictionary.ContainsKey(filename))
+            {
+                // Add our sound to the sound library
+                var s = System.IO.File.OpenRead(Path.Combine("Sounds", filename));
+                stream = new WaveStream(s);
+                s.Close();
+                soundManager.SoundDictionary[filename] = stream;
+            }
+            else
+            {
+                stream = soundManager.SoundDictionary[filename];
+            }
 
-            WaveStream stream = soundManager.SoundDictionary[filename];
-            stream.Position = 0;
+            WaveFormat format = stream.Format;
 
             buffer = new AudioBuffer();
             buffer.AudioData = stream;
             buffer.AudioBytes = (int)stream.Length;
             buffer.Flags = BufferFlags.EndOfStream;
+            buffer.AudioData.Position = 0;
 
-            //currentlyPlaying = new SourceVoice(device, stream.Format);
-            //currentlyPlaying.SubmitSourceBuffer(buffer);
-            //currentlyPlaying.Start();
+            currentlyPlaying = new SourceVoice(soundManager.device, format);
+            currentlyPlaying.BufferEnd += (s, e) => playing = false;
+            currentlyPlaying.Start();
+            currentlyPlaying.SubmitSourceBuffer(buffer);
+
+            playing = true;
         }
 
         public void Stop()
@@ -117,24 +115,13 @@ namespace Kinectitude.Sound
 
         public void Update()
         {
-            /*if (null != currentlyPlaying)
-            {
-                if (currentlyPlaying.State.BuffersQueued <= 0)
-                {
-                    // cleanup the voice
-                    buffer.Dispose();
-                    currentlyPlaying.Dispose();
-                    //stream.Dispose();
-                    //Stop();
-                }
-            }*/
+
         }
 
         public override void Destroy()
         {
-            masteringVoice.Dispose();
-            device.Dispose();
-            soundManager.Remove(this);
+            buffer.Dispose();
+            currentlyPlaying.Dispose();
         }
     }
 }

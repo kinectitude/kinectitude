@@ -9,12 +9,14 @@ using Irony.Interpreter.Ast;
 
 namespace IronlyLangTest
 {
-    [Language("test", "1.0", "Sample test grammar")]
-    public class TestGrammar : Grammar
+    [Language("Kinectitude Game Language", "1.0a", "Used to create Kinectitude games")]
+    public class KinectitudeGrammar : Grammar
     {
         //TODO known issue is that all terminals can have a space entity.component == entity . component
         private IdentifierTerminal identifier = TerminalFactory.CreateCSharpIdentifier("identifier");
         private RegexBasedTerminal name = new RegexBasedTerminal("name", "[a-zA-Z][a-zA-Z0-9_]*");
+        private Terminal number = TerminalFactory.CreateCSharpNumber("number");
+        private Terminal str = TerminalFactory.CreateCSharpString("str");
 
         private void createDefinitionsRules(NonTerminal many, NonTerminal single, string type, BnfTerm definedAs)
         {
@@ -22,153 +24,142 @@ namespace IronlyLangTest
             many.Rule =  single + many | Empty;
         }
 
-        public TestGrammar()
+        public KinectitudeGrammar()
         {
+
+            #region operator terminals
             Terminal openBrace = ToTerm("{");
             Terminal closeBrace = ToTerm("}");
-            Terminal equals = ToTerm("=");
+            Terminal becomes = ToTerm("=");
             Terminal colon = ToTerm(":");
             Terminal eql = ToTerm("==");
             Terminal lt = ToTerm("<");
             Terminal gt = ToTerm(">");
             Terminal le = ToTerm("<=");
             Terminal ge = ToTerm(">=");
-            Terminal ne = ToTerm("!=");
+            Terminal neq = ToTerm("!=");
             Terminal plus = ToTerm("+");
             Terminal minus = ToTerm("-");
             Terminal mult = ToTerm("*");
             Terminal div = ToTerm("/");
             Terminal rem = ToTerm("%");
-            Terminal pow = ToTerm("**");
+            Terminal pow = ToTerm("^");
             Terminal openBrac = ToTerm("(");
             Terminal closeBrac = ToTerm(")");
-            Terminal and = ToTerm("&&");
-            Terminal or = ToTerm("||");
+            Terminal and = new RegexBasedTerminal(@"(&&)|and");
+            Terminal or = new RegexBasedTerminal(@"(\|\|)|or");
+            Terminal not = new RegexBasedTerminal(@"\!|(not)");
+            Terminal leftShift = ToTerm("<<");
+            Terminal RightShift = ToTerm(">>");
+            #endregion
 
+            #region kinectitude langauge part definition
+
+            #region kinectitude key words and parts
             NonTerminal game = new NonTerminal("game");
-
             NonTerminal scenes = new NonTerminal("scenes");
             NonTerminal scene = new NonTerminal("scene");
-
             NonTerminal entities = new NonTerminal("entities");
             NonTerminal entity = new NonTerminal("entity");
-            
             NonTerminal properties = new NonTerminal("properties");
             NonTerminal names = new NonTerminal("names");
             NonTerminal isPrototype = new NonTerminal("isPrototype");
             NonTerminal prototypes = new NonTerminal("prototypes");
             NonTerminal entityDefinition = new NonTerminal("entityDefinition");
-
             NonTerminal prototype = new NonTerminal("prototype");
-
             NonTerminal basicDefinition = new NonTerminal("basicDefinition");
-
             NonTerminal managers = new NonTerminal("managers");
             NonTerminal manager = new NonTerminal("manager");
-
             NonTerminal components = new NonTerminal("components");
             NonTerminal component = new NonTerminal("component");
-
             NonTerminal evts = new NonTerminal("events");
             NonTerminal evt = new NonTerminal("event");
             NonTerminal evtDefinition = new NonTerminal("evtDefinition");
-
             NonTerminal optionalActions = new NonTerminal("optionalActions");
             NonTerminal action = new NonTerminal("action");
             NonTerminal condition = new NonTerminal("condition");
             NonTerminal actions = new NonTerminal("actions");
-
             NonTerminal uses = new NonTerminal("uses");
             NonTerminal files = new NonTerminal("files");
             NonTerminal classes = new NonTerminal("classes");
             NonTerminal definitions = new NonTerminal("definitions");
             NonTerminal define = new NonTerminal("define");
+            NonTerminal className = new NonTerminal("className");
+            #endregion
 
+            #region values
             NonTerminal value = new NonTerminal("value");
-
             NonTerminal threeVal = new NonTerminal("threeVal");
-            threeVal.Rule = name + "." + identifier + "." + identifier;
-
             NonTerminal twoVal = new NonTerminal("twoVal");
-            twoVal.Rule = name + "." + identifier;
-
-
             NonTerminal isType = new NonTerminal("isType");
-            isType.Rule = "$" + name;
-
             NonTerminal isExactType = new NonTerminal("isExactType");
-            isExactType.Rule = "#" + name;
-
             NonTerminal parentVal = new NonTerminal("parentVal");
-            parentVal.Rule = "@" + twoVal | "@" + threeVal | "@" + identifier;
+            NonTerminal exactValue = new NonTerminal("exactValue");
+            NonTerminal typeMatcher = new NonTerminal("typeMatcher");
+            #endregion
 
-            MarkPunctuation(colon, eql, lt, gt, le, ge, ne, openBrac, closeBrac, plus, minus, div, mult, rem, pow, and, or);
+            #endregion
+
+            #region value rules
+            threeVal.Rule = name + "." + identifier + "." + identifier;
+            twoVal.Rule = name + "." + identifier;
+            isType.Rule = "$" + name;
             RegisterBracePair("(", ")");
             RegisterBracePair("{", "}");
-
-            NonTerminal exactValue = new NonTerminal("exactValue");
+            isExactType.Rule = "#" + name;
+            parentVal.Rule = "@" + twoVal | "@" + threeVal | "@" + identifier;
             exactValue.Rule = name | twoVal | threeVal | parentVal;
-
-            NonTerminal typeMatcher = new NonTerminal("typeMatcher");
             typeMatcher.Rule = isType | isExactType | isType + plus + typeMatcher | isExactType + plus + typeMatcher;
-
-            #region math
-
-            Terminal number = TerminalFactory.CreateCSharpNumber("number");
-            NonTerminal mathExpr = new NonTerminal("mathExpr");
-            NonTerminal mathTerm = new NonTerminal("mathTerm");
-            NonTerminal mathFactor = new NonTerminal("mathFactor");
-
-            mathExpr.Rule = mathTerm | mathExpr + plus + mathTerm | mathExpr + minus + mathTerm;
-            mathTerm.Rule = mathFactor | mathTerm + mult + mathFactor | mathTerm + div + mathFactor | mathTerm + rem + mathFactor;
-            //TODO think of a way to make this not ambigious with values
-            mathFactor.Rule = "n:" + exactValue | number | "-" + number | openBrac + mathExpr + closeBrac;
-            
             #endregion
 
-            #region string
+            #region expressions
+            NonTerminal expr = new NonTerminal("expr");
+            NonTerminal binOp = new NonTerminal("binOp");
+            NonTerminal uniOp = new NonTerminal("uniOp");
+            NonTerminal term = new NonTerminal("term");
 
-            NonTerminal strExpr = new NonTerminal("strExpr");
-            Terminal str = TerminalFactory.CreateCSharpString("str");
-            strExpr.Rule = str | str + plus + strExpr | exactValue | exactValue + plus + strExpr;
-
+            expr.Rule = term | expr + binOp + expr | uniOp + expr;
+            binOp.Rule = plus | minus | div | mult | pow | and | or | eql | neq | gt | ge | lt | le;
+            uniOp.Rule = not;
+            term.Rule = number | str | openBrac + expr + closeBrac | exactValue | minus + expr | plus + expr;
             #endregion
-            
-            #region bool
 
-            NonTerminal boolExpr = new NonTerminal("boolExpr");
-            NonTerminal boolTerm = new NonTerminal("boolTerm");
-            NonTerminal boolFactor = new NonTerminal("boolFactor");
-            NonTerminal test = new NonTerminal("test");
-
-            boolExpr.Rule = boolTerm | boolExpr + or + boolTerm | boolExpr + "or" + boolTerm;
-            boolTerm.Rule = boolFactor | boolTerm + and + boolFactor | boolTerm + "and" + boolFactor;
-            
-            test.Rule = mathExpr + lt + mathExpr | mathExpr + gt + mathExpr | mathExpr + eql + mathExpr |
-                mathExpr + le + mathExpr | mathExpr + ge + mathExpr | mathExpr + ne + mathExpr |
-                //TODO this should be allowed look into why it causes shift red conflicts
-                /*boolExpr + eql + boolExpr | boolExpr + ne + boolExpr |*/ strExpr + eql + strExpr | strExpr + ne + strExpr;
-
-            //TODO think of a way to make this not ambigious with values
-            boolFactor.Rule = "b:" + exactValue | "true" | "false" | openBrac + boolExpr + closeBrac | test;
+            #region operator precedence
+            /* NOTE: Order is taken from C++/C# order with power added in.
+             * Higher number = more important
+             * Increments are by 10 to allow easy adding of new terms
+             * Power is not in C++/C#, but has been added where is seems to fit
+             */
+            RegisterOperators(10, Associativity.Right, becomes);
+            RegisterOperators(20, Associativity.Left, or);
+            RegisterOperators(30, Associativity.Left, and);
+            RegisterOperators(40, Associativity.Left, eql, neq);
+            RegisterOperators(50, Associativity.Left, eql, neq);
+            RegisterOperators(60, Associativity.Left, ge, le, lt, gt);
+            RegisterOperators(70, Associativity.Left, leftShift, RightShift);
+            RegisterOperators(70, Associativity.Left, plus, minus);
+            RegisterOperators(80, Associativity.Left, div, mult, rem);
+            RegisterOperators(90, Associativity.Left, pow);
 
             #endregion
 
-            value.Rule = typeMatcher | mathExpr | boolExpr | strExpr;
+            #region game creation rules
+
+            value.Rule = typeMatcher | expr;
 
             names.Rule = names + name | name;
             isPrototype.Rule = colon + names | Empty;
 
             basicDefinition.Rule = openBrace + properties + closeBrace;
 
-            properties.Rule = properties + identifier + equals + value | Empty;
+            properties.Rule = properties + identifier + becomes + value | Empty;
             entityDefinition.Rule = isPrototype + openBrace + properties + components + evts + closeBrace;
 
             createDefinitionsRules(prototypes, prototype, "Prototype", entityDefinition);
             createDefinitionsRules(managers, manager, "Manager", basicDefinition);
             createDefinitionsRules(components, component, "Component", basicDefinition);
 
-            condition.Rule = "if" + openBrac + boolExpr + closeBrac + openBrace + optionalActions + closeBrace;
+            condition.Rule = "if" + openBrac + expr + closeBrac + openBrace + optionalActions + closeBrace;
 
             action.Rule = "Action" + identifier + basicDefinition;
             actions.Rule = action + optionalActions | condition + optionalActions;
@@ -183,17 +174,29 @@ namespace IronlyLangTest
             scenes.Rule = scene + scenes | scene;
             scene.Rule = "Scene" + name + openBrace + properties + managers + entities + closeBrace;
 
-            NonTerminal className = new NonTerminal("className");
             className.Rule = identifier | identifier + "." + className;
 
             uses.Rule = files + uses | Empty;
             files.Rule = "using" + className + openBrace + definitions + closeBrace;
-            //TODO this may need better logic?
             define.Rule = "define" + identifier + "as" + className;
             definitions.Rule = define + definitions | define;
 
             game.Rule = uses + "Game" + name + openBrace  + properties + prototypes + scenes + closeBrace;
+            #endregion
+
             Root = game;
+            //Removes from the tree, we don't care about having these there
+            MarkPunctuation("{", "}", "(", ")", ":", "$", "@", "#", "Game", "using", "define", "Scene", "Entity", 
+                "Action", "if", "Component", "Manager", "Prototype");
+        }
+
+        public static void Main()
+        {
+            KinectitudeGrammar kGrammar = new KinectitudeGrammar();
+            Parser parser = new Parser(kGrammar);
+            string fileName = @"D:\School\Assignments\Kinectitude\tmpconversion.txt";
+            string source = System.IO.File.ReadAllText(fileName);
+            ParseTree tree = parser.Parse(source, fileName);
         }
     }
 }

@@ -13,8 +13,9 @@ namespace Kinectitude.Core.Base
         private readonly Dictionary<string, List<Timer>> runningTimers = new Dictionary<string, List<Timer>>();
         private readonly Dictionary<string, List<Timer>> pausedTimers = new Dictionary<string, List<Timer>>();
 
-        internal readonly Dictionary<Type, IManager> ManagersDictionary;
-        internal readonly List<IManager> Managers;
+        internal readonly Dictionary<Type, IManager> ManagersDictionary = new Dictionary<Type,IManager>();
+        internal readonly List<IManager> Managers = new List<IManager>();
+        internal readonly List<IManager> AddedManagers = new List<IManager>();
 
         private bool started = false;
         private bool running = false;
@@ -43,6 +44,8 @@ namespace Kinectitude.Core.Base
                             e.DoActions();
                         }
                     }
+                    Managers.AddRange(AddedManagers);
+                    AddedManagers.Clear();
                     foreach (IManager m in Managers)
                     {
                         m.Start();
@@ -61,8 +64,6 @@ namespace Kinectitude.Core.Base
 
         internal Scene(SceneLoader sceneLoader, Game game) : base(-1)
         {
-            ManagersDictionary = new Dictionary<Type, IManager>();
-            Managers = new List<IManager>();
             Game = game;
             OnStart = new List<SceneStartsEvent>();
             IsType = new Dictionary<string, HashSet<int>>();
@@ -189,7 +190,7 @@ namespace Kinectitude.Core.Base
             {
                 manager = ClassFactory.Create<IManager>(registeredName);
                 ManagersDictionary.Add(managerType, manager);
-                Managers.Add(manager);
+                AddedManagers.Add(manager);
             }
             return manager;
         }
@@ -199,7 +200,7 @@ namespace Kinectitude.Core.Base
             if (!ManagersDictionary.ContainsKey(typeof(T)))
             {
                 T manager = ClassFactory.Create<T>(typeof(T));
-                Managers.Add(manager);
+                AddedManagers.Add(manager);
                 ManagersDictionary.Add(typeof(T), manager);
                 return manager;
             }

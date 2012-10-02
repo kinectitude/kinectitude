@@ -8,8 +8,13 @@ namespace Kinectitude.Sound
 {
     public class SoundManager : Manager<SoundComponent>
     {
+        public XAudio2 device;
+        public MasteringVoice masteringVoice;
+
         public SoundManager()
         {
+            device = new XAudio2();
+            masteringVoice = new MasteringVoice(device);
             SoundDictionary = new Dictionary<string, WaveStream>();
         }
 
@@ -17,15 +22,27 @@ namespace Kinectitude.Sound
         // when we want to play a sound
         public Dictionary<string, WaveStream> SoundDictionary{ get; private set; }
 
+        public void AddSound(SoundComponent sc)
+        {
+            this.Children.Add(sc);
+            sc.Setup(this);
+            sc.Play();
+        }
+
         public override void OnUpdate(float t)
         {
-            foreach (SoundComponent sc in Children)
+            List<SoundComponent> temp = Children;
+            foreach (SoundComponent sc in temp)
             {
-                //sc.Update();
+                if (!sc.Playing)
+                {
+                    sc.Destroy();
+                    Children.Remove(sc);
+                }
             }
         }
 
-        public void MuteSounds()
+        public void MuteAllSounds()
         {
             foreach (SoundComponent sc in Children)
             {
