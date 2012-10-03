@@ -129,11 +129,14 @@ namespace Kinectitude.Editor.Views
         {
             ClearEntities();
 
-            scene.Entities.CollectionChanged += Entities_CollectionChanged;
-
-            foreach (Entity entity in scene.Entities)
+            if (null != scene)
             {
-                AddEntity(entity);
+                scene.Entities.CollectionChanged += Entities_CollectionChanged;
+
+                foreach (Entity entity in scene.Entities)
+                {
+                    AddEntity(entity);
+                }
             }
         }
 
@@ -144,17 +147,8 @@ namespace Kinectitude.Editor.Views
 
         private void AddEntity(Entity entity)
         {
-            EntityItem item = new EntityItem();
-            item.Content = entity;
-
-            item.Width = entity.Presenter.Width;
-            item.Height = entity.Presenter.Height;
-
-            SceneCanvas.SetLeft(item, entity.Presenter.X);
-            SceneCanvas.SetTop(item, entity.Presenter.Y);
-
+            EntityItem item = new EntityItem(entity);
             Canvas.SetZIndex(item, Children.Count);
-
             Children.Add(item);
         }
 

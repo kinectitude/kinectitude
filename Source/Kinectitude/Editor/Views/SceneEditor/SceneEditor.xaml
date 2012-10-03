@@ -10,8 +10,35 @@
 
     <UserControl.Resources>
 
+        <BooleanToVisibilityConverter x:Key="boolToVis" />
+
+        <DataTemplate DataType="{x:Type p:EntityPresenter}" />
+
+        <DataTemplate DataType="{x:Type p:BasicEntityPresenter}">
+            <Grid>
+                <Rectangle Visibility="{Binding IsRectangular, Converter={StaticResource boolToVis}}" Width="{Binding Width}" Height="{Binding Height}">
+                    <Rectangle.Fill>
+                        <SolidColorBrush Color="{Binding FillColor}" />
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Ellipse Visibility="{Binding IsElliptical, Converter={StaticResource boolToVis}}" Width="{Binding Width}" Height="{Binding Height}">
+                    <Ellipse.Fill>
+                        <SolidColorBrush Color="{Binding FillColor}" />
+                    </Ellipse.Fill>
+                </Ellipse>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type p:SpriteEntityPresenter}" />
+
+        <DataTemplate DataType="{x:Type p:TextEntityPresenter}">
+            <Canvas>
+                <TextBlock Text="{Binding Value}" FontSize="{Binding FontSize}" Foreground="{Binding FontColor}" />
+            </Canvas>
+        </DataTemplate>
+
         <DataTemplate DataType="{x:Type m:Entity}">
-            <v:EntityCanvas DataContext="{Binding Presenter}" />
+            <ContentPresenter Content="{Binding Presenter}" />
         </DataTemplate>
 
         <Style x:Key="EntityContainerStyle">

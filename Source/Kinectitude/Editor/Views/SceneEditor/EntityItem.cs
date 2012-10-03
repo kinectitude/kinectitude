@@ -6,6 +6,10 @@ using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using Kinectitude.Editor.Models;
+using Kinectitude.Editor.Presenters;
+using System.Collections.Specialized;
+using System.Windows.Data;
 
 namespace Kinectitude.Editor.Views
 {
@@ -17,15 +21,21 @@ namespace Kinectitude.Editor.Views
         public static readonly DependencyProperty IsSelectedProperty =
             DependencyProperty.Register("IsSelected", typeof(bool), typeof(EntityItem), new FrameworkPropertyMetadata(false));
 
+        private readonly Entity entity;
+
         public bool IsSelected
         {
             get { return (bool)GetValue(IsSelectedProperty); }
             set { SetValue(IsSelectedProperty, value); }
         }
 
-        public EntityItem()
+        public EntityItem(Entity entity)
         {
-            //FrameworkElement.DefaultStyleKeyProperty.OverrideMetadata(typeof(EntityItem), new FrameworkPropertyMetadata(typeof(EntityItem)));
+            this.entity = entity;
+
+            entity.Components.CollectionChanged += Components_CollectionChanged;
+
+            UpdatePresenter();
         }
 
         protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
@@ -55,6 +65,41 @@ namespace Kinectitude.Editor.Views
             }
 
             e.Handled = false;
+        }
+
+        private void Components_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            UpdatePresenter();
+        }
+
+        private void UpdatePresenter()
+        {
+            EntityPresenter presenter = EntityPresenter.Create(entity);
+            Content = presenter;
+
+            Binding widthBinding = new Binding("Width");
+            widthBinding.Source = presenter;
+            widthBinding.Mode = BindingMode.TwoWay;
+
+            this.SetBinding(ContentControl.WidthProperty, widthBinding);
+
+            Binding heightBinding = new Binding("Height");
+            heightBinding.Source = presenter;
+            heightBinding.Mode = BindingMode.TwoWay;
+
+            this.SetBinding(ContentControl.HeightProperty, heightBinding);
+
+            Binding leftBinding = new Binding("X");
+            leftBinding.Source = presenter;
+            leftBinding.Mode = BindingMode.TwoWay;
+
+            this.SetBinding(Canvas.LeftProperty, leftBinding);
+
+            Binding topBinding = new Binding("Y");
+            topBinding.Source = presenter;
+            topBinding.Mode = BindingMode.TwoWay;
+
+            this.SetBinding(Canvas.TopProperty, topBinding);
         }
     }
 }

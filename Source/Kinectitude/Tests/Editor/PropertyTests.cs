@@ -1,9 +1,8 @@
 ﻿using System.Linq;
 using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Components;
-using Kinectitude.Editor.ViewModels;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Kinectitude.Editor.Models;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Component = Kinectitude.Editor.Models.Component;
 
 namespace Kinectitude.Editor.Tests

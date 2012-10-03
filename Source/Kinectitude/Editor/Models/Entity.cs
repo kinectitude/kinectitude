@@ -9,7 +9,6 @@ using System.Windows.Input;
 using System;
 using Kinectitude.Core.Components;
 using Kinectitude.Render;
-using Kinectitude.Editor.Presenters;
 
 namespace Kinectitude.Editor.Models
 {
@@ -20,8 +19,7 @@ namespace Kinectitude.Editor.Models
         private string name;
         private IEntityScope scope;
         private int nextAttribute;
-        private EntityPresenter presenter;
-
+        
         public event ScopeChangedEventHandler ScopeChanged;
         public event PluginAddedEventHandler PluginAdded;
         public event DefineAddedEventHandler DefineAdded;
@@ -62,27 +60,6 @@ namespace Kinectitude.Editor.Models
         public IEnumerable<Plugin> Plugins
         {
             get { return Components.Select(x => x.Plugin).Union(Events.SelectMany(x => x.Plugins)).Distinct(); }
-        }
-
-        public EntityPresenter Presenter
-        {
-            get
-            {
-                if (null == presenter)
-                {
-                    presenter = EntityPresenter.Create(this);
-                }
-
-                return presenter;
-            }
-            set
-            {
-                if (presenter != value)
-                {
-                    presenter = value;
-                    NotifyPropertyChanged("Presenter");
-                }
-            }
         }
 
         public ICommand AddPrototypeCommand { get; private set; }
@@ -493,8 +470,6 @@ namespace Kinectitude.Editor.Models
                 Components.Add(component);
 
                 NotifyPluginAdded(component.Plugin);
-
-                Presenter = EntityPresenter.Create(this);
 
                 Workspace.Instance.CommandHistory.Log(
                     "add component '" + component.DisplayName + "'",

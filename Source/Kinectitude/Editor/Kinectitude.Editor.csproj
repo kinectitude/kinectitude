@@ -138,9 +138,6 @@
       <DependentUpon>AddEntityDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SceneEditor\DragThumb.cs" />
-    <Compile Include="Views\SceneEditor\EntityCanvas.xaml.cs">
-      <DependentUpon>EntityCanvas.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\EntityEditor\EventsList.xaml.cs">
       <DependentUpon>EventsList.xaml</DependentUpon>
     </Compile>
@@ -194,10 +191,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SceneEditor\AddEntityDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\SceneEditor\EntityCanvas.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
