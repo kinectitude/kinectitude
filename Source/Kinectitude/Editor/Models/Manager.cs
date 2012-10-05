@@ -1,8 +1,8 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
-using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Base;
-using System;
+using Kinectitude.Editor.Models.Interfaces;
 
 namespace Kinectitude.Editor.Models
 {

@@ -1,6 +1,6 @@
 ﻿using System;
-using Kinectitude.Core.Base;
 using System.Collections.Generic;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Data
 {

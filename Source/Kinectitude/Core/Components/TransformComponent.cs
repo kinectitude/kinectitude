@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using Kinectitude.Core.Attributes;
+﻿using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Base;
-using Kinectitude.Core.ComponentInterfaces;
 
 public delegate void ChangeDelegate();
 

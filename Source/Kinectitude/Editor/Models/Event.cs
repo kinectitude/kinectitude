@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Kinectitude.Editor.Models.Interfaces;
-using System;
-using Kinectitude.Editor.Presenters;
 
 namespace Kinectitude.Editor.Models
 {

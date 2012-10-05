@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Controls;
+﻿using System.Collections.Specialized;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using Kinectitude.Editor.Models;
 using Kinectitude.Editor.Presenters;
-using System.Collections.Specialized;
-using System.Windows.Data;
 
 namespace Kinectitude.Editor.Views
 {
@@ -76,6 +72,9 @@ namespace Kinectitude.Editor.Views
         {
             EntityPresenter presenter = EntityPresenter.Create(entity);
             Content = presenter;
+
+            object w = presenter.Width;
+            object h = presenter.Height;
 
             Binding widthBinding = new Binding("Width");
             widthBinding.Source = presenter;

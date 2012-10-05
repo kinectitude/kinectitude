@@ -203,8 +203,20 @@ namespace Kinectitude.Editor.Storage
 
             foreach (XElement componentElement in element.Elements(Constants.Component))
             {
-                Component component = CreateComponent(componentElement);
-                entity.AddComponent(component);
+                // Adding a component adds any other components that the new component requires.
+                // It is necessary to check if the component we are attempting to add already
+                // exists. If it does, we should not attempt to create a new component.
+
+                Plugin plugin = game.GetPlugin((string)componentElement.Attribute(Constants.Type));
+                
+                Component component = entity.GetComponentByType(plugin.CoreType);
+                if (null == component)
+                {
+                    component = new Component(plugin);
+                    entity.AddComponent(component);
+                }
+
+                PopulateComponent(componentElement, component);
             }
 
             foreach (XElement eventElement in element.Elements(Constants.Event))
@@ -215,16 +227,12 @@ namespace Kinectitude.Editor.Storage
             return entity;
         }
 
-        private Component CreateComponent(XElement element)
+        private void PopulateComponent(XElement element, Component component)
         {
-            Plugin plugin = game.GetPlugin((string)element.Attribute(Constants.Type));
-            Component component = new Component(plugin);
-
             foreach (XAttribute attribute in element.Attributes().Except(element.Attributes(Constants.Type)))
             {
                 component.SetProperty(attribute.Name.LocalName, (string)attribute);
             }
-            return component;
         }
 
         private Event CreateEvent(XElement element)

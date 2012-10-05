@@ -2,12 +2,9 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Windows.Input;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
-using System.Windows.Input;
-using Kinectitude.Editor.Presenters;
-using System;
-using Kinectitude.Editor.Views;
 
 namespace Kinectitude.Editor.Models
 {
@@ -116,7 +113,7 @@ namespace Kinectitude.Editor.Models
                     {
                         Entity entity = new Entity();
 
-                        foreach (Plugin plugin in preset.Plugins)
+                        foreach (Plugin plugin in preset.Components)
                         {
                             Component component = new Component(plugin);
                             entity.AddComponent(component);

@@ -1,18 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Windows.Input;
 using Kinectitude.Core.Attributes;
+using Kinectitude.Core.Components;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Commands;
 using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.Views;
-using System.Windows.Input;
-using System.Collections.Specialized;
-using Kinectitude.Editor.Presenters;
-using System.Collections.Generic;
-using Kinectitude.Core.Components;
 using Kinectitude.Render;
 
 namespace Kinectitude.Editor.Models

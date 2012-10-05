@@ -1,14 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Input;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
-using System.Windows.Input;
-using System;
-using Kinectitude.Core.Components;
-using Kinectitude.Render;
 
 namespace Kinectitude.Editor.Models
 {

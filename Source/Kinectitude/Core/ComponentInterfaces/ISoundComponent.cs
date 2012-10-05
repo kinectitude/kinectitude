@@ -1,6 +1,5 @@
-﻿using Kinectitude.Core.Base;
-using Kinectitude.Core.Attributes;
-using System;
+﻿using System;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.ComponentInterfaces
 {

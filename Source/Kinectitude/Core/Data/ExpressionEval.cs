@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Kinectitude.Core.Base;
 using NCalc;
-using System.Collections.Generic;
 
 namespace Kinectitude.Core.Data
 {

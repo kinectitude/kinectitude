@@ -49,7 +49,7 @@ namespace Kinectitude.Editor.Models
         {
             get
             {
-                if (IsInherited)
+                if (IsInherited && !IsRoot)
                 {
                     return null != scope ? scope.GetInheritedValue(Name) : 0;   // TODO: Get actual default
                 }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Kinectitude.Editor.Models
 {
@@ -9,12 +6,12 @@ namespace Kinectitude.Editor.Models
     {
         public string Name { get; private set; }
 
-        public IEnumerable<Plugin> Plugins { get; private set; }
+        public IEnumerable<Plugin> Components { get; private set; }
 
-        public EntityPreset(string name, params Plugin[] plugins)
+        public EntityPreset(string name, params Plugin[] components)
         {
             Name = name;
-            Plugins = plugins;
+            Components = components;
         }
     }
 }
