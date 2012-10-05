@@ -1,7 +1,7 @@
 ﻿
 namespace Kinectitude.Core.Base
 {
-    public abstract class Service
+    public abstract class Service : Changeable
     {
 
         /// <summary>

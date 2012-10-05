@@ -497,7 +497,9 @@ namespace Kinectitude.Core.Base
 
         internal static string GetReferedName(Type t)
         {
-            return referedDictionary[t];
+            string name;
+            if(referedDictionary.TryGetValue(t, out name)) return name;
+            return null;
         }
 
     }

@@ -57,6 +57,7 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Compile Include="Core\Base\SceneTests.cs" />
     <Compile Include="Core\Base\TimerTests.cs" />
     <Compile Include="Core\Data\MathDataTests.cs" />
     <Compile Include="Core\Data\StringDataTests.cs" />

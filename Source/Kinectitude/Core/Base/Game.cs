@@ -47,9 +47,18 @@ namespace Kinectitude.Core.Base
 
         public void Start()
         {
+            //TODO check if the are us
             Scene main = GameLoader.GetScene(GameLoader.FirstScene);
             currentScenes.Push(main);
             main.Running = true;
+        }
+
+        public void Stop()
+        {
+            //TODO check if they are us
+            Scene main = GameLoader.GetScene(GameLoader.FirstScene);
+            currentScenes.Push(main);
+            main.Running = false;
         }
 
         public void OnUpdate(float frameDelta)
@@ -113,6 +122,12 @@ namespace Kinectitude.Core.Base
 
         internal override Changeable GetComponentOrManager(string name)
         {
+            Type type;
+            if (ClassFactory.TypesDict.TryGetValue(name, out type))
+            {
+                Service s;
+                if (services.TryGetValue(type, out s)) return s;
+            }
             return null;
         }
     }

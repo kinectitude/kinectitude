@@ -50,7 +50,16 @@ namespace IronlyLangTest
             Terminal or = new RegexBasedTerminal(@"(\|\|)|or");
             Terminal not = new RegexBasedTerminal(@"\!|(not)");
             Terminal leftShift = ToTerm("<<");
-            Terminal RightShift = ToTerm(">>");
+            Terminal rightShift = ToTerm(">>");
+            Terminal comma = ToTerm(",");
+            Terminal plusEq = ToTerm("+=");
+            Terminal minusEq = ToTerm("-=");
+            Terminal multEq = ToTerm("*=");
+            Terminal divEq = ToTerm("/=");
+            Terminal remEq = ToTerm("%=");
+            Terminal powEq = ToTerm("^=");
+            Terminal rshiftEq = ToTerm(">>=");
+            Terminal lshiftEq = ToTerm("<<=");
             #endregion
 
             #region kinectitude langauge part definition
@@ -96,6 +105,7 @@ namespace IronlyLangTest
             NonTerminal parentVal = new NonTerminal("parentVal");
             NonTerminal exactValue = new NonTerminal("exactValue");
             NonTerminal typeMatcher = new NonTerminal("typeMatcher");
+            NonTerminal legalSetValue = new NonTerminal("legalSetValue");
             #endregion
 
             #endregion
@@ -136,7 +146,7 @@ namespace IronlyLangTest
             RegisterOperators(40, Associativity.Left, eql, neq);
             RegisterOperators(50, Associativity.Left, eql, neq);
             RegisterOperators(60, Associativity.Left, ge, le, lt, gt);
-            RegisterOperators(70, Associativity.Left, leftShift, RightShift);
+            RegisterOperators(70, Associativity.Left, leftShift, rightShift);
             RegisterOperators(70, Associativity.Left, plus, minus);
             RegisterOperators(80, Associativity.Left, div, mult, rem);
             RegisterOperators(90, Associativity.Left, pow);
@@ -150,10 +160,14 @@ namespace IronlyLangTest
             names.Rule = names + name | name;
             isPrototype.Rule = colon + names | Empty;
 
-            basicDefinition.Rule = openBrace + properties + closeBrace;
+            basicDefinition.Rule = openBrac + properties + closeBrac;
 
-            properties.Rule = properties + identifier + becomes + value | Empty;
-            entityDefinition.Rule = isPrototype + openBrace + properties + components + evts + closeBrace;
+            properties.Rule = identifier + becomes + value | identifier + becomes + value + comma + properties | Empty;
+            entityDefinition.Rule = isPrototype + basicDefinition + openBrace + components + evts + closeBrace;
+
+            /*assignments.Rule = exactValue + becomes + value | exactValue + plusEq + value | 
+                exactValue + minusEq + value | exactValue + multEq + value | exactValue + remEq + value | 
+                exactValue + divEq + value | */
 
             createDefinitionsRules(prototypes, prototype, "Prototype", entityDefinition);
             createDefinitionsRules(managers, manager, "Manager", basicDefinition);
@@ -161,18 +175,18 @@ namespace IronlyLangTest
 
             condition.Rule = "if" + openBrac + expr + closeBrac + openBrace + optionalActions + closeBrace;
 
-            action.Rule = "Action" + identifier + basicDefinition;
+            action.Rule = identifier + basicDefinition;
             actions.Rule = action + optionalActions | condition + optionalActions;
             optionalActions.Rule = actions | Empty;
 
-            evtDefinition.Rule = openBrace + properties + actions + closeBrace;
+            evtDefinition.Rule = basicDefinition + openBrace + actions + closeBrace;
             createDefinitionsRules(evts, evt, "Event", evtDefinition);
 
             entity.Rule = "Entity" + name + entityDefinition | "Entity" + entityDefinition;
             entities.Rule = entity + entities | entity;
 
             scenes.Rule = scene + scenes | scene;
-            scene.Rule = "Scene" + name + openBrace + properties + managers + entities + closeBrace;
+            scene.Rule = "Scene" + name + basicDefinition + openBrace + managers + entities + closeBrace;
 
             className.Rule = identifier | identifier + "." + className;
 
@@ -181,13 +195,15 @@ namespace IronlyLangTest
             define.Rule = "define" + identifier + "as" + className;
             definitions.Rule = define + definitions | define;
 
-            game.Rule = uses + "Game" + name + openBrace  + properties + prototypes + scenes + closeBrace;
+            game.Rule = uses + "Game" + name + basicDefinition + openBrace + prototypes + scenes + closeBrace;
             #endregion
 
             Root = game;
             //Removes from the tree, we don't care about having these there
             MarkPunctuation("{", "}", "(", ")", ":", "$", "@", "#", "Game", "using", "define", "Scene", "Entity", 
-                "Action", "if", "Component", "Manager", "Prototype");
+                 ",", "if", "Component", "Manager", "Prototype");
+
+            MarkTransient(basicDefinition);
         }
 
         public static void Main()

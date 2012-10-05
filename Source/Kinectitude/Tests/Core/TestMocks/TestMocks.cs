@@ -293,4 +293,12 @@ namespace Kinectitude.Tests.Core.TestMocks
         public override void OnInitialize() { }
     }
 
+    public class GetManagerAction : Action
+    {
+        public override void Run()
+        {
+            ManagerMock m = GetManager<ManagerMock>();
+        }
+    }
+
 }
