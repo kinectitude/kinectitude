@@ -9,6 +9,7 @@ using SlimDX.Direct2D;
 using SlimDX.Windows;
 using Factory = SlimDX.Direct2D.Factory;
 using Kinectitude.DirectInput;
+using Button = System.Windows.Forms.Button;
 
 namespace Kinectitude.Player
 {
@@ -18,7 +19,6 @@ namespace Kinectitude.Player
 
         private readonly RenderService renderService;
         private readonly RenderForm form;
-        private readonly Form infoForm;
         private readonly Game game;
         private readonly DirectInputService directInputService;
 
@@ -54,16 +54,17 @@ namespace Kinectitude.Player
 
             directInputService = game.GetService<DirectInputService>();
             directInputService.Control = form;
-            infoForm = new Form();
-            int y = (int)(SystemInformation.VirtualScreen.Height - game.Height * dpi.Height / 96.0) / 2;
+            int y = (int)((SystemInformation.VirtualScreen.Height - game.Height * dpi.Height / 96.0)/ 2);
             if(y < 0) y = 0;
-            int x = (int)(SystemInformation.VirtualScreen.Width - game.Width * dpi.Width / 96.0 - 200) / 2;
+            int x = (int)((SystemInformation.VirtualScreen.Width - game.Width * dpi.Width / 96.0) / 2);
             if (x < 0) x = 0;
-            form.SetDesktopLocation(0, y);
-            infoForm.Height = form.Height;
-            infoForm.Width = 200;
-            infoForm.SetDesktopLocation((int)(x + form.Width * dpi.Width / 96.0), y);
-            infoForm.Show();
+            form.SetDesktopLocation(x, y);
+            form.Width += 150;
+            Button pauseResume = new Button();
+            pauseResume.Size = new Size(30, 30);
+            pauseResume.Text = "Pause";
+            pauseResume.Location = new Point((int)(game.Width * dpi.Width / 96.0) + 10, y);
+            form.Container.Add(pauseResume);
 
         }
 

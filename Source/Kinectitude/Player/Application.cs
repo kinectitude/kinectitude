@@ -54,7 +54,11 @@ namespace Kinectitude.Player
 
             directInputService = game.GetService<DirectInputService>();
             directInputService.Control = form;
-
+            int y = (int)((SystemInformation.VirtualScreen.Height - game.Height * dpi.Height / 96.0) / 2);
+            if (y < 0) y = 0;
+            int x = (int)((SystemInformation.VirtualScreen.Width - game.Width * dpi.Width / 96.0) / 2);
+            if (x < 0) x = 0;
+            form.SetDesktopLocation(x, y);
         }
 
         public void Dispose()
