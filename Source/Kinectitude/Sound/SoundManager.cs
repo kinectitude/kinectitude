@@ -24,7 +24,7 @@ namespace Kinectitude.Sound
 
         public void AddSound(SoundComponent sc)
         {
-            this.Children.Add(sc);
+            this.Add(sc);
             sc.Setup(this);
             sc.Play();
         }
@@ -34,10 +34,14 @@ namespace Kinectitude.Sound
             List<SoundComponent> temp = Children;
             foreach (SoundComponent sc in temp)
             {
-                if (!sc.Playing)
+                if (!sc.Playing && !sc.Looping)
                 {
                     sc.Destroy();
-                    Children.Remove(sc);
+                    this.Remove(sc);
+                }
+                else
+                {
+                    sc.OnUpdate(t);
                 }
             }
         }
@@ -48,6 +52,21 @@ namespace Kinectitude.Sound
             {
                 sc.Stop();
             }
+        }
+
+        public void StopSound(string filename)
+        {
+            List<SoundComponent> temp = Children;
+            foreach (SoundComponent sc in temp)
+            {
+                if (sc.Filename == filename)
+                {
+                    sc.Stop();
+                    this.Remove(sc);
+                }
+            }
+
+            SoundDictionary.Remove(filename);
         }
     }
 }

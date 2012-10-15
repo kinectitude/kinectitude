@@ -104,8 +104,11 @@
     <Content Include="Assets\tailsSprites.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\tennisball.png" />
-    <Content Include="asteroids.xml">
+<<<<<<< HEAD
+    <Content Include="asteroids.xml" />
+=======
+>>>>>>> 962baa1d7dc952e92826ce7eea8ba5228cd95f61
+    <Content Include="game.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -113,14 +116,13 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
-<<<<<<< HEAD
-    <Content Include="agame.xml" />
-=======
-    <Content Include="game.xml">
+    <Content Include="newgame.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="loopBreakout.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
->>>>>>> fe48637ae2ca3c83427898974a2e107ced8b9d88
     <Content Include="oldgame.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -133,7 +135,13 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Sounds\bottle_pop.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Sounds\explosion.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\pop.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

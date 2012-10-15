@@ -12,7 +12,7 @@ namespace Kinectitude.Sound
 {
     [Plugin("Sound Component", "")]
     [Provides(typeof(ISound))]
-    public class SoundComponent : Component, ISound
+    public class SoundComponent : ISound
     {
         private SoundManager soundManager;
         private SourceVoice currentlyPlaying;
@@ -39,7 +39,6 @@ namespace Kinectitude.Sound
                 if (filename != value)
                 {
                     filename = value;
-                    Change("Filename");
                 }
             }
         }
@@ -52,7 +51,6 @@ namespace Kinectitude.Sound
             set
             {
                 looping = value;
-                Change("Looping");
             }
         }
 
@@ -66,7 +64,6 @@ namespace Kinectitude.Sound
                 if (volume != value)
                 {
                     volume = value;
-                    Change("Volume");
                 }
             }
         }
@@ -96,7 +93,14 @@ namespace Kinectitude.Sound
             buffer.Flags = BufferFlags.EndOfStream;
             buffer.AudioData.Position = 0;
 
+            if (Looping == true)
+            {
+                buffer.LoopCount = XAudio2.LoopInfinite;
+                buffer.LoopLength = 0;
+            }
+
             currentlyPlaying = new SourceVoice(soundManager.device, format);
+            currentlyPlaying.Volume = this.Volume;
             currentlyPlaying.BufferEnd += (s, e) => playing = false;
             currentlyPlaying.Start();
             currentlyPlaying.SubmitSourceBuffer(buffer);
@@ -110,15 +114,18 @@ namespace Kinectitude.Sound
             {
                 currentlyPlaying.Stop();
                 currentlyPlaying.FlushSourceBuffers();
+                currentlyPlaying.Dispose();
+                buffer.Dispose();
+                playing = false;
             }
         }
 
-        public void Update()
+        public void OnUpdate(float t)
         {
 
         }
 
-        public override void Destroy()
+        public void Destroy()
         {
             buffer.Dispose();
             currentlyPlaying.Dispose();

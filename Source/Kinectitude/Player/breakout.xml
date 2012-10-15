@@ -61,10 +61,10 @@
     <Component Type="RenderComponent" FillColor="Red" Shape="Rectangle"/>
     <Component Type="PhysicsComponent" XVelocity="0" YVelocity="0" Shape="Rectangle" Restitution="0" Mass="1" Friction="0" LinearDamping="0" MovesWhenHit="false" FixedRotation="true"/>
     <Component Type="TransformComponent" Width="95" Height="20"/>
-    <Component Type="SoundComponent" Filename="bottle_pop.wav" Looping="false"/>
+    
     <Event Type="CollisionEvent" CollidesWith="$extraBall $primaryBall">
       <Action Type="IncrementAction" Target="scene.blocks" IncrementBy="-1"/>
-      <Action Type="PlaySoundAction"/>
+      <Action Type="PlaySoundAction" Filename="bottle_pop.wav" Looping="false" Volume="0.1"/>
       <Action Type="DestroyAction" />
     </Event>
   </Prototype>

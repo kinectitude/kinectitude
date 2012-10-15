@@ -7,11 +7,12 @@ namespace Kinectitude.Sound
     [Plugin("Stop the sound associated with this entity", "")]
     public class StopSoundAction : Action
     {
-        public StopSoundAction() { }
+        [Plugin("Filename", "File name of the sound to stop")]
+        public string Filename { get; set; }
 
         public override void Run()
         {
-            GetComponent<SoundComponent>().Stop();
+            this.GetManager<SoundManager>().StopSound(Filename);
         }
     }
 }
