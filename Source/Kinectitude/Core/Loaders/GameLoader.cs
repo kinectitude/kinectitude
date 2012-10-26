@@ -4,92 +4,56 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Kinectitude.Core.Base;
+using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Loaders
 {
     public class GameLoader
     {
         private readonly LoaderUtility loaderUtility;
-        private readonly LanguageKeywords lang;
         private readonly Dictionary<string, LoadedScene> Scenes = new Dictionary<string, LoadedScene>();
 
         public string FirstScene { get; private set; }
 
         private static Dictionary<string, Assembly> LoadedFiles = new Dictionary<string, Assembly>();
 
-        internal readonly HashSet<string> AvaliblePrototypes = new HashSet<string>();
-        internal readonly Dictionary<string, List<string>> PrototypeIs = new Dictionary<string, List<string>>();
-
-        internal Dictionary<string, object> Prototypes { get; private set; }
         internal Game Game { get; private set; }
 
         public Game CreateGame()
         {
-            object root = loaderUtility.Load();
-            HashSet<string> gameWords = new HashSet<string>() { lang.FirstScene, lang.Name };
-            Dictionary<string, string> gameProperties = loaderUtility.GetProperties(root, gameWords);
-            List<Tuple<string, string>> gameValues = loaderUtility.GetValues(root, gameWords);
+            object root = loaderUtility.GetGame();
+            PropertyHolder gameProperties = loaderUtility.GetProperties(root);
 
-            foreach (Tuple<string, string> gameValue in gameValues) Game[gameValue.Item1] = gameValue.Item2;
+            foreach (Tuple<string, object> gameValue in gameProperties)
+                Game[gameValue.Item1] = loaderUtility.MakeAssignable(gameValue.Item2, null, null, null) as ValueReader;
 
-            Game.Name = gameProperties[lang.Name];
-            FirstScene = gameProperties[lang.FirstScene];
+            Game.Name = loaderUtility.GetName(root);
+            FirstScene = gameProperties["FirstScene"] as ValueReader;
             //TODO for Widht, Height, IsFullScreen
 
             IEnumerable<object> usings = loaderUtility.GetOfType(root, loaderUtility.UsingType);
-            HashSet<string> usingWords = new HashSet<string>() { lang.File};
-            HashSet<string> defineWords = new HashSet<string>() { lang.Name, lang.Class };
 
             foreach (object uses in usings)
             {
-                string useFile = loaderUtility.GetProperties(uses, usingWords)[lang.File];
-                IEnumerable<object> defines = loaderUtility.GetOfType(uses, loaderUtility.DefineType);
-
-                foreach (object defined in defines)
-                {
-                    Dictionary<string, string> defineProperties = loaderUtility.GetProperties(defined, defineWords);
-                    string defName = defineProperties[lang.Name];
-                    string className = defineProperties[lang.Class];
-                    loadReflection(useFile, defName , className);
-                }
+                IEnumerable<Tuple<string, string>> defines = loaderUtility.GetDefines(uses);
+                string useFile = loaderUtility.GetFile(uses);
+                foreach (Tuple<string, string> defined in defines) loadReflection(useFile, defined.Item1, defined.Item2);
             }
 
             IEnumerable<object> prototypes = loaderUtility.GetOfType(root, loaderUtility.PrototypeType);
-            HashSet<string> typeWords = new HashSet<string>() { lang.Name, lang.Prototype };
 
             foreach (object prototype in prototypes)
             {
-                Dictionary<string, string> prototypeProperties = loaderUtility.GetProperties(prototype, typeWords);
-                string myName = prototypeProperties[lang.Name];
-
-                PrototypeIs[myName] = new List<string>();
-                PrototypeIs[myName].Add(myName);
-
-                string name;
-                object prototypeRef = prototype;
-                if (prototypeProperties.TryGetValue(lang.Prototype, out name))
-                {
-                    name = name.Trim();
-                    if (name.Contains(' '))
-                    {
-                        string[] names = name.Split(' ');
-                        foreach (string n in names) mergePrototpye(ref prototypeRef, myName, n);
-                    }
-                    else
-                    {
-                        mergePrototpye(ref prototypeRef, myName, name);
-                    }
-                }
-                Prototypes.Add(myName, prototype);
-                AvaliblePrototypes.Add(myName);
+                PropertyHolder prototypeProperties = loaderUtility.GetProperties(prototype);
+                string myName = loaderUtility.GetName(prototype);
+                LoadedEntity loadedPrototype = entityParse(prototype, myName, -3);
             }
 
             IEnumerable<object> scenes = loaderUtility.GetOfType(root, loaderUtility.SceneType);
 
             foreach (object scene in scenes)
             {
-                HashSet<string> sceneWords = new HashSet<string>() { lang.Name };
-                string sceneName = loaderUtility.GetProperties(scene, sceneWords)[lang.Name];
+                string sceneName = loaderUtility.GetName(scene);
                 SceneLoader sceneLoader = new SceneLoader(sceneName, scene, loaderUtility, this);
                 Scenes[sceneName] = sceneLoader.LoadedScene;
             }
@@ -104,13 +68,13 @@ namespace Kinectitude.Core.Loaders
             Game = new Game(this, scaleX, scaleY, windowOffset);
 
             string extention = fileName.Substring(fileName.IndexOf('.'));
-            if (".xml" == extention)
+            if (".kgl" == extention)
             {
-                loaderUtility = new XMLLoaderUtility(fileName, this);
+                loaderUtility = new KGLLoaderUtility(fileName, this);
             }
             else
             {
-                throw new ArgumentException("File " + fileName + " could not be loaded");
+                throw new ArgumentException("File " + fileName + " could Not be loaded");
             }
 
             foreach (Assembly loaded in preloads)
@@ -122,8 +86,6 @@ namespace Kinectitude.Core.Loaders
                     ClassFactory.LoadServices(loaded);
                 }
             }
-            lang = loaderUtility.Lang;
-            Prototypes = new Dictionary<string, object>();
         }
 
         internal Scene GetScene(string name) { return Scenes[name].Create(); }
@@ -133,7 +95,7 @@ namespace Kinectitude.Core.Loaders
             Assembly assembly = null;
             if (!LoadedFiles.ContainsKey(file))
             {
-                assembly =  Assembly.LoadFrom(Path.Combine(Environment.CurrentDirectory, lang.Plugins, file));
+                assembly =  Assembly.LoadFrom(Path.Combine(Environment.CurrentDirectory, "plugins", file));
                 ClassFactory.LoadServices(assembly);
                 LoadedFiles.Add(file, assembly);
             }
@@ -144,13 +106,74 @@ namespace Kinectitude.Core.Loaders
             ClassFactory.RegisterType(named, assembly.GetType(fullName));
         }
 
-        private void mergePrototpye(ref object newPrototype, string myName, string mergeWith)
+        internal LoadedEntity entityParse(object entity, string name, int id)
         {
-            loaderUtility.MergePrototpye(ref newPrototype, myName, mergeWith);
-            foreach (string isPrototype in PrototypeIs[mergeWith])
+            List<string> isType = new List<string>();
+            List<string> isExactType = new List<string>();
+            IEnumerable<object> components = loaderUtility.GetOfType(entity, loaderUtility.ComponentType);
+            IEnumerable<object> events = loaderUtility.GetOfType(entity, loaderUtility.EventType);
+            PropertyHolder entityProperties = loaderUtility.GetProperties(entity);
+            IEnumerable<string> prototypes = loaderUtility.GetPrototypes(entity);
+
+            LoadedEntity loadedEntity = new LoadedEntity(name, entityProperties, id, prototypes, loaderUtility);
+
+            foreach (object component in components)
             {
-                if (!PrototypeIs[myName].Contains(isPrototype)) PrototypeIs[myName].Add(isPrototype);
+                PropertyHolder componentProperties = loaderUtility.GetProperties(component);
+                string type = loaderUtility.GetType(component);
+                LoadedComponent lc = new LoadedComponent(type, componentProperties, loaderUtility);
+                loadedEntity.AddLoadedComponent(lc);
+            }
+
+            foreach (object evt in events)
+                loadedEntity.AddLoadedEvent(createEvent(Game, evt, loadedEntity));
+            
+            loadedEntity.Prepare();
+            return loadedEntity;
+        }
+
+        private LoadedEvent createEvent(Game game, object from, LoadedEntity entity)
+        {
+            PropertyHolder keyWords = loaderUtility.GetProperties(from);
+            string type = loaderUtility.GetType(from);
+            LoadedEvent loadedEvt = new LoadedEvent(type, keyWords, entity, loaderUtility);
+            addActions(game, from, loadedEvt);
+            return loadedEvt;
+        }
+
+        private LoadedCondition createCondition(Game game, LoadedEvent e, object condition)
+        {
+            LoadedCondition lc = new LoadedCondition(loaderUtility.GetCondition(condition), loaderUtility);
+            addActions(game, condition, e, lc);
+            return lc;
+        }
+
+        //Adds actions to an event or trigger
+        private void addActions(Game game, object evt, LoadedEvent loadedEvent, LoadedCondition cond = null)
+        {
+            IEnumerable<object> actions = loaderUtility.GetOfType(evt, loaderUtility.ActionType);
+
+            foreach (object action in actions)
+            {
+                PropertyHolder actionProperties = loaderUtility.GetProperties(action);
+                string type = loaderUtility.GetType(action);
+
+                if (loaderUtility.IsAciton(action))
+                {
+                    LoadedAction loadedAction = new LoadedAction(type, actionProperties, loaderUtility);
+                    if (null != cond) cond.AddAction(loadedAction);
+                    else loadedEvent.AddAction(loadedAction);
+                }
+                else if (null == cond)
+                {
+                    loadedEvent.AddAction(createCondition(game, loadedEvent, action));
+                }
+                else
+                {
+                    cond.AddAction(createCondition(game, loadedEvent, action));
+                }
             }
         }
+
     }
 }

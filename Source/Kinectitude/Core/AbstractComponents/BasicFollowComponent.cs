@@ -97,7 +97,7 @@ namespace Kinectitude.Core.AbstractComponents
         }
 
         private bool ignoresPhysics = false;
-        [Plugin("Ignore Physics", "Ignores physics component, use if motion should not care about physics")]
+        [Plugin("Ignore Physics", "Ignores physics Component, use if motion should Not care about physics")]
         public bool IgnoresPhysics
         {
             get { return ignoresPhysics; }

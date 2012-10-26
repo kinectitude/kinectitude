@@ -3,7 +3,7 @@ using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Actions
 {
-    [Plugin("Pop scene", "Pops the currently running scene")]
+    [Plugin("Pop Scene", "Pops the currently running Scene")]
     internal sealed class PopSceneAction : Action
     {
         public PopSceneAction() { }

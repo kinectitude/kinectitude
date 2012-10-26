@@ -4,18 +4,15 @@ using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Data
 {
-    internal class ListedTypeMatcher : MultiTypeMatcher
+    internal sealed class ListedTypeMatcher : MultiTypeMatcher
     {
-        private readonly List<ITypeMatcher> readables;
-        
-        internal ListedTypeMatcher(List<ITypeMatcher> readables)
-        {
-            this.readables = readables;
-        }
+        private readonly List<TypeMatcher> Readables;
+
+        internal ListedTypeMatcher(List<TypeMatcher> readables) { Readables = readables; }
 
         public override bool MatchAndSet(IEntity DataContainer)
         {
-            foreach (TypeMatcher r in readables)
+            foreach (TypeMatcher r in Readables)
             {
                 if (r.MatchAndSet(DataContainer))
                 {

@@ -132,7 +132,7 @@ namespace Kinectitude.Core.Base
                 {
                     if (timer.tick(frameDelta))
                     {
-                        FireTrigger(timer.ExpressionReader.GetValue());
+                        FireTrigger(timer.Name);
                         if (!timer.Recurring) remove.Add(timer);
                     }
                 }
@@ -209,7 +209,7 @@ namespace Kinectitude.Core.Base
                 return ManagersDictionary[typeof(T)] as T;
             }
         }
-        internal void AddTimer(string name, float time, IExpressionReader expressionReader, bool recurring)
+        internal void AddTimer(string name, float time, string expressionReader, bool recurring)
         {
             TimerEvts.Add(new TimerEvt(EType.Create, name, new Timer(expressionReader, time, recurring)));
         }
@@ -241,6 +241,18 @@ namespace Kinectitude.Core.Base
             IManager manager = null;
             ManagersDictionary.TryGetValue(managerType, out manager);
             return manager as Changeable;
+        }
+
+        internal HashSet<int> GetOfPrototype(string prototype, bool exact)
+        {
+            Dictionary<string, HashSet<int>> dict = exact ? IsExactType : IsType;
+            HashSet<int> ids;
+            if (!dict.TryGetValue(prototype, out ids))
+            {
+                ids = new HashSet<int>();
+                dict[prototype] = ids;
+            }
+            return ids;
         }
     }
 }

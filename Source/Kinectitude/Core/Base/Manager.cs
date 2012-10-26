@@ -124,8 +124,5 @@ namespace Kinectitude.Core.Base
         {
             return Game.CurrentGame.GetService<U>();
         }
-
-
-
     }
 }

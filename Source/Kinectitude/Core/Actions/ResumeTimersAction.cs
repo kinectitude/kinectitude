@@ -11,11 +11,11 @@ namespace Kinectitude.Core.Actions
     internal class ResumeTimersAction : Action
     {
         [Plugin("Name", "Name of the timers to resume")]
-        public IExpressionReader Name { get; set; }
+        public ValueReader Name { get; set; }
 
         public override void Run()
         {
-            Event.Entity.Scene.ResumeTimers(Name.GetValue());
+            Event.Entity.Scene.ResumeTimers(Name);
         }
     }
 }

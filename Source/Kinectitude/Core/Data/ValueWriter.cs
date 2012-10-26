@@ -1,63 +1,21 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Kinectitude.Core.Base;
-using Kinectitude.Core.Exceptions;
 
 namespace Kinectitude.Core.Data
 {
-    internal abstract class ValueWriter : IValueWriter
+    public abstract class ValueWriter : RepeatReader
     {
-        protected readonly DataContainer DataContainer;
-        
-        internal static ValueWriter CreateValueWriter(string key, Entity entity)
-        {
-            if (key.Contains('.'))
-            {
-                bool isDef = true;
-                string [] keyParts = key.Split('.');
-                DataContainer dc;
-                switch (keyParts[0])
-                {
-                    case "scene":
-                        dc = entity.Scene;
-                        break;
-                    case "game":
-                        dc = entity.Scene.Game;
-                        break;
-                    case "this":
-                        dc = entity;
-                        break;
-                    default:
-                        if (keyParts.Length != 2) throw new InvalidValueWriterException();
-                        dc = entity;
-                        isDef = false;
-                        break;
-                }
-                if (isDef)
-                {
-                    switch (keyParts.Length)
-                    {
-                        case 2:
-                            return new AttributeWriter(keyParts[1], dc);
-                        case 3:
-                            return new PropertyWriter(keyParts[1], keyParts[2], dc);
-                        default:
-                            throw new InvalidValueWriterException();
-                    }
-                }
-                else
-                {
-                    return new PropertyWriter(keyParts[0], keyParts[1], dc);
-                }
-            }
-            return new AttributeWriter(key, entity);
-        }
+        internal ValueWriter(ValueReader reader) { Reader = reader; }
 
-        protected ValueWriter(DataContainer dc)
-        {
-            DataContainer = dc;
-        }
+        public void SetValue(object value) { SetValue(new ConstantReader(value)); }
+        public abstract void SetValue(ValueReader value);
 
+        //This won't be called on a writer
+        internal override void notifyOfChange(Action<ValueReader> change) { return; }
 
-        public abstract string Value { get; set; }
+        internal override ValueWriter ConvertToWriter() { return this; }
     }
 }

@@ -12,12 +12,12 @@ namespace Kinectitude.Core.Loaders
         private static readonly Dictionary<LoadedScene, Dictionary<string, LoadedManager>> ManagerMap =
             new Dictionary<LoadedScene, Dictionary<string, LoadedManager>>();
 
-        private LoadedManager(string type, List<Tuple<string ,string>> values):base(values)
+        private LoadedManager(string type, PropertyHolder values, LoaderUtility loaderUtil) : base(values, loaderUtil)
         {
             Type = type;
         }
 
-        internal static LoadedManager GetLoadedManager(string type, LoadedScene ls, List<Tuple<string, string>> values)
+        internal static LoadedManager GetLoadedManager(string type, LoadedScene ls, PropertyHolder values, LoaderUtility loaderUtil)
         {
             Dictionary<string, LoadedManager> managersByName;
             
@@ -29,7 +29,7 @@ namespace Kinectitude.Core.Loaders
             LoadedManager loadedManager;
             if (!managersByName.TryGetValue(type, out loadedManager))
             {
-                loadedManager = new LoadedManager(type, values);
+                loadedManager = new LoadedManager(type, values, loaderUtil);
                 managersByName[type] = loadedManager;
             }
             else

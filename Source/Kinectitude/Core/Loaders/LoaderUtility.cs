@@ -2,34 +2,34 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Kinectitude.Core.Data;
+using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Loaders
 {
-    internal abstract class LoaderUtility
+    interface LoaderUtility
     {
-        internal object EntityType;
-        internal object ActionType;
-        internal object ConditionType;
-        internal object ManagerType;
-        internal object EventType;
-        internal object TriggerType;
-        internal object ComponentType;
-        internal object UsingType;
-        internal object DefineType;
-        internal object PrototypeType;
-        internal object SceneType;
+        object EntityType { get; }
+        object ActionType { get; }
+        object ConditionType { get; }
+        object ManagerType { get; }
+        object EventType { get; }
+        object ComponentType { get; }
+        object UsingType { get; }
+        object DefineType { get; }
+        object PrototypeType { get; }
+        object SceneType { get; }
 
-        protected string FileName;
-
-        internal LanguageKeywords Lang { get; set; }
-
-        internal abstract object Load();
-        internal abstract List<Tuple<string, string>> GetValues(object from, HashSet<string> ignore);
-        internal abstract Dictionary<string, string> GetProperties(object from, HashSet<string> specialWords);
-        internal abstract IEnumerable<object> GetOfType(object entity, object type);
-        internal abstract IEnumerable<object> GetAll(object evt);
-        internal abstract bool IsAciton(object obj);
-        internal abstract void CreateWithPrototype(GameLoader gl, string name, ref object entity, int id);
-        internal abstract void MergePrototpye(ref object newPrototype, string myName, string mergeWith);
+        object GetGame();
+        PropertyHolder GetProperties(object from);
+        string GetName(object from);
+        IEnumerable<object> GetOfType(object from, object type);
+        string GetFile(object from);
+        IEnumerable<Tuple<string, string>> GetDefines(object from);
+        bool IsAciton(object obj);
+        IEnumerable<string> GetPrototypes(object from);
+        string GetType(object from);
+        object GetCondition(object from);
+        IAssignable MakeAssignable(object obj, Scene scene, Entity entity, Event evt);
     }
 }

@@ -11,8 +11,8 @@ namespace Kinectitude.Core.Loaders
         private readonly string type;
         private readonly List<LoadedBaseAction> actions = new List<LoadedBaseAction>();
 
-        internal LoadedEvent(string type, List<Tuple<string, string>> values, LoadedEntity entity)
-            : base(values)
+        internal LoadedEvent(string type, PropertyHolder values, LoadedEntity entity, LoaderUtility loaderUtil)
+            : base(values, loaderUtil)
         {
             this.type = type;
             entity.AddLoadedEvent(this);

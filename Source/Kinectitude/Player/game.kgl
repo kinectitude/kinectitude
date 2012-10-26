@@ -1,0 +1,243 @@
+using Kinectitude.Kinect.dll{
+    define KinectFollowComponent as Kinectitude.Kinect.KinectFollowComponent
+    define KinectManager as Kinectitude.Kinect.KinectManager
+    define GestureEvent as Kinectitude.Kinect.GestureEvent
+}
+
+using Kinectitude.Physics.dll{
+    define PhysicsManager as Kinectitude.Physics.PhysicsManager
+    define PhysicsComponent as Kinectitude.Physics.PhysicsComponent
+    define CrossesLineEvent as Kinectitude.Physics.CrossesLineEvent
+    define CollisionEvent as Kinectitude.Physics.CollisionEvent
+}
+
+using Kinectitude.Render.dll{
+    define RenderManager as Kinectitude.Render.RenderManager
+    define RenderComponent as Kinectitude.Render.RenderComponent
+    define TextRenderComponent as Kinectitude.Render.TextRenderComponent
+    define ImageRenderComponent as Kinectitude.Render.ImageRenderComponent
+}
+
+Game breakout(Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = false){
+    Prototype paddle () {
+        Component KinectFollowComponent(Direction = "X", Player = 1, Joint = "HandRight")
+        Component RenderComponent(FillColor = "Black", Shape="Rectangle")
+        Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", 
+            Restitution="0", Mass="1", Friction="0", LinearDamping="0", MovesWhenHit="false", 
+            FixedRotation="true")
+        Component TransformComponent(Width = 128, Height="24")
+    }
+
+    Prototype ball (Value = 0){
+        Component RenderComponent(FillColor = "Black", Shape = "Rectangle")
+        
+        Component TransformComponent(X = 400, Y = 550, Width = 24, Height=24)
+        
+        Component PhysicsComponent(MinimumVelocity = 50,  MaximumVelocity = 50,  XVelocity = -40,
+            YVelocity = -20, Shape = "Ellipse", Restitution = 1, Mass = 1, Friction = 0, 
+            LinearDamping = 0, MovesWhenHit = true, AngularVelocity = 1, FixedRotation = false)
+        Event TriggerOccursEvent(Trigger = gameOver){
+            DestroyAction()
+        }
+    }
+
+    Prototype primaryBall : ball(){
+        Event CollisionEvent(CollidesWith = bottom_wall){
+            SetPositionAction(X = 400, Y = 300)
+            IncrementAction(Target = scene.balls , IncrementBy = -1)
+        }
+    }
+
+    Prototype extraBall : ball (){
+        Event CollisionEvent(CollidesWith= bottom_wall) { 
+            DestroyAction()
+        }
+    }
+    
+    Prototype block (){
+        Component RenderComponent(FillColor = "Red", Shape="Rectangle")
+        Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = Rectangle, 
+            Restitution = 0, Mass = 1, Friction = 0, LinearDamping = 0, 
+            MovesWhenHit = false, FixedRotation = true)
+            
+        Component TransformComponent(Width = 95, Height = 20)
+        
+        Event CollisionEvent(CollidesWith = $extraBall+$primaryBall){
+            IncrementAction(Target=scene.blocks, IncrementBy = -1)
+            DestroyAction()
+        }
+    }
+
+    Prototype spawn1Block : block(){
+        Component RenderComponent(FillColor="Orange")
+        Event CollisionEvent(CollidesWith = $extraBall+$primaryBall){
+            CreateEntityAction(Prototype = extraBall)
+        }
+    }
+
+    Prototype spawn3Block : block(){
+        Component RenderComponent (FillColor="Yellow")
+        Event CollisionEvent(CollidesWith = $extraBall+$primaryBall){
+            CreateEntity(Prototype = extraBall)
+            CreateEntity(Prototype = extraBall)
+            CreateEntity(Prototype = extraBall)
+        }
+    }
+
+    Prototype text() {
+        Component TextRenderComponent(FontFamily="Arial", FontWeight="Normal", FontStyle="Normal", FontStretch="Normal", 
+            FontSize="36", FontColor="White")
+    }
+    
+    Scene game(balls = 10, blocks = 24){
+        Entity player : paddle(){
+            Component TransformComponent(X = 400, Y = 560)
+        }
+        
+        Entity  : spawn3Block(){
+            Component TransformComponent(X = 50,Y = 200)
+        }
+        
+        Entity : block(){
+            Component TransformComponent(X = 150, Y = 200)
+        }
+        
+        Entity : block(){
+           Component TransformComponent(X = 250, Y = 200)
+        }
+        
+        Entity : block(){
+            Component TransformComponent(X = 350, Y = 200)
+        }
+        
+        Entity : block(){
+            Component TransformComponent(X = 450, Y = 200)
+        }
+        
+        Entity : block(){
+            Component TransformComponent(X = 550, Y = 200)
+        }
+        
+        Entity : block(){
+            Component TransformComponent(X = 650, Y = 200)
+        }
+        
+        Entity : spawn3Block(){
+            Component TransformComponent(X = 750, Y = 200)
+        }
+        
+        Entity  : block(){
+            Component TransformComponent(X = 50, Y = 225)
+        }
+        
+        Entity : block(){
+            Component TransformComponent(X = 150, Y = 225)
+        }
+        
+        Entity : block(){
+            Component TransformComponent(X = 250, Y = 225)
+        }
+        
+        Entity : block(){
+            Component TransformComponent(X = 350, Y = 225)
+        }
+        
+        Entity : block(){
+            Component TransformComponent(X = 450, Y = 225)
+        }
+        
+        Entity : block(){
+            Component TransformComponent(X = 550, Y = 225)
+        }
+        
+        Entity : block(){
+            Component TransformComponent(X = 650, Y = 225)
+        }
+        
+        Entity : block(){
+            Component TransformComponent(X = 750, Y = 225)
+        }
+        
+        Entity  : block(){
+            Component TransformComponent(X = 50, Y = 250)
+        }
+        
+        Entity : spawn1Block(){
+            Component TransformComponent(X = 150, Y = 250)
+        }
+        
+        Entity : block(){
+            Component TransformComponent(X = 250, Y = 250)
+        }
+        
+        Entity : spawn1Block(){
+            Component TransformComponent(X = 350, Y = 250)
+        }
+        
+        Entity : block(){
+            Component TransformComponent(X = 450, Y = 250)
+        }
+        
+        Entity : spawn1Block(){
+            Component TransformComponent(X = 550, Y = 250)
+        }
+        
+        Entity : block(){
+            Component TransformComponent(X = 650, Y = 250)
+        }
+        
+        Entity : spawn1Block(){
+            Component TransformComponent(X = 750, Y = 250)
+        }
+        
+        Entity top_wall(){
+            Component TransformComponent(X = 400, Y = 0, Width = 800, Height = 2)
+            Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = Rectangle, Restitution = 0, Mass = 1, LinearDamping = 0, 
+                MovesWhenHit = false, FixedRotation = true)
+        }
+        
+        Entity bottom_wall(){
+            Component TransformComponent(X = 400, Y = 600, Width = 800, Height = 2)
+            Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = Rectangle, Restitution = 0, Mass = 1, LinearDamping = 0, 
+                MovesWhenHit = false, FixedRotation = true)
+        }
+        Entity left_wall(){
+            Component TransformComponent(X = 0, Y = 300, Width = 2, Height = 600)
+            Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = Rectangle, Restitution = 0, Mass = 1, LinearDamping = 0,
+                MovesWhenHit = false, FixedRotation = true)
+        }
+        Entity right_wall(){
+            Component TransformComponent(X = 800, Y = 300, Width = 2, Height = 600)
+            Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = Rectangle, Restitution = 0, Mass = 1, LinearDamping = 0,
+                MovesWhenHit = false, FixedRotation = true)
+        }
+        
+        Entity : primaryBall(){
+            Component RenderComponent(FillColor = "White")
+        }
+        
+        Entity (){
+            Event SceneStartsEvent(){
+                InrementAction(Target = scene.bloocks, IncrementBy = 0)
+            }
+        }
+        
+        Entity : text(){
+            Component TransformComponent(X = 0, Y = 0, Width = 800)
+            Component TextRenderComponent(Value = "", FontSize = 20, TextAlignment = "Center")
+            Event AttributeChangesEvent(Target = scene.balls + scene.blocks){
+                SetAcion(Target = TextRenderComponent, Value = "Extra Balls: " + scene.balls)
+                
+                if (scene.blocks == 0){
+                    SetAction(Target = TextRenderComponent.Value, Value = "YOU WIN!")
+                    FireTriggerAction(Name="gameOver")
+                }
+          
+                if (scene.balls < 0){
+                    SetAction(Target = TextRenderComponent.Value, Value = "GAME OVER")
+                    FireTrigger(Name="gameOver")
+                }
+            }
+        }
+    }
+}

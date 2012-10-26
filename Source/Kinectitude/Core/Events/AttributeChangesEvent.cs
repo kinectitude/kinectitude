@@ -12,7 +12,7 @@ namespace Kinectitude.Core.Events
     internal class AttributeChangesEvent : Event
     {
         [Plugin("Expression", "")]
-        public IExpressionReader Target { get; set; }
+        public ValueReader Target { get; set; }
 
         public AttributeChangesEvent() { }
 
@@ -21,7 +21,7 @@ namespace Kinectitude.Core.Events
             Target.notifyOfChange(Trigger);
         }
 
-        public void Trigger(string newValue)
+        public void Trigger(ValueReader newValue)
         {
             DoActions();
         }

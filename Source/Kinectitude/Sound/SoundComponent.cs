@@ -2,7 +2,6 @@
 using Kinectitude.Core.Attributes;
 using Kinectitude.Core.ComponentInterfaces;
 using Kinectitude.Core.Components;
-using Kinectitude.Core.Data;
 using SlimDX.XAudio2;
 using SlimDX.Multimedia;
 using System.Threading;

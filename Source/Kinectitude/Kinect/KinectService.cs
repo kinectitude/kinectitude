@@ -18,7 +18,7 @@ namespace Kinectitude.Kinect
 
         public Action<string> SpeechCallback { get; set; }
 
-        private readonly SpeechRecognitionEngine speechRecognitionEngine;
+        //private readonly SpeechRecognitionEngine speechRecognitionEngine;
 
         private void enable()
         {

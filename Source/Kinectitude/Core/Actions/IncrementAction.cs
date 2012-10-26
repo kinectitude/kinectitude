@@ -8,21 +8,19 @@ namespace Kinectitude.Core.Actions
     internal sealed class IncrementAction : Action
     {
         [Plugin("Key", "")]
-        public IValueWriter Target { get; set; }
+        public ValueWriter Target { get; set; }
 
         [Plugin("Amount", "")]
-        public IDoubleExpressionReader IncrementBy { get; set; }
+        public ValueReader IncrementBy { get; set; }
 
-        public IncrementAction() { }
+        public IncrementAction()
+        {
+            IncrementBy = new ConstantReader(1);
+        }
 
         public override void Run()
         {
-            if (null == IncrementBy)
-            {
-                IncrementBy = new DoubleExpressionReader("1", Event, Event.Entity);
-            }
-            if (null != Target.Value) Target.Value = (double.Parse(Target.Value) + IncrementBy.GetValue()).ToString();
-            else Target.Value = "1";
+            if (null != Target) Target.SetValue(Target.GetDoubleValue() + IncrementBy.GetDoubleValue());
         }
     }
 }

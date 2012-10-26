@@ -7,12 +7,8 @@ using Kinectitude.Core.Loaders;
 
 namespace Kinectitude.Core.Data
 {
-    internal abstract class TypeMatcher : ITypeMatcher
+    public abstract class TypeMatcher : IAssignable
     {
-        internal const char TypeChar = '$';
-        internal const char ExactTypeChar = '#';
-        internal const char ParentChar = '@';
-
         internal DataContainer DataContainer { get; set; }
 
         //used to see if an expression has changed when the data container changes
@@ -27,78 +23,19 @@ namespace Kinectitude.Core.Data
             from.TryGetValue(value, out matcher);
             if (null == matcher)
             {
-                if (!loader.AvaliblePrototypes.Contains(value))
-                {
-                    throw new NoSuchPrototypeException(value);
-                }
-                else
-                {
-                    matcher = new HashSet<int>();
-                    from[value] = matcher;
-                }
+                matcher = new HashSet<int>();
+                from[value] = matcher;
             }
             return new PrototypeTypeMatcher(matcher);
         }
 
-        internal static TypeMatcher CreateTypeMatcher(string value, Event evt, Entity entity)
-        {
-            Scene scene = null == entity ? null : entity.Scene;
-            if (value.Contains(' '))
-            {
-                List<ITypeMatcher> readableList = new List<ITypeMatcher>();
-                string[] readables = value.Split(' ');
-                foreach (string readable in readables)
-                {
-                    readableList.Add(CreateTypeMatcher(readable, evt, entity));
-                }
-                return new ListedTypeMatcher(readableList);
-            }
-            if (ParentChar == value[0])
-            {
-                if (null == evt)
-                {
-                    throw new IllegalPlacementException(ParentChar.ToString(), "events or actions");
-                }
-                value = value.Substring(1);
-                TypeMatcher matcher = ClassFactory.GetParam<ITypeMatcher>(evt, value) as TypeMatcher;
-                if (null == matcher)
-                {
-                    throw new InvalidAttributeException
-                        (value, null == entity.Name ? entity.Id.ToString() : entity.Name);
-                }
-                return matcher;
-            }
-            if (TypeChar == value[0])
-            {
-                return CreationHelper(value, scene.IsType, scene.Game.GameLoader);
-            }
-            if (ExactTypeChar == value[0])
-            {
-                return CreationHelper(value, scene.IsExactType, scene.Game.GameLoader);
-            }
-            if ("game" == value)
-            {
-                return new SingleTypeMatcher(Game.CurrentGame);
-            }
-            if ("scene" == value)
-            {
-                return new SingleTypeMatcher(entity.Scene);
-            }
-            if ("this" == value)
-            {
-                return new SingleTypeMatcher(entity);
-            }
-            entity = scene.GetEntity(value);
-            return new SingleTypeMatcher(entity);
-        }
-
-        internal string this[string key]
+        internal ValueReader this[string key]
         {
             get
             {
                 if (DataContainer.Deleted)
                 {
-                    return "";
+                    return null;
                 }
                 return DataContainer[key];
             }
@@ -120,9 +57,8 @@ namespace Kinectitude.Core.Data
         }
 
 
-        public int IdOfLastMatch
-        {
-            get { return DataContainer.Id; }
-        }
+        public int IdOfLastMatch { get { return DataContainer.Id; } }
+
+        public void SetParam(object obj, string param) { ClassFactory.SetParam<TypeMatcher>(obj, param, this); }
     }
 }

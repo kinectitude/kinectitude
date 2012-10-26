@@ -8,16 +8,16 @@ namespace Kinectitude.Core.Actions
     public sealed class SetAction : Action
     {
         [Plugin("Value", "Value to set with")]
-        public IExpressionReader Value { get; set; }
+        public ValueReader Value { get; set; }
 
-        [Plugin("Key", "Attribute or property to change")]
-        public IValueWriter Target { get; set; }
+        [Plugin("Key", "Attribute Or property to change")]
+        public ValueWriter Target { get; set; }
 
         public SetAction() { }
 
         public override void Run()
         {
-            Target.Value = Value.GetValue();
+            Target.SetValue(Value);
         }
     }
 }

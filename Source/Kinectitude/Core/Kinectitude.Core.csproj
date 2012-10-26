@@ -48,6 +48,12 @@
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Irony">
+      <HintPath>..\..\..\Libraries\Irony.dll</HintPath>
+    </Reference>
+    <Reference Include="Irony.Interpreter">
+      <HintPath>..\..\..\Libraries\Irony.Interpreter.dll</HintPath>
+    </Reference>
     <Reference Include="NCalc">
       <HintPath>..\..\..\Libraries\NCalc.dll</HintPath>
     </Reference>
@@ -97,48 +103,53 @@
     <Compile Include="Base\IUpdateable.cs" />
     <Compile Include="Base\Manager.cs" />
     <Compile Include="Components\TransformComponent.cs" />
-    <Compile Include="Data\AttributeWriter.cs" />
-    <Compile Include="Data\BoolExpressionReader.cs" />
-    <Compile Include="Data\ComponentValueReader.cs" />
-    <Compile Include="Data\ConstantExpressionReader.cs" />
-    <Compile Include="Data\DoubleExpressionReader.cs" />
-    <Compile Include="Data\EvalExpressionReader.cs" />
-    <Compile Include="Data\ExpressionEval.cs" />
-    <Compile Include="Data\IBoolExpressionReader.cs" />
-    <Compile Include="Data\IChangeNotify.cs" />
-    <Compile Include="Data\IDoubleExpressionReader.cs" />
-    <Compile Include="Data\IIntExpressionReader.cs" />
-    <Compile Include="Data\IntExpressionReader.cs" />
-    <Compile Include="Data\ManagerValueReader.cs" />
-    <Compile Include="Data\EntityValueReader.cs" />
+    <Compile Include="Data\DataContainerWriter.cs" />
+    <Compile Include="Data\NeqOpReader.cs" />
+    <Compile Include="Data\DataContainerReader.cs" />
+    <Compile Include="Data\IAssignable.cs" />
+    <Compile Include="Data\NullWriter.cs" />
+    <Compile Include="Data\ParameterValueWriter.cs" />
+    <Compile Include="Data\RepeatReader.cs" />
+    <Compile Include="Data\TypeMatcherReader.cs" />
     <Compile Include="Data\MultiTypeMatcher.cs" />
-    <Compile Include="Data\MultiValueReader.cs" />
     <Compile Include="Data\ParameterValueReader.cs" />
-    <Compile Include="Data\PropertyWriter.cs" />
     <Compile Include="Data\SingleTypeMatcher.cs" />
-    <Compile Include="Data\IExpressionReader.cs" />
-    <Compile Include="Data\ITypeMatcher.cs" />
-    <Compile Include="Data\IValueWriter.cs" />
     <Compile Include="Data\ListedTypeMatcher.cs" />
     <Compile Include="Data\PrototypeTypeMatcher.cs" />
     <Compile Include="Data\TypeMatcher.cs" />
-    <Compile Include="Data\ExpressionReader.cs" />
+    <Compile Include="Data\AndOpReader.cs" />
+    <Compile Include="Data\RightShiftOpReader.cs" />
+    <Compile Include="Data\LeftShiftOpReader.cs" />
+    <Compile Include="Data\ConstantReader.cs" />
+    <Compile Include="Data\GeOpReader.cs" />
+    <Compile Include="Data\GtOpReader.cs" />
+    <Compile Include="Data\EqlOpReader.cs" />
+    <Compile Include="Data\NegOpReader.cs" />
+    <Compile Include="Data\NotOpReader.cs" />
+    <Compile Include="Data\OrOpReader.cs" />
+    <Compile Include="Data\PowOpReader.cs" />
+    <Compile Include="Data\RemOpReader.cs" />
+    <Compile Include="Data\MultOpReader.cs" />
+    <Compile Include="Data\DivOpReader.cs" />
+    <Compile Include="Data\MinusOpReader.cs" />
+    <Compile Include="Data\PlusOpReader.cs" />
+    <Compile Include="Data\BinOpReader.cs" />
+    <Compile Include="Data\UniOpReader.cs" />
+    <Compile Include="Data\ValueReader.cs" />
     <Compile Include="Data\ValueWriter.cs" />
     <Compile Include="Events\AttributeChangesEvent.cs" />
     <Compile Include="Events\AttributeEqualsEvent.cs" />
     <Compile Include="Events\OnCreateEvent.cs" />
     <Compile Include="Events\SceneStartsEvent.cs" />
     <Compile Include="Events\TriggerOccursEvent.cs" />
-    <Compile Include="Exceptions\IllegalPlacementException.cs" />
     <Compile Include="Exceptions\InvalidAttributeException.cs" />
-    <Compile Include="Exceptions\InvalidTypeException.cs" />
     <Compile Include="Exceptions\InvalidValueWriterException.cs" />
     <Compile Include="Exceptions\MissingRequirementsException.cs" />
-    <Compile Include="Exceptions\NoSuchPrototypeException.cs" />
-    <Compile Include="Loaders\EnglishLanguageKeywords.cs" />
-    <Compile Include="Loaders\LanguageKeywords.cs" />
-    <Compile Include="Loaders\XMLLoaderUtility.cs" />
-    <Compile Include="Loaders\GameLoader.cs" />
+    <Compile Include="Language\KinectitudeGrammar.cs" />
+    <Compile Include="Loaders\GameLoader.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Loaders\KGLLoaderUtility.cs" />
     <Compile Include="Loaders\LoadedAction.cs" />
     <Compile Include="Loaders\LoadedBaseAction.cs" />
     <Compile Include="Loaders\LoadedComponent.cs" />
@@ -149,6 +160,7 @@
     <Compile Include="Loaders\LoadedObject.cs" />
     <Compile Include="Loaders\LoadedScene.cs" />
     <Compile Include="Loaders\LoaderUtility.cs" />
+    <Compile Include="Loaders\PropertyHolder.cs" />
     <Compile Include="Loaders\SceneLoader.cs" />
     <Compile Include="Managers\TimeManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -166,10 +178,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Editor\Storage\Xml\schema.xsd">
-      <Link>Loaders\schema.xsd</Link>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

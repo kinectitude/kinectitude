@@ -247,10 +247,10 @@ namespace Kinectitude.Physics
             }
         }
 
-        private ITypeMatcher ignoreCollisionsWith = null;
+        private TypeMatcher ignoreCollisionsWith = null;
 
-        [Plugin("Ignores collisions with", "Any entities that match this type matcher will pass through this object")]
-        public ITypeMatcher IgnoreCollisionsWith
+        [Plugin("Ignores collisions with", "Any Entities that match this type matcher will pass through this object")]
+        public TypeMatcher IgnoreCollisionsWith
         {
             get { return ignoreCollisionsWith; }
             set

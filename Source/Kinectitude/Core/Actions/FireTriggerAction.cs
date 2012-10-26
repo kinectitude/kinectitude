@@ -8,13 +8,13 @@ namespace Kinectitude.Core.Actions
     internal sealed class FireTriggerAction : Action
     {
         [Plugin("Trigger", "")]
-        public IExpressionReader Name { get; set; }
+        public ValueReader Name { get; set; }
 
         public FireTriggerAction() { }
 
         public override void Run()
         {
-            Event.Entity.Scene.FireTrigger(Name.GetValue());
+            Event.Entity.Scene.FireTrigger(Name);
         }
     }
 }

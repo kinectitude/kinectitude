@@ -39,7 +39,7 @@ namespace Kinectitude.Core.Base
             if (ShouldCheck)
             {
                 //TODO there must be a better way?
-                string value = ClassFactory.GetStringParam(this, str);
+                object value = ClassFactory.GetParam(this, str);
                 DataContainer.ChangedProperty(change + '.' + str, value);
             }
         }

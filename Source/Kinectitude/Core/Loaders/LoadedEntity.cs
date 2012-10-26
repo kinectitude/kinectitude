@@ -18,29 +18,40 @@ namespace Kinectitude.Core.Loaders
 
         //used to save the loaded components
         private readonly List<LoadedComponent> components = new List<LoadedComponent>();
+        private readonly Dictionary<Type, LoadedComponent> componentDict = new Dictionary<Type, LoadedComponent>();
 
         private readonly List<LoadedEvent> events = new List<LoadedEvent>();
         private readonly string Name;
-        private readonly List<string> isType;
-        private readonly List<string> isExactType;
+        private readonly List<string> isType = new List<string>();
+        private readonly List<string> isExactType = new List<string>();
 
         private bool firstCreate = true;
 
         int id;
 
-        internal LoadedEntity(string name, List<Tuple<string, string>> values, 
-            int id, List<string> isType, List<string> isExactType): base(values)
+        internal static readonly Dictionary<string, LoadedEntity> Prototypes = new Dictionary<string, LoadedEntity>();
+
+        internal LoadedEntity(string name, PropertyHolder values, int id, IEnumerable<string> prototypes, LoaderUtility loaderUtil)
+            : base(values, loaderUtil)
         {
             Name = name;
             this.id = id;
-            this.isExactType = isExactType;
-            this.isType = isType;
+            foreach (string prototype in prototypes)
+            {
+                isExactType.Add(prototype);
+                isType.Add(prototype);
+                isType.AddRange(Prototypes[prototype].isType);
+            }
+
+            //it is a prototype
+            if (id < 0) Prototypes.Add(name, this);
         }
 
         internal void AddLoadedComponent(LoadedComponent component)
         {
             components.Add(component);
             componentSet.Add(component.Type);
+            componentDict[component.Type] = component;
             foreach (Type type in ClassFactory.GetRequirements(component.Type))
             {
                 needs.Add(type);
@@ -93,9 +104,11 @@ namespace Kinectitude.Core.Loaders
                 evt.Initialize();
             }
 
-            foreach (Tuple<string, string> value in Values) 
-                entity[value.Item1] = ExpressionReader.CreateExpressionReader(value.Item2, null, entity).GetValue();
-
+            foreach (Tuple<string, object> value in Values)
+            {
+                IAssignable assignable = LoaderUtil.MakeAssignable(value.Item2, scene, entity, null);
+                entity[value.Item1] = assignable as ValueReader;
+            }
 
             scene.EntityById[entity.Id] = entity;
             entity.Scene = scene;
@@ -116,6 +129,31 @@ namespace Kinectitude.Core.Loaders
             events.Add(evt);
         }
 
+        internal void Prepare()
+        {
+            foreach(string prototypeName in isExactType)
+            {
+                LoadedEntity prototype = Prototypes[prototypeName];
+                Values.MergeWith(prototype.Values);
+                needs.AddRange(prototype.needs);
+                componentSet.UnionWith(prototype.componentSet);
+                foreach (KeyValuePair<Type, LoadedComponent> entry in prototype.componentDict)
+                {
+                    LoadedComponent component;
+                    if (componentDict.TryGetValue(entry.Key, out component))
+                    {
+                        component.Values.MergeWith(entry.Value.Values);
+                    }
+                    else
+                    {
+                        componentDict[entry.Key] = entry.Value;
+                        components.Add(entry.Value);
+                    }
+                }
+                events.AddRange(prototype.events);
+            }
+        }
+
         private void addToType(Dictionary<string, HashSet<int>> addTo, string type, int id)
         {
             HashSet<int> addSet = null;
@@ -126,6 +164,5 @@ namespace Kinectitude.Core.Loaders
             }
             addSet.Add(id);
         }
-
     }
 }

@@ -8,15 +8,15 @@ namespace Kinectitude.Core.Base
 {
     internal class Timer
     {
-        internal IExpressionReader ExpressionReader { get; private set; }
+        internal string Name { get; private set; }
         internal bool Recurring { get; private set; }
 
         private float time;
         private readonly float initTime;
 
-        internal Timer(IExpressionReader expressionReader, float time, bool recurring)
+        internal Timer(string name, float time, bool recurring)
         {
-            ExpressionReader = expressionReader;
+            Name = name;
             initTime = this.time = time;
             Recurring = recurring;
         }

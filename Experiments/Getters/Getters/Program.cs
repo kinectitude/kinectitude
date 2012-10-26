@@ -17,7 +17,7 @@ namespace Getters
             gm.Type = GetMethods.X.Test;
 
             PropertyInfo pi = typeof(GetMethods).GetProperty("A");
-
+            
             var call = new Func<GetMethods, int>(input => (int)pi.GetGetMethod().Invoke(input, null));
 
             var instance = Expression.Parameter(typeof(object), "instance");
@@ -26,7 +26,7 @@ namespace Getters
 
             var parameter = Expression.Parameter(typeof(object), "i");
 
-            var cast = Expression.TypeAs(parameter, pi.DeclaringType);
+            var cast = Expression.Convert(parameter, pi.DeclaringType);
 
             var getterBody = Expression.Property(cast, pi);
 

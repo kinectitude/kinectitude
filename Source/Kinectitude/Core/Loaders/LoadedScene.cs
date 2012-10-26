@@ -16,8 +16,8 @@ namespace Kinectitude.Core.Loaders
         private readonly Game Game;
         private readonly string Name;
 
-        internal LoadedScene(string name, List<Tuple<string, string>> values, SceneLoader loader, Game game) 
-            : base(values)
+        internal LoadedScene(string name, PropertyHolder values, SceneLoader loader, Game game, LoaderUtility loaderUtil) 
+            : base(values, loaderUtil)
         {
             Loader = loader;
             Game = game;
@@ -29,8 +29,11 @@ namespace Kinectitude.Core.Loaders
             Scene scene = new Scene(Loader, Game);
             scene.Name = Name;
 
-            foreach (Tuple<string, string> value in Values)
-                scene[value.Item1] = ExpressionReader.CreateExpressionReader(value.Item2, null, null).GetValue();
+            foreach (Tuple<string, object> value in Values)
+            {
+                IAssignable assignable = LoaderUtil.MakeAssignable(value.Item2, scene, null, null);
+                scene[value.Item1] = assignable as ValueReader;
+            }
             
             foreach (LoadedManager loadedManager in Managers)
             {

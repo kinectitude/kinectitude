@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Base
 {
     public abstract class DataContainer : IEntity
     {
-        private readonly Dictionary<string, string> attributes = new Dictionary<string,string>();
+        private readonly Dictionary<string, ValueReader> attributes =
+            new Dictionary<string, ValueReader>();
 
-        private readonly Dictionary<string, List<Action<string>>> callbacks = 
-            new Dictionary<string,List<Action<string>>>();
+        private readonly Dictionary<string, List<Action<ValueReader>>> callbacks =
+            new Dictionary<string, List<Action<ValueReader>>>();
 
-        internal readonly Dictionary<string, List<Action<string>>> CheckProperties =
-            new Dictionary<string, List<Action<string>>>();
-        protected readonly List<Tuple<DataContainer, string, Action<string>>> PropertyChanges =
-            new List<Tuple<DataContainer, string, Action<string>>>();
+        internal readonly Dictionary<string, List<Action<ValueReader>>> CheckProperties =
+            new Dictionary<string, List<Action<ValueReader>>>();
+        protected readonly List<Tuple<DataContainer, string, Action<ValueReader>>> PropertyChanges =
+            new List<Tuple<DataContainer, string, Action<ValueReader>>>();
 
         public bool Deleted { get; protected set; }
 
@@ -23,7 +25,7 @@ namespace Kinectitude.Core.Base
             private set
             {
                 id = value;
-                attributes["Id"] = id.ToString();
+                attributes["Id"] = new ConstantReader(id);
             }
         }
 
@@ -33,18 +35,15 @@ namespace Kinectitude.Core.Base
             set
             {
                 name = value;
-                attributes["Name"] = value;
+                attributes["Name"] = new ConstantReader(value);
             }
         }
 
-        public string this[string key]
+        public ValueReader this[string key]
         {
             get
             {
-                if (attributes.ContainsKey(key))
-                {
-                    return attributes[key];
-                }
+                if (attributes.ContainsKey(key)) return attributes[key];
                 return null;
             }
 
@@ -52,15 +51,14 @@ namespace Kinectitude.Core.Base
             {
                 if ("Name" == key || "Id" == key)
                 {
-                    throw new ArgumentException("Name and Id can't be changed");
+                    throw new ArgumentException("Name And Id can't be changed");
                 }
-                attributes[key] = value;
+
+                ValueReader reader = new ConstantReader(value.GetPreferedValue());
+                attributes[key] = reader;
                 if (callbacks.ContainsKey(key))
                 {
-                    foreach (Action<string> action in callbacks[key])
-                    {
-                        action(value);
-                    }
+                    foreach (Action<ValueReader> action in callbacks[key]) action(reader);
                 }
             }
         }
@@ -71,13 +69,13 @@ namespace Kinectitude.Core.Base
             Deleted = false;
         }
 
-        internal void NotifyOfChange(string key, Action<string> callback)
+        internal void NotifyOfChange(string key, Action<ValueReader> callback)
         {
-            List<Action<string>> addTo = null;
+            List<Action<ValueReader>> addTo = null;
             callbacks.TryGetValue(key, out addTo);
             if (null == addTo)
             {
-                addTo = new List<Action<string>>();
+                addTo = new List<Action<ValueReader>>();
                 callbacks[key] = addTo;
                 addTo.Add(callback);
             }
@@ -87,23 +85,23 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        internal void StopNotifications(string key, Action<string> callback)
+        internal void StopNotifications(string key, Action<ValueReader> callback)
         {
-            List<Action<string>> removeFrom = callbacks[key];
+            List<Action<ValueReader>> removeFrom = callbacks[key];
             removeFrom.Remove(callback);
         }
 
 
-        internal void NotifyOfComponentChange(string what, Action<string> callback)
+        internal void NotifyOfComponentChange(string what, Action<ValueReader> callback)
         {
-            List<Action<string>> callbacks;
+            List<Action<ValueReader>> callbacks;
             if (CheckProperties.TryGetValue(what, out callbacks))
             {
                 callbacks.Add(callback);
             }
             else
             {
-                callbacks = new List<Action<string>>();
+                callbacks = new List<Action<ValueReader>>();
                 callbacks.Add(callback);
                 CheckProperties[what] = callbacks;
                 string[] parts = what.Split('.');
@@ -112,9 +110,9 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        internal void UnnotifyOfComponentChange(string what, Action<string> callback)
+        internal void UnnotifyOfComponentChange(string what, Action<ValueReader> callback)
         {
-            List<Action<string>> callbacks;
+            List<Action<ValueReader>> callbacks;
             if (CheckProperties.TryGetValue(what, out callbacks))
             {
                 callbacks.Remove(callback);
@@ -126,16 +124,15 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        internal void ChangedProperty(string what, string value)
+        internal void ChangedProperty(string what, object value)
         {
-            List<Action<string>> callbacks;
+            List<Action<ValueReader>> callbacks;
             if (CheckProperties.TryGetValue(what, out callbacks))
             {
-                foreach (Action<string> callback in callbacks) callback(value);
+                foreach (Action<ValueReader> callback in callbacks) callback(new ConstantReader(value));
             }
         }
 
         internal abstract Changeable GetComponentOrManager(string name);
-
     }
 }

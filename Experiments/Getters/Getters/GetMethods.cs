@@ -9,7 +9,7 @@ namespace Getters
     {
         public int A { get; set; }
         public GetMethods Next { get; set; }
-        public enum X { Test };
+        public enum X : int { Test = 10 };
         public X Type { get; set; }
     }
 }

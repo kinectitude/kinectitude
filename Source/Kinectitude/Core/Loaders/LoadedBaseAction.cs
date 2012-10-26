@@ -9,7 +9,7 @@ namespace Kinectitude.Core.Loaders
 {
     internal abstract class LoadedBaseAction : LoadedObject
     {
-        protected LoadedBaseAction(List<Tuple<string, string>> values) : base(values) { }
+        protected LoadedBaseAction(PropertyHolder values, LoaderUtility loaderUtil) : base(values, loaderUtil) { }
         internal abstract Action Create(Event evt);
     }
 }

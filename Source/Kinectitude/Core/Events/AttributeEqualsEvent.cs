@@ -8,10 +8,10 @@ namespace Kinectitude.Core.Events
     internal sealed class AttributeEqualsEvent : Event
     {
         [Plugin("Left", "")]
-        public IExpressionReader Value { get; set; }
+        public ValueReader Value { get; set; }
 
         [Plugin("Right", "")]
-        public IExpressionReader Target { get; set; }
+        public ValueReader Target { get; set; }
 
         public AttributeEqualsEvent() { }
 
@@ -22,12 +22,9 @@ namespace Kinectitude.Core.Events
             Target.notifyOfChange(Trigger);
         }
 
-        public void Trigger(string newValue)
+        public void Trigger(ValueReader newValue)
         {
-            if (Value.GetValue() == Target.GetValue())
-            {
-                DoActions();
-            }
+            if (Value == Target) DoActions();
         }
     }
 }

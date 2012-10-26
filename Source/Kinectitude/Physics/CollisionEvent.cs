@@ -8,7 +8,7 @@ namespace Kinectitude.Physics
     public class CollisionEvent : Event
     {
         [Plugin("Collides with","")]
-        public ITypeMatcher CollidesWith { get; set; }
+        public TypeMatcher CollidesWith { get; set; }
 
         public CollisionEvent() { }
 

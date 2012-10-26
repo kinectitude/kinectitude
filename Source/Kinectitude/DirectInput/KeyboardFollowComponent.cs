@@ -8,7 +8,7 @@ using SlimDX.DirectInput;
 
 namespace Kinectitude.DirectInput
 {
-    [Plugin("Follow component for the keyboard", "")]
+    [Plugin("Follow Component for the keyboard", "")]
     [Provides(typeof(BasicFollowComponent))]
     public class KeyboardFollowComponent : BasicFollowComponent
     {

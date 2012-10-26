@@ -11,11 +11,11 @@ namespace Kinectitude.Core.Actions
     internal class PauseTimersAction : Action
     {
         [Plugin("Name", "Name of the timers to pause")]
-        public IExpressionReader Name { get; set; }
+        public ValueReader Name { get; set; }
 
         public override void Run()
         {
-            Event.Entity.Scene.PauseTimers(Name.GetValue());
+            Event.Entity.Scene.PauseTimers(Name);
         }
     }
 }

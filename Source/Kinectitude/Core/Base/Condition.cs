@@ -6,9 +6,9 @@ namespace Kinectitude.Core.Base
     internal class Condition : Action
     {
         private List<Action> actions = new List<Action>();
-        private IBoolExpressionReader expression;
+        private ValueReader expression;
 
-        internal Condition(IBoolExpressionReader expr)
+        internal Condition(ValueReader expr)
         {
             expression = expr;
         }
@@ -18,10 +18,7 @@ namespace Kinectitude.Core.Base
             actions.Add(action);
         }
 
-        internal bool ShouldRun()
-        {
-            return expression.GetValue();
-        }
+        internal bool ShouldRun() { return expression.GetBoolValue(); }
         
         public override void Run()
         {

@@ -14,7 +14,7 @@ namespace Kinectitude.Kinect
     public class GestureEvent : Event
     {
         private KinectManager manager;
-        private const string folder = "Kinectitude.Kinect.Data.";
+        private const string folder = "Kinectitude.Kinect.DataOld.";
         private const string extention = ".save";
 
         public TemplatedGestureDetector GestureDetector { get; private set; }

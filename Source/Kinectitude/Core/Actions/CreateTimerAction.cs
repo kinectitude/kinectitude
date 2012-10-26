@@ -11,25 +11,25 @@ namespace Kinectitude.Core.Actions
     internal class CreateTimerAction : Action
     {
         [Plugin("Name", "Name of the timer to create")]
-        public IExpressionReader Name { get; set; }
+        public ValueReader Name { get; set; }
 
         [Plugin("Duration", "Duration, in seconds, to wait before triggering the trigger")]
-        public IDoubleExpressionReader Duration { get; set; }
+        public ValueReader Duration { get; set; }
 
         [Plugin("Trigger", "Trigger to fire")]
-        public IExpressionReader Trigger { get; set; }
+        public ValueReader Trigger { get; set; }
 
         [Plugin("Recurring", "Determines if the timer should start again when it has finished")]
-        public IBoolExpressionReader Recurring { get; set; }
+        public ValueReader Recurring { get; set; }
 
         public CreateTimerAction()
         {
-            Recurring = new BoolExpressionReader("false", null, null);
+            Recurring = new ConstantReader(false);
         }
 
         public override void Run()
         {
-            Event.Entity.Scene.AddTimer(Name.GetValue(), (float)Duration.GetValue(), Trigger, Recurring.GetValue());
+            Event.Entity.Scene.AddTimer(Name, Duration, Trigger, Recurring);
         }
     }
 }

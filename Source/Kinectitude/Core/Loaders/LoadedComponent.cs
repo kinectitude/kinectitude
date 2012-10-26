@@ -11,7 +11,8 @@ namespace Kinectitude.Core.Loaders
         internal readonly string Name;
         internal readonly Type Type;
 
-        internal LoadedComponent(string name, List<Tuple<string, string>> values) : base(values) 
+        internal LoadedComponent(string name, PropertyHolder values, LoaderUtility loaderUtil)
+            : base(values, loaderUtil)
         {
             Name = name;
             Type = ClassFactory.TypesDict[Name];

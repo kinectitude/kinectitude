@@ -3,10 +3,10 @@ using Action = Kinectitude.Core.Base.Action;
 
 namespace Kinectitude.Core.Actions
 {
-    [Plugin("Create entity based on {Prototype}", "")]
+    [Plugin("Create Entity based on {Prototype}", "")]
     class CreateEntityAction : Action
     {
-        [Plugin("Prototype", "Name of prototype to make")]
+        [Plugin("Prototype", "Name of Prototype to make")]
         public string Prototype { get; set; }
 
         public override void Run()

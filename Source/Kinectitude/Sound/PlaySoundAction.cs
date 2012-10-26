@@ -4,13 +4,13 @@ using Action = Kinectitude.Core.Base.Action;
 
 namespace Kinectitude.Sound
 {
-    [Plugin("Play the sound associated with this entity", "")]
+    [Plugin("Play the sound associated with this Entity", "")]
     public class PlaySoundAction : Action
     {
         [Plugin("Filename", "File name of sound to play")]
         public string Filename { get; set; }
 
-        [Plugin("Looping", "Whether this sound loops or not")]
+        [Plugin("Looping", "Whether this sound loops Or Not")]
         public bool Looping { get; set; }
 
         [Plugin("Volume", "The volume to play this sound at")]

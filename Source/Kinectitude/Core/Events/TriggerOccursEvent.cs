@@ -13,12 +13,12 @@ namespace Kinectitude.Core.Events
         public TriggerOccursEvent() { }
 
         [Plugin("Trigger", "")]
-        public IExpressionReader Trigger { get; set; }
+        public string Trigger { get; set; }
 
         public override void OnInitialize()
         {
             Scene scene = Entity.Scene;
-            scene.RegisterTrigger(Trigger.GetValue(), this);
+            scene.RegisterTrigger(Trigger, this);
         }
     }
 }

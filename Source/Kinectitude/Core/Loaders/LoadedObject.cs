@@ -9,23 +9,21 @@ namespace Kinectitude.Core.Loaders
 {
     internal abstract class LoadedObject
     {
-        protected List<Tuple<string, string>> Values { get; private set; }
+        internal readonly PropertyHolder Values;
+        protected readonly LoaderUtility LoaderUtil;
 
-        protected LoadedObject(List<Tuple<string, string>> values)
+        protected LoadedObject(PropertyHolder values, LoaderUtility loaderUtil)
         {
             Values = values;
+            LoaderUtil = loaderUtil;
         }
 
         protected void setValues(object obj, Event evt, Entity entity)
         {
-            foreach (Tuple<string, string> val in Values)
+            foreach (Tuple<string, object> val in Values)
             {
-                string param = val.Item1;
-
-                string value = ClassFactory.PreEvaluate(obj, param) ? 
-                    ExpressionReader.CreateExpressionReader(val.Item2, evt, entity).GetValue() : val.Item2;
-
-                ClassFactory.SetParam(obj, param, value, evt, entity);
+                IAssignable assignable = LoaderUtil.MakeAssignable(val.Item2, entity.Scene, entity, evt);
+                assignable.SetParam(obj, val.Item1);
             }
         }
     }
