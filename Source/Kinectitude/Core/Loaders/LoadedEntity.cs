@@ -106,7 +106,7 @@ namespace Kinectitude.Core.Loaders
 
             foreach (Tuple<string, object> value in Values)
             {
-                IAssignable assignable = LoaderUtil.MakeAssignable(value.Item2, scene, entity, null);
+                IAssignable assignable = LoaderUtil.MakeAssignable(value.Item2, scene, entity);
                 entity[value.Item1] = assignable as ValueReader;
             }
 

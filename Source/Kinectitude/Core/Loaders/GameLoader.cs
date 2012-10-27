@@ -25,10 +25,10 @@ namespace Kinectitude.Core.Loaders
             PropertyHolder gameProperties = loaderUtility.GetProperties(root);
 
             foreach (Tuple<string, object> gameValue in gameProperties)
-                Game[gameValue.Item1] = loaderUtility.MakeAssignable(gameValue.Item2, null, null, null) as ValueReader;
+                Game[gameValue.Item1] = loaderUtility.MakeAssignable(gameValue.Item2) as ValueReader;
 
             Game.Name = loaderUtility.GetName(root);
-            FirstScene = gameProperties["FirstScene"] as ValueReader;
+            FirstScene = loaderUtility.MakeAssignable(gameProperties["FirstScene"]) as ValueReader;
             //TODO for Widht, Height, IsFullScreen
 
             IEnumerable<object> usings = loaderUtility.GetOfType(root, loaderUtility.UsingType);

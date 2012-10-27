@@ -31,7 +31,7 @@ namespace Kinectitude.Core.Loaders
 
             foreach (Tuple<string, object> value in Values)
             {
-                IAssignable assignable = LoaderUtil.MakeAssignable(value.Item2, scene, null, null);
+                IAssignable assignable = LoaderUtil.MakeAssignable(value.Item2, scene);
                 scene[value.Item1] = assignable as ValueReader;
             }
             

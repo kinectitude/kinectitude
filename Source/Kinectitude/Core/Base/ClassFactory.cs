@@ -185,41 +185,45 @@ namespace Kinectitude.Core.Base
 
         private static void createDelegate(PropertyInfo pi, out object setter, out Func<object, object> getter)
         {
-            ParameterExpression target = Expression.Parameter(pi.PropertyType, "Target");
-            ParameterExpression obj = Expression.Parameter(typeof(object));
             Expression setBody;
+            ParameterExpression setAs = Expression.Parameter(typeof(object));
 
             if (typeof(TypeMatcher) == pi.PropertyType)
             {
-                setBody = Expression.Parameter(typeof(TypeMatcher));
+                setBody = setAs;
             }
             else if (typeof(ValueWriter) == pi.PropertyType)
             {
-                setBody = Expression.Call(WriterMaker, Expression.Parameter(typeof(ValueReader)));
+                setBody = Expression.Call(WriterMaker, Expression.TypeAs(setAs, typeof(ValueReader)));
             }
             else if (pi.PropertyType.IsEnum)
             {
-                setBody = Expression.Convert(
-                    Expression.Convert(Expression.Parameter(typeof(ValueReader)), typeof(string)),
-                    pi.PropertyType);
+                setBody = Expression.Convert(Expression.Convert(setAs, typeof(string)), pi.PropertyType);
             }
             else
             {
-                setBody = Expression.Convert(Expression.Parameter(typeof(ValueReader)), pi.PropertyType);
+                setBody = Expression.Convert(setAs, pi.PropertyType);
             }
 
+            ParameterExpression objParam = Expression.Parameter(typeof(object));
+            UnaryExpression cast = Expression.TypeAs(objParam, pi.DeclaringType);
+            Expression getterBody = Expression.Property(cast, pi);
+            
+            Expression<Func<object, object>> expr = 
+                Expression.Lambda<Func<object, object>>(Expression.Convert(getterBody, typeof(object)), objParam);
 
-            ParameterExpression param = Expression.Parameter(pi.DeclaringType);
-            MemberExpression member = Expression.Property(param, pi);
-
-            Expression<Func<object, object>> expr = Expression.Lambda<Func<object, object>>(member, param);
             while (expr.CanReduce) expr = (Expression<Func<object, object>>)expr.Reduce();
-
             getter = expr.Compile();
 
-            Expression<Action<object, object>> setExpr = Expression.Lambda<Action<object, object>>(Expression.Assign(target, setBody));
-            while(setExpr.CanReduce) setExpr = (Expression<Action<object, object>>)setExpr.Reduce();
-            setter = setExpr.Compile();
+            setter = Expression.Lambda<Action<object, object>>(
+                        Expression.Call(
+                            Expression.Convert(objParam, pi.DeclaringType),
+                            pi.GetSetMethod(),
+                            setBody
+                        ),
+                        objParam,
+                        setAs
+                    ).Compile();
         }
 
         internal static List<Type> GetRequirements(Type component)

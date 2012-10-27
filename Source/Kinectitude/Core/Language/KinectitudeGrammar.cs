@@ -11,14 +11,14 @@ using Kinectitude.Core.Data;
 namespace Kinectitude.Core.Language
 {
     [Language("Kinectitude Game Language", "1.0.0", "Used to create Kinectitude games")]
-    public class KinectitudeGrammar : Grammar
+    internal sealed class KinectitudeGrammar : Grammar
     {
         //TODO known issue is that all terminals can have a space entity.component == entity . component
         internal static readonly IdentifierTerminal Identifier = TerminalFactory.CreateCSharpIdentifier("Identifier");
         internal static readonly RegexBasedTerminal Name = new RegexBasedTerminal("Name", "[a-zA-Z][a-zA-Z0-9_]*");
         internal static readonly Terminal Number = TerminalFactory.CreateCSharpNumber("Number");
         internal static readonly Terminal Str = TerminalFactory.CreateCSharpString("Str");
-        internal static readonly Terminal ClassName = new RegexBasedTerminal(@"@?[a-z_A-Z]\w+(?:\.@?[a-z_A-Z]\w+)*");
+        internal static readonly Terminal ClassName = new RegexBasedTerminal("className", @"@?[a-z_A-Z]\w+(?:\.@?[a-z_A-Z]\w+)*");
 
         #region kinectitude key words and parts
         internal static readonly NonTerminal Game = new NonTerminal("Game", "Game");
@@ -29,24 +29,17 @@ namespace Kinectitude.Core.Language
         internal static readonly NonTerminal Entity = new NonTerminal("Entity", "Entity");
         internal static readonly NonTerminal Properties = new NonTerminal("Properties");
         internal static readonly NonTerminal Names = new NonTerminal("Names", "Names");
-        internal static readonly NonTerminal IsPrototype = new NonTerminal("IsPrototype", "IsPrototype");
-        internal static readonly NonTerminal Prototypes = new NonTerminal("Prototypes", "Prototypes");
-        internal static readonly NonTerminal EntityDefinition = new NonTerminal("EntityDefinition", "EntityDefinition");
         internal static readonly NonTerminal Prototype = new NonTerminal("Prototype", "Prototype");
+        internal static readonly NonTerminal EntityDefinition = new NonTerminal("EntityDefinition", "EntityDefinition");
         internal static readonly NonTerminal BasicDefinition = new NonTerminal("BasicDefinition", "BasicDefinition");
-        internal static readonly NonTerminal Managers = new NonTerminal("Managers", "Managers");
         internal static readonly NonTerminal Manager = new NonTerminal("Manager", "Manager");
-        internal static readonly NonTerminal Components = new NonTerminal("Components", "Components");
         internal static readonly NonTerminal Component = new NonTerminal("Component", "Component");
-        internal static readonly NonTerminal Evts = new NonTerminal("events", "events");
-        internal static readonly NonTerminal Evt = new NonTerminal("event", "event");
+        internal static readonly NonTerminal Evt = new NonTerminal("Event", "Event");
         internal static readonly NonTerminal EvtDefinition = new NonTerminal("EvtDefinition", "EvtDefinition");
-        internal static readonly NonTerminal OptionalActions = new NonTerminal("OptionalActions", "OptionalActions");
         internal static readonly NonTerminal Action = new NonTerminal("Action", "Action");
         internal static readonly NonTerminal Condition = new NonTerminal("Condition", "Condition");
         internal static readonly NonTerminal Actions = new NonTerminal("Actions", "Actions");
         internal static readonly NonTerminal Uses = new NonTerminal("Uses", "Uses");
-        internal static readonly NonTerminal File = new NonTerminal("File", "File");
         internal static readonly NonTerminal Classes = new NonTerminal("Classes", "Classes");
         internal static readonly NonTerminal Definitions = new NonTerminal("Definitions", "Definitions");
         #endregion
@@ -72,12 +65,6 @@ namespace Kinectitude.Core.Language
         internal readonly Terminal Becomes, Eql, Lt, Gt, Le, Ge, Neq, Plus, Minus, Mult, Div, Rem, Pow, And, Or, Not,
             LeftShift, RightShift, PlusEq, MinusEq, MultEq, DivEq, RemEq, PowEq, RshiftEq, LshiftEq;
         #endregion
-
-        private void createDefinitionsRules(NonTerminal many, NonTerminal single, string type, BnfTerm definedAs)
-        {
-            single.Rule = type + Identifier + definedAs;
-            many.Rule = single + many | Empty;
-        }
 
         public KinectitudeGrammar()
         {
@@ -163,6 +150,7 @@ namespace Kinectitude.Core.Language
             #endregion
 
             #region game creation rules
+            NonTerminal IsPrototype = new NonTerminal("IsPrototype", "IsPrototype");
 
             value.Rule = TypeMatcher | Expr;
 
@@ -172,35 +160,35 @@ namespace Kinectitude.Core.Language
             BasicDefinition.Rule = openBrac + Properties + closeBrac;
 
             Properties.Rule = Identifier + Becomes + value | Identifier + Becomes + value + comma + Properties | Empty;
-            EntityDefinition.Rule = IsPrototype + BasicDefinition + openBrace + Components + Evts + closeBrace;
+            EntityDefinition.Rule = IsPrototype + BasicDefinition + openBrace + Component + Evt + closeBrace;
 
             /*assignments.Rule = exactValue + becomes + value | exactValue + plusEq + value | 
                 exactValue + minusEq + value | exactValue + multEq + value | exactValue + remEq + value | 
                 exactValue + divEq + value | */
 
-            createDefinitionsRules(Prototypes, Prototype, "Prototype", EntityDefinition);
-            createDefinitionsRules(Managers, Manager, "Manager", BasicDefinition);
-            createDefinitionsRules(Components, Component, "Component", BasicDefinition);
+            Prototype.Rule = "Prototype" + Name + EntityDefinition + Prototype | Empty;
+            Manager.Rule = "Manager" + ClassName + BasicDefinition + Manager | Empty;
+            Component.Rule = "Component" + ClassName + BasicDefinition + Component | Empty;
 
+            NonTerminal OptionalActions = new NonTerminal("OptionalActions", "OptionalActions");
             Condition.Rule = "if" + openBrac + Expr + closeBrac + openBrace + OptionalActions + closeBrace;
 
             Action.Rule = Identifier + BasicDefinition;
             Actions.Rule = Action + OptionalActions | Condition + OptionalActions;
             OptionalActions.Rule = Actions | Empty;
 
-            EvtDefinition.Rule = BasicDefinition + openBrace + Actions + closeBrace;
-            createDefinitionsRules(Evts, Evt, "Event", EvtDefinition);
+            Evt.Rule = "Event" + Name + BasicDefinition + openBrace + Actions + closeBrace + Evt | Empty;
 
             Entity.Rule = "Entity" + Name + EntityDefinition | "Entity" + EntityDefinition;
             Entities.Rule = Entity + Entities | Entity;
 
             Scenes.Rule = Scene + Scenes | Scene;
-            Scene.Rule = "Scene" + Name + BasicDefinition + openBrace + Managers + Entities + closeBrace;
+            Scene.Rule = "Scene" + Name + BasicDefinition + openBrace + Manager + Entities + closeBrace;
 
             Uses.Rule = "using" + ClassName + openBrace + Definitions + closeBrace + Uses | Empty;
-            Definitions.Rule = "define" + Identifier + "as" + ClassName + Definitions | "define" + Identifier + "as" + ClassName;
+            Definitions.Rule = "define" + Name + "as" + ClassName + Definitions | "define" + Name + "as" + ClassName;
 
-            Game.Rule = Uses + "Game" + Name + BasicDefinition + openBrace + Prototypes + Scenes + closeBrace;
+            Game.Rule = Uses + "Game" + Name + BasicDefinition + openBrace + Prototype + Scenes + closeBrace;
             #endregion
 
             Root = Game;
@@ -208,7 +196,7 @@ namespace Kinectitude.Core.Language
             MarkPunctuation("{", "}", "(", ")", ":", "$", "@", "#", "Game", "using", "define", "Scene", "Entity",
                  ",", "if", "Component", "Manager", "Prototype", "=", ".", "as", "Event", "^");
 
-            MarkTransient(BasicDefinition, value, BasicDefinition, IsPrototype, term, IsPrototype, exactValue);
+            MarkTransient(BasicDefinition, value, IsPrototype, term, exactValue);
             //LanguageFlags = LanguageFlags.CreateAst;
         }
     }
