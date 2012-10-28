@@ -1,14 +1,14 @@
 using Kinectitude.Kinect.dll{
     define KinectFollowComponent as Kinectitude.Kinect.KinectFollowComponent
     define KinectManager as Kinectitude.Kinect.KinectManager
-    define GestureEvent as Kinectitude.Kinect.GestureEvent
+    define Gesture as Kinectitude.Kinect.GestureEvent
 }
 
 using Kinectitude.Physics.dll{
     define PhysicsManager as Kinectitude.Physics.PhysicsManager
     define PhysicsComponent as Kinectitude.Physics.PhysicsComponent
-    define CrossesLineEvent as Kinectitude.Physics.CrossesLineEvent
-    define CollisionEvent as Kinectitude.Physics.CollisionEvent
+    define CrossesLine as Kinectitude.Physics.CrossesLineEvent
+    define Collision as Kinectitude.Physics.CollisionEvent
 }
 
 using Kinectitude.Render.dll{
@@ -18,7 +18,7 @@ using Kinectitude.Render.dll{
     define ImageRenderComponent as Kinectitude.Render.ImageRenderComponent
 }
 
-Game breakout(Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = false){
+Game breakout(Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = "false"){
     Prototype paddle () {
         Component KinectFollowComponent(Direction = "X", Player = 1, Joint = "HandRight")
         Component RenderComponent(FillColor = "Black", Shape="Rectangle")
@@ -35,34 +35,34 @@ Game breakout(Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = fa
         
         Component PhysicsComponent(MinimumVelocity = 50,  MaximumVelocity = 50,  XVelocity = -40,
             YVelocity = -20, Shape = "Ellipse", Restitution = 1, Mass = 1, Friction = 0, 
-            LinearDamping = 0, MovesWhenHit = true, AngularVelocity = 1, FixedRotation = false)
-        Event TriggerOccursEvent(Trigger = gameOver){
+            LinearDamping = 0, MovesWhenHit = "true", AngularVelocity = 1, FixedRotation = "flase")
+        Event TriggerOccurs(Trigger = "gameOver"){
             DestroyAction()
         }
     }
 
     Prototype primaryBall : ball(){
-        Event CollisionEvent(CollidesWith = bottom_wall){
+        Event Collision(CollidesWith = $bottom_wall){
             SetPositionAction(X = 400, Y = 300)
             IncrementAction(Target = scene.balls , IncrementBy = -1)
         }
     }
 
     Prototype extraBall : ball (){
-        Event CollisionEvent(CollidesWith= bottom_wall) { 
+        Event Collision(CollidesWith= $bottom_wall) { 
             DestroyAction()
         }
     }
     
     Prototype block (){
         Component RenderComponent(FillColor = "Red", Shape="Rectangle")
-        Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = Rectangle, 
+        Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", 
             Restitution = 0, Mass = 1, Friction = 0, LinearDamping = 0, 
-            MovesWhenHit = false, FixedRotation = true)
+            MovesWhenHit = "false", FixedRotation = "true")
             
         Component TransformComponent(Width = 95, Height = 20)
         
-        Event CollisionEvent(CollidesWith = $extraBall+$primaryBall){
+        Event Collision(CollidesWith = $extraBall+$primaryBall){
             IncrementAction(Target=scene.blocks, IncrementBy = -1)
             DestroyAction()
         }
@@ -70,14 +70,14 @@ Game breakout(Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = fa
 
     Prototype spawn1Block : block(){
         Component RenderComponent(FillColor="Orange")
-        Event CollisionEvent(CollidesWith = $extraBall+$primaryBall){
+        Event Collision(CollidesWith = $extraBall+$primaryBall){
             CreateEntityAction(Prototype = extraBall)
         }
     }
 
     Prototype spawn3Block : block(){
         Component RenderComponent (FillColor="Yellow")
-        Event CollisionEvent(CollidesWith = $extraBall+$primaryBall){
+        Event Collision(CollidesWith = $extraBall+$primaryBall){
             CreateEntity(Prototype = extraBall)
             CreateEntity(Prototype = extraBall)
             CreateEntity(Prototype = extraBall)
@@ -192,24 +192,24 @@ Game breakout(Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = fa
         
         Entity top_wall(){
             Component TransformComponent(X = 400, Y = 0, Width = 800, Height = 2)
-            Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = Rectangle, Restitution = 0, Mass = 1, LinearDamping = 0, 
-                MovesWhenHit = false, FixedRotation = true)
+            Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, 
+                MovesWhenHit = "false", FixedRotation = "true")
         }
         
         Entity bottom_wall(){
             Component TransformComponent(X = 400, Y = 600, Width = 800, Height = 2)
-            Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = Rectangle, Restitution = 0, Mass = 1, LinearDamping = 0, 
-                MovesWhenHit = false, FixedRotation = true)
+            Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, 
+                MovesWhenHit = "false" , FixedRotation = "true")
         }
         Entity left_wall(){
             Component TransformComponent(X = 0, Y = 300, Width = 2, Height = 600)
-            Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = Rectangle, Restitution = 0, Mass = 1, LinearDamping = 0,
-                MovesWhenHit = false, FixedRotation = true)
+            Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0,
+                MovesWhenHit = "flase", FixedRotation = "true")
         }
         Entity right_wall(){
             Component TransformComponent(X = 800, Y = 300, Width = 2, Height = 600)
-            Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = Rectangle, Restitution = 0, Mass = 1, LinearDamping = 0,
-                MovesWhenHit = false, FixedRotation = true)
+            Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0,
+                MovesWhenHit = "flase", FixedRotation = "true")
         }
         
         Entity : primaryBall(){
@@ -217,7 +217,7 @@ Game breakout(Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = fa
         }
         
         Entity (){
-            Event SceneStartsEvent(){
+            Event SceneStarts(){
                 InrementAction(Target = scene.bloocks, IncrementBy = 0)
             }
         }
@@ -225,7 +225,7 @@ Game breakout(Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = fa
         Entity : text(){
             Component TransformComponent(X = 0, Y = 0, Width = 800)
             Component TextRenderComponent(Value = "", FontSize = 20, TextAlignment = "Center")
-            Event AttributeChangesEvent(Target = scene.balls + scene.blocks){
+            Event AttributeChanges(Target = scene.balls + scene.blocks){
                 SetAcion(Target = TextRenderComponent, Value = "Extra Balls: " + scene.balls)
                 
                 if (scene.blocks == 0){

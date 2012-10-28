@@ -7,7 +7,7 @@ using Kinectitude.Core.Loaders;
 
 namespace Kinectitude.Core.Data
 {
-    public abstract class TypeMatcher : IAssignable
+    public abstract class TypeMatcher
     {
         internal DataContainer DataContainer { get; set; }
 
@@ -56,9 +56,6 @@ namespace Kinectitude.Core.Data
             }
         }
 
-
         public int IdOfLastMatch { get { return DataContainer.Id; } }
-
-        public void SetParam(object obj, string param) { ClassFactory.SetParam<TypeMatcher>(obj, param, this); }
     }
 }

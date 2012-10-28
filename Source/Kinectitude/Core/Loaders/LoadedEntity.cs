@@ -89,7 +89,7 @@ namespace Kinectitude.Core.Loaders
             }
 
             Entity entity = new Entity(id);
-            entity.Name = Name;
+            if(Name != null) entity.Name = Name;
             entity.Scene = scene;
 
             foreach (LoadedComponent loadedComponent in components)
@@ -106,7 +106,7 @@ namespace Kinectitude.Core.Loaders
 
             foreach (Tuple<string, object> value in Values)
             {
-                IAssignable assignable = LoaderUtil.MakeAssignable(value.Item2, scene, entity);
+                object assignable = LoaderUtil.MakeAssignable(value.Item2, scene, entity);
                 entity[value.Item1] = assignable as ValueReader;
             }
 
@@ -146,8 +146,9 @@ namespace Kinectitude.Core.Loaders
                     }
                     else
                     {
-                        componentDict[entry.Key] = entry.Value;
-                        components.Add(entry.Value);
+                        component = entry.Value.clone();
+                        componentDict[entry.Key] = component;
+                        components.Add(component);
                     }
                 }
                 events.AddRange(prototype.events);

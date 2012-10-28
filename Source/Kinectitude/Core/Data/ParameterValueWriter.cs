@@ -19,6 +19,6 @@ namespace Kinectitude.Core.Data
             Owner = reader.Owner;
         }
 
-        public override void SetValue(ValueReader value) { ClassFactory.SetParam<ValueReader>(Obj, Param, value); }
+        public override void SetValue(ValueReader value) { ClassFactory.SetParam(Obj, Param, value); }
     }
 }

@@ -22,8 +22,8 @@ namespace Kinectitude.Core.Loaders
         {
             foreach (Tuple<string, object> val in Values)
             {
-                IAssignable assignable = LoaderUtil.MakeAssignable(val.Item2, entity.Scene, entity, evt);
-                assignable.SetParam(obj, val.Item1);
+                object assignable = LoaderUtil.MakeAssignable(val.Item2, entity.Scene, entity, evt);
+                ClassFactory.SetParam(obj, val.Item1, assignable);
             }
         }
     }

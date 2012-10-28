@@ -43,7 +43,8 @@ namespace Kinectitude.Core.Loaders
             foreach (object entity in entities)
             {
                 string name = loaderUtility.GetName(entity);
-                gameLoader.entityParse(entity, name, Onid++);
+                LoadedEntity loadedEntity = gameLoader.entityParse(entity, name, Onid++);
+                LoadedScene.addLoadedEntity(loadedEntity);
             }
 
         }

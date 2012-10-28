@@ -25,5 +25,10 @@ namespace Kinectitude.Core.Loaders
             setValues(created, null, entity);
             return created;
         }
+
+        internal LoadedComponent clone()
+        {
+            return new LoadedComponent(Name, Values.clone(), LoaderUtil);
+        }
     }
 }

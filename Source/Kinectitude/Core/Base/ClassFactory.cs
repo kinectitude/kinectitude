@@ -32,8 +32,8 @@ namespace Kinectitude.Core.Base
         private static readonly Dictionary<Type, string> referedDictionary = new Dictionary<Type, string>();
 
         //stores setters that are used by the user
-        private static readonly Dictionary<Type, Dictionary<string, object>> settersByType =
-            new Dictionary<Type, Dictionary<string, object>>();
+        private static readonly Dictionary<Type, Dictionary<string, Action<object, object>>> settersByType =
+            new Dictionary<Type, Dictionary<string, Action<object, object>>>();
 
         //empty constructors
         private static readonly Dictionary<string, Func<object>> constructors =
@@ -109,7 +109,7 @@ namespace Kinectitude.Core.Base
 
             constructors[registeredName] = ConstructorTypes[type] = createConstructorDelegate(type);
 
-            settersByType[type] = new Dictionary<string, object>();
+            settersByType[type] = new Dictionary<string, Action<object, object>>();
             referedDictionary[type] = registeredName;
             paramType[type] = new Dictionary<string, Type>();
             gettersByType[type] = new Dictionary<string, Func<object, object>>();
@@ -119,7 +119,7 @@ namespace Kinectitude.Core.Base
             {
                 paramType[type][pi.Name] = pi.PropertyType;
 
-                object setter = null;
+                Action<object, object> setter = null;
                 Func<object, object> getter = null;
 
                 createDelegate(pi, out setter, out getter);
@@ -153,7 +153,7 @@ namespace Kinectitude.Core.Base
             return CreateHelper<T, Type>(type, ConstructorTypes);
         }
 
-        internal static void SetParam<T>(object obj, string param, T val)
+        internal static void SetParam(object obj, string param, object val)
         {
             Type setType = null;
             if(!paramType[obj.GetType()].TryGetValue(param, out setType))
@@ -161,9 +161,16 @@ namespace Kinectitude.Core.Base
                 throw new InvalidAttributeException(param, referedDictionary[obj.GetType()]);
             }
 
-            Dictionary<string, object> setters = settersByType[obj.GetType()];
+            Dictionary<string, Action<object, object>> setters = settersByType[obj.GetType()];
 
-            Action<object, T> action = setters[param] as Action<object, T>;
+            Action<object, object> action = setters[param] as Action<object, object>;
+
+            var p = Expression.Parameter(typeof(ValueReader));
+            var tmp = new ConstantReader(10);
+            var convert = Expression.Convert(p, typeof(string));
+            var call = Expression.Lambda<Func<ValueReader, string>>(convert, p);
+            var compiled = call.Compile();
+
             //TODO make this more effecient, just make the set in here.
             action(obj, val);
         }
@@ -183,26 +190,33 @@ namespace Kinectitude.Core.Base
             ).Compile();
         }
 
-        private static void createDelegate(PropertyInfo pi, out object setter, out Func<object, object> getter)
+        private static void createDelegate(PropertyInfo pi, out Action<object,object> setter, out Func<object, object> getter)
         {
             Expression setBody;
             ParameterExpression setAs = Expression.Parameter(typeof(object));
 
-            if (typeof(TypeMatcher) == pi.PropertyType)
-            {
-                setBody = setAs;
-            }
-            else if (typeof(ValueWriter) == pi.PropertyType)
+            if (typeof(ValueWriter) == pi.PropertyType)
             {
                 setBody = Expression.Call(WriterMaker, Expression.TypeAs(setAs, typeof(ValueReader)));
             }
             else if (pi.PropertyType.IsEnum)
             {
-                setBody = Expression.Convert(Expression.Convert(setAs, typeof(string)), pi.PropertyType);
+                setBody = Expression.Convert(
+                    Expression.Call(
+                        EnumParse,
+                        Expression.Constant(pi.PropertyType, typeof(Type)),
+                        Expression.Convert(Expression.TypeAs(setAs, typeof(ValueReader)), typeof(string))
+                    ),
+                    pi.PropertyType
+                );
+            }
+            else if (typeof(TypeMatcher) == pi.PropertyType)
+            {
+                setBody = Expression.Convert(setAs, typeof(TypeMatcher));
             }
             else
             {
-                setBody = Expression.Convert(setAs, pi.PropertyType);
+                setBody = Expression.Convert(Expression.TypeAs(setAs, typeof(ValueReader)), pi.PropertyType);
             }
 
             ParameterExpression objParam = Expression.Parameter(typeof(object));
@@ -215,15 +229,18 @@ namespace Kinectitude.Core.Base
             while (expr.CanReduce) expr = (Expression<Func<object, object>>)expr.Reduce();
             getter = expr.Compile();
 
-            setter = Expression.Lambda<Action<object, object>>(
+            Expression<Action<object, object>> setExpr = Expression.Lambda<Action<object, object>>(
                         Expression.Call(
-                            Expression.Convert(objParam, pi.DeclaringType),
+                            cast,
                             pi.GetSetMethod(),
                             setBody
                         ),
                         objParam,
-                        setAs
-                    ).Compile();
+                        setAs);
+
+            while(setExpr.CanReduce) setExpr = (Expression<Action<object, object>>)setExpr.Reduce();
+
+            setter = setExpr.Compile();
         }
 
         internal static List<Type> GetRequirements(Type component)

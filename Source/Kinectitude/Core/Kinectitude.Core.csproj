@@ -106,7 +106,6 @@
     <Compile Include="Data\DataContainerWriter.cs" />
     <Compile Include="Data\NeqOpReader.cs" />
     <Compile Include="Data\DataContainerReader.cs" />
-    <Compile Include="Data\IAssignable.cs" />
     <Compile Include="Data\NullWriter.cs" />
     <Compile Include="Data\ParameterValueWriter.cs" />
     <Compile Include="Data\RepeatReader.cs" />

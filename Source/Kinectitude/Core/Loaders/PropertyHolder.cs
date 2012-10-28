@@ -42,5 +42,12 @@ namespace Kinectitude.Core.Loaders
                 }
             }
         }
+
+        internal PropertyHolder clone()
+        {
+            PropertyHolder clone = new PropertyHolder();
+            clone.MergeWith(this);
+            return clone;
+        }
     }
 }

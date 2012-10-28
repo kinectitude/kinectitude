@@ -6,9 +6,9 @@ using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Data
 {
-    internal enum PreferedType { String, Number, Boolean, NoPreference }
+    internal enum PreferedType { String, Number, Boolean }
 
-    public abstract class ValueReader : IAssignable
+    public abstract class ValueReader
     {
         protected readonly List<Action<ValueReader>> Callbacks = new List<Action<ValueReader>>();
         protected ValueWriter Writer { get; private set; }
@@ -82,28 +82,17 @@ namespace Kinectitude.Core.Data
         internal abstract PreferedType PreferedRetType();
         internal abstract void notifyOfChange(Action<ValueReader> change);
 
-        //Always will have same string value if they are the same.
-        public static bool operator ==(ValueReader a, ValueReader b)
-        {
-            if (a == null && b == null) return true;
-            if (a == null || b == null) return false;
-            if (a.PreferedRetType() != b.PreferedRetType() && a.PreferedRetType() != PreferedType.NoPreference 
-                && b.PreferedRetType() != PreferedType.NoPreference) return false;
 
-            return a.GetStrValue() == b.GetStrValue();
-        }
-        //Making this call return the opposite of == will always hold consistancy (chagnes to == won't require change to !=)
-        public static bool operator !=(ValueReader a, ValueReader b) { return !(a == b); }
-
-        public override bool Equals(object obj)
+        internal bool hasSameVal(ValueReader other)
         {
-            ValueReader var = obj as ValueReader;
-            return var == this;
-        }
-
-        public virtual void SetParam(object obj, string param)
-        {
-            ClassFactory.SetParam<ValueReader>(obj, param, this);
+            if (other == null) return false;
+            if (PreferedRetType() != other.PreferedRetType()) return false;
+            switch (PreferedRetType())
+            {
+                case PreferedType.Boolean: return GetBoolValue() == other.GetBoolValue();
+                case PreferedType.Number: return GetDoubleValue() == other.GetDoubleValue();
+                default: return GetStrValue() == other.GetStrValue();
+            }
         }
 
         internal abstract ValueWriter ConvertToWriter();

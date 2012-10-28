@@ -74,9 +74,8 @@ namespace Kinectitude.Core.Data
         {
             if (Left.PreferedRetType() == PreferedType.String || Right.PreferedRetType() == PreferedType.String)
                 return PreferedType.String;
-            if (Left.PreferedRetType() == PreferedType.Number || Right.PreferedRetType() == PreferedType.Number)
-                return PreferedType.Number;
-            return PreferedType.NoPreference;
+
+            return PreferedType.Number;
         }
 
         internal override double GetDoubleValue()
