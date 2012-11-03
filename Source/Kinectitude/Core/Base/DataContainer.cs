@@ -44,7 +44,7 @@ namespace Kinectitude.Core.Base
             get
             {
                 if (attributes.ContainsKey(key)) return attributes[key];
-                return null;
+                return new ConstantReader("");
             }
 
             set

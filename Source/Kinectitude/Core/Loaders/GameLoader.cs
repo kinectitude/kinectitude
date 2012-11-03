@@ -125,8 +125,7 @@ namespace Kinectitude.Core.Loaders
                 loadedEntity.AddLoadedComponent(lc);
             }
 
-            foreach (object evt in events)
-                loadedEntity.AddLoadedEvent(createEvent(Game, evt, loadedEntity));
+            foreach (object evt in events) createEvent(Game, evt, loadedEntity);
             
             loadedEntity.Prepare();
             return loadedEntity;
@@ -155,11 +154,10 @@ namespace Kinectitude.Core.Loaders
 
             foreach (object action in actions)
             {
-                PropertyHolder actionProperties = loaderUtility.GetProperties(action);
-                string type = loaderUtility.GetType(action);
-
                 if (loaderUtility.IsAciton(action))
                 {
+                    PropertyHolder actionProperties = loaderUtility.GetProperties(action);
+                    string type = loaderUtility.GetType(action);
                     LoadedAction loadedAction = new LoadedAction(type, actionProperties, loaderUtility);
                     if (null != cond) cond.AddAction(loadedAction);
                     else loadedEvent.AddAction(loadedAction);

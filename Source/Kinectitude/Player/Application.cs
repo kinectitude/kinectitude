@@ -83,6 +83,7 @@ namespace Kinectitude.Player
                     while (accumulator > TimeStep)
                     {
                         game.OnUpdate(TimeStep);
+                        if (!game.Running) Environment.Exit(0);
                         accumulator -= TimeStep;
                     }
 

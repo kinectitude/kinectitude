@@ -48,21 +48,8 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Actions\CoreActionTests.cs" />
-    <Compile Include="Core\Base\ClassFactoryTests.cs" />
-    <Compile Include="Core\Base\ConditionTests.cs" />
-    <Compile Include="Core\Base\EntityTests.cs" />
-    <Compile Include="Core\Base\EventTests.cs" />
-    <Content Include="Core\sample.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Compile Include="Core\Base\SceneTests.cs" />
-    <Compile Include="Core\Base\TimerTests.cs" />
-    <Compile Include="Core\Data\MathDataTests.cs" />
-    <Compile Include="Core\Data\StringDataTests.cs" />
-    <Compile Include="Core\Loaders\GameLoaderTests.cs" />
-    <Compile Include="Core\TestMocks\TestMocks.cs" />
+    <Compile Include="Core\TestSettersAndInheritence.cs" />
+    <Compile Include="Core\TestMocks.cs" />
     <Compile Include="Editor\ActionTests.cs" />
     <Compile Include="Editor\AttributeTests.cs" />
     <Compile Include="Editor\ComponentTests.cs" />
@@ -89,6 +76,11 @@
       <Name>Kinectitude.Render</Name>
       <Private>True</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Core\inheritence.kgl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -118,11 +118,7 @@ namespace Kinectitude.Core.Base
             TimerEvts.Clear();
 
             //should not be updated if not running
-            foreach (IManager m in Managers)
-            {
-                m.OnUpdate(frameDelta);
-
-            }
+            foreach (IManager m in Managers) m.OnUpdate(frameDelta);
             
             foreach (KeyValuePair<string, List<Timer>> pair in runningTimers)
             {

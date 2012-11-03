@@ -1,0 +1,70 @@
+﻿using Kinectitude.Tests.dll{
+    define MockComponent as Kinectitude.Tests.Core.TestMocks.MockComponent
+    define MockComponent2 as Kinectitude.Tests.Core.TestMocks.MockComponent2
+    define Assertion as Kinectitude.Tests.Core.TestMocks.AssertionAction
+}
+
+
+Game test(Width = 800, Height=600, FirstScene="test", IsFullScreen="false", X="15"){
+    Prototype prototype1(score=100, Z = "X", TESTVAL=1){
+        Component Transform(X = 1000, Y = 2000)
+        Component MockComponent(EnumVal = "value1", IntVal=this.Transform.X)
+        Component MockComponent2(IntVal=1000)
+        Event AttributeChanges(Target=game.runtests){
+            Assertion(LS=this.Transform.X, RS=1000, Assertion="Prototype1 X", OnlyRunIf=this.TESTVAL == 1)
+            Assertion(LS=this.Transform.Y, RS=2000, Assertion="Prototype1 Y", OnlyRunIf=this.TESTVAL == 1)
+            Assertion(LS=this.score, RS=100, Assertion="Prototype1 score", OnlyRunIf=this.TESTVAL == 1)
+            Assertion(LS=this.MockComponent2.DoubleVal, RS=0, Assertion="Prototype1 mock2 double val", OnlyRunIf=this.TESTVAL == 1)
+            Assertion(LS=this.Z, RS="X", Assertion="Prototype1 inheritance Z", OnlyRunIf= "true")
+            Assertion(LS=this.MockComponent.IntVal, RS=1000, Assertion="Prototype1 mock int val", OnlyRunIf=this.TESTVAL == 1)
+        }
+    }
+
+    Prototype prototype2 : prototype1(score=50, test="TEST", TESTVAL=2){
+        Component Transform(X=5000)
+        Component MockComponent2(DoubleVal=2000)
+        Event AttributeChanges(Target=game.runtests){
+            Assertion(LS=this.Transform.X, RS=5000, Assertion="Prototype2 X", OnlyRunIf=this.TESTVAL == 2)
+            Assertion(LS=this.Transform.Y, RS=2000, Assertion="Prototype2 Y", OnlyRunIf=this.TESTVAL == 2)
+            Assertion(LS=this.score, RS=50, Assertion="Prototype2 score", OnlyRunIf=this.TESTVAL == 2)
+            Assertion(LS=this.MockComponent2.DoubleVal, RS=2000, Assertion="Prototype2 mock2 double val", OnlyRunIf=this.TESTVAL == 2)
+            Assertion(LS=this.MockComponent.IntVal, RS=5000, Assertion="Prototype2 mock int val", OnlyRunIf=this.TESTVAL == 2)
+            Assertion(LS=this.test, RS="TEST", Assertion="Prototype2 test val", OnlyRunIf=this.TESTVAL == 2)
+        }
+    }
+    
+    Prototype prototype3 : prototype1, prototype2(testing = "NOPE", TESTVAL=3){
+        Event AttributeChanges(Target=game.runtests){
+            Assertion(LS=this.Transform.X, RS=1000, Assertion="Prototype3 X", OnlyRunIf=this.TESTVAL == 3)
+            Assertion(LS=this.Transform.Y, RS=2000, Assertion="Prototype3 Y", OnlyRunIf=this.TESTVAL == 3)
+            Assertion(LS=this.score, RS=100, Assertion="Prototype3 score", OnlyRunIf=this.TESTVAL == 3)
+            Assertion(LS=this.MockComponent2.DoubleVal, RS=2000, Assertion="Prototype3 mock2 double val", OnlyRunIf=this.TESTVAL == 3)
+            Assertion(LS=this.MockComponent.IntVal, RS=1000, Assertion="Prototype3 mock int val", OnlyRunIf=this.TESTVAL == 3)
+            Assertion(LS=this.test, RS="TEST", Assertion="Prototype3 test val", OnlyRunIf=this.TESTVAL == 3)
+        }   
+    }
+
+    Scene test(score = 0, X = game.X){
+        Entity e1 : prototype1(){ }
+        Entity e2 : prototype2(){ }
+        Entity e3 : prototype3(){ }
+        Entity e4 : prototype2(TESTVAL=4, test="NOT TEST"){
+            Event AttributeChanges(Target=game.runtests){
+                Assertion(LS=this.Transform.X, RS=5000, Assertion="e4 X", OnlyRunIf=this.TESTVAL == 4)
+                Assertion(LS=this.Transform.Y, RS=2000, Assertion="e4 Y", OnlyRunIf=this.TESTVAL == 4)
+                Assertion(LS=this.score, RS=50, Assertion="e4 score", OnlyRunIf=this.TESTVAL == 4)
+                Assertion(LS=this.MockComponent2.DoubleVal, RS=2000, Assertion="e4 mock2 double val", OnlyRunIf=this.TESTVAL == 4)
+                Assertion(LS=this.MockComponent.IntVal, RS=5000, Assertion="e4 mock int val", OnlyRunIf=this.TESTVAL == 4)
+                Assertion(LS=this.test, RS="NOT TEST", Assertion="e4 test val", OnlyRunIf=this.TESTVAL == 4)
+            }
+        }
+        Entity runTests(){
+        Event SceneStarts(){
+                Set(Target=game.runtests, Value="true")
+				Assertion(LS=scene.score, RS=0, Assertion="scene score", OnlyRunIf=true)
+				Assertion(LS=scene.X, RS=15, Assertion="scene score", OnlyRunIf=true)
+                PopScene()
+            }
+        }
+    }
+}

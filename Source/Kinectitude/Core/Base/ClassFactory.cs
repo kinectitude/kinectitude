@@ -61,7 +61,7 @@ namespace Kinectitude.Core.Base
             RegisterType("SceneStarts", typeof(SceneStartsEvent));
             RegisterType("FireTrigger", typeof(FireTriggerAction));
             RegisterType("TriggerOccurs", typeof(TriggerOccursEvent));
-            RegisterType("TransformComponent", typeof(TransformComponent));
+            RegisterType("Transform", typeof(TransformComponent));
             RegisterType("SetPosition", typeof(SetPositionAction));
             RegisterType("TimeManager", typeof(TimeManager));
             RegisterType("CreateEntity", typeof(CreateEntityAction));

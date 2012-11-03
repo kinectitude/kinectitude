@@ -56,7 +56,7 @@ namespace Kinectitude.Core.Loaders
             {
                 //TODO throw exception?
             }
-            Entity entity = loadedEntity.Create(Onid++, scene);
+            Entity entity = loadedEntity.Create(Onid++, scene, true);
             entity.Scene = scene;
             entity.Ready();
 #if TEST

@@ -466,10 +466,7 @@ namespace Kinectitude.Physics
             {
                 foreach (CollisionEvent ce in collisionEvents)
                 {
-                    if (ce.CollidesWith.MatchAndSet(collidedWith))
-                    {
-                        ce.DoActions();
-                    }
+                    if (ce.CollidesWith.MatchAndSet(collidedWith)) ce.DoActions();
                 }
             }
 

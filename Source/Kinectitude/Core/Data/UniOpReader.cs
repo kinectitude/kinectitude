@@ -19,7 +19,6 @@ namespace Kinectitude.Core.Data
         internal override void notifyOfChange(Action<ValueReader> change)
         {
             Callbacks.Add(change);
-            Reader.notifyOfChange(new Action<ValueReader>(vr => valChange()));
         }
 
         private void valChange()

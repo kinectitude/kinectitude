@@ -27,11 +27,13 @@ namespace Kinectitude.Core.Data
 
         private void change(ValueReader value)
         {
+            ValueReader oldVal = Reader;
+            Reader = value;
             if (value != Reader)
             {
                 foreach (Action<ValueReader> callback in Callbacks) callback(value);
             }
-            Reader = value;
+            
         }
 
         private void change(DataContainer dataContainer)

@@ -48,7 +48,6 @@ namespace Kinectitude.Core.Language
         internal static readonly NonTerminal TypeMatcher = new NonTerminal("TypeMatcher", "TypeMatcher");
         internal static readonly NonTerminal IsType = new NonTerminal("IsType", "IsType");
         internal static readonly NonTerminal IsExactType = new NonTerminal("IsExactType", "IsExactType");
-        internal static readonly NonTerminal IsEntity = new NonTerminal("IsEntity", "IsEntity");
         internal static readonly NonTerminal ThreeVal = new NonTerminal("ThreeVal", "ThreeVal");
         internal static readonly NonTerminal TwoVal = new NonTerminal("TwoVal", "TwoVal");
         internal static readonly NonTerminal ParentVal = new NonTerminal("ParentVal", "ParentVal");
@@ -116,10 +115,9 @@ namespace Kinectitude.Core.Language
             RegisterBracePair("(", ")");
             RegisterBracePair("{", "}");
             IsExactType.Rule = "#" + Name;
-            IsEntity.Rule = "^" + Name;
             ParentVal.Rule = "@" + TwoVal | "@" + ThreeVal | "@" + Identifier;
             exactValue.Rule = Name | TwoVal | ThreeVal | ParentVal;
-            TypeMatcher.Rule = IsType | IsExactType | IsEntity | IsType + Plus + TypeMatcher | IsExactType + Plus + TypeMatcher;
+            TypeMatcher.Rule = IsType | IsExactType| IsType + Plus + TypeMatcher | IsExactType + Plus + TypeMatcher;
             #endregion
 
             #region expressions
@@ -171,7 +169,7 @@ namespace Kinectitude.Core.Language
             Component.Rule = "Component" + ClassName + BasicDefinition + Component | Empty;
 
             NonTerminal OptionalActions = new NonTerminal("OptionalActions", "OptionalActions");
-            Condition.Rule = "if" + openBrac + Expr + closeBrac + openBrace + OptionalActions + closeBrace;
+            Condition.Rule = "if" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace;
 
             Action.Rule = Identifier + BasicDefinition;
             Actions.Rule = Action + OptionalActions | Condition + OptionalActions;
@@ -194,9 +192,9 @@ namespace Kinectitude.Core.Language
             Root = Game;
             //Removes from the tree, we don't care about having these there
             MarkPunctuation("{", "}", "(", ")", ":", "$", "@", "#", "Game", "using", "define", "Scene", "Entity",
-                 ",", "if", "Component", "Manager", "Prototype", "=", ".", "as", "Event", "^");
+                 ",", "if", "Component", "Manager", "Prototype", "=", ".", "as", "Event");
 
-            MarkTransient(BasicDefinition, value, IsPrototype, term, exactValue);
+            MarkTransient(BasicDefinition, value, IsPrototype, term, exactValue, OptionalActions);
             //LanguageFlags = LanguageFlags.CreateAst;
         }
     }

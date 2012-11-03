@@ -9,13 +9,10 @@ namespace Kinectitude.Core.Base
     {
         //public to see if types exist
         public readonly GameLoader GameLoader;
-#if TEST
-        internal readonly Stack<Scene> currentScenes = new Stack<Scene>();
-        internal static Game CurrentGame { get; set; }
-#else
         private readonly Stack<Scene> currentScenes = new Stack<Scene>();
         internal static Game CurrentGame { get; private set; }
-#endif
+        public bool Running { get; private set; }
+
         private readonly Dictionary<Type, Service> services = new Dictionary<Type, Service>();
 
         private readonly Func<Tuple<int, int>> WindowOffset;
@@ -43,31 +40,22 @@ namespace Kinectitude.Core.Base
             ScaleX = scaleX;
             ScaleY = scaleY;
             WindowOffset = windowOffset;
+            Running = true;
         }
 
         public void Start()
         {
             //TODO check if the are us
             Scene main = GameLoader.GetScene(GameLoader.FirstScene);
+            Running = true;
             currentScenes.Push(main);
             main.Running = true;
-        }
-
-        public void Stop()
-        {
-            //TODO check if they are us
-            Scene main = GameLoader.GetScene(GameLoader.FirstScene);
-            currentScenes.Push(main);
-            main.Running = false;
         }
 
         public void OnUpdate(float frameDelta)
         {
             Scene currentScene = currentScenes.Peek();
-            if (currentScene.Running)
-            {
-                currentScene.OnUpdate(frameDelta);
-            }
+            if (Running) currentScene.OnUpdate(frameDelta);
         }
 
         internal void RunScene(string name)
@@ -95,18 +83,15 @@ namespace Kinectitude.Core.Base
                     service.Stop();
                 }
             }
-            Environment.Exit(0);
+            Running = false;
         }
 
         internal void PopScene()
         {
             currentScenes.Peek().Running = false;
             currentScenes.Pop();
-            if (0 == currentScenes.Count)
-            {
-                Quit();
-            }
-            currentScenes.Peek().Running = true;
+            if (0 == currentScenes.Count) Quit();
+            else currentScenes.Peek().Running = true;
         }
 
         internal void SetService(Service service)

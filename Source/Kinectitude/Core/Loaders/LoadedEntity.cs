@@ -21,10 +21,16 @@ namespace Kinectitude.Core.Loaders
         private readonly Dictionary<Type, LoadedComponent> componentDict = new Dictionary<Type, LoadedComponent>();
 
         private readonly List<LoadedEvent> events = new List<LoadedEvent>();
+        
+#if TEST
+        internal readonly string Name;
+        internal readonly List<string> isType = new List<string>();
+        internal readonly List<string> isExactType = new List<string>();
+#else
         private readonly string Name;
         private readonly List<string> isType = new List<string>();
         private readonly List<string> isExactType = new List<string>();
-
+#endif
         private bool firstCreate = true;
 
         int id;
@@ -42,7 +48,7 @@ namespace Kinectitude.Core.Loaders
                 isType.Add(prototype);
                 isType.AddRange(Prototypes[prototype].isType);
             }
-
+            
             //it is a prototype
             if (id < 0) Prototypes.Add(name, this);
         }
@@ -63,7 +69,7 @@ namespace Kinectitude.Core.Loaders
             }
         }
 
-        internal Entity Create(int id, Scene scene)
+        internal Entity Create(int id, Scene scene, bool isPrototype = false)
         {
 
             if (firstCreate)
@@ -89,7 +95,16 @@ namespace Kinectitude.Core.Loaders
             }
 
             Entity entity = new Entity(id);
-            if(Name != null) entity.Name = Name;
+            if (Name != null)
+            {
+                addToType(scene.IsExactType, Name, id);
+                addToType(scene.IsType, Name, id);
+                if (!isPrototype)
+                {
+                    entity.Name = Name;
+                    scene.EntityByName.Add(entity.Name, entity);
+                }
+            }
             entity.Scene = scene;
 
             foreach (LoadedComponent loadedComponent in components)
@@ -112,22 +127,23 @@ namespace Kinectitude.Core.Loaders
 
             scene.EntityById[entity.Id] = entity;
             entity.Scene = scene;
-            if (null != entity.Name) scene.EntityByName.Add(entity.Name, entity);
-            foreach (string type in isType) addToType(scene.IsType, type, entity.Id);
-            foreach (string type in isExactType) addToType(scene.IsExactType, type, entity.Id);
 
+            if (isPrototype)
+            {
+                foreach (string type in isType) addToType(scene.IsType, type, entity.Id);
+                foreach (string type in isExactType) addToType(scene.IsType, type, entity.Id);
+            }
+            else
+            {
+                foreach (string type in isType) addToType(scene.IsType, type, entity.Id);
+                foreach (string type in isExactType) addToType(scene.IsExactType, type, entity.Id);
+            }
             return entity;
         }
 
-        internal Entity Create(Scene scene)
-        {
-            return Create(id, scene);
-        }
+        internal Entity Create(Scene scene) { return Create(id, scene); }
 
-        internal void AddLoadedEvent(LoadedEvent evt)
-        {
-            events.Add(evt);
-        }
+        internal void AddLoadedEvent(LoadedEvent evt) { events.Add(evt); }
 
         internal void Prepare()
         {

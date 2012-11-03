@@ -10,18 +10,15 @@ namespace Kinectitude.Core.Data
 
         internal ListedTypeMatcher(List<TypeMatcher> readables) { Readables = readables; }
 
-        public override bool MatchAndSet(IEntity DataContainer)
+        public override bool MatchAndSet(IEntity entity)
         {
             foreach (TypeMatcher r in Readables)
             {
-                if (r.MatchAndSet(DataContainer))
+                if (r.MatchAndSet(entity))
                 {
                     OldDataContainer = this.DataContainer;
-                    this.DataContainer = DataContainer as DataContainer;
-                    foreach (Action<DataContainer> toNotify in notify)
-                    {
-                        toNotify(this.DataContainer);
-                    }
+                    DataContainer = entity as DataContainer;
+                    foreach (Action<DataContainer> toNotify in notify) toNotify(this.DataContainer);
                     return true;
                 }
             }

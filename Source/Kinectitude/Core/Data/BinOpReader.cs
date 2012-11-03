@@ -32,6 +32,7 @@ namespace Kinectitude.Core.Data
             if (oldVal != value)
             {
                 foreach (Action<ValueReader> callback in Callbacks) callback(this);
+                oldVal = value;
             }
         }
         internal override ValueWriter ConvertToWriter() { return new NullWriter(this); }

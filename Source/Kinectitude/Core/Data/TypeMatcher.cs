@@ -16,19 +16,6 @@ namespace Kinectitude.Core.Data
 
         public abstract bool MatchAndSet(IEntity entity);
 
-        internal static TypeMatcher CreationHelper(string value, Dictionary<string,HashSet<int>> from, GameLoader loader)
-        {
-            value = value.Substring(1);
-            HashSet<int> matcher = null;
-            from.TryGetValue(value, out matcher);
-            if (null == matcher)
-            {
-                matcher = new HashSet<int>();
-                from[value] = matcher;
-            }
-            return new PrototypeTypeMatcher(matcher);
-        }
-
         internal ValueReader this[string key]
         {
             get

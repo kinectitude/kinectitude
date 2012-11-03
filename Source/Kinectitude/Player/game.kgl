@@ -25,32 +25,32 @@ Game breakout(Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = "f
         Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", 
             Restitution="0", Mass="1", Friction="0", LinearDamping="0", MovesWhenHit="false", 
             FixedRotation="true")
-        Component TransformComponent(Width = 128, Height="24")
+        Component Transform(Width = 128, Height="24")
     }
 
     Prototype ball (Value = 0){
         Component RenderComponent(FillColor = "Black", Shape = "Rectangle")
         
-        Component TransformComponent(X = 400, Y = 550, Width = 24, Height=24)
+        Component Transform(X = 400, Y = 550, Width = 24, Height=24)
         
-        Component PhysicsComponent(MinimumVelocity = 50,  MaximumVelocity = 50,  XVelocity = -40,
+        Component PhysicsComponent(MinimumVelocity = 30,  MaximumVelocity = 30,  XVelocity = -40,
             YVelocity = -20, Shape = "Ellipse", Restitution = 1, Mass = 1, Friction = 0, 
             LinearDamping = 0, MovesWhenHit = "true", AngularVelocity = 1, FixedRotation = "flase")
         Event TriggerOccurs(Trigger = "gameOver"){
-            DestroyAction()
+            Destroy()
         }
     }
 
     Prototype primaryBall : ball(){
         Event Collision(CollidesWith = $bottom_wall){
-            SetPositionAction(X = 400, Y = 300)
-            IncrementAction(Target = scene.balls , IncrementBy = -1)
+            SetPosition(X = 400, Y = 300)
+            Increment(Target = scene.balls , IncrementBy = -1)
         }
     }
 
     Prototype extraBall : ball (){
         Event Collision(CollidesWith= $bottom_wall) { 
-            DestroyAction()
+            Destroy()
         }
     }
     
@@ -60,27 +60,27 @@ Game breakout(Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = "f
             Restitution = 0, Mass = 1, Friction = 0, LinearDamping = 0, 
             MovesWhenHit = "false", FixedRotation = "true")
             
-        Component TransformComponent(Width = 95, Height = 20)
+        Component Transform(Width = 95, Height = 20)
         
         Event Collision(CollidesWith = $extraBall+$primaryBall){
-            IncrementAction(Target=scene.blocks, IncrementBy = -1)
-            DestroyAction()
+            Increment(Target=scene.blocks, IncrementBy = -1)
+            Destroy()
         }
     }
 
     Prototype spawn1Block : block(){
         Component RenderComponent(FillColor="Orange")
         Event Collision(CollidesWith = $extraBall+$primaryBall){
-            CreateEntityAction(Prototype = extraBall)
+            CreateEntity(Prototype = "extraBall")
         }
     }
 
     Prototype spawn3Block : block(){
         Component RenderComponent (FillColor="Yellow")
         Event Collision(CollidesWith = $extraBall+$primaryBall){
-            CreateEntity(Prototype = extraBall)
-            CreateEntity(Prototype = extraBall)
-            CreateEntity(Prototype = extraBall)
+            CreateEntity(Prototype = "extraBall")
+			CreateEntity(Prototype = "extraBall")
+			CreateEntity(Prototype = "extraBall")
         }
     }
 
@@ -91,123 +91,123 @@ Game breakout(Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = "f
     
     Scene game(balls = 10, blocks = 24){
         Entity player : paddle(){
-            Component TransformComponent(X = 400, Y = 560)
+            Component Transform(X = 400, Y = 560)
         }
         
         Entity  : spawn3Block(){
-            Component TransformComponent(X = 50,Y = 200)
+            Component Transform(X = 50,Y = 200)
         }
         
         Entity : block(){
-            Component TransformComponent(X = 150, Y = 200)
+            Component Transform(X = 150, Y = 200)
         }
         
         Entity : block(){
-           Component TransformComponent(X = 250, Y = 200)
+           Component Transform(X = 250, Y = 200)
         }
         
         Entity : block(){
-            Component TransformComponent(X = 350, Y = 200)
+            Component Transform(X = 350, Y = 200)
         }
         
         Entity : block(){
-            Component TransformComponent(X = 450, Y = 200)
+            Component Transform(X = 450, Y = 200)
         }
         
         Entity : block(){
-            Component TransformComponent(X = 550, Y = 200)
+            Component Transform(X = 550, Y = 200)
         }
         
         Entity : block(){
-            Component TransformComponent(X = 650, Y = 200)
+            Component Transform(X = 650, Y = 200)
         }
         
         Entity : spawn3Block(){
-            Component TransformComponent(X = 750, Y = 200)
+            Component Transform(X = 750, Y = 200)
         }
         
         Entity  : block(){
-            Component TransformComponent(X = 50, Y = 225)
+            Component Transform(X = 50, Y = 225)
         }
         
         Entity : block(){
-            Component TransformComponent(X = 150, Y = 225)
+            Component Transform(X = 150, Y = 225)
         }
         
         Entity : block(){
-            Component TransformComponent(X = 250, Y = 225)
+            Component Transform(X = 250, Y = 225)
         }
         
         Entity : block(){
-            Component TransformComponent(X = 350, Y = 225)
+            Component Transform(X = 350, Y = 225)
         }
         
         Entity : block(){
-            Component TransformComponent(X = 450, Y = 225)
+            Component Transform(X = 450, Y = 225)
         }
         
         Entity : block(){
-            Component TransformComponent(X = 550, Y = 225)
+            Component Transform(X = 550, Y = 225)
         }
         
         Entity : block(){
-            Component TransformComponent(X = 650, Y = 225)
+            Component Transform(X = 650, Y = 225)
         }
         
         Entity : block(){
-            Component TransformComponent(X = 750, Y = 225)
+            Component Transform(X = 750, Y = 225)
         }
         
         Entity  : block(){
-            Component TransformComponent(X = 50, Y = 250)
+            Component Transform(X = 50, Y = 250)
         }
         
         Entity : spawn1Block(){
-            Component TransformComponent(X = 150, Y = 250)
+            Component Transform(X = 150, Y = 250)
         }
         
         Entity : block(){
-            Component TransformComponent(X = 250, Y = 250)
+            Component Transform(X = 250, Y = 250)
         }
         
         Entity : spawn1Block(){
-            Component TransformComponent(X = 350, Y = 250)
+            Component Transform(X = 350, Y = 250)
         }
         
         Entity : block(){
-            Component TransformComponent(X = 450, Y = 250)
+            Component Transform(X = 450, Y = 250)
         }
         
         Entity : spawn1Block(){
-            Component TransformComponent(X = 550, Y = 250)
+            Component Transform(X = 550, Y = 250)
         }
         
         Entity : block(){
-            Component TransformComponent(X = 650, Y = 250)
+            Component Transform(X = 650, Y = 250)
         }
         
         Entity : spawn1Block(){
-            Component TransformComponent(X = 750, Y = 250)
+            Component Transform(X = 750, Y = 250)
         }
         
         Entity top_wall(){
-            Component TransformComponent(X = 400, Y = 0, Width = 800, Height = 2)
+            Component Transform(X = 400, Y = 0, Width = 800, Height = 2)
             Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, 
                 MovesWhenHit = "false", FixedRotation = "true")
         }
         
         Entity bottom_wall(){
-            Component TransformComponent(X = 400, Y = 600, Width = 800, Height = 2)
+            Component Transform(X = 400, Y = 600, Width = 800, Height = 2)
             Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, 
                 MovesWhenHit = "false" , FixedRotation = "true")
         }
         Entity left_wall(){
-            Component TransformComponent(X = 0, Y = 300, Width = 2, Height = 600)
+            Component Transform(X = 0, Y = 300, Width = 2, Height = 600)
             Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0,
                 MovesWhenHit = "flase", FixedRotation = "true")
         }
         Entity right_wall(){
-            Component TransformComponent(X = 800, Y = 300, Width = 2, Height = 600)
+            Component Transform(X = 800, Y = 300, Width = 2, Height = 600)
             Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0,
                 MovesWhenHit = "flase", FixedRotation = "true")
         }
@@ -216,25 +216,19 @@ Game breakout(Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = "f
             Component RenderComponent(FillColor = "White")
         }
         
-        Entity (){
-            Event SceneStarts(){
-                InrementAction(Target = scene.bloocks, IncrementBy = 0)
-            }
-        }
-        
         Entity : text(){
-            Component TransformComponent(X = 0, Y = 0, Width = 800)
+            Component Transform(X = 0, Y = 0, Width = 800)
             Component TextRenderComponent(Value = "", FontSize = 20, TextAlignment = "Center")
             Event AttributeChanges(Target = scene.balls + scene.blocks){
-                SetAcion(Target = TextRenderComponent, Value = "Extra Balls: " + scene.balls)
+                Set(Target = TextRenderComponent.Value, Value = "Extra Balls: " + scene.balls + " blocks left " + scene.blocks)
                 
                 if (scene.blocks == 0){
-                    SetAction(Target = TextRenderComponent.Value, Value = "YOU WIN!")
-                    FireTriggerAction(Name="gameOver")
+                    Set(Target = TextRenderComponent.Value, Value = "YOU WIN!")
+                    FireTrigger(Name="gameOver")
                 }
           
                 if (scene.balls < 0){
-                    SetAction(Target = TextRenderComponent.Value, Value = "GAME OVER")
+                    Set(Target = TextRenderComponent.Value, Value = "GAME OVER")
                     FireTrigger(Name="gameOver")
                 }
             }

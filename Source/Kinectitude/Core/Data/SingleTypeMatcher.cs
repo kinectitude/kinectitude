@@ -5,15 +5,23 @@ namespace Kinectitude.Core.Data
 {
     internal sealed class SingleTypeMatcher : TypeMatcher
     {
-        internal SingleTypeMatcher(DataContainer dataContainer)
+        private readonly Scene Scene;
+        private readonly string Name;
+        internal SingleTypeMatcher(string name, Scene scene) 
         {
-            DataContainer = dataContainer;
+            Scene = scene;
+            Name = name;
         }
 
         public override bool MatchAndSet(IEntity dataContainer)
         {
-            //no need to set, it already is
-            return dataContainer == DataContainer;
+            Entity entity;
+            if(Scene.EntityByName.TryGetValue(Name, out entity) && entity == DataContainer)
+            {
+                DataContainer = entity;
+                return true;
+            }
+            return false;
         }
 
         internal override void NotifyOfChange(Action<DataContainer> action) { }
