@@ -23,6 +23,15 @@ namespace Kinectitude.Editor.Views
     /// </summary>
     public partial class EventsList : UserControl
     {
+        public static readonly DependencyProperty ShowInheritedEventsProperty =
+            DependencyProperty.Register("ShowInheritedEvents", typeof(bool), typeof(EventsList), new FrameworkPropertyMetadata(true));
+
+        public bool ShowInheritedEvents
+        {
+            get { return (bool)GetValue(ShowInheritedEventsProperty); }
+            set { SetValue(ShowInheritedEventsProperty, value); }
+        }
+
         public EventsList()
         {
             InitializeComponent();
@@ -31,11 +40,20 @@ namespace Kinectitude.Editor.Views
         private void ActionTarget_Drop(object sender, DragEventArgs args)
         {
             DragDropData data = args.Data.GetData(typeof(DragDropData)) as DragDropData;
-
             if (null != data)
             {
-                Plugin plugin = data.Plugin;
-                if (null != plugin)
+                AbstractAction action = null;
+
+                if (data.IsCondition)
+                {
+                    action = new Condition();
+                }
+                else if (null != data.Plugin && data.Plugin.Type == PluginType.Action)
+                {
+                    action = new Action(data.Plugin);
+                }
+
+                if (null != action)
                 {
                     FrameworkElement element = sender as FrameworkElement;
                     if (null != element)
@@ -43,14 +61,14 @@ namespace Kinectitude.Editor.Views
                         Event evt = element.DataContext as Event;
                         if (null != evt)
                         {
-                            evt.AddAction(new Action(plugin));
+                            evt.AddAction(action);
                         }
                         else
                         {
                             Condition condition = element.DataContext as Condition;
                             if (null != condition)
                             {
-                                condition.AddAction(new Action(plugin));
+                                condition.AddAction(action);
                             }
                         }
                     }
@@ -65,7 +83,7 @@ namespace Kinectitude.Editor.Views
             if (null != data)
             {
                 Plugin plugin = data.Plugin;
-                if (null != plugin)
+                if (null != plugin && plugin.Type == PluginType.Event)
                 {
                     Entity entity = DataContext as Entity;
                     if (null != entity)

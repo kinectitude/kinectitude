@@ -14,7 +14,11 @@ namespace Kinectitude.Editor.Models
         public event PropertyEventHandler InheritedPropertyAdded { add { } remove { } }
         public event PropertyEventHandler InheritedPropertyRemoved { add { } remove { } }
         public event PropertyEventHandler InheritedPropertyChanged { add { } remove { } }
-        
+
+        public virtual event PluginAddedEventHandler PluginAdded { add { } remove { } }
+
+        public abstract Plugin Plugin { get; }
+
         public abstract string Type { get; }
 
         public abstract string DisplayName { get; }
@@ -108,5 +112,17 @@ namespace Kinectitude.Editor.Models
         }
 
         public abstract bool InheritsFrom(AbstractAction action);
+
+        public virtual AbstractAction DeepCopy()
+        {
+            Action copy = new Action(this.Plugin);
+
+            foreach (AbstractProperty property in this.Properties)
+            {
+                copy.SetProperty(property.Name, property.Value);
+            }
+
+            return copy;
+        }
     }
 }

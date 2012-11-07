@@ -149,5 +149,10 @@ namespace Kinectitude.Editor.Models
                 NotifyPropertyChanged("Scope");
             }
         }
+
+        public Attribute DeepCopy()
+        {
+            return new Attribute(this.Key) { Value = this.Value };
+        }
     }
 }

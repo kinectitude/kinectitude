@@ -14,6 +14,7 @@ namespace Kinectitude.Editor
             DialogService.RegisterWindow<EntityDialog>(DialogService.Constants.EntityDialog);
             DialogService.RegisterWindow<ComponentDialog>(DialogService.Constants.ComponentDialog);
             DialogService.RegisterWindow<AddEntityDialog>(DialogService.Constants.AddEntityDialog);
+            DialogService.RegisterWindow<RenameDialog>(DialogService.Constants.RenameDialog);
         }
     }
 }

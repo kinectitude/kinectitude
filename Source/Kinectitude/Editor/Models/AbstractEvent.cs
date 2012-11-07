@@ -20,6 +20,8 @@ namespace Kinectitude.Editor.Models
         public abstract event DefineAddedEventHandler DefineAdded;
         public abstract event DefinedNameChangedEventHandler DefineChanged;
 
+        public abstract Plugin Plugin { get; }
+
         [DependsOn("Scope")]
         public abstract string Type { get; }
 
@@ -75,6 +77,8 @@ namespace Kinectitude.Editor.Models
             action.SetScope(this);
             Actions.Add(action);
 
+            action.PluginAdded += OnActionPluginAdded;
+
             if (null != PluginAdded)
             {
                 foreach (Plugin plugin in action.Plugins)
@@ -96,6 +100,15 @@ namespace Kinectitude.Editor.Models
         {
             action.SetScope(null);
             Actions.Remove(action);
+            action.PluginAdded -= OnActionPluginAdded;
+        }
+
+        private void OnActionPluginAdded(Plugin plugin)
+        {
+            if (null != PluginAdded)
+            {
+                PluginAdded(plugin);
+            }
         }
 
         public void SetScope(IEventScope scope)
@@ -144,5 +157,22 @@ namespace Kinectitude.Editor.Models
         }
 
         public abstract bool InheritsFrom(AbstractEvent evt);
+
+        public Event DeepCopy()
+        {
+            Event copy = new Event(this.Plugin);
+
+            foreach (AbstractProperty property in this.Properties)
+            {
+                copy.SetProperty(property.Name, property.Value);
+            }
+
+            foreach (AbstractAction action in this.Actions)
+            {
+                copy.AddAction(action.DeepCopy());
+            }
+
+            return copy;
+        }
     }
 }

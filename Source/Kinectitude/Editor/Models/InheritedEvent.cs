@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using System.Linq;
 using Kinectitude.Editor.Models.Interfaces;
+using System.Text.RegularExpressions;
 
 namespace Kinectitude.Editor.Models
 {
@@ -21,6 +22,11 @@ namespace Kinectitude.Editor.Models
             remove { inheritedEvent.DefineChanged -= value; }
         }
 
+        public override Plugin Plugin
+        {
+            get { return inheritedEvent.Plugin; }
+        }
+
         public override string Type
         {
             get { return inheritedEvent.Type; }
@@ -30,6 +36,8 @@ namespace Kinectitude.Editor.Models
         {
             get { return inheritedEvent.Header; }
         }
+
+        public IEnumerable<object> Tokens { get; private set; }
 
         public override string Description
         {
@@ -68,6 +76,24 @@ namespace Kinectitude.Editor.Models
                 InheritedProperty localProperty = new InheritedProperty(inheritedProperty);
                 AddProperty(localProperty);
             }
+
+            string[] splitHeader = Regex.Split(inheritedEvent.Header, "({.*?})");
+            List<object> tokens = new List<object>();
+
+            foreach (string token in splitHeader)
+            {
+                if (token.StartsWith("{"))
+                {
+                    string property = token.TrimStart('{').TrimEnd('}');
+                    tokens.Add(GetProperty(property));
+                }
+                else if (token != string.Empty)
+                {
+                    tokens.Add(token);
+                }
+            }
+
+            Tokens = tokens;
         }
 
         private void OnInheritedEventActionsChanged(object sender, NotifyCollectionChangedEventArgs args)

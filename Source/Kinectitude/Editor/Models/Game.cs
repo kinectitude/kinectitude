@@ -19,6 +19,7 @@ namespace Kinectitude.Editor.Models
         private Scene firstScene;
         private int nextAttribute;
         private int nextScene;
+        private int nextPrototype;
 
         public event ScopeChangedEventHandler ScopeChanged { add { } remove { } }
 
@@ -177,6 +178,7 @@ namespace Kinectitude.Editor.Models
             private set;
         }
 
+        public ICommand RenameCommand { get; private set; }
         public ICommand AddPrototypeCommand { get; private set; }
         public ICommand RemovePrototypeCommand { get; private set; }
         public ICommand AddAttributeCommand { get; private set; }
@@ -197,10 +199,17 @@ namespace Kinectitude.Editor.Models
             Scenes = new ObservableCollection<Scene>();
             Attributes = new ObservableCollection<Attribute>();
 
+            RenameCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    DialogService.ShowDialog(DialogService.Constants.RenameDialog, this);
+                }
+            );
+
             AddPrototypeCommand = new DelegateCommand(null,
                 (parameter) =>
                 {
-                    Entity prototype = new Entity();
+                    Entity prototype = CreatePrototype();
 
                     DialogService.ShowDialog(DialogService.Constants.EntityDialog, prototype,
                         (result) =>
@@ -316,6 +325,11 @@ namespace Kinectitude.Editor.Models
         private bool HasPrototypeWithName(string name)
         {
             return Prototypes.Any(x => x.Name == name);
+        }
+
+        public Entity CreatePrototype()
+        {
+            return new Entity() { Name = GetNextPrototypeName() };
         }
 
         public void AddPrototype(Entity prototype)
@@ -493,6 +507,19 @@ namespace Kinectitude.Editor.Models
             {
                 nextScene++;
                 ret = "Scene " + nextScene;
+            }
+
+            return ret;
+        }
+
+        private string GetNextPrototypeName()
+        {
+            string ret = "Prototype" + nextPrototype;
+
+            while (Prototypes.Any(x => x.Name == ret))
+            {
+                nextPrototype++;
+                ret = "Prototype" + nextPrototype;
             }
 
             return ret;

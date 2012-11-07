@@ -99,6 +99,7 @@
     <ProjectReference Include="..\DirectInput\Kinectitude.DirectInput.csproj">
       <Project>{6F23FA79-3A6F-4D54-A099-336F90A719E7}</Project>
       <Name>Kinectitude.DirectInput</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Player\Kinectitude.Player.csproj">
       <Project>{753C2E85-FCF6-46E1-939C-D35C0B047E40}</Project>
@@ -107,6 +108,7 @@
     <ProjectReference Include="..\Render\Kinectitude.Render.csproj">
       <Project>{E6DD6F76-999C-4B56-887C-347FAF50DAB3}</Project>
       <Name>Kinectitude.Render</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

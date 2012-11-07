@@ -5,6 +5,8 @@ using System.Linq;
 using System.Windows.Input;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
+using Kinectitude.Core.Components;
+using Kinectitude.Editor.Views;
 
 namespace Kinectitude.Editor.Models
 {
@@ -73,6 +75,7 @@ namespace Kinectitude.Editor.Models
             get { return Entities.SelectMany(x => x.Plugins).Union(Managers.Select(x => x.Plugin)).Distinct(); }
         }
 
+        public ICommand RenameCommand { get; private set; }
         public ICommand SelectCommand { get; private set; }
         public ICommand AddAttributeCommand { get; private set; }
         public ICommand RemoveAttributeCommand { get; private set; }
@@ -88,6 +91,13 @@ namespace Kinectitude.Editor.Models
             Managers = new ObservableCollection<Manager>();
             Entities = new ObservableCollection<Entity>();
             SelectedEntities = new ObservableCollection<Entity>();
+
+            RenameCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    DialogService.ShowDialog(DialogService.Constants.RenameDialog, this);
+                }
+            );
 
             AddAttributeCommand = new DelegateCommand(null,
                 (parameter) =>
@@ -107,18 +117,11 @@ namespace Kinectitude.Editor.Models
             AddEntityCommand = new DelegateCommand(null,
                 (parameter) =>
                 {
-                    EntityPreset preset = parameter as EntityPreset;
+                    Entity preset = parameter as Entity;
                     
                     if (null != preset)
                     {
-                        Entity entity = new Entity();
-
-                        foreach (Plugin plugin in preset.Components)
-                        {
-                            Component component = new Component(plugin);
-                            entity.AddComponent(component);
-                        }
-
+                        Entity entity = preset.DeepCopy();
                         AddEntity(entity);
                         SelectEntity(entity);
                     }

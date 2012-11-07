@@ -30,7 +30,7 @@ namespace Kinectitude.Editor.Models
 
         private Game game;
         private BaseModel activeItem;
-        private List<EntityPreset> entityPresets;
+        private List<Entity> entityPresets;
 
         public Game Game
         {
@@ -88,7 +88,7 @@ namespace Kinectitude.Editor.Models
             private set;
         }
 
-        public IEnumerable<EntityPreset> EntityPresets
+        public IEnumerable<Entity> EntityPresets
         {
             get { return entityPresets; }
         }
@@ -219,11 +219,44 @@ namespace Kinectitude.Editor.Models
                 }
             }
 
-            entityPresets = new List<EntityPreset>();
-            entityPresets.Add(new EntityPreset("Blank Entity", GetPlugin(typeof(TransformComponent))));
-            entityPresets.Add(new EntityPreset("Image Entity", GetPlugin(typeof(TransformComponent)), GetPlugin(typeof(ImageRenderComponent))));
-            entityPresets.Add(new EntityPreset("Shape Entity", GetPlugin(typeof(TransformComponent)), GetPlugin(typeof(RenderComponent))));
-            entityPresets.Add(new EntityPreset("Text Entity", GetPlugin(typeof(TransformComponent)), GetPlugin(typeof(TextRenderComponent))));
+            entityPresets = new List<Entity>();
+        }
+
+        public void Initialize()
+        {
+            Entity blankEntity = new Entity() { Name = "Blank Entity" };
+            Component blankEntityTransform = new Component(GetPlugin(typeof(TransformComponent)));
+            blankEntityTransform.SetProperty("Width", 48);
+            blankEntityTransform.SetProperty("Height", 48);
+            blankEntity.AddComponent(blankEntityTransform);
+
+            entityPresets.Add(blankEntity);
+
+            Entity imageEntity = new Entity() { Name = "Image Entity" };
+            imageEntity.AddComponent(new Component(GetPlugin(typeof(ImageRenderComponent))));
+
+            entityPresets.Add(imageEntity);
+
+            Entity shapeEntity = new Entity() { Name = "Shape Entity" };
+            Component shapeEntityTransform = new Component(GetPlugin(typeof(TransformComponent)));
+            shapeEntityTransform.SetProperty("Width", 48);
+            shapeEntityTransform.SetProperty("Height", 48);
+            shapeEntity.AddComponent(blankEntityTransform);
+            Component shapeEntityRender = new Component(GetPlugin(typeof(RenderComponent)));
+            shapeEntityRender.SetProperty("Shape", "Rectangle");
+            shapeEntityRender.SetProperty("FillColor", "Blue");
+            shapeEntity.AddComponent(shapeEntityRender);
+
+            entityPresets.Add(shapeEntity);
+
+            Entity textEntity = new Entity() { Name = "Text Entity" };
+            Component textEntityText = new Component(GetPlugin(typeof(TextRenderComponent)));
+            textEntityText.SetProperty("FontSize", 36);
+            textEntityText.SetProperty("FontColor", "Black");
+            textEntityText.SetProperty("Value", "Your Text Here");
+            textEntity.AddComponent(textEntityText);
+
+            entityPresets.Add(textEntity);
         }
 
         public void NewGame()

@@ -143,6 +143,11 @@
                                         </StackPanel.InputBindings>
                                         <Image Source="{StaticResource icoGame}" />
                                         <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="#FFF" Padding="3" />
+                                        <StackPanel.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Rename..." Command="{Binding RenameCommand}" />
+                                            </ContextMenu>
+                                        </StackPanel.ContextMenu>
                                     </StackPanel>
                                 </HierarchicalDataTemplate>
 
@@ -153,15 +158,21 @@
                                     </StackPanel>
                                 </HierarchicalDataTemplate>
 
-                                <DataTemplate DataType="{x:Type m:Scene}">
+                                <HierarchicalDataTemplate DataType="{x:Type m:Scene}" ItemsSource="{Binding Entities}">
                                     <StackPanel Orientation="Horizontal">
                                         <StackPanel.InputBindings>
                                             <MouseBinding Gesture="LeftDoubleClick" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=OpenItemCommand, Mode=OneWay}" CommandParameter="{Binding}" />
                                         </StackPanel.InputBindings>
                                         <Image Source="{StaticResource icoScene}" />
                                         <TextBlock Text="{Binding Name}" Foreground="#FFF" Padding="3" />
+                                        <StackPanel.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Rename..." Command="{Binding RenameCommand}" />
+                                                <MenuItem Header="Delete" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=Game.RemoveItemCommand}" CommandParameter="{Binding}" />
+                                            </ContextMenu>
+                                        </StackPanel.ContextMenu>
                                     </StackPanel>
-                                </DataTemplate>
+                                </HierarchicalDataTemplate>
 
                                 <DataTemplate DataType="{x:Type m:Entity}">
                                     <StackPanel Orientation="Horizontal">
@@ -169,16 +180,26 @@
                                             <MouseBinding Gesture="LeftDoubleClick" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=OpenItemCommand, Mode=OneWay}" CommandParameter="{Binding}" />
                                         </StackPanel.InputBindings>
                                         <Image Source="{StaticResource icoEntity}" />
-                                        <TextBlock Text="{Binding Name}" Foreground="#FFF" Padding="3" />
+                                        <TextBlock Text="{Binding DisplayName}" Foreground="#FFF" Padding="3" />
+                                        <StackPanel.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Rename..." Command="{Binding RenameCommand}" />
+                                                <MenuItem Header="Delete" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=Game.RemoveItemCommand}" CommandParameter="{Binding}" />
+                                                <Separator />
+                                                <MenuItem Header="Properties..." Command="{Binding PropertiesCommand}" />
+                                            </ContextMenu>
+                                        </StackPanel.ContextMenu>
                                     </StackPanel>
                                 </DataTemplate>
 
                             </TreeView.Resources>
+                            
                             <TreeView.ItemContainerStyle>
                                 <Style>
                                     <Setter Property="TreeViewItem.IsExpanded" Value="True" />
                                 </Style>
                             </TreeView.ItemContainerStyle>
+                            
                         </TreeView>
                     </ScrollViewer>
                 </DockPanel>

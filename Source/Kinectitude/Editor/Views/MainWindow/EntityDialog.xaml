@@ -5,7 +5,9 @@
         Title="Entity"
         ResizeMode="NoResize"
         SizeToContent="WidthAndHeight"
-        FocusManager.FocusedElement="{Binding ElementName=txtPrototypeName}">
+        FocusManager.FocusedElement="{Binding ElementName=txtPrototypeName}"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        WindowStartupLocation="CenterScreen">
     <StackPanel Orientation="Vertical">
         <Grid>
             <Grid.RowDefinitions>
@@ -17,28 +19,28 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="0" Grid.Row="0" Margin="4">Name</Label>
+            <Label Foreground="{StaticResource ForegroundBrush}" Grid.Column="0" Grid.Row="0" Margin="4">Name</Label>
             <TextBox Name="txtPrototypeName" Width="300" Grid.Column="1" Grid.Row="0" Text="{Binding Name}" Margin="0,4,4,4" />
         </Grid>
         <Separator />
-        <Label Margin="4">Prototypes</Label>
+        <Label Foreground="{StaticResource ForegroundBrush}" Margin="4">Prototypes</Label>
         <StackPanel Orientation="Horizontal">
             <StackPanel.Resources>
                 <DataTemplate DataType="{x:Type vm:Entity}">
-                    <TextBlock Text="{Binding Name}" />
+                    <TextBlock Foreground="{StaticResource ForegroundBrush}" Text="{Binding Name}" />
                 </DataTemplate>
             </StackPanel.Resources>
-            <ListBox Name="lstPrototypes" ItemsSource="{Binding Source={x:Static vm:Workspace.Instance}, Path=Game.Prototypes}" Width="200" Height="300" Margin="4" />
+            <ListBox Name="lstPrototypes" ItemsSource="{Binding Source={x:Static vm:Workspace.Instance}, Path=Game.Prototypes}" Width="200" Height="300" Margin="4,0,4,4" />
             <StackPanel Orientation="Vertical">
-                <Button Content="&gt;&gt;" Command="{Binding AddPrototypeCommand}" CommandParameter="{Binding ElementName=lstPrototypes, Path=SelectedItem}"></Button>
+                <Button Content="&gt;&gt;" Command="{Binding AddPrototypeCommand}" CommandParameter="{Binding ElementName=lstPrototypes, Path=SelectedItem}" Margin="0,0,0,4"></Button>
                 <Button Content="&lt;&lt;" Command="{Binding RemovePrototypeCommand}" CommandParameter="{Binding ElementName=lstPrototypes, Path=SelectedItem}"></Button>
             </StackPanel>
-            <ListBox ItemsSource="{Binding Prototypes}" Width="200" Height="300" />
+            <ListBox ItemsSource="{Binding Prototypes}" Width="200" Height="300" Margin="4,0,4,4" />
         </StackPanel>
         <Separator />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Name="btnCancel" IsCancel="True" Width="100" Margin="4">Cancel</Button>
-            <Button Name="btnOK" IsDefault="True" Click="btnOK_Click" Width="100" Margin="0,4,4,4">OK</Button>
+            <Button Name="btnOK" IsDefault="True" Click="btnOK_Click" Width="100" Margin="0,4,4,4" >OK</Button>
         </StackPanel>
     </StackPanel>
 </Window>

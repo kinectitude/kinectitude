@@ -7,7 +7,7 @@
     
     <Window.Resources>
         
-        <DataTemplate DataType="{x:Type m:EntityPreset}">
+        <DataTemplate DataType="{x:Type m:Entity}">
             <TextBlock Text="{Binding Name}" />
         </DataTemplate>
         

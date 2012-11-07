@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Kinectitude.Editor.Presenters;
+using System;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
@@ -11,46 +13,75 @@ namespace Kinectitude.Editor.Views
         public DragThumb()
         {
             DragDelta += DragThumb_DragDelta;
+            DragStarted += DragThumb_DragStarted;
+            DragCompleted += DragThumb_DragCompleted;
+        }
+
+        private Selection GetSelection()
+        {
+            DependencyObject result = VisualTreeHelper.GetParent(this);
+            Selection selection = result as Selection;
+
+            while (null == selection)
+            {
+                result = VisualTreeHelper.GetParent(result);
+
+                if (null == result)
+                {
+                    return null;
+                }
+
+                selection = result as Selection;
+            }
+
+            return selection;
+        }
+
+        void DragThumb_DragCompleted(object sender, DragCompletedEventArgs e)
+        {
+            //Selection selection = GetSelection();
+
+            //foreach (EntityItem item in selection.EntityItems)
+            //{
+            //    EntityPresenter presenter = item.Content as EntityPresenter;
+
+            //    presenter.X = Canvas.GetLeft(selection) + Canvas.GetLeft(item);
+            //    presenter.Y = Canvas.GetTop(selection) + Canvas.GetTop(item);
+            //}
+        }
+
+        void DragThumb_DragStarted(object sender, DragStartedEventArgs e)
+        {
+            
         }
 
         void DragThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
-            EntityItem entityItem = this.DataContext as EntityItem;
-            SceneCanvas canvas = VisualTreeHelper.GetParent(entityItem) as SceneCanvas;
-            if (entityItem != null && canvas != null && entityItem.IsSelected)
+            //Selection selection = GetSelection();
+
+            //Canvas.SetLeft(selection, Canvas.GetLeft(selection) + e.HorizontalChange);
+            //Canvas.SetTop(selection, Canvas.GetTop(selection) + e.VerticalChange);
+
+            DependencyObject obj = VisualTreeHelper.GetParent(this);
+            EntityItem item = obj as EntityItem;
+
+            while (null == item)
             {
-                double minLeft = double.MaxValue;
-                double minTop = double.MaxValue;
+                obj = VisualTreeHelper.GetParent(obj);
 
-                var selectedItems = canvas.SelectionService.SelectedItems.OfType<EntityItem>();
-
-                foreach (EntityItem item in selectedItems)
+                if (null == obj)
                 {
-                    double left = Canvas.GetLeft(item);
-                    double top = Canvas.GetTop(item);
-
-                    minLeft = double.IsNaN(left) ? 0 : Math.Min(left, minLeft);
-                    minTop = double.IsNaN(top) ? 0 : Math.Min(top, minTop);
+                    return;
                 }
 
-                double deltaHorizontal = Math.Max(-minLeft, e.HorizontalChange);
-                double deltaVertical = Math.Max(-minTop, e.VerticalChange);
-
-                foreach (EntityItem item in selectedItems)
-                {
-                    double left = Canvas.GetLeft(item);
-                    double top = Canvas.GetTop(item);
-
-                    if (double.IsNaN(left)) left = 0;
-                    if (double.IsNaN(top)) top = 0;
-
-                    Canvas.SetLeft(item, left + deltaHorizontal);
-                    Canvas.SetTop(item, top + deltaVertical);
-                }
-
-                canvas.InvalidateMeasure();
-                e.Handled = true;
+                item = obj as EntityItem;
             }
+
+            TranslateTransform translate = item.Template.FindName("EntityTranslate", item) as TranslateTransform;
+            //object rotate = item.Template.FindName("EntityRotate", item);
+
+            translate.X += e.HorizontalChange;
+            translate.Y += e.VerticalChange;
         }
     }
 }

@@ -61,7 +61,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Windows.Interactivity" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -85,7 +84,6 @@
     <Compile Include="Commands\DelegateUndoableCommand.cs" />
     <Compile Include="Commands\ICommandHistory.cs" />
     <Compile Include="Commands\IUndoableCommand.cs" />
-    <Compile Include="Models\EntityPreset.cs" />
     <Compile Include="Storage\IGameStorage.cs" />
     <Compile Include="Storage\XmlGameStorage.cs" />
     <Compile Include="Models\AbstractAction.cs" />
@@ -130,10 +128,19 @@
     <Compile Include="Views\ComponentDialog.xaml.cs">
       <DependentUpon>ComponentDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\DragDropData.cs" />
-    <Compile Include="Views\DraggableItem.xaml.cs">
+    <Compile Include="Views\EntityEditor\DragDropData.cs" />
+    <Compile Include="Views\EntityEditor\DraggableItem.xaml.cs">
       <DependentUpon>DraggableItem.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\EntityEditor\EventHeader.xaml.cs">
+      <DependentUpon>EventHeader.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MainWindow\RenameDialog.xaml.cs">
+      <DependentUpon>RenameDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SceneEditor\ControlAdorner.cs" />
+    <Compile Include="Views\SceneEditor\EntityItemEventArgs.cs" />
+    <Compile Include="Views\SceneEditor\SceneCanvasModes\AbstractMode.cs" />
     <Compile Include="Views\SceneEditor\AddEntityDialog.xaml.cs">
       <DependentUpon>AddEntityDialog.xaml</DependentUpon>
     </Compile>
@@ -141,7 +148,7 @@
     <Compile Include="Views\EntityEditor\EventsList.xaml.cs">
       <DependentUpon>EventsList.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\FolderConverter.cs" />
+    <Compile Include="Views\MainWindow\FolderConverter.cs" />
     <Compile Include="Views\MainWindow\EntityDialog.xaml.cs">
       <DependentUpon>EntityDialog.xaml</DependentUpon>
     </Compile>
@@ -159,17 +166,23 @@
       <DependentUpon>SceneDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SceneEditor\EntityItem.cs" />
-    <Compile Include="Views\SceneEditor\ISelectable.cs" />
+    <Compile Include="Views\SceneEditor\SceneCanvasModes\EntityPreviewAdorner.cs" />
+    <Compile Include="Views\SceneEditor\SceneCanvasModes\ManipulationMode.cs" />
+    <Compile Include="Views\SceneEditor\SceneCanvasModes\PanningMode.cs" />
     <Compile Include="Views\SceneEditor\ResizeThumb.cs" />
     <Compile Include="Views\SceneEditor\RubberBandAdorner.cs" />
     <Compile Include="Views\SceneEditor\SceneCanvas.cs" />
+    <Compile Include="Views\SceneEditor\SceneCanvasModes\PlacementMode.cs" />
+    <Compile Include="Views\SceneEditor\SceneCanvasModes\SelectionMode.cs" />
     <Compile Include="Views\SceneEditor\SceneEditor.xaml.cs">
       <DependentUpon>SceneEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\GameEditor\SceneThumbnail.xaml.cs">
       <DependentUpon>SceneThumbnail.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SceneEditor\SelectionService.cs" />
+    <Compile Include="Views\SceneEditor\Selection.xaml.cs">
+      <DependentUpon>Selection.xaml</DependentUpon>
+    </Compile>
     <Page Include="Resources\Icons.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -186,7 +199,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\DraggableItem.xaml">
+    <Page Include="Views\EntityEditor\DraggableItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EntityEditor\EventHeader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MainWindow\RenameDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -227,6 +248,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\GameEditor\SceneThumbnail.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SceneEditor\Selection.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

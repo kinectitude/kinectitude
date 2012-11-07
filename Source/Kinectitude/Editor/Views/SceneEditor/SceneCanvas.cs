@@ -1,26 +1,28 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using Kinectitude.Editor.Models;
+using System.Collections.Generic;
 
 namespace Kinectitude.Editor.Views
 {
     internal class SceneCanvas : Canvas
     {
-        private Point? boxedSelectionStart;
-        private Lazy<SelectionService> selectionService;
+        private readonly Stack<AbstractMode> modes;
 
-        public SelectionService SelectionService
+        public IEnumerable<EntityItem> EntityItems
         {
-            get { return selectionService.Value; }
+            get { return this.Children.OfType<EntityItem>(); }
         }
 
         public SceneCanvas()
         {
-            selectionService = new Lazy<SelectionService>(() => new SelectionService(this));
+            DataContextChanged += SceneCanvas_DataContextChanged;
+            Loaded += SceneCanvas_Loaded;
 
             Scene scene = DataContext as Scene;
             if (null != scene)
@@ -28,43 +30,67 @@ namespace Kinectitude.Editor.Views
                 UpdateEntities(scene);
             }
 
-            DataContextChanged += SceneCanvas_DataContextChanged;
+            modes = new Stack<AbstractMode>();
+
+            AddHandler(EntityItem.EntityItemMouseDownEvent, new EntityItemEventHandler(EntityItem_MouseDown));
+            AddHandler(EntityItem.EntityItemMouseUpEvent, new EntityItemEventHandler(EntityItem_MouseUp));
+        }
+
+        private void SceneCanvas_Loaded(object sender, RoutedEventArgs e)
+        {
+            SetMode(new SelectionMode(this));
+        }
+
+        public void SetMode(AbstractMode mode)
+        {
+            while (modes.Count > 0)
+            {
+                AbstractMode previous = modes.Pop();
+                previous.Uninitialize();
+            }
+
+            mode.Initialize();
+            modes.Push(mode);
+        }
+
+        public void PushMode(AbstractMode mode)
+        {
+            modes.Peek().Pause();
+
+            mode.Initialize();
+            modes.Push(mode);
+        }
+
+        public void PopMode()
+        {
+            AbstractMode previous = modes.Pop();
+            previous.Uninitialize();
+
+            modes.Peek().Resume();
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             base.OnMouseDown(e);
 
-            if (e.Source == this)
-            {
-                boxedSelectionStart = new Point?(e.GetPosition(this));
-
-                SelectionService.ClearSelection();
-                Focus();
-                e.Handled = true;
-            }
+            modes.Peek().OnMouseDown(e);
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
 
-            if (e.LeftButton != MouseButtonState.Pressed)
-            {
-                boxedSelectionStart = null;
-            }
+            modes.Peek().OnMouseMove(e);
+        }
 
-            if (boxedSelectionStart.HasValue)
-            {
-                AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer(this);
-                if (null != adornerLayer)
-                {
-                    RubberBandAdorner adorner = new RubberBandAdorner(this, boxedSelectionStart);
-                    adornerLayer.Add(adorner);
-                }
-            }
+        private void EntityItem_MouseDown(object sender, EntityItemEventArgs e)
+        {
+            modes.Peek().OnEntityMouseDown(e);
+        }
 
-            e.Handled = true;
+        private void EntityItem_MouseUp(object sender, EntityItemEventArgs e)
+        {
+            modes.Peek().OnEntityMouseUp(e);
         }
 
         protected override Size MeasureOverride(Size constraint)

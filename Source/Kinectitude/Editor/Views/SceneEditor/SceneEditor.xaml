@@ -39,23 +39,8 @@
         <DataTemplate DataType="{x:Type p:SpriteEntityPresenter}" />
 
         <DataTemplate DataType="{x:Type p:TextEntityPresenter}">
-            <Canvas>
-                <TextBlock Text="{Binding Value}" FontSize="{Binding FontSize}" Foreground="{Binding FontColor}" />
-            </Canvas>
+            <TextBlock Text="{Binding Value}" FontSize="{Binding FontSize}" Foreground="{Binding FontColor}" />
         </DataTemplate>
-
-        <ControlTemplate x:Key="ResizeDecoratorTemplate" TargetType="{x:Type Control}">
-            <Grid Opacity="0.7" SnapsToDevicePixels="true">
-                <v:ResizeThumb Height="3" Cursor="SizeNS" Margin="0 -4 0 0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-                <v:ResizeThumb Width="3" Cursor="SizeWE" Margin="-4 0 0 0" VerticalAlignment="Stretch" HorizontalAlignment="Left" />
-                <v:ResizeThumb Width="3" Cursor="SizeWE" Margin="0 0 -4 0" VerticalAlignment="Stretch" HorizontalAlignment="Right" />
-                <v:ResizeThumb Height="3" Cursor="SizeNS" Margin="0 0 0 -4" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" />
-                <v:ResizeThumb Width="7" Height="7" Cursor="SizeNWSE" Margin="-6 -6 0 0" VerticalAlignment="Top" HorizontalAlignment="Left" />
-                <v:ResizeThumb Width="7" Height="7" Cursor="SizeNESW" Margin="0 -6 -6 0" VerticalAlignment="Top" HorizontalAlignment="Right" />
-                <v:ResizeThumb Width="7" Height="7" Cursor="SizeNESW" Margin="-6 0 0 -6" VerticalAlignment="Bottom" HorizontalAlignment="Left" />
-                <v:ResizeThumb Width="7" Height="7" Cursor="SizeNWSE" Margin="0 0 -6 -6" VerticalAlignment="Bottom" HorizontalAlignment="Right" />
-            </Grid>
-        </ControlTemplate>
 
         <Style TargetType="{x:Type v:DragThumb}">
             <Setter Property="Template">
@@ -75,20 +60,23 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type v:EntityItem}">
                         <Grid DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
-                            <v:DragThumb x:Name="PART_DragThumb" Cursor="SizeAll" />
-                            <Control x:Name="PART_ResizeDecorator" Visibility="Collapsed" Template="{StaticResource ResizeDecoratorTemplate}" />       
                             <ContentPresenter x:Name="PART_ContentPresenter"
                                               HorizontalAlignment="Stretch"
                                               VerticalAlignment="Stretch"
                                               Content="{TemplateBinding ContentControl.Content}"
-                                              Margin="{TemplateBinding ContentControl.Padding}" />
+                                              Margin="{TemplateBinding ContentControl.Padding}"
+                                              RenderTransformOrigin="0.5, 0.5">
+                                <ContentPresenter.RenderTransform>
+                                    <TransformGroup>
+                                        <TranslateTransform x:Name="EntityTranslate" />
+                                        <RotateTransform x:Name="EntityRotate" />
+                                    </TransformGroup>
+                                </ContentPresenter.RenderTransform>
+                            </ContentPresenter>
+                            <Rectangle Stroke="CornflowerBlue" StrokeThickness="1" Fill="Transparent" Visibility="{Binding IsSelected, Converter={StaticResource boolToVis}}" />
+                            <v:DragThumb Visibility="{Binding IsSelected, Converter={StaticResource boolToVis}}" />
                         </Grid>
-                        <ControlTemplate.Triggers>
-                            <DataTrigger Value="True" Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsSelected}">
-                                <Setter TargetName="PART_ResizeDecorator" Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
+                    </ControlTemplate> 
                 </Setter.Value>
             </Setter>
         </Style>
@@ -142,18 +130,7 @@
         </StackPanel>
         
         <ScrollViewer Background="Gray" HorizontalScrollBarVisibility="Visible">
-            <!--ItemsControl ItemsSource="{Binding Entities}" ItemTemplate="{StaticResource EntityTemplate}" ItemContainerStyle="{StaticResource EntityContainerStyle}">
-
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas Background="White" Width="{Binding Source={x:Static m:Workspace.Instance}, Path=Game.Width}" Height="{Binding Source={x:Static m:Workspace.Instance}, Path=Game.Height}" Margin="16" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-
-            </ItemsControl-->
-
             <v:SceneCanvas Focusable="true" x:Name="sceneCanvas" Background="White" Margin="16" FocusVisualStyle="{x:Null}" Width="{Binding Source={x:Static m:Workspace.Instance}, Path=Game.Width}" Height="{Binding Source={x:Static m:Workspace.Instance}, Path=Game.Height}" />
-
         </ScrollViewer>
 
     </DockPanel>

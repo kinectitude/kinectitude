@@ -1,10 +1,16 @@
 ﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Kinectitude.Editor.Models
 {
     internal sealed class InheritedAction : AbstractAction
     {
         private readonly AbstractAction inheritedAction;
+
+        public override Plugin Plugin
+        {
+            get { return inheritedAction.Plugin; }
+        }
 
         public override string Type
         {
@@ -15,6 +21,8 @@ namespace Kinectitude.Editor.Models
         {
             get { return inheritedAction.DisplayName; }
         }
+
+        public IEnumerable<object> Tokens { get; private set; }
 
         public override bool IsLocal
         {
@@ -42,6 +50,24 @@ namespace Kinectitude.Editor.Models
                 InheritedProperty localProperty = new InheritedProperty(inheritedProperty);
                 AddProperty(localProperty);
             }
+
+            string[] splitHeader = Regex.Split(inheritedAction.DisplayName, "({.*?})");
+            List<object> tokens = new List<object>();
+
+            foreach (string token in splitHeader)
+            {
+                if (token.StartsWith("{"))
+                {
+                    string property = token.TrimStart('{').TrimEnd('}');
+                    tokens.Add(GetProperty(property));
+                }
+                else if (token != string.Empty)
+                {
+                    tokens.Add(token);
+                }
+            }
+
+            Tokens = tokens;
         }
 
         public override bool InheritsFrom(AbstractAction action)

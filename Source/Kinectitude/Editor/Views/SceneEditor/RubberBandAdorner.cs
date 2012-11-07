@@ -73,22 +73,24 @@ namespace Kinectitude.Editor.Views
 
         private void UpdateSelection()
         {
-            canvas.SelectionService.ClearSelection();
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.None)
+            {
+                foreach (EntityItem item in canvas.EntityItems)
+                {
+                    item.IsSelected = false;
+                }
+            }
 
             Rect boxedSelection = new Rect(startPoint.Value, endPoint.Value);
 
-            foreach (Control item in canvas.Children)
+            foreach (EntityItem item in canvas.EntityItems)
             {
                 Rect itemRect = VisualTreeHelper.GetDescendantBounds(item);
                 Rect itemBounds = item.TransformToAncestor(canvas).TransformBounds(itemRect);
 
                 if (boxedSelection.Contains(itemBounds))
                 {
-                    EntityItem entityItem = item as EntityItem;
-                    if (null != entityItem)
-                    {
-                        canvas.SelectionService.AddToSelection(entityItem);
-                    }
+                    item.IsSelected = true;
                 }
             }
         }

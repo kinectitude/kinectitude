@@ -220,5 +220,17 @@ namespace Kinectitude.Editor.Models
         {
             return Plugin.CoreType == type;
         }
+
+        public Component DeepCopy()
+        {
+            Component copy = new Component(this.Plugin);
+
+            foreach (AbstractProperty property in this.Properties)
+            {
+                copy.SetProperty(property.Name, property.Value);
+            }
+
+            return copy;
+        }
     }
 }

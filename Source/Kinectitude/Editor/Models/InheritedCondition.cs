@@ -14,6 +14,11 @@ namespace Kinectitude.Editor.Models
             set { }
         }
 
+        public override Plugin Plugin
+        {
+            get { return null; }
+        }
+
         public override string Type
         {
             get { return null; }
@@ -101,6 +106,18 @@ namespace Kinectitude.Editor.Models
             {
                 PrivateRemoveAction(localAction);
             }
+        }
+
+        public override AbstractAction DeepCopy()
+        {
+            Condition copy = new Condition() { If = this.If };
+
+            foreach (AbstractAction action in this.Actions)
+            {
+                copy.AddAction(action.DeepCopy());
+            }
+
+            return copy;
         }
     }
 }

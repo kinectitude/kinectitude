@@ -4,7 +4,9 @@
         Title="Scene"
         ResizeMode="NoResize"
         SizeToContent="WidthAndHeight"
-        FocusManager.FocusedElement="{Binding ElementName=txtSceneName}">
+        FocusManager.FocusedElement="{Binding ElementName=txtSceneName}"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        WindowStartupLocation="CenterScreen">
     <StackPanel Orientation="Vertical">
         <Grid>
             <Grid.RowDefinitions>
@@ -16,7 +18,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="0" Grid.Row="0" Margin="4">Name</Label>
+            <Label Foreground="{StaticResource ForegroundBrush}" Grid.Column="0" Grid.Row="0" Margin="4">Name</Label>
             <TextBox Name="txtSceneName" Width="300" Grid.Column="1" Grid.Row="0" Text="{Binding Name}" Margin="0,4,4,4" />
         </Grid>
         <Separator />

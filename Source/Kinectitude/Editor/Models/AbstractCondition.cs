@@ -7,6 +7,7 @@ namespace Kinectitude.Editor.Models
     {
         public event DefineAddedEventHandler DefineAdded;
         public event DefinedNameChangedEventHandler DefineChanged;
+        public override event PluginAddedEventHandler PluginAdded;
 
         public abstract string If { get; set; }
 
@@ -30,6 +31,15 @@ namespace Kinectitude.Editor.Models
         {
             action.SetScope(this);
             Actions.Add(action);
+            action.PluginAdded += OnActionPluginAdded;
+
+            if (null != PluginAdded)
+            {
+                foreach (Plugin plugin in action.Plugins)
+                {
+                    PluginAdded(plugin);
+                }
+            }
         }
 
         public void RemoveAction(AbstractAction action)
@@ -44,6 +54,15 @@ namespace Kinectitude.Editor.Models
         {
             action.SetScope(null);
             Actions.Remove(action);
+            action.PluginAdded -= OnActionPluginAdded;
+        }
+
+        private void OnActionPluginAdded(Plugin plugin)
+        {
+            if (null != PluginAdded)
+            {
+                PluginAdded(plugin);
+            }
         }
 
         string IPluginNamespace.GetDefinedName(Plugin plugin)

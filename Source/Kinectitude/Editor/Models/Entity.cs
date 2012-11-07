@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows.Input;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
+using Kinectitude.Editor.Views;
 
 namespace Kinectitude.Editor.Models
 {
@@ -50,6 +51,27 @@ namespace Kinectitude.Editor.Models
             }
         }
 
+        [DependsOn("Name")]
+        [DependsOn("Prototypes")]
+        public string DisplayName
+        {
+            get
+            {
+                if (null != name)
+                {
+                    return name;
+                }
+
+                if (Prototypes.Count > 0)
+                {
+                    string result = "<" + string.Join(" ", Prototypes.Select(x => x.Name)) + ">";
+                }
+
+                return "<Anonymous Entity>";
+            }
+        }
+
+        public FilteredObservableCollection<Entity> AvailablePrototypes { get; private set; }
         public ObservableCollection<Entity> Prototypes { get; private set; }
         public ObservableCollection<Attribute> Attributes { get; private set; }
         public ObservableCollection<Component> Components { get; private set; }
@@ -60,6 +82,8 @@ namespace Kinectitude.Editor.Models
             get { return Components.Select(x => x.Plugin).Union(Events.SelectMany(x => x.Plugins)).Distinct(); }
         }
 
+        public ICommand RenameCommand { get; private set; }
+        public ICommand PropertiesCommand { get; private set; }
         public ICommand AddPrototypeCommand { get; private set; }
         public ICommand RemovePrototypeCommand { get; private set; }
         public ICommand AddAttributeCommand { get; private set; }
@@ -75,6 +99,20 @@ namespace Kinectitude.Editor.Models
             Attributes = new ObservableCollection<Attribute>();
             Components = new ObservableCollection<Component>();
             Events = new ObservableCollection<AbstractEvent>();
+
+            RenameCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    DialogService.ShowDialog(DialogService.Constants.RenameDialog, this);
+                }
+            );
+
+            PropertiesCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    DialogService.ShowDialog(DialogService.Constants.EntityDialog, this);
+                }
+            );
 
             AddPrototypeCommand = new DelegateCommand(null,
                 (parameter) =>
@@ -541,6 +579,14 @@ namespace Kinectitude.Editor.Models
             evt.PluginAdded += OnEventPluginAdded;
             Events.Add(evt);
 
+            if (null != PluginAdded)
+            {
+                foreach (Plugin plugin in evt.Plugins)
+                {
+                    PluginAdded(plugin);
+                }
+            }
+
             Workspace.Instance.CommandHistory.Log(
                 "add event '" + evt.Header + "'",
                 () => AddEvent(evt),
@@ -742,6 +788,28 @@ namespace Kinectitude.Editor.Models
             {
                 PrivateRemoveEvent(localEvent);
             }
+        }
+
+        public Entity DeepCopy()
+        {
+            Entity copy = new Entity();
+
+            foreach (Attribute attribute in this.Attributes)
+            {
+                copy.AddAttribute(attribute.DeepCopy());
+            }
+
+            foreach (Component component in this.Components)
+            {
+                copy.AddComponent(component.DeepCopy());
+            }
+
+            foreach (AbstractEvent evt in this.Events)
+            {
+                copy.AddEvent(evt.DeepCopy());
+            }
+
+            return copy;
         }
     }
 }
