@@ -14,21 +14,9 @@ namespace Kinectitude.Core.Data
         { 
             Reader = reader;
             oldVal = GetPreferedValue();
+            reader.notifyOfChange(Change);
         }
 
-        internal override void notifyOfChange(Action<ValueReader> change)
-        {
-            Callbacks.Add(change);
-        }
-
-        private void valChange()
-        {
-            object value = GetPreferedValue();
-            if (oldVal != value)
-            {
-                foreach (Action<ValueReader> callback in Callbacks) callback(this);
-            }
-        }
         internal override ValueWriter ConvertToWriter() { return new NullWriter(this); }
     }
 }

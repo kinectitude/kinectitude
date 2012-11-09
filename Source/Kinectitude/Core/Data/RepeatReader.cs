@@ -1,8 +1,9 @@
-﻿namespace Kinectitude.Core.Data
+﻿using System;
+namespace Kinectitude.Core.Data
 {
     public abstract class RepeatReader : ValueReader
     {
-        protected  ValueReader Reader;
+        protected abstract ValueReader Reader { get; }
 
         internal override double GetDoubleValue() { return Reader.GetDoubleValue(); }
         internal override float GetFloatValue() { return Reader.GetFloatValue(); }

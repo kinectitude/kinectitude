@@ -1,21 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using Kinectitude.Core.Data;
+using SysAction = System.Action;
 
 namespace Kinectitude.Core.Base
 {
     public abstract class DataContainer : IEntity
     {
-        private readonly Dictionary<string, ValueReader> attributes =
-            new Dictionary<string, ValueReader>();
+        private readonly Dictionary<string, ValueReader> attributes = new Dictionary<string, ValueReader>();
+        private readonly Dictionary<string, List<SysAction>> callbacks = new Dictionary<string, List<SysAction>>();
 
-        private readonly Dictionary<string, List<Action<ValueReader>>> callbacks =
-            new Dictionary<string, List<Action<ValueReader>>>();
-
-        internal readonly Dictionary<string, List<Action<ValueReader>>> CheckProperties =
-            new Dictionary<string, List<Action<ValueReader>>>();
-        protected readonly List<Tuple<DataContainer, string, Action<ValueReader>>> PropertyChanges =
-            new List<Tuple<DataContainer, string, Action<ValueReader>>>();
+        internal readonly Dictionary<string, List<SysAction>> CheckProperties = new Dictionary<string, List<SysAction>>();
+        protected readonly List<Tuple<DataContainer, string, SysAction>> PropertyChanges = new List<Tuple<DataContainer, string, SysAction>>();
 
         public bool Deleted { get; protected set; }
 
@@ -43,22 +39,26 @@ namespace Kinectitude.Core.Base
         {
             get
             {
-                if (attributes.ContainsKey(key)) return attributes[key];
-                return new ConstantReader("");
+                if (Deleted || !attributes.ContainsKey(key)) return ConstantReader.NullValue;
+                return attributes[key];
             }
 
             set
             {
+                if (Deleted) return;
                 if ("Name" == key || "Id" == key)
                 {
                     throw new ArgumentException("Name And Id can't be changed");
                 }
 
-                ValueReader reader = new ConstantReader(value.GetPreferedValue());
+                ValueReader reader;
+                if (typeof(ConstantReader) == value.GetType()) reader = value;
+                else reader = new ConstantReader(value.GetPreferedValue());
+
                 attributes[key] = reader;
                 if (callbacks.ContainsKey(key))
                 {
-                    foreach (Action<ValueReader> action in callbacks[key]) action(reader);
+                    foreach (SysAction Callable in callbacks[key]) Callable();
                 }
             }
         }
@@ -69,13 +69,13 @@ namespace Kinectitude.Core.Base
             Deleted = false;
         }
 
-        internal void NotifyOfChange(string key, Action<ValueReader> callback)
+        internal void NotifyOfChange(string key, SysAction callback)
         {
-            List<Action<ValueReader>> addTo = null;
+            List<SysAction> addTo = null;
             callbacks.TryGetValue(key, out addTo);
             if (null == addTo)
             {
-                addTo = new List<Action<ValueReader>>();
+                addTo = new List<SysAction>();
                 callbacks[key] = addTo;
                 addTo.Add(callback);
             }
@@ -85,23 +85,23 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        internal void StopNotifications(string key, Action<ValueReader> callback)
+        internal void StopNotifications(string key, SysAction callback)
         {
-            List<Action<ValueReader>> removeFrom = callbacks[key];
+            List<SysAction> removeFrom = callbacks[key];
             removeFrom.Remove(callback);
         }
 
 
-        internal void NotifyOfComponentChange(string what, Action<ValueReader> callback)
+        internal void NotifyOfComponentChange(string what, SysAction callback)
         {
-            List<Action<ValueReader>> callbacks;
+            List<SysAction> callbacks;
             if (CheckProperties.TryGetValue(what, out callbacks))
             {
                 callbacks.Add(callback);
             }
             else
             {
-                callbacks = new List<Action<ValueReader>>();
+                callbacks = new List<SysAction>();
                 callbacks.Add(callback);
                 CheckProperties[what] = callbacks;
                 string[] parts = what.Split('.');
@@ -110,9 +110,9 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        internal void UnnotifyOfComponentChange(string what, Action<ValueReader> callback)
+        internal void UnnotifyOfComponentChange(string what, SysAction callback)
         {
-            List<Action<ValueReader>> callbacks;
+            List<SysAction> callbacks;
             if (CheckProperties.TryGetValue(what, out callbacks))
             {
                 callbacks.Remove(callback);
@@ -124,12 +124,12 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        internal void ChangedProperty(string what, object value)
+        internal void ChangedProperty(string what)
         {
-            List<Action<ValueReader>> callbacks;
+            List<SysAction> callbacks;
             if (CheckProperties.TryGetValue(what, out callbacks))
             {
-                foreach (Action<ValueReader> callback in callbacks) callback(new ConstantReader(value));
+                foreach (SysAction callback in callbacks) callback();
             }
         }
 

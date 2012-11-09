@@ -152,10 +152,11 @@ namespace Kinectitude.Core.Loaders
             if (grammar.Mult == op) return new MultOpReader(left, right);
             if (grammar.Rem == op) return new RemOpReader(left, right);
             if (grammar.Pow == op) return new PowOpReader(left, right);
-            if (grammar.And == op) return new PowOpReader(left, right);
+            if (grammar.And == op) return new AndOpReader(left, right);
             if (grammar.Or == op) return new OrOpReader(left, right);
             if (grammar.LeftShift == op) return new LeftShiftOpReader(left, right);
             if (grammar.RightShift == op) return new RightShiftOpReader(left, right);
+            if(grammar.Div == op) return new DivOpReader(left, right);
             throw new NotImplementedException("Error with implementation of operator " + op.Name);
         }
 
@@ -180,9 +181,8 @@ namespace Kinectitude.Core.Loaders
 
         private ValueReader makeParameterReader(Scene scene, Entity entity, string name, string component, string param)
         {
-            DataContainer dataContainer = getDataContainer(scene, entity, name);
-            object obj = dataContainer.GetComponentOrManager(component);
-            return new ParameterValueReader(obj, param, scene);
+            object obj = getDataContainer(scene, entity, name).GetComponentOrManager(component);
+            return ParameterValueReader.getParameterValueReader(obj, param, scene);
         }
 
         private ValueReader makeDcReader(Scene scene, Entity entity, string name, string param)
@@ -223,7 +223,16 @@ namespace Kinectitude.Core.Loaders
             }
             else if (child0 == KinectitudeGrammar.ParentVal)
             {
-                //TODO
+                ParseTreeNode make = node.ChildNodes[0];
+                switch (make.ChildNodes.Count)
+                {
+                    case 2:
+                        return TypeMatcherDCReader.getTypeMatcherDCValueReader(evt, make.ChildNodes[0].Token.ValueString, 
+                            make.ChildNodes[1].Token.ValueString, entity); 
+                    case 3:
+                        return TypeMatcherProperyReader.getTypeMatcherProperyReader(evt, make.ChildNodes[0].Token.ValueString,
+                            make.ChildNodes[1].Token.ValueString, make.ChildNodes[2].Token.ValueString, entity);
+                }
             }
             else if (node.ChildNodes.Count == 3 && node.ChildNodes[1].Term == KinectitudeGrammar.BinOp)
             {

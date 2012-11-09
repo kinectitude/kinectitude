@@ -7,6 +7,7 @@ using Irony.Ast;
 using Irony.Parsing.Construction;
 using Irony.Interpreter.Ast;
 using Kinectitude.Core.Data;
+using System.Text.RegularExpressions;
 
 namespace Kinectitude.Core.Language
 {
@@ -87,9 +88,9 @@ namespace Kinectitude.Core.Language
             Div = ToTerm("/", "Div");
             Rem = ToTerm("%", "Rem");
             Pow = ToTerm("**", "Pow");
-            And = new RegexBasedTerminal(@"(&&)|(And)", "And");
-            Or = new RegexBasedTerminal(@"(\|\|)|(Or)", "Or");
-            Not = new RegexBasedTerminal(@"\!|(Not)", "Not");
+            And = new RegexBasedTerminal("And", @"(&&)|(and)");
+            Or = new RegexBasedTerminal("Or", @"(\|\|)|(or)");
+            Not = new RegexBasedTerminal("Not", @"!|(not)");
             LeftShift = ToTerm("<<", "leftShitf");
             RightShift = ToTerm(">>", "RightShift");
             PlusEq = ToTerm("+=", "PlusEq");
@@ -115,14 +116,14 @@ namespace Kinectitude.Core.Language
             RegisterBracePair("(", ")");
             RegisterBracePair("{", "}");
             IsExactType.Rule = "#" + Name;
-            ParentVal.Rule = "@" + TwoVal | "@" + ThreeVal | "@" + Identifier;
+            ParentVal.Rule =  "@" + Identifier + "." + Identifier | "@" + Identifier + "." + Identifier + "." + Identifier;
             exactValue.Rule = Name | TwoVal | ThreeVal | ParentVal;
             TypeMatcher.Rule = IsType | IsExactType| IsType + Plus + TypeMatcher | IsExactType + Plus + TypeMatcher;
             #endregion
 
             #region expressions
             NonTerminal term = new NonTerminal("term");
-            Expr.Rule = term | Expr + BinOp + Expr | UniOp + Expr;
+            Expr.Rule = Expr + BinOp + Expr | UniOp + Expr | term;
             BinOp.Rule = Plus | Minus | Div | Mult | Rem | Pow | And | Or | Eql | Neq | Gt | Ge | Lt | Le | LeftShift | RightShift;
             UniOp.Rule = Not | Minus;
             term.Rule = Number | Str | openBrac + Expr + closeBrac | exactValue;

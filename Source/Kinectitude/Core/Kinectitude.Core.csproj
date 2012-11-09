@@ -59,6 +59,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -78,7 +80,6 @@
     <Compile Include="Actions\PopSceneAction.cs" />
     <Compile Include="Actions\PushSceneAction.cs" />
     <Compile Include="Actions\SetAction.cs" />
-    <Compile Include="Actions\SetPositionAction.cs" />
     <Compile Include="Actions\CreateTimerAction.cs" />
     <Compile Include="Attributes\PluginAttribute.cs" />
     <Compile Include="Attributes\PresetAttribute.cs" />
@@ -104,12 +105,13 @@
     <Compile Include="Base\Manager.cs" />
     <Compile Include="Components\TransformComponent.cs" />
     <Compile Include="Data\DataContainerWriter.cs" />
+    <Compile Include="Data\DoubleDictionary.cs" />
     <Compile Include="Data\NeqOpReader.cs" />
     <Compile Include="Data\DataContainerReader.cs" />
     <Compile Include="Data\NullWriter.cs" />
     <Compile Include="Data\ParameterValueWriter.cs" />
     <Compile Include="Data\RepeatReader.cs" />
-    <Compile Include="Data\TypeMatcherReader.cs" />
+    <Compile Include="Data\TypeMatcherDCReader.cs" />
     <Compile Include="Data\MultiTypeMatcher.cs" />
     <Compile Include="Data\ParameterValueReader.cs" />
     <Compile Include="Data\SingleTypeMatcher.cs" />
@@ -133,6 +135,8 @@
     <Compile Include="Data\MinusOpReader.cs" />
     <Compile Include="Data\PlusOpReader.cs" />
     <Compile Include="Data\BinOpReader.cs" />
+    <Compile Include="Data\TypeMatcherProperyReader.cs" />
+    <Compile Include="Data\TypeMatcherWatcher.cs" />
     <Compile Include="Data\UniOpReader.cs" />
     <Compile Include="Data\ValueReader.cs" />
     <Compile Include="Data\ValueWriter.cs" />

@@ -1,0 +1,46 @@
+﻿using Kinectitude.Tests.dll{
+    define MockComponent as Kinectitude.Tests.Core.MockComponent
+    define MockComponent2 as Kinectitude.Tests.Core.MockComponent2
+    define Assertion as Kinectitude.Tests.Core.AssertionAction
+}
+
+Game actions(Width = 800, Height=600, FirstScene="test", IsFullScreen="false", val=0, create=1){
+    Scene test(score = 0, val = 1){
+        Entity runTests(val = 2){
+            Event SceneStarts(){
+                FireTrigger(Name="t1")
+            }
+            Event TriggerOccurs(Trigger="t1"){
+                Assertion(LS=1, RS=1, Assertion="t1", OnlyRunIf= "true")
+                CreateTimer(Name="t1", Duration=1, Trigger="t2", Recurring="true")
+                CreateTimer(Name="t1", Duration=2, Trigger="ty", Recurring="true")
+				CreateTimer(Name="tx", Duration=1, Trigger="tx", Recurring="false")
+            }
+            Event TriggerOccurs(Trigger="t2"){
+                Assertion(LS=1, RS=1, Assertion="t2", OnlyRunIf= "true")
+				if(game.create == 1){
+					CreateTimer(Name="t3", Duration=1, Trigger="t3", Recurring="false")
+					Set(Target=game.create, Value = 0)
+				}
+            }
+            Event TriggerOccurs(Trigger="t3"){
+                Assertion(LS=1, RS=1, Assertion="t3", OnlyRunIf= "true")
+                CreateTimer(Name="t4", Duration=5, Trigger="t4", Recurring="false")
+                if(game.val == 0){
+                    PauseTimers(Name="t1")
+                    Set(Target = game.val, Value = 1)
+                }
+            }
+            Event TriggerOccurs(Trigger="t4"){
+				Assertion(LS=1, RS=1, Assertion="t4", OnlyRunIf= "true")
+                ResumeTimers(Name="t1")
+            }
+			Event TriggerOccurs(Trigger="tx"){
+				Assertion(LS=1, RS=1, Assertion="tx", OnlyRunIf= "true")
+            }
+			Event TriggerOccurs(Trigger="ty"){
+				Assertion(LS=1, RS=1, Assertion="ty", OnlyRunIf= "true")
+            }
+        }
+    }
+}

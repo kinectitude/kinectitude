@@ -33,7 +33,7 @@ Game breakout(Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = "f
         
         Component Transform(X = 400, Y = 550, Width = 24, Height=24)
         
-        Component PhysicsComponent(MinimumVelocity = 30,  MaximumVelocity = 30,  XVelocity = -40,
+        Component PhysicsComponent(MinimumVelocity = 50,  MaximumVelocity = 50,  XVelocity = -40,
             YVelocity = -20, Shape = "Ellipse", Restitution = 1, Mass = 1, Friction = 0, 
             LinearDamping = 0, MovesWhenHit = "true", AngularVelocity = 1, FixedRotation = "flase")
         Event TriggerOccurs(Trigger = "gameOver"){
@@ -41,14 +41,15 @@ Game breakout(Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = "f
         }
     }
 
-    Prototype primaryBall : ball(){
+    Prototype primaryBall : ball(ball="primary"){
         Event Collision(CollidesWith = $bottom_wall){
-            SetPosition(X = 400, Y = 300)
+            Set(Target=Transform.X, Value=400)
+            Set(Target=Transform.Y, Value=300)
             Increment(Target = scene.balls , IncrementBy = -1)
         }
     }
 
-    Prototype extraBall : ball (){
+    Prototype extraBall : ball (ball="extra"){
         Event Collision(CollidesWith= $bottom_wall) { 
             Destroy()
         }
@@ -79,8 +80,9 @@ Game breakout(Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = "f
         Component RenderComponent (FillColor="Yellow")
         Event Collision(CollidesWith = $extraBall+$primaryBall){
             CreateEntity(Prototype = "extraBall")
-			CreateEntity(Prototype = "extraBall")
-			CreateEntity(Prototype = "extraBall")
+            CreateEntity(Prototype = "extraBall")
+            CreateEntity(Prototype = "extraBall")
+            Set(Target=scene.show, Value="A " + @CollidesWith.ball + " at X " + @CollidesWith.Transform.X)
         }
     }
 
@@ -231,6 +233,13 @@ Game breakout(Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = "f
                     Set(Target = TextRenderComponent.Value, Value = "GAME OVER")
                     FireTrigger(Name="gameOver")
                 }
+            }
+        }
+        Entity : text(){
+            Component Transform(X = 0, Y = 100, Width = 800)
+            Component TextRenderComponent(Value = "", FontSize = 20, TextAlignment = "Center")
+            Event AttributeChanges(Target = scene.show){
+				Set(Target = TextRenderComponent.Value, Value = "The value of scene.show " + scene.show)
             }
         }
     }

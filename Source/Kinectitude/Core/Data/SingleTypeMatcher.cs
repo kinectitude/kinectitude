@@ -13,12 +13,12 @@ namespace Kinectitude.Core.Data
             Name = name;
         }
 
-        public override bool MatchAndSet(IEntity dataContainer)
+        public override bool MatchAndSet(IEntity entity)
         {
-            Entity entity;
-            if(Scene.EntityByName.TryGetValue(Name, out entity) && entity == DataContainer)
+            Entity match;
+            if(Scene.EntityByName.TryGetValue(Name, out match) && entity == match)
             {
-                DataContainer = entity;
+                Entity = entity as Entity;
                 return true;
             }
             return false;

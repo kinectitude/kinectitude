@@ -12,7 +12,13 @@ namespace Kinectitude.Core.Data
         internal readonly string Param;
         internal readonly DataContainer Owner;
 
-        internal ParameterValueReader(object obj, string param, Scene scene)
+        internal static ParameterValueReader getParameterValueReader(object obj, string param, Scene scene)
+        {
+            Func<ParameterValueReader> create = new Func<ParameterValueReader>(() => new ParameterValueReader(obj, param, scene));
+            return DoubleDictionary<object, string, ParameterValueReader>.getItem(obj, param, create);
+        }
+
+        private ParameterValueReader(object obj, string param, Scene scene)
         {
             Obj = obj;
             Param = param;
@@ -21,6 +27,8 @@ namespace Kinectitude.Core.Data
             else if (typeof(IManager).IsAssignableFrom(objType)) Owner = scene;
             else if (typeof(Service).IsAssignableFrom(objType)) Owner = scene.Game;
             else Owner = null;
+            if (null != Owner)
+                Owner.NotifyOfComponentChange(ClassFactory.GetReferedName(Obj.GetType()) + '.' + Param, Change);
         }
 
         internal override double GetDoubleValue() { return ToNumber<double>(ClassFactory.GetParam(Obj, Param)); }
@@ -30,12 +38,6 @@ namespace Kinectitude.Core.Data
         internal override bool GetBoolValue() { return ToBool(ClassFactory.GetParam(Obj, Param)); }
         internal override string GetStrValue() { return ClassFactory.GetParam(Obj, Param).ToString(); }
         internal override PreferedType PreferedRetType() { return NativeReturnType(ClassFactory.GetParam(Obj, Param)); }
-
-        internal override void notifyOfChange(Action<ValueReader> change) 
-        {
-            if (null != Owner)
-                Owner.NotifyOfComponentChange(ClassFactory.GetReferedName(Obj.GetType()) + '.' + Param, change);
-        }
 
         internal override ValueWriter ConvertToWriter() { return new ParameterValueWriter(this); }
     }

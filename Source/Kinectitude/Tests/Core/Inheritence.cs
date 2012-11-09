@@ -6,21 +6,17 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Loaders;
 using System.Reflection;
-using Kinectitude.Tests.Core.TestMocks;
 
 namespace Kinectitude.Tests.Core
 {
     [TestClass]
-    public class TestSettersAndInheritence
+    public class Inheritence
     {
         [TestMethod]
-        public void Inheritence()
+        [DeploymentItem("core/inheritence.kgl")]
+        public void InheritenceAndSet()
         {
-            string testFile = "core/inheritence.kgl";
-            GameLoader gameLoader = new GameLoader(testFile, new Assembly[] { typeof(TestSettersAndInheritence).Assembly }, 1, 1, null);
-            Game game = gameLoader.CreateGame();
-            game.Start();
-            while (game.Running) game.OnUpdate(1 / 60f);
+            Setup.RunGame("inheritence.kgl");
             AssertionAction.CheckValue("Prototype1 X");
             AssertionAction.CheckValue("Prototype1 Y");
             AssertionAction.CheckValue("Prototype1 score");

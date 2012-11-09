@@ -13,12 +13,14 @@ namespace Kinectitude.Core.Data
         private readonly bool Bval;
         private readonly PreferedType Type;
 
+        internal static readonly ConstantReader NullValue = new ConstantReader(null);
+
         internal ConstantReader(object value)
         {
-
-            Dval = ToNumber<double>(value);
-            Sval = value.ToString();
             Type = NativeReturnType(value);
+            Dval = ToNumber<double>(value);
+            if (value != null) Sval = value.ToString();
+            else Sval = "";
             Bval = ToBool(value);
         }
 
@@ -29,7 +31,6 @@ namespace Kinectitude.Core.Data
         internal override bool GetBoolValue() { return Bval; }
         internal override string GetStrValue() { return Sval; }
         internal override PreferedType PreferedRetType() { return Type; }
-        internal override void notifyOfChange(Action<ValueReader> change) { return; }
         internal override ValueWriter ConvertToWriter() { return new NullWriter(this); }
     }
 }

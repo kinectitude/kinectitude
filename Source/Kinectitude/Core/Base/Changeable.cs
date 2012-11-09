@@ -36,12 +36,7 @@ namespace Kinectitude.Core.Base
 
         protected void Change(string str)
         {
-            if (ShouldCheck)
-            {
-                //TODO there must be a better way?
-                object value = ClassFactory.GetParam(this, str);
-                DataContainer.ChangedProperty(change + '.' + str, value);
-            }
+            if (ShouldCheck) DataContainer.ChangedProperty(change + '.' + str);
         }
     }
 }

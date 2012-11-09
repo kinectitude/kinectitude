@@ -62,7 +62,6 @@ namespace Kinectitude.Core.Base
             RegisterType("FireTrigger", typeof(FireTriggerAction));
             RegisterType("TriggerOccurs", typeof(TriggerOccursEvent));
             RegisterType("Transform", typeof(TransformComponent));
-            RegisterType("SetPosition", typeof(SetPositionAction));
             RegisterType("TimeManager", typeof(TimeManager));
             RegisterType("CreateEntity", typeof(CreateEntityAction));
             RegisterType("Destroy", typeof(DestroyAction));
@@ -96,7 +95,7 @@ namespace Kinectitude.Core.Base
                     }
                     provides.Add(provided.Type);
                 }
-                componentProvides.Add(type, provides);
+                componentProvides[type] = provides;
 
                 List<Type> needs = new List<Type>();
                 foreach (RequiresAttribute requires in type.GetCustomAttributes(true).

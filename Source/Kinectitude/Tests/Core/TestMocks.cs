@@ -10,7 +10,7 @@ using System;
 using System.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Kinectitude.Tests.Core.TestMocks
+namespace Kinectitude.Tests.Core
 {
     public enum TestEnum { value1, value2 }
 
@@ -68,33 +68,118 @@ namespace Kinectitude.Tests.Core.TestMocks
     [Plugin("MockComponent", "")]
     public class MockComponent : Component
     {
+        private int intVal = 0;
         [Plugin("int", "")]
-        public int IntVal { get; set; }
-        [Plugin("double", "")]
-        public double DoubleVal { get; set; }
-        [Plugin("string", "")]
-        public string StrVal { get; set; }
-        [Plugin("boool", "")]
-        public bool BoolVal { get; set; }
-        [Plugin("enum", "")]
-        public TestEnum EnumVal { get; set; }
-        [Plugin("Reader", "")]
-        public ValueReader ReaderVal { get; set; }
-        [Plugin("Writer", "")]
-        public ValueWriter WriterVal { get; set; }
-        [Plugin("Matcher", "")]
-        public TypeMatcher Matcher { get; set; }
-        public bool DestroyedCalled = false;
-        public MockComponent()
-        {
-            DoubleVal = IntVal = 0;
-            StrVal = "";
-            BoolVal = false;
-            EnumVal = TestEnum.value2;
-            ReaderVal = null;
-            WriterVal = null;
-            Matcher = null;
+        public int IntVal { 
+            get { return intVal; }
+            set
+            {
+                if (intVal != value)
+                {
+                    intVal = value;
+                    Change("IntVal");
+                }
+            }
         }
+        double doubleVal = 0;
+        [Plugin("double", "")]
+        public double DoubleVal
+        {
+            get { return doubleVal; }
+            set
+            {
+                if(doubleVal != value)
+                {
+                    doubleVal = value;
+                    Change("DoubleVal");
+                }
+            }
+        }
+        string strVal = "";
+        [Plugin("string", "")]
+        public string StrVal
+        {
+            get { return strVal; }
+            set
+            {
+                if (strVal != value)
+                {
+                    strVal = value;
+                    Change("StrVal");
+                }
+            }
+        }
+        bool boolVal = false;
+        [Plugin("bool", "")]
+        public bool BoolVal
+        {
+            get { return boolVal; }
+            set
+            {
+                if (boolVal != value)
+                {
+                    boolVal = value;
+                    Change("BoolVal");
+                }
+            }
+        }
+        TestEnum enumVal = TestEnum.value1;
+        [Plugin("enum", "")]
+        public TestEnum EnumVal
+        {
+            get { return enumVal; }
+            set
+            {
+                if(enumVal != value)
+                {
+                    enumVal = value;
+                    Change("EnumVal");
+                }
+            }
+        }
+        ValueReader readerVal = null;
+        [Plugin("reader", "")]
+        public ValueReader ReaderVal
+        {
+            get { return readerVal; }
+            set
+            {
+                if (readerVal != value)
+                {
+                    readerVal = value;
+                    Change("ReaderVal");
+                }
+            }
+        }
+        ValueWriter writerVal = null;
+        [Plugin("reader", "")]
+        public ValueWriter WriterVal
+        {
+            get { return WriterVal; }
+            set
+            {
+                if (writerVal != value)
+                {
+                    writerVal = value;
+                    Change("WriterVal");
+                }
+            }
+        }
+        TypeMatcher matcherVal = null;
+        [Plugin("Matcher", "")]
+        public TypeMatcher MatcherVal
+        {
+            get { return matcherVal; }
+            set
+            {
+                if (matcherVal != value)
+                {
+                    matcherVal = value;
+                    Change("MatcherVal");
+                }
+            }
+        }
+        public bool DestroyedCalled = false;
         public override void Destroy() { DestroyedCalled = true; }
     }
 

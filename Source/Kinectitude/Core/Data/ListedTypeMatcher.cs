@@ -16,9 +16,9 @@ namespace Kinectitude.Core.Data
             {
                 if (r.MatchAndSet(entity))
                 {
-                    OldDataContainer = this.DataContainer;
-                    DataContainer = entity as DataContainer;
-                    foreach (Action<DataContainer> toNotify in notify) toNotify(this.DataContainer);
+                    OldEntity = Entity;
+                    Entity = entity as Entity;
+                    foreach (Action<DataContainer> toNotify in notify) toNotify(this.Entity);
                     return true;
                 }
             }

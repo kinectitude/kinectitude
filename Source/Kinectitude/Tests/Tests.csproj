@@ -48,7 +48,10 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\TestSettersAndInheritence.cs" />
+    <Compile Include="Core\Actions.cs" />
+    <Compile Include="Core\Changes.cs" />
+    <Compile Include="Core\Setup.cs" />
+    <Compile Include="Core\Inheritence.cs" />
     <Compile Include="Core\TestMocks.cs" />
     <Compile Include="Editor\ActionTests.cs" />
     <Compile Include="Editor\AttributeTests.cs" />
@@ -78,6 +81,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Core\actions.kgl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Core\changes.kgl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Core\timers.kgl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Core\inheritence.kgl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

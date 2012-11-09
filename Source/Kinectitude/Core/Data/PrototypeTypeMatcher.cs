@@ -13,15 +13,15 @@ namespace Kinectitude.Core.Data
             this.prototype = prototype;
         }
 
-        public override bool MatchAndSet(IEntity dataContainer)
+        public override bool MatchAndSet(IEntity entity)
         {
-            if (prototype.Contains(dataContainer.Id))
+            if (prototype.Contains(entity.Id))
             {
-                OldDataContainer = this.DataContainer;
-                this.DataContainer = dataContainer as DataContainer;
+                OldEntity = this.Entity;
+                Entity = entity as Entity;
                 foreach (Action<DataContainer> toNotify in notify)
                 {
-                    toNotify(this.DataContainer);
+                    toNotify(Entity);
                 }
                 return true;
             }

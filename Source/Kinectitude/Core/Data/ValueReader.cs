@@ -6,11 +6,14 @@ using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Data
 {
-    internal enum PreferedType { String, Number, Boolean }
+    internal enum PreferedType { String, Number, Boolean, Null }
 
     public abstract class ValueReader
     {
         protected readonly List<Action<ValueReader>> Callbacks = new List<Action<ValueReader>>();
+        //TODO change to a null reader when I make one
+        private ConstantReader oldValue = null;
+
         protected ValueWriter Writer { get; private set; }
 
         /*Inconsistent (can be fixed by making dc hold objects
@@ -20,6 +23,7 @@ namespace Kinectitude.Core.Data
          */
         internal static T ToNumber<T>(object obj) where T : struct
         {
+            if (null == obj) return (T)Convert.ChangeType(0, typeof(T));
             if (typeof(string) == obj.GetType())
             {
                 int i = 0;
@@ -36,6 +40,7 @@ namespace Kinectitude.Core.Data
 
         internal static bool ToBool(object obj)
         {
+            if (null == obj) return false;
             Type type = obj.GetType();
             if (typeof(bool) == type)
             {
@@ -52,6 +57,7 @@ namespace Kinectitude.Core.Data
 
         internal static PreferedType NativeReturnType(object value)
         {
+            if (null == value) return PreferedType.Null;
             if (value.GetType() == typeof(string)) return PreferedType.String;
             else if (value.GetType() == typeof(bool)) return PreferedType.Boolean;
             return PreferedType.Number;
@@ -80,8 +86,8 @@ namespace Kinectitude.Core.Data
         internal abstract string GetStrValue();
         public static implicit operator string(ValueReader reader) { return reader.GetStrValue(); }
         internal abstract PreferedType PreferedRetType();
-        internal abstract void notifyOfChange(Action<ValueReader> change);
 
+        internal void notifyOfChange(Action<ValueReader> change) { Callbacks.Add(change); }
 
         internal bool hasSameVal(ValueReader other)
         {
@@ -103,5 +109,17 @@ namespace Kinectitude.Core.Data
         }
 
         public static ValueWriter GetValueWriter(ValueReader reader) { return reader.toValueWriter(); }
+
+        protected void Change()
+        {
+            if (!hasSameVal(oldValue))
+            {
+                foreach (Action<ValueReader> callback in Callbacks) callback(this);
+                oldValue = new ConstantReader(this.GetPreferedValue());
+            }
+        }
+
+        //many value readers notify of change from another vr so use this function instead of creating delegates
+        protected void Change(ValueReader vr) { Change(); }
     }
 }

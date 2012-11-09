@@ -64,10 +64,10 @@ namespace Kinectitude.Core.Data
 
             if (convertLeft)
             {
-                return repeateString(Right.ToString(), Left.GetDoubleValue());
+                return repeateString(Right.GetStrValue(), Left.GetDoubleValue());
             }
 
-            return repeateString(Left.ToString(), Right.GetDoubleValue());
+            return repeateString(Left.GetStrValue(), Right.GetDoubleValue());
         }
 
         internal override PreferedType PreferedRetType()

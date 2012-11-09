@@ -1,0 +1,68 @@
+﻿using Kinectitude.Tests.dll{
+    define MockComponent as Kinectitude.Tests.Core.MockComponent
+    define MockComponent2 as Kinectitude.Tests.Core.MockComponent2
+    define Assertion as Kinectitude.Tests.Core.AssertionAction
+}
+
+Game actions(Width = 800, Height=600, FirstScene="test", IsFullScreen="false", val=0){
+    Prototype prototype(){
+        Event OnCreate(){
+			if(scene.created){
+				Set(Target = scene.created, Value= scene.created + 1)
+			}
+			if(!scene.created){
+				Set(Target = scene.created, Value= 1)
+			}
+            Assertion(LS=scene.created, RS=1, Assertion="Created new entity", OnlyRunIf= "true")
+        }
+    }
+    
+    Scene test(score = 0, val = 1){
+        Entity runTests(val = 2){
+            Event SceneStarts(){
+                CreateEntity(Prototype="prototype")
+                Assertion(LS=scene.created, RS=1, Assertion="Created new entity", OnlyRunIf= "true")
+                Set(Target=game.val, Value = game.val + 1)
+                PushScene(Target="test" + this.val)
+                Assertion(LS=game.lastScene, RS=2, Assertion="Got back from scene 2", OnlyRunIf= "true")
+                Set(Target=runTests.val,Value = this.val + scene.val)
+                PushScene(Target="test" + this.val)
+                Assertion(LS=game.lastScene, RS=3, Assertion="Got back from scene 3", OnlyRunIf= "true")
+                ChangeScene(Target="test4")
+                Increment(Target=game.val, IncrementBy=1)
+                Assertion(LS=game.val, RS=4, Assertion="game's val is correct", OnlyRunIf= "true")
+            }
+        }
+    }
+    
+    Scene test2(){
+        Entity runTests(val = 2){
+            Event SceneStarts(){
+                Set(Target=game.lastScene, Value = 2)
+                Set(Target=runTests.val,Value = this.val + 1)
+                Set(Target=scene.val, Value=10)
+                PopScene()
+            }
+        }
+    }
+    
+    Scene test3(){
+        Entity runTests(val = 2){
+            Event SceneStarts(){
+                Set(Target=game.lastScene, Value = 3)
+                Set(Target=game.val, Value = game.val + 2)
+                Set(Target=runTests.val,Value = this.val + 100)
+                Set(Target=scene.val, Value=220)
+                PopScene()
+            }
+        }
+    }
+    
+    Scene test4(){
+        Entity runTests(){
+            Event SceneStarts(){
+                PopScene()
+            }
+        }
+    }
+}

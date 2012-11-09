@@ -24,7 +24,7 @@ namespace Kinectitude.Core.Events
 
         public void Trigger(ValueReader newValue)
         {
-            if (Value == Target) DoActions();
+            if (Value.hasSameVal(Target)) DoActions();
         }
     }
 }
