@@ -15,7 +15,8 @@ namespace Kinectitude.Core.Data
 
         public override bool MatchAndSet(IEntity entity)
         {
-            if (prototype.Contains(entity.Id))
+            Entity who = entity as Entity;
+            if (prototype.Contains(who.Id))
             {
                 OldEntity = this.Entity;
                 Entity = entity as Entity;

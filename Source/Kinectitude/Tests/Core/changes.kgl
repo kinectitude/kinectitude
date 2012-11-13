@@ -4,7 +4,7 @@
     define Assertion as Kinectitude.Tests.Core.AssertionAction
 }
 
-Game actions(Width = 800, Height=600, FirstScene="test", IsFullScreen="false"){
+Game (Width = 800, Height=600, FirstScene="test", IsFullScreen="false"){
     Scene test(lol = "lollol"){
         Entity runTests(){
             Component MockComponent()

@@ -114,7 +114,6 @@
     <Compile Include="Data\TypeMatcherDCReader.cs" />
     <Compile Include="Data\MultiTypeMatcher.cs" />
     <Compile Include="Data\ParameterValueReader.cs" />
-    <Compile Include="Data\SingleTypeMatcher.cs" />
     <Compile Include="Data\ListedTypeMatcher.cs" />
     <Compile Include="Data\PrototypeTypeMatcher.cs" />
     <Compile Include="Data\TypeMatcher.cs" />
@@ -136,7 +135,9 @@
     <Compile Include="Data\PlusOpReader.cs" />
     <Compile Include="Data\BinOpReader.cs" />
     <Compile Include="Data\TypeMatcherProperyReader.cs" />
+    <Compile Include="Data\TypeMatcherProperyWriter.cs" />
     <Compile Include="Data\TypeMatcherWatcher.cs" />
+    <Compile Include="Data\TypeMatchreDCWriter.cs" />
     <Compile Include="Data\UniOpReader.cs" />
     <Compile Include="Data\ValueReader.cs" />
     <Compile Include="Data\ValueWriter.cs" />
@@ -145,9 +146,6 @@
     <Compile Include="Events\OnCreateEvent.cs" />
     <Compile Include="Events\SceneStartsEvent.cs" />
     <Compile Include="Events\TriggerOccursEvent.cs" />
-    <Compile Include="Exceptions\InvalidAttributeException.cs" />
-    <Compile Include="Exceptions\InvalidValueWriterException.cs" />
-    <Compile Include="Exceptions\MissingRequirementsException.cs" />
     <Compile Include="Language\KinectitudeGrammar.cs" />
     <Compile Include="Loaders\GameLoader.cs">
       <SubType>Code</SubType>

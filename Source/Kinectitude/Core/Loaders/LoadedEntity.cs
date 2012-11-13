@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Kinectitude.Core.Base;
-using Kinectitude.Core.Exceptions;
 using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Loaders
@@ -88,8 +87,9 @@ namespace Kinectitude.Core.Loaders
 
                 if (missing.Count != 0)
                 {
-                    string identity = null != Name ? Name : "Entity " + id.ToString();
-                    throw MissingRequirementsException.MissingRequirement(identity, missing);
+                    string identity = null != Name ? Name : "An unnamed entity";
+                    string message = identity + " is missing required components: " + string.Join(",", missing);
+                    Game.CurrentGame.Die(message);
                 }
                 firstCreate = false;
             }
@@ -101,8 +101,11 @@ namespace Kinectitude.Core.Loaders
                 addToType(scene.IsType, Name, id);
                 if (!isPrototype)
                 {
-                    entity.Name = Name;
-                    scene.EntityByName.Add(entity.Name, entity);
+                    if (scene.EntityByName.ContainsKey(Name))
+                    {
+                        Game.CurrentGame.Die("Entity with the name " + Name + " in the scene " + scene.Name);
+                    }
+                    scene.EntityByName.Add(Name, entity);
                 }
             }
             entity.Scene = scene;

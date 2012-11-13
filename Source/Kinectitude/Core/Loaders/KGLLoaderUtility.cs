@@ -252,10 +252,7 @@ namespace Kinectitude.Core.Loaders
             if (node.Term == KinectitudeGrammar.IsType)
                 return new PrototypeTypeMatcher(scene.GetOfPrototype(node.ChildNodes[0].Token.ValueString, false));
             
-            if (node.Term == KinectitudeGrammar.IsExactType)
-                return new PrototypeTypeMatcher(scene.GetOfPrototype(node.ChildNodes[0].Token.ValueString, true));
-
-            return new SingleTypeMatcher(node.ChildNodes[0].Token.ValueString, scene);
+            return new PrototypeTypeMatcher(scene.GetOfPrototype(node.ChildNodes[0].Token.ValueString, true));
         }
 
         private TypeMatcher makeTypeMatcher(ParseTreeNode node, Scene scene)

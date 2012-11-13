@@ -5,7 +5,7 @@
 }
 
 
-Game inheritence(Width = 800, Height=600, FirstScene="test", IsFullScreen="false", X="15"){
+Game (Width = 800, Height=600, FirstScene="test", IsFullScreen="false", X="15"){
     Prototype prototype1(score=100, Z = "X", TESTVAL=1){
         Component Transform(X = 1000, Y = 2000)
         Component MockComponent(EnumVal = "value1", IntVal=this.Transform.X)

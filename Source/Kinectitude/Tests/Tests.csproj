@@ -53,6 +53,7 @@
     <Compile Include="Core\Setup.cs" />
     <Compile Include="Core\Inheritence.cs" />
     <Compile Include="Core\TestMocks.cs" />
+    <Compile Include="Core\TypeMatcherTests.cs" />
     <Compile Include="Editor\ActionTests.cs" />
     <Compile Include="Editor\AttributeTests.cs" />
     <Compile Include="Editor\ComponentTests.cs" />
@@ -85,6 +86,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Core\changes.kgl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Core\typeMatcher.kgl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Core\timers.kgl">

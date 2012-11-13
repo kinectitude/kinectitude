@@ -29,7 +29,8 @@ namespace Kinectitude.Core.Data
             Param = param;
             Type objType = obj.GetType();
             Owner = owner;
-            Owner.NotifyOfComponentChange(ClassFactory.GetReferedName(Obj.GetType()) + '.' + Param, change);
+            if(typeof(Changeable).IsAssignableFrom(obj.GetType()))
+                Owner.NotifyOfComponentChange(ClassFactory.GetReferedName(Obj.GetType()) + '.' + Param, change);
         }
 
         internal TypeMatcher GetTypeMatcher() { return ClassFactory.GetParam(Obj, Param) as TypeMatcher; }

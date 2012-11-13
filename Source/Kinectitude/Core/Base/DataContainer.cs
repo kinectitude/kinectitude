@@ -5,7 +5,7 @@ using SysAction = System.Action;
 
 namespace Kinectitude.Core.Base
 {
-    public abstract class DataContainer : IEntity
+    public abstract class DataContainer
     {
         private readonly Dictionary<string, ValueReader> attributes = new Dictionary<string, ValueReader>();
         private readonly Dictionary<string, List<SysAction>> callbacks = new Dictionary<string, List<SysAction>>();
@@ -15,25 +15,9 @@ namespace Kinectitude.Core.Base
 
         public bool Deleted { get; protected set; }
 
-        private int id;
-        public int Id {
-            get { return id; }
-            private set
-            {
-                id = value;
-                attributes["Id"] = new ConstantReader(id);
-            }
-        }
+        public int Id { get; private set; }
 
-        private string name;
-        public string Name {
-            get { return name; }
-            set
-            {
-                name = value;
-                attributes["Name"] = new ConstantReader(value);
-            }
-        }
+        public string Name { get; set; }
 
         public ValueReader this[string key]
         {
@@ -46,10 +30,6 @@ namespace Kinectitude.Core.Base
             set
             {
                 if (Deleted) return;
-                if ("Name" == key || "Id" == key)
-                {
-                    throw new ArgumentException("Name And Id can't be changed");
-                }
 
                 ValueReader reader;
                 if (typeof(ConstantReader) == value.GetType()) reader = value;

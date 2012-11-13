@@ -187,7 +187,7 @@ namespace Kinectitude.Core.Language
             Uses.Rule = "using" + ClassName + openBrace + Definitions + closeBrace + Uses | Empty;
             Definitions.Rule = "define" + Name + "as" + ClassName + Definitions | "define" + Name + "as" + ClassName;
 
-            Game.Rule = Uses + "Game" + Name + BasicDefinition + openBrace + Prototype + Scenes + closeBrace;
+            Game.Rule = Uses + "Game"  + BasicDefinition + openBrace + Prototype + Scenes + closeBrace;
             #endregion
 
             Root = Game;

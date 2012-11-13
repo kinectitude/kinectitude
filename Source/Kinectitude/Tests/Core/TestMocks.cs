@@ -65,6 +65,42 @@ namespace Kinectitude.Tests.Core
         }
     }
 
+    public class MatcherManager : Manager<MockMatchComponent>
+    {
+        public readonly List<MockMatchHappensEvent> Events = new List<MockMatchHappensEvent>();
+        public override void OnUpdate(float frameDelta)
+        {
+            foreach (MockMatchHappensEvent evt in Events)
+            {
+                foreach(MockMatchComponent child in Children)
+                {
+                    if (evt.MatcherVal.MatchAndSet(child.IEntity)) evt.DoActions();
+                }
+            }
+        }
+    }
+
+    public class MockMatchComponent : Component
+    {
+        public override void Ready()
+        {
+            GetManager<MatcherManager>().Add(this);
+        }
+
+        public override void Destroy() { }
+    }
+
+    public class MockMatchHappensEvent : Event
+    {
+        [Plugin("Matcher", "")]
+        public TypeMatcher MatcherVal { get; set; }
+
+        public override void OnInitialize()
+        {
+            GetManager<MatcherManager>().Events.Add(this);
+        }
+    }
+
     [Plugin("MockComponent", "")]
     public class MockComponent : Component
     {

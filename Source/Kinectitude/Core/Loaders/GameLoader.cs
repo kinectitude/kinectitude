@@ -27,7 +27,6 @@ namespace Kinectitude.Core.Loaders
             foreach (Tuple<string, object> gameValue in gameProperties)
                 Game[gameValue.Item1] = loaderUtility.MakeAssignable(gameValue.Item2) as ValueReader;
 
-            Game.Name = loaderUtility.GetName(root);
             FirstScene = loaderUtility.MakeAssignable(gameProperties["FirstScene"]) as ValueReader;
             //TODO for Widht, Height, IsFullScreen
 
@@ -62,10 +61,10 @@ namespace Kinectitude.Core.Loaders
         }
 
         public GameLoader
-            (string fileName, Assembly [] preloads, float scaleX, float scaleY, Func<Tuple<int, int>> windowOffset)
+            (string fileName, Assembly [] preloads, float scaleX, float scaleY, Func<Tuple<int, int>> windowOffset, Action<string> die)
         {
 
-            Game = new Game(this, scaleX, scaleY, windowOffset);
+            Game = new Game(this, scaleX, scaleY, windowOffset, die);
 
             string extention = fileName.Substring(fileName.IndexOf('.'));
             if (".kgl" == extention)
@@ -83,7 +82,7 @@ namespace Kinectitude.Core.Loaders
                 if (!LoadedFiles.ContainsKey(name))
                 {
                     LoadedFiles.Add(name, loaded);
-                    ClassFactory.LoadServices(loaded);
+                    ClassFactory.LoadServicesAndManagers(loaded);
                 }
             }
         }
@@ -96,7 +95,7 @@ namespace Kinectitude.Core.Loaders
             if (!LoadedFiles.ContainsKey(file))
             {
                 assembly =  Assembly.LoadFrom(Path.Combine(Environment.CurrentDirectory, "plugins", file));
-                ClassFactory.LoadServices(assembly);
+                ClassFactory.LoadServicesAndManagers(assembly);
                 LoadedFiles.Add(file, assembly);
             }
             else
@@ -104,6 +103,7 @@ namespace Kinectitude.Core.Loaders
                 assembly = LoadedFiles[file];
             }
             ClassFactory.RegisterType(named, assembly.GetType(fullName));
+
         }
 
         internal LoadedEntity entityParse(object entity, string name, int id)

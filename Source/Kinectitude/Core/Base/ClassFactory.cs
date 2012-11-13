@@ -7,7 +7,6 @@ using Kinectitude.Core.Actions;
 using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Components;
 using Kinectitude.Core.Events;
-using Kinectitude.Core.Exceptions;
 using Kinectitude.Core.Managers;
 using Kinectitude.Core.Data;
 
@@ -71,13 +70,18 @@ namespace Kinectitude.Core.Base
             RegisterType("OnCreate", typeof(OnCreateEvent));
         }
 
-        internal static void LoadServices(Assembly assembly)
+        internal static void LoadServicesAndManagers(Assembly assembly)
         {
             foreach(Type type in assembly.GetTypes().Where(item => typeof(Service).IsAssignableFrom(item)))
             {
                 Service service = Activator.CreateInstance(type) as Service;
                 Game.CurrentGame.SetService(service);
                 if (service.AutoStart()) service.Start();
+            }
+
+            foreach (Type type in assembly.GetTypes().Where(item => typeof(IManager).IsAssignableFrom(item)))
+            {
+                ConstructorTypes[type] = createConstructorDelegate(type);
             }
         }
 
@@ -89,10 +93,7 @@ namespace Kinectitude.Core.Base
                 foreach (ProvidesAttribute provided in type.GetCustomAttributes(true).
                     Where(input => input.GetType() == typeof(ProvidesAttribute)))
                 {
-                    if (!provided.Type.IsAssignableFrom(type))
-                    {
-                        throw new ArgumentException(type.FullName + " can't provide " + provided.Type.FullName);
-                    }
+                    if (!provided.Type.IsAssignableFrom(type)) Game.CurrentGame.Die(type.FullName + " can't provide " + provided.Type.FullName);
                     provides.Add(provided.Type);
                 }
                 componentProvides[type] = provides;
@@ -106,7 +107,9 @@ namespace Kinectitude.Core.Base
                 componentNeeds[type] = needs;
             }
 
-            constructors[registeredName] = ConstructorTypes[type] = createConstructorDelegate(type);
+            Func<object> creator;
+            if (ConstructorTypes.TryGetValue(type, out creator)) constructors[registeredName] = creator;
+            else constructors[registeredName] = ConstructorTypes[type] = createConstructorDelegate(type);
 
             settersByType[type] = new Dictionary<string, Action<object, object>>();
             referedDictionary[type] = registeredName;
@@ -155,10 +158,9 @@ namespace Kinectitude.Core.Base
         internal static void SetParam(object obj, string param, object val)
         {
             Type setType = null;
+            
             if(!paramType[obj.GetType()].TryGetValue(param, out setType))
-            {
-                throw new InvalidAttributeException(param, referedDictionary[obj.GetType()]);
-            }
+                Game.CurrentGame.Die(referedDictionary[obj.GetType()] + " does not have parameter " + param);
 
             Dictionary<string, Action<object, object>> setters = settersByType[obj.GetType()];
 

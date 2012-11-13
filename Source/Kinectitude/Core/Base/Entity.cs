@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Kinectitude.Core.Exceptions;
 using Kinectitude.Core.Events;
 using Kinectitude.Core.Data;
 using SysAction = System.Action;
@@ -39,7 +38,11 @@ namespace Kinectitude.Core.Base
         internal Component GetComponent(string name)
         {
             Component component = null;
-            componentNameDictionary.TryGetValue(name, out component);
+            if (!componentNameDictionary.TryGetValue(name, out component))
+            {
+                string identity = null != Name ? Name : "An unnamed entity";
+                Game.CurrentGame.Die(identity + " does not have a " + name + " component");
+            }
             return component;
         }
 

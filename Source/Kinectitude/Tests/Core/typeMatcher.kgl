@@ -1,0 +1,64 @@
+﻿using Kinectitude.Tests.dll{
+    define MatchC as Kinectitude.Tests.Core.MockMatchComponent
+    define MatchE as Kinectitude.Tests.Core.MockMatchHappensEvent
+    define Assertion as Kinectitude.Tests.Core.AssertionAction
+}
+
+Game (Width = 800, Height=600, FirstScene="test", IsFullScreen="false", val=0){
+    Prototype p1(){ }
+    Prototype p2(){ }
+    Prototype p3 : p1, p2(){ }
+    Prototype p4(){ }
+    
+    Scene test(score = 0, val = 1){
+        Entity : p1(){
+            Component MatchC()
+        }
+        Entity : p2(){
+            Component MatchC()
+        }
+        Entity : p2(){
+            Component MatchC()
+        }
+        Entity : p3(){
+            Component MatchC()
+        }
+        Entity : p4, p1(){
+            Component MatchC()
+        }
+        
+        Entity run(name = run){
+            Component MatchC()
+            Event MatchE(MatcherVal = $run){
+                Assertion(LS=1, RS=1, Assertion="$run", OnlyRunIf=1 == 1)
+            }
+            Event MatchE(MatcherVal = $p1){
+                Assertion(LS=1, RS=1, Assertion="$p1", OnlyRunIf=1 == 1)
+            }
+            Event MatchE(MatcherVal = $p2){
+                Assertion(LS=1, RS=1, Assertion="$p2", OnlyRunIf=1 == 1)
+            }
+            Event MatchE(MatcherVal = $p3){
+                Assertion(LS=1, RS=1, Assertion="$p3", OnlyRunIf=1 == 1)
+            }
+            Event MatchE(MatcherVal = $p4){
+                Assertion(LS=1, RS=1, Assertion="$p4", OnlyRunIf=1 == 1)
+            }
+            Event MatchE(MatcherVal = #run){
+                Assertion(LS=1, RS=1, Assertion="#run", OnlyRunIf=1 == 1)
+            }
+            Event MatchE(MatcherVal = #p1){
+                Assertion(LS=1, RS=1, Assertion="#p1", OnlyRunIf=1 == 1)
+            }
+            Event MatchE(MatcherVal = #p2){
+                Assertion(LS=1, RS=1, Assertion="#p2", OnlyRunIf=1 == 1)
+            }
+            Event MatchE(MatcherVal = #p3){
+                Assertion(LS=1, RS=1, Assertion="#p3", OnlyRunIf=1 == 1)
+            }
+            Event MatchE(MatcherVal = #p4){
+                Assertion(LS=1, RS=1, Assertion="#p4", OnlyRunIf=1 == 1)
+            }
+        }
+    }
+}

@@ -102,13 +102,13 @@ namespace Kinectitude.Core.Data
         }
 
         internal abstract ValueWriter ConvertToWriter();
-        private ValueWriter toValueWriter()
+        internal ValueWriter GetValueWriter()
         {
             if (null == Writer) Writer = ConvertToWriter();
             return Writer;
         }
 
-        public static ValueWriter GetValueWriter(ValueReader reader) { return reader.toValueWriter(); }
+        public static ValueWriter GetValueWriter(ValueReader reader) { return reader.GetValueWriter(); }
 
         protected void Change()
         {

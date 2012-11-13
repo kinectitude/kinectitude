@@ -22,6 +22,12 @@ namespace Kinectitude.Player
         private readonly Game game;
         private readonly DirectInputService directInputService;
 
+        private void die(string message)
+        {
+            MessageBox.Show(message, "Game Error");
+            Environment.Exit(1);
+        }
+
         public Application()
         {
             Assembly renderAssembly = Assembly.GetAssembly(typeof(RenderService));
@@ -32,8 +38,8 @@ namespace Kinectitude.Player
 
             Func<Tuple<int, int>> windowOffset = new Func<Tuple<int, int>>(() => new Tuple<int, int>(form.Left, form.Top));
 
-            GameLoader gameLoader = new GameLoader("Game.xml",
-                new Assembly[] { renderAssembly, directAssemdly }, 96 / dpi.Width, 90 / dpi.Height, windowOffset);
+            GameLoader gameLoader = new GameLoader("Game.xml", new Assembly[] { renderAssembly, directAssemdly }, 
+                96 / dpi.Width, 90 / dpi.Height, windowOffset, die);
 
             game = gameLoader.CreateGame();
             Size size = new Size((int)(game.Width * dpi.Width / 96.0f), (int)(game.Height * dpi.Height / 96.0f));

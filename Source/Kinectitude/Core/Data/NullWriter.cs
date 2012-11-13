@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Kinectitude.Core.Base;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,9 @@ namespace Kinectitude.Core.Data
     internal class NullWriter : ValueWriter
     {
         public NullWriter(ValueReader reader) : base(reader) { }
-        public override void SetValue(ValueReader value){ }
+        public override void SetValue(ValueReader value) 
+        {
+            Game.CurrentGame.Die("The target of a write must be a single attribute or property name");
+        }
     }
 }

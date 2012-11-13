@@ -62,7 +62,7 @@ namespace Kinectitude.Render
             bitmaps = new Dictionary<string, Bitmap>();
             brushes = new Dictionary<Tuple<Color4, float>, SolidColorBrush>();
             writeFactory = new SlimDX.DirectWrite.Factory(SlimDX.DirectWrite.FactoryType.Shared);
-            clearColor = new Color4(0.30f, 0.30f, 0.80f);
+            clearColor = new Color4(1, 1, 1);
             PixelFormat pixelFormat = new PixelFormat(SlimDX.DXGI.Format.B8G8R8A8_UNorm, AlphaMode.Premultiplied);
             bitmapProperties = new BitmapProperties() { PixelFormat = pixelFormat };
         }

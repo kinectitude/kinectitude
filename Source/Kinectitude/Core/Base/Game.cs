@@ -12,6 +12,8 @@ namespace Kinectitude.Core.Base
         private readonly Stack<Scene> currentScenes = new Stack<Scene>();
         internal static Game CurrentGame { get; private set; }
         public bool Running { get; private set; }
+        
+        internal readonly Action<string> Die;
 
         private readonly Dictionary<Type, Service> services = new Dictionary<Type, Service>();
 
@@ -33,7 +35,7 @@ namespace Kinectitude.Core.Base
         internal Tuple<int, int> GetWidowOffset() { return WindowOffset(); }
         internal Tuple<int, int> GetWinowSize() { return new Tuple<int, int>(Width, Height); }
 
-        internal Game(GameLoader gameLoader, float scaleX, float scaleY, Func<Tuple<int, int>> windowOffset) : base(-2)
+        internal Game(GameLoader gameLoader, float scaleX, float scaleY, Func<Tuple<int, int>> windowOffset, Action<string> die) : base(-2)
         {
             this.GameLoader = gameLoader;
             CurrentGame = this;
@@ -41,6 +43,7 @@ namespace Kinectitude.Core.Base
             ScaleY = scaleY;
             WindowOffset = windowOffset;
             Running = true;
+            Die = die;
         }
 
         public void Start()

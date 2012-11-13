@@ -8,8 +8,8 @@ namespace Kinectitude.Core.Data
 {
     internal sealed class TypeMatcherDCReader : RepeatReader
     {
-        private readonly TypeMatcherWatcher Watcher;
-        private readonly string Param;
+        internal readonly TypeMatcherWatcher Watcher;
+        internal readonly string Param;
         Entity lastEntity = null;
 
         protected override ValueReader Reader
@@ -40,7 +40,7 @@ namespace Kinectitude.Core.Data
             entity.StopNotifications(Param, Change);
             Change();
         }
-
-        internal override ValueWriter ConvertToWriter() { return new NullWriter(this); }
+        //TODO make this
+        internal override ValueWriter ConvertToWriter() { return new TypeMatchreDCWriter(this); }
     }
 }
