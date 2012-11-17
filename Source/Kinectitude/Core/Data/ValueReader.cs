@@ -12,9 +12,10 @@ namespace Kinectitude.Core.Data
     {
         protected readonly List<Action<ValueReader>> Callbacks = new List<Action<ValueReader>>();
         //TODO change to a null reader when I make one
-        private ConstantReader oldValue = null;
+        private ConstantReader oldValue = ConstantReader.NullValue;
 
         protected ValueWriter Writer { get; private set; }
+        internal abstract ConstantReader NullEquals { get; }
 
         /*Inconsistent (can be fixed by making dc hold objects
          * entity.x = true
@@ -89,7 +90,7 @@ namespace Kinectitude.Core.Data
 
         internal void notifyOfChange(Action<ValueReader> change) { Callbacks.Add(change); }
 
-        internal bool hasSameVal(ValueReader other)
+        internal bool HasSameVal(ValueReader other)
         {
             if (other == null) return false;
             if (PreferedRetType() != other.PreferedRetType()) return false;
@@ -112,7 +113,7 @@ namespace Kinectitude.Core.Data
 
         protected void Change()
         {
-            if (!hasSameVal(oldValue))
+            if (!(HasSameVal(oldValue) || oldValue.PreferedRetType() == PreferedType.Null && HasSameVal(NullEquals)))
             {
                 foreach (Action<ValueReader> callback in Callbacks) callback(this);
                 oldValue = new ConstantReader(this.GetPreferedValue());

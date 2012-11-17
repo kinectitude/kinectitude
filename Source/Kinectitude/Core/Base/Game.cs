@@ -91,7 +91,9 @@ namespace Kinectitude.Core.Base
 
         internal void PopScene()
         {
-            currentScenes.Peek().Running = false;
+            Scene currentScene = currentScenes.Peek();
+            currentScene.Running = false;
+            currentScene.Destroy();
             currentScenes.Pop();
             if (0 == currentScenes.Count) Quit();
             else currentScenes.Peek().Running = true;

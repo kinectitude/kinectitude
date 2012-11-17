@@ -19,7 +19,7 @@ namespace Kinectitude.Core.Language
         internal static readonly RegexBasedTerminal Name = new RegexBasedTerminal("Name", "[a-zA-Z][a-zA-Z0-9_]*");
         internal static readonly Terminal Number = TerminalFactory.CreateCSharpNumber("Number");
         internal static readonly Terminal Str = TerminalFactory.CreateCSharpString("Str");
-        internal static readonly Terminal ClassName = new RegexBasedTerminal("className", @"@?[a-z_A-Z]\w+(?:\.@?[a-z_A-Z]\w+)*");
+        internal static readonly Terminal ClassName = new RegexBasedTerminal("ClassName", @"@?[a-z_A-Z]\w+(?:\.@?[a-z_A-Z]\w+)*");
 
         #region kinectitude key words and parts
         internal static readonly NonTerminal Game = new NonTerminal("Game", "Game");
@@ -43,6 +43,7 @@ namespace Kinectitude.Core.Language
         internal static readonly NonTerminal Uses = new NonTerminal("Uses", "Uses");
         internal static readonly NonTerminal Classes = new NonTerminal("Classes", "Classes");
         internal static readonly NonTerminal Definitions = new NonTerminal("Definitions", "Definitions");
+        internal static readonly NonTerminal Assignment = new NonTerminal("Assignment", "Assignment");
         #endregion
 
         #region Key Types of KGL
@@ -62,12 +63,20 @@ namespace Kinectitude.Core.Language
 
         #region operator terminals
         //ToTerm needs an instance, but reference to these are needed.
-        internal readonly Terminal Becomes, Eql, Lt, Gt, Le, Ge, Neq, Plus, Minus, Mult, Div, Rem, Pow, And, Or, Not,
+        internal Terminal Becomes, Eql, Lt, Gt, Le, Ge, Neq, Plus, Minus, Mult, Div, Rem, Pow, And, Or, Not,
             LeftShift, RightShift, PlusEq, MinusEq, MultEq, DivEq, RemEq, PowEq, RshiftEq, LshiftEq;
         #endregion
 
+        internal readonly Dictionary<string, ConstantReader> Constants = new Dictionary<string, ConstantReader>();
+
         public KinectitudeGrammar()
         {
+            #region constants
+            Constants.Add("true", ConstantReader.TrueValue);
+            Constants.Add("false", ConstantReader.FalseValue);
+            Constants.Add("Pi", new ConstantReader(Math.PI));
+            Constants.Add("E", new ConstantReader(Math.E));
+            #endregion
             #region operator terminals
             Terminal openBrace = ToTerm("{");
             Terminal closeBrace = ToTerm("}");
@@ -106,7 +115,6 @@ namespace Kinectitude.Core.Language
             #region values
             NonTerminal value = new NonTerminal("value");
             NonTerminal exactValue = new NonTerminal("exactValue", "exactValue");
-            //NonTerminal legalSetValue = new NonTerminal("legalSetValue", "legalSetValue");
             #endregion
 
             #region value rules
@@ -151,7 +159,8 @@ namespace Kinectitude.Core.Language
             #region game creation rules
             NonTerminal IsPrototype = new NonTerminal("IsPrototype", "IsPrototype");
 
-            value.Rule = TypeMatcher | Expr;
+            AddTermsReportGroup("constants", "true", "false", "Pi", "E");
+            value.Rule =  TypeMatcher | Expr;
 
             Names.Rule = Name + comma + Names | Name;
             IsPrototype.Rule = colon + Names | Empty;
@@ -160,10 +169,6 @@ namespace Kinectitude.Core.Language
 
             Properties.Rule = Identifier + Becomes + value | Identifier + Becomes + value + comma + Properties | Empty;
             EntityDefinition.Rule = IsPrototype + BasicDefinition + openBrace + Component + Evt + closeBrace;
-
-            /*assignments.Rule = exactValue + becomes + value | exactValue + plusEq + value | 
-                exactValue + minusEq + value | exactValue + multEq + value | exactValue + remEq + value | 
-                exactValue + divEq + value | */
 
             Prototype.Rule = "Prototype" + Name + EntityDefinition + Prototype | Empty;
             Manager.Rule = "Manager" + ClassName + BasicDefinition + Manager | Empty;
@@ -196,7 +201,6 @@ namespace Kinectitude.Core.Language
                  ",", "if", "Component", "Manager", "Prototype", "=", ".", "as", "Event");
 
             MarkTransient(BasicDefinition, value, IsPrototype, term, exactValue, OptionalActions);
-            //LanguageFlags = LanguageFlags.CreateAst;
         }
     }
 }

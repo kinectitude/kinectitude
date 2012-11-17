@@ -54,7 +54,7 @@ namespace Kinectitude.Tests.Core
                     Assertions[Assertion] = assertionList;
                 }
 
-                if (Type) assertionList.Add(LS.hasSameVal(RS));
+                if (Type) assertionList.Add(LS.HasSameVal(RS));
                 else assertionList.Add(LS.GetStrValue() == RS.GetStrValue());
             }
         }
@@ -222,6 +222,31 @@ namespace Kinectitude.Tests.Core
     //Have a second component to test with
     [Plugin("MockComponent2", "")]
     public class MockComponent2 : MockComponent { }
+
+    [Plugin("Manager", "")]
+    public class MockManager : Manager<SubscribeComponent>
+    {
+        [Plugin("bool", "")]
+        public bool BoolVal { get; set; }
+        public static int Added = 0;
+        public override void OnUpdate(float frameDelta) { }
+        public MockManager() { BoolVal = false; }
+        protected override void OnAdd(SubscribeComponent item)
+        {
+            Added++;
+        }
+    }
+
+    [Plugin("Component register", "")]
+    public class SubscribeComponent : Component
+    {
+
+        public override void Destroy() { }
+        public override void Ready()
+        {
+            GetManager<MockManager>().Add(this);
+        }
+    }
 
     [Plugin("MockRequiersComponent", "")]
     [Requires(typeof(TransformComponent))]

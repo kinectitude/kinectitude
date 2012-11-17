@@ -16,10 +16,15 @@ namespace Kinectitude.Core.Data
             get { return DataContainer[Param]; }
         }
 
-        internal static DataContainerReader getDataContainerReader(DataContainer dataContainer, string param)
+        internal static DataContainerReader GetDataContainerReader(DataContainer dataContainer, string param)
         {
             Func<DataContainerReader> create = new Func<DataContainerReader>(() => new DataContainerReader(dataContainer, param));
-            return DoubleDictionary<DataContainer, string, DataContainerReader>.getItem(dataContainer, param, create);
+            return DoubleDictionary<DataContainer, string, DataContainerReader>.GetItem(dataContainer, param, create);
+        }
+
+        internal static void DeleteDataContainer(DataContainer dataContainer)
+        {
+            DoubleDictionary<DataContainer, string, DataContainerReader>.DeleteDict(dataContainer);
         }
 
         private DataContainerReader(DataContainer dataContainer, string param)

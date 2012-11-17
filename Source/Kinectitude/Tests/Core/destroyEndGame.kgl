@@ -1,0 +1,28 @@
+﻿using Kinectitude.Tests.dll{
+    define Assertion as Kinectitude.Tests.Core.AssertionAction
+}
+
+Game (Width = 800, Height=600, FirstScene="testing", IsFullScreen=false, val=0){
+    Scene testing(){
+		Entity(){
+			Event SceneStarts(){
+                PushScene(Target="test")
+            }
+		}
+	}
+    Scene test(score = 0, val = 1){
+        Entity(){
+            Event SceneStarts(){
+                FireTrigger(Name="trigger")
+                FireTrigger(Name="trigger")
+                Quit()
+            }
+        }
+        Entity(){
+            Event TriggerOccurs(Trigger="trigger"){
+                Assertion(LS=true, RS=true, Assertion="run trigger", OnlyRunIf= true)
+                Destroy()
+            }
+        }
+    }
+}

@@ -22,7 +22,7 @@ namespace Kinectitude.Core.Loaders
         {
             Component created = ClassFactory.Create<Component>(Name);
             created.Entity = entity;
-            setValues(created, null, entity);
+            setValues(created, null, entity, entity.Scene);
             return created;
         }
 

@@ -7,6 +7,7 @@ namespace Kinectitude.Core.Data
 {
     internal sealed class NegOpReader : UniOpReader
     {
+        internal override ConstantReader NullEquals { get { return ConstantReader.ZeroValue; } }
         internal NegOpReader(ValueReader reader) : base(reader) { }
         internal override double GetDoubleValue() { return -Reader.GetDoubleValue(); }
         internal override float GetFloatValue() { return -Reader.GetFloatValue(); }

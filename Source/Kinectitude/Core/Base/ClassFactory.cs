@@ -68,6 +68,7 @@ namespace Kinectitude.Core.Base
             RegisterType("PauseTimers", typeof(PauseTimersAction));
             RegisterType("ResumeTimers", typeof(ResumeTimersAction));
             RegisterType("OnCreate", typeof(OnCreateEvent));
+            RegisterType("Quit", typeof(QuitAction));
         }
 
         internal static void LoadServicesAndManagers(Assembly assembly)

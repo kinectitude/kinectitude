@@ -32,10 +32,8 @@ namespace Kinectitude.Core.Loaders
             Parser parser = new Parser(grammar);
             string src = File.ReadAllText(fileName);
             ParseTree parseTree = parser.Parse(src, fileName);
-            if (parseTree.HasErrors())
-            {
-                //TODO
-            }
+            //TODO find out what to do here to get the error to show
+            if (parseTree.HasErrors()) Game.CurrentGame.Die("Can't construct game ");
             Root = parseTree.Root;
         }
 
@@ -67,7 +65,9 @@ namespace Kinectitude.Core.Loaders
             ParseTreeNode node = from as ParseTreeNode;
             ParseTreeNode nameNode = node.ChildNodes.FirstOrDefault(child => child.Term == KinectitudeGrammar.Name);
             if (nameNode == null) return null;
-            return nameNode.Token.ValueString;
+            string name = nameNode.Token.ValueString;
+            if (grammar.Constants.ContainsKey(name)) Game.CurrentGame.Die("Can't use keyword " + name + " as a name");
+            return name;
         }
 
         public IEnumerable<object> GetOfType(object from, object type)
@@ -182,13 +182,20 @@ namespace Kinectitude.Core.Loaders
         private ValueReader makeParameterReader(Scene scene, Entity entity, string name, string component, string param)
         {
             object obj = getDataContainer(scene, entity, name).GetComponentOrManager(component);
-            return ParameterValueReader.getParameterValueReader(obj, param, scene);
+            return ParameterValueReader.GetParameterValueReader(obj, param, scene);
         }
 
         private ValueReader makeDcReader(Scene scene, Entity entity, string name, string param)
         {
             DataContainer dataContainer = getDataContainer(scene, entity, name);
-            return DataContainerReader.getDataContainerReader(dataContainer, param);
+            return DataContainerReader.GetDataContainerReader(dataContainer, param);
+        }
+
+        private void checkForConstant(ParseTreeNodeList list)
+        {
+            ParseTreeNode first;
+            if ((first = list.FirstOrDefault(key => grammar.Constants.ContainsKey(key.Token.ValueString))) != null) 
+                Game.CurrentGame.Die("Invalid use of the term " + first.Token.ValueString);
         }
 
         private ValueReader makeValueReader(ParseTreeNode node, Scene scene, Entity entity, Event evt)
@@ -207,30 +214,35 @@ namespace Kinectitude.Core.Loaders
             else if (child0 == KinectitudeGrammar.ThreeVal)
             {
                 ParseTreeNodeList list = node.ChildNodes[0].ChildNodes;
+                checkForConstant(list);
                 return makeParameterReader(scene, entity, list[0].Token.ValueString, 
                     list[1].Token.ValueString, list[2].Token.ValueString);
             }
             else if (child0 == KinectitudeGrammar.TwoVal)
             {
                 ParseTreeNodeList list = node.ChildNodes[0].ChildNodes;
+                checkForConstant(list);
                 if (null == getDataContainer(scene, entity, list[0].Token.ValueString)) 
                     return makeParameterReader(scene, entity, "this", list[0].Token.ValueString, list[1].Token.ValueString);
                 return makeDcReader(scene, entity, list[0].Token.ValueString, list[1].Token.ValueString);
             }
             else if (child0 == KinectitudeGrammar.Name)
             {
+                ConstantReader value;
+                if (grammar.Constants.TryGetValue(node.ChildNodes[0].Token.ValueString, out value)) return value;
                 return makeDcReader(scene, entity, "this", node.ChildNodes[0].Token.ValueString);
             }
             else if (child0 == KinectitudeGrammar.ParentVal)
             {
                 ParseTreeNode make = node.ChildNodes[0];
+                checkForConstant(make.ChildNodes);
                 switch (make.ChildNodes.Count)
                 {
                     case 2:
-                        return TypeMatcherDCReader.getTypeMatcherDCValueReader(evt, make.ChildNodes[0].Token.ValueString, 
+                        return TypeMatcherDCReader.GetTypeMatcherDCValueReader(evt, make.ChildNodes[0].Token.ValueString, 
                             make.ChildNodes[1].Token.ValueString, entity); 
                     case 3:
-                        return TypeMatcherProperyReader.getTypeMatcherProperyReader(evt, make.ChildNodes[0].Token.ValueString,
+                        return TypeMatcherProperyReader.GetTypeMatcherProperyReader(evt, make.ChildNodes[0].Token.ValueString,
                             make.ChildNodes[1].Token.ValueString, make.ChildNodes[2].Token.ValueString, entity);
                 }
             }
@@ -249,10 +261,13 @@ namespace Kinectitude.Core.Loaders
 
         private TypeMatcher makeTypeMatcherHelper(ParseTreeNode node, Scene scene)
         {
+            string strVal = node.ChildNodes[0].Token.ValueString;
+            if (grammar.Constants.ContainsKey(strVal)) Game.CurrentGame.Die("Invalid use of the term " + strVal);
+
             if (node.Term == KinectitudeGrammar.IsType)
-                return new PrototypeTypeMatcher(scene.GetOfPrototype(node.ChildNodes[0].Token.ValueString, false));
-            
-            return new PrototypeTypeMatcher(scene.GetOfPrototype(node.ChildNodes[0].Token.ValueString, true));
+                return new PrototypeTypeMatcher(scene.GetOfPrototype(strVal, false));
+
+            return new PrototypeTypeMatcher(scene.GetOfPrototype(strVal, true));
         }
 
         private TypeMatcher makeTypeMatcher(ParseTreeNode node, Scene scene)
@@ -285,9 +300,9 @@ namespace Kinectitude.Core.Loaders
             List<ParseTreeNode> defines = new List<ParseTreeNode>();
             getOfTypeHelper(node, KinectitudeGrammar.Definitions, defines);
             
-            foreach(ParseTreeNode define in defines){
+            foreach(ParseTreeNode define in defines)
+            {
                 string className = define.ChildNodes.First(child => child.Term == KinectitudeGrammar.ClassName).Token.ValueString;
-
                 definitions.Add(new Tuple<string,string>(GetName(define), className));
             }
             return definitions;

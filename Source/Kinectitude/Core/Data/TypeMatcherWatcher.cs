@@ -16,10 +16,10 @@ namespace Kinectitude.Core.Data
 
         private readonly List<SysAction> Callbacks = new List<SysAction>();
 
-        internal static TypeMatcherWatcher getTypeMatcherWatcher(object obj, string param, Entity owner)
+        internal static TypeMatcherWatcher GetTypeMatcherWatcher(object obj, string param, Entity owner)
         {
             Func<TypeMatcherWatcher> create = new Func<TypeMatcherWatcher>(() => new TypeMatcherWatcher(obj, param, owner));
-            return DoubleDictionary<object, string, TypeMatcherWatcher>.getItem(obj, param, create);
+            return DoubleDictionary<object, string, TypeMatcherWatcher>.GetItem(obj, param, create);
 
         }
 

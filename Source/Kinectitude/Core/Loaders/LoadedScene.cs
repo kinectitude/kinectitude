@@ -37,7 +37,7 @@ namespace Kinectitude.Core.Loaders
             
             foreach (LoadedManager loadedManager in Managers)
             {
-                IManager manager = loadedManager.CreateManager();
+                IManager manager = loadedManager.CreateManager(scene);
                 scene.Managers.Add(manager);
                 scene.ManagersDictionary[manager.GetType()] =  manager;
             }

@@ -250,5 +250,15 @@ namespace Kinectitude.Core.Base
             }
             return ids;
         }
+
+        internal void Destroy()
+        {
+            List<Entity> entities = new List<Entity>();
+            //clone so that it won't cause an error in the next line
+            foreach (Entity entity in EntityById.Values) entities.Add(entity);
+            foreach (Entity entity in entities) entity.Destroy();
+            foreach (IManager manager in Managers) ParameterValueReader.DeleteObject(manager);
+            DataContainerReader.DeleteDataContainer(this);
+        }
     }
 }

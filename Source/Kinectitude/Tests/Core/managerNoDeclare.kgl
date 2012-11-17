@@ -1,0 +1,19 @@
+﻿using Kinectitude.Tests.dll{
+    define MockComponent as Kinectitude.Tests.Core.SubscribeComponent
+    define Assertion as Kinectitude.Tests.Core.AssertionAction
+	define MockManager as Kinectitude.Tests.Core.MockManager
+}
+
+
+Game (Width = 800, Height=600, FirstScene="test", IsFullScreen="false", X="15"){
+
+    Scene test(score = 0, X = game.X){
+        Entity runTests(){
+			Component MockComponent()
+			Event SceneStarts(){
+                Set(Target=game.runtests, Value=true)
+				Assertion(LS=true, RS=true, Assertion="no crash", OnlyRunIf=true)
+            }
+        }
+    }
+}

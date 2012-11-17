@@ -82,8 +82,13 @@ namespace Kinectitude.Core.Base
 
             foreach (Event evt in Events) evt.Destroy();
 
-            foreach (Component component in componentList) component.Destroy();
+            foreach (Component component in componentList)
+            {
+                ParameterValueReader.DeleteObject(component);
+                component.Destroy();
+            }
 
+            DataContainerReader.DeleteDataContainer(this);
             Scene.DeleteEntity(this);
             Deleted = true;
         }

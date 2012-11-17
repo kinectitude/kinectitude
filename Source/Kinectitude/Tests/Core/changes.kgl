@@ -4,7 +4,7 @@
     define Assertion as Kinectitude.Tests.Core.AssertionAction
 }
 
-Game (Width = 800, Height=600, FirstScene="test", IsFullScreen="false"){
+Game (Width = 800, Height=600, FirstScene="test", IsFullScreen=false){
     Scene test(lol = "lollol"){
         Entity runTests(){
             Component MockComponent()
@@ -12,97 +12,98 @@ Game (Width = 800, Height=600, FirstScene="test", IsFullScreen="false"){
                 Set(Target=val, Value=1)
             }
             Event AttributeChanges(Target=runTests.val){
-                Assertion(LS=runTests.val, RS=1, Assertion="runTests.val is set", OnlyRunIf= "true")
+                Assertion(LS=runTests.val, RS=1, Assertion="runTests.val is set", OnlyRunIf= true)
                 Set(Target=this.MockComponent.IntVal, Value=100)
-                Assertion(LS=runTests.MockComponent.IntVal, RS=200, Assertion="IntVal is set, and attribute equals is run first", OnlyRunIf= "true")
+                Assertion(LS=runTests.MockComponent.IntVal, RS=200, Assertion="IntVal is set, and attribute equals is run first", OnlyRunIf= true)
                 Set(Target=scene.x, Value=99)
             }
             Event AttributeEquals(Target=this.MockComponent.IntVal, Value=100){
                 Set(Target=this.MockComponent.IntVal, Value=200)
             }
             Event AttributeChanges(Target=scene.x){
-                Assertion(LS=scene.x, RS=99, Assertion="scene.x", OnlyRunIf= "true")
+                Assertion(LS=scene.x, RS=99, Assertion="scene.x", OnlyRunIf= true)
                 Set(Target = scene.balls, Value = 9)
                 Set(Target = scene.rofl, Value = 9)
                 Set(Target = scene.left, Value = 1.5)
                 Set(Target = scene.shift, Value = 0x100 << 2)
-                Assertion(LS=scene.shift, RS=0x400, Assertion="left shift", OnlyRunIf= "true")
+                Assertion(LS=scene.shift, RS=0x400, Assertion="left shift", OnlyRunIf= true)
                 Set(Target = scene.shift, Value = 0x400 >> 2)
-                Assertion(LS=scene.shift, RS=0x100, Assertion="right shift", OnlyRunIf= "true")
-                Set(Target=this.bool2, Value="false")
-                Set(Target=this.bool, Value="true")
-                Set(Target=this.bool2, Value="true")
-				Set(Target=this.neg, Value=10)
-				Set(Target=this.not, Value="true")
+                Assertion(LS=scene.shift, RS=0x100, Assertion="right shift", OnlyRunIf= true)
+                Set(Target=this.bool2, Value=false)
+                Set(Target=this.bool, Value=true)
+                Set(Target=this.bool2, Value=true)
+                Set(Target=this.neg, Value=10)
+                Set(Target=this.not, Value=true)
+                Set(Target=this.lv, Value=1)
+                Set(Target=this.lv, Value=9)
+                Set(Target=this.lv, Value=9)
+                Set(Target=this.lv, Value=10)
+                Set(Target=this.lv, Value=1)
             }
             Event AttributeChanges(Target=scene.balls + scene.rofl){
-                Assertion(LS=1, RS=1, Assertion="balls + rofl", OnlyRunIf= "true")
+                Assertion(LS=1, RS=1, Assertion="balls + rofl", OnlyRunIf= true)
             }
             Event AttributeChanges(Target=scene.left * scene.lol){
-                Assertion(LS="lollollol", RS=scene.left * scene.lol, Assertion="Multiply words", OnlyRunIf= "true")
+                Assertion(LS="lollollol", RS=scene.left * scene.lol, Assertion="Multiply words", OnlyRunIf= true)
             }
             Event AttributeChanges(Target=scene.left/2){
-                Assertion(LS=.75, RS=scene.left/2, Assertion="divide", OnlyRunIf= "true")
+                Assertion(LS=.75, RS=scene.left/2, Assertion="divide", OnlyRunIf= true)
             }
 
             Event AttributeChanges(Target=-this.neg){
-                Assertion(LS=-this.neg, RS=-10, Assertion="-ve", OnlyRunIf= "true")
+                Assertion(LS=-this.neg, RS=-10, Assertion="-ve", OnlyRunIf= true)
             }
 
-            Event AttributeChanges(Target=-!this.not){
-                Assertion(LS=!this.not, RS=false, Assertion="not", OnlyRunIf= "true")
+            Event AttributeChanges(Target=!this.not){
+                Assertion(LS=!this.not, RS=false, Assertion="not", OnlyRunIf= true)
             }
 
             Event AttributeChanges(Target=scene.balls - scene.rofl){
-                Assertion(LS=1, RS=1, Assertion="balls - rofl", OnlyRunIf= "true")
+                Assertion(LS=1, RS=1, Assertion="balls - rofl", OnlyRunIf= true)
             }
 
             Event AttributeChanges(Target=scene.balls / 1){
-                Assertion(LS=9, RS=scene.balls/1, Assertion="balls / 1", OnlyRunIf= "true")
+                Assertion(LS=9, RS=scene.balls/1, Assertion="balls / 1", OnlyRunIf= true)
             }
 
             Event AttributeChanges(Target=scene.balls % 2){
-                Assertion(LS=1, RS=scene.balls%2, Assertion="balls % 2", OnlyRunIf= "true")
+                Assertion(LS=1, RS=scene.balls%2, Assertion="balls % 2", OnlyRunIf= true)
             }
 
             Event AttributeChanges(Target=scene.balls ** 2){
-                Assertion(LS=81, RS=scene.balls**2, Assertion="balls ** 2", OnlyRunIf= "true")
+                Assertion(LS=81, RS=scene.balls**2, Assertion="balls ** 2", OnlyRunIf= true)
             }
 
             Event AttributeChanges(Target=this.bool and this.bool2){
-                Assertion(LS=true, RS=this.bool && this.bool2, Assertion="and", OnlyRunIf= "true")
-                Set(Target=this.bool, Value="true")
+                Assertion(LS=true, RS=this.bool && this.bool2, Assertion="and", OnlyRunIf= true)
             }
 
             Event AttributeChanges(Target=this.bool or this.bool2){
-                Assertion(LS="true", RS=this.bool || this.bool2, Assertion="or", OnlyRunIf= "true")
+                Assertion(LS=true, RS=this.bool || this.bool2, Assertion="or", OnlyRunIf= true)
             }
 
             Event AttributeChanges(Target=this.bool == this.bool2){
-                Assertion(LS=1, RS=1, Assertion="eql", OnlyRunIf= "true")
+                Assertion(LS=1, RS=1, Assertion="eql", OnlyRunIf= true)
             }
 
             Event AttributeChanges(Target=this.bool != this.bool2){
-                Assertion(LS=1, RS=1, Assertion="neq", OnlyRunIf= "true")
-                Set(Target=this.lv, Value=1)
+                Assertion(LS=1, RS=1, Assertion="neq", OnlyRunIf= true)
             }
 
-            Event AttributeChanges(Target=this.lv < this.balls){
-                Assertion(LS=1, RS=1, Assertion="lt", OnlyRunIf= "true")
-                Set(Target=this.lv, Value=9)
+            Event AttributeChanges(Target=this.lv < scene.balls){
+                Assertion(LS=1, RS=1, Assertion="lt", OnlyRunIf= true)
             }
 
-            Event AttributeChanges(Target=this.lv <= this.balls){
-                Assertion(LS=1, RS=1, Assertion="le", OnlyRunIf= "true")
+            Event AttributeChanges(Target=this.lv <= scene.balls){
+                Assertion(LS=1, RS=1, Assertion="le", OnlyRunIf= true)
             }
 
-            Event AttributeChanges(Target = this.balls > this.lv){
-                Assertion(LS=1, RS=1, Assertion="gt", OnlyRunIf= "true")
-                Set(Target=this.lv, Value=9)
+            Event AttributeChanges(Target = this.lv > scene.balls){
+                Assertion(LS=1, RS=1, Assertion="gt", OnlyRunIf= true)
             }
 
-            Event AttributeChanges(Target=this.balls >= this.lv){
-                Assertion(LS=1, RS=1, Assertion="ge", OnlyRunIf= "true")
+            Event AttributeChanges(Target= this.lv >= scene.balls){
+                Assertion(LS=true, RS=true, Assertion="ge", OnlyRunIf= true)
             }
         }
     }

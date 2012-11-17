@@ -10,7 +10,7 @@ namespace Kinectitude.Core.Data
         private static readonly Dictionary<FirstHash, Dictionary<SecondHash, Item>> itemHash = 
             new Dictionary<FirstHash, Dictionary<SecondHash, Item>>();
 
-        internal static Item getItem(FirstHash key1, SecondHash key2, Func<Item> create)
+        internal static Item GetItem(FirstHash key1, SecondHash key2, Func<Item> create)
         {
             Dictionary<SecondHash, Item> secondDict;
             if (!itemHash.TryGetValue(key1, out secondDict))
@@ -23,12 +23,12 @@ namespace Kinectitude.Core.Data
             if(item == null)
             {
                 item = create();
-                putItem(key1, key2, item);
+                PutItem(key1, key2, item);
             }
             return item;
         }
 
-        internal static void putItem(FirstHash key1, SecondHash key2, Item item)
+        internal static void PutItem(FirstHash key1, SecondHash key2, Item item)
         {
             Dictionary<SecondHash, Item> secondDict;
             if (!itemHash.TryGetValue(key1, out secondDict))
@@ -37,6 +37,11 @@ namespace Kinectitude.Core.Data
                 itemHash[key1] = secondDict;
             }
             secondDict[key2] = item;
+        }
+
+        internal static void DeleteDict(FirstHash key1)
+        {
+            if(itemHash.ContainsKey(key1)) itemHash.Remove(key1);
         }
     }
 }

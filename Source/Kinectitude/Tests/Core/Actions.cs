@@ -9,6 +9,9 @@ namespace Kinectitude.Tests.Core
     {
         private const string actionFile = "core/actions.kgl";
         private const string timerFile = "core/timers.kgl";
+        private const string destroyEndGame = "core/destroyEndGame.kgl";
+
+        private static Game destroyGame;
 
         static Actions()
         {
@@ -23,10 +26,22 @@ namespace Kinectitude.Tests.Core
             AssertionAction.CheckValue("Created new entity", 2);
         }
 
-        //TODO
         [TestMethod]
+        [DeploymentItem(destroyEndGame)]
         public void DestroyAction()
         {
+            destroyGame = Setup.StartGame("destroyEndGame.kgl");
+            destroyGame.OnUpdate(1 / 60);
+            AssertionAction.CheckValue("run trigger");
+        }
+
+        [TestMethod]
+        [DeploymentItem(destroyEndGame)]
+        public void EndGameAction()
+        {
+            destroyGame = Setup.StartGame("destroyEndGame.kgl");
+            destroyGame.OnUpdate(1 / 60);
+            Assert.IsFalse(destroyGame.Running);
         }
 
         [TestMethod]

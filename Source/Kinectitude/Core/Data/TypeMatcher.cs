@@ -29,18 +29,18 @@ namespace Kinectitude.Core.Data
             }
         }
 
-        internal ValueReader getComponentValue(string comopnentName, string param)
+        internal ValueReader GetComponentValue(string comopnentName, string param)
         {
             if (Entity == null) Game.CurrentGame.Die("Can't read from an unmatched entity");
             Component component = Entity.GetComponent(comopnentName);
-            return ParameterValueReader.getParameterValueReader(component, param, Entity.Scene);
+            return ParameterValueReader.GetParameterValueReader(component, param, Entity.Scene);
         }
 
         internal void setComponentValue(string comopnentName, string param, ValueReader value)
         {
             if (Entity == null) Game.CurrentGame.Die("Can't write from an unmatched entity");
             Component component = Entity.GetComponent(comopnentName);
-            ParameterValueReader.getParameterValueReader(component, param, Entity.Scene).GetValueWriter().SetValue(value);
+            ParameterValueReader.GetParameterValueReader(component, param, Entity.Scene).GetValueWriter().SetValue(value);
         }
 
         internal abstract void NotifyOfChange(Action<DataContainer> action);

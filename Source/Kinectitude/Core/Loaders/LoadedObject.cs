@@ -18,11 +18,11 @@ namespace Kinectitude.Core.Loaders
             LoaderUtil = loaderUtil;
         }
 
-        protected void setValues(object obj, Event evt, Entity entity)
+        protected void setValues(object obj, Event evt, Entity entity, Scene scene)
         {
             foreach (Tuple<string, object> val in Values)
             {
-                object assignable = LoaderUtil.MakeAssignable(val.Item2, entity.Scene, entity, evt);
+                object assignable = LoaderUtil.MakeAssignable(val.Item2, scene, entity, evt);
                 ClassFactory.SetParam(obj, val.Item1, assignable);
             }
         }

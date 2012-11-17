@@ -13,7 +13,6 @@ namespace Kinectitude.Tests.Core
         [DeploymentItem(gameFile)]
         public void ChangeTests()
         {
-            //TODO False and True as strings, true and false consts in lang (with pi)
             Game game = Setup.StartGame("changes.kgl");
             game.OnUpdate(1 / 60f);
             AssertionAction.CheckValue("runTests.val is set");
@@ -25,19 +24,19 @@ namespace Kinectitude.Tests.Core
             AssertionAction.CheckValue("Multiply words");
             AssertionAction.CheckValue("divide");
             AssertionAction.CheckValue("-ve");
-            //AssertionAction.CheckValue("not");
+            AssertionAction.CheckValue("not");
             AssertionAction.CheckValue("balls - rofl", 2);
             AssertionAction.CheckValue("balls / 1");
             AssertionAction.CheckValue("balls % 2");
             AssertionAction.CheckValue("balls ** 2");
-            //AssertionAction.CheckValue("and");
-            //AssertionAction.CheckValue("or");
-            //AssertionAction.CheckValue("eql", 2);
-            //AssertionAction.CheckValue("neq", 2);
-            //AssertionAction.CheckValue("lt");
-            //AssertionAction.CheckValue("le");
-            //AssertionAction.CheckValue("gt");
-            //AssertionAction.CheckValue("ge");
+            AssertionAction.CheckValue("and");
+            AssertionAction.CheckValue("or");
+            AssertionAction.CheckValue("eql", 2);
+            AssertionAction.CheckValue("neq", 2);
+            AssertionAction.CheckValue("lt", 3);
+            AssertionAction.CheckValue("le", 2);
+            AssertionAction.CheckValue("gt", 2);
+            AssertionAction.CheckValue("ge", 3);
 
         }
     }

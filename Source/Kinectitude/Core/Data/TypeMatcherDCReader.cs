@@ -17,11 +17,11 @@ namespace Kinectitude.Core.Data
             get { return Watcher.GetTypeMatcher()[Param]; }
         }
 
-        internal static TypeMatcherDCReader getTypeMatcherDCValueReader(object obj, string objParam, string param,  Entity owner)
+        internal static TypeMatcherDCReader GetTypeMatcherDCValueReader(object obj, string objParam, string param,  Entity owner)
         {
-            TypeMatcherWatcher watcher = TypeMatcherWatcher.getTypeMatcherWatcher(obj, objParam, owner);
+            TypeMatcherWatcher watcher = TypeMatcherWatcher.GetTypeMatcherWatcher(obj, objParam, owner);
             Func<TypeMatcherDCReader> create = new Func<TypeMatcherDCReader>(() => new TypeMatcherDCReader(watcher, param));
-            return DoubleDictionary<TypeMatcherWatcher, string, TypeMatcherDCReader>.getItem(watcher, param, create);
+            return DoubleDictionary<TypeMatcherWatcher, string, TypeMatcherDCReader>.GetItem(watcher, param, create);
         }
 
         private TypeMatcherDCReader(TypeMatcherWatcher watcher, string param)

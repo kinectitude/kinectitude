@@ -9,10 +9,7 @@ namespace Kinectitude.Core.Data
     public abstract class ValueWriter : RepeatReader
     {
         private readonly ValueReader ReaderVal;
-        protected override ValueReader Reader 
-        {
-            get { return ReaderVal; }
-        }
+        protected override ValueReader Reader { get { return ReaderVal; } }
 
         internal ValueWriter(ValueReader reader)
         {

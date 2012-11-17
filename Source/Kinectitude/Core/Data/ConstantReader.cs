@@ -13,7 +13,17 @@ namespace Kinectitude.Core.Data
         private readonly bool Bval;
         private readonly PreferedType Type;
 
+        //Used by DataContainer for null values and ConstantValueReader default
         internal static readonly ConstantReader NullValue = new ConstantReader(null);
+        //Used by boolean based value reader defaults
+        internal static readonly ConstantReader TrueValue = new ConstantReader(true);
+        internal static readonly ConstantReader FalseValue = new ConstantReader(false);
+
+        //Used by number based value readers for defaults
+        internal static readonly ConstantReader ZeroValue = new ConstantReader(0);
+        internal static readonly ConstantReader OneValue = new ConstantReader(1);
+
+        internal override ConstantReader NullEquals { get { return NullValue; } }
 
         internal ConstantReader(object value)
         {

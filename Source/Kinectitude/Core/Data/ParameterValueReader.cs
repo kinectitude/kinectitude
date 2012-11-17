@@ -12,10 +12,17 @@ namespace Kinectitude.Core.Data
         internal readonly string Param;
         internal readonly DataContainer Owner;
 
-        internal static ParameterValueReader getParameterValueReader(object obj, string param, Scene scene)
+        internal override ConstantReader NullEquals { get { return ConstantReader.NullValue; } }
+
+        internal static ParameterValueReader GetParameterValueReader(object obj, string param, Scene scene)
         {
             Func<ParameterValueReader> create = new Func<ParameterValueReader>(() => new ParameterValueReader(obj, param, scene));
-            return DoubleDictionary<object, string, ParameterValueReader>.getItem(obj, param, create);
+            return DoubleDictionary<object, string, ParameterValueReader>.GetItem(obj, param, create);
+        }
+
+        internal static void DeleteObject(object obj)
+        {
+            DoubleDictionary<object, string, ParameterValueReader>.DeleteDict(obj);
         }
 
         private ParameterValueReader(object obj, string param, Scene scene)

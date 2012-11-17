@@ -19,7 +19,7 @@ namespace Kinectitude.Core.Loaders
         internal override Action Create(Event evt)
         {
             Action action = ClassFactory.Create<Action>(type);
-            setValues(action, evt, evt.Entity);
+            setValues(action, evt, evt.Entity, evt.Entity.Scene);
             action.Event = evt;
             return action;
         }

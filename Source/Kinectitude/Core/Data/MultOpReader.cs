@@ -7,6 +7,7 @@ namespace Kinectitude.Core.Data
 {
     internal sealed class MultOpReader : BinOpReader
     {
+        internal override ConstantReader NullEquals { get { return ConstantReader.ZeroValue; } }
         internal MultOpReader(ValueReader left, ValueReader right) : base(left, right) { }
 
         private static string repeateString(string str, double numTimes)

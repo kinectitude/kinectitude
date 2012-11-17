@@ -39,10 +39,10 @@ namespace Kinectitude.Core.Loaders
             return loadedManager;
         }
 
-        internal IManager CreateManager()
+        internal IManager CreateManager(Scene scene)
         {
             IManager manager = ClassFactory.Create<IManager>(Type);
-            setValues(manager, null, null);
+            setValues(manager, null, null, scene);
             return manager;
         }
     }

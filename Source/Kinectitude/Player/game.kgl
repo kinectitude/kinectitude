@@ -15,13 +15,13 @@ using Kinectitude.Render.dll{
     define ImageRenderComponent as Kinectitude.Render.ImageRenderComponent
 }
 
-Game (Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = "false", Name="breakout"){
+Game (Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = false, Name="breakout"){
     Prototype paddle () {
         Component KinectFollowComponent(Direction = "X", Player = 1, Joint = "HandRight")
         Component RenderComponent(FillColor = "Black", Shape="Rectangle")
         Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", 
-            Restitution="0", Mass="1", Friction="0", LinearDamping="0", MovesWhenHit="false", 
-            FixedRotation="true")
+            Restitution="0", Mass="1", Friction="0", LinearDamping="0", MovesWhenHit=false, 
+            FixedRotation=true)
         Component Transform(Width = 128, Height="24")
     }
 
@@ -32,7 +32,7 @@ Game (Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = "false", N
         
         Component PhysicsComponent(MinimumVelocity = 50,  MaximumVelocity = 50,  XVelocity = -40,
             YVelocity = -20, Shape = "Ellipse", Restitution = 1, Mass = 1, Friction = 0, 
-            LinearDamping = 0, MovesWhenHit = "true", AngularVelocity = 1, FixedRotation = "flase")
+            LinearDamping = 0, MovesWhenHit = true, AngularVelocity = 1, FixedRotation = false)
         Event TriggerOccurs(Trigger = "gameOver"){
             Destroy()
         }
@@ -56,7 +56,7 @@ Game (Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = "false", N
         Component RenderComponent(FillColor = "Red", Shape="Rectangle")
         Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", 
             Restitution = 0, Mass = 1, Friction = 0, LinearDamping = 0, 
-            MovesWhenHit = "false", FixedRotation = "true")
+            MovesWhenHit = false, FixedRotation = true)
             
         Component Transform(Width = 95, Height = 20)
         
@@ -192,23 +192,23 @@ Game (Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = "false", N
         Entity top_wall(){
             Component Transform(X = 400, Y = 0, Width = 800, Height = 2)
             Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, 
-                MovesWhenHit = "false", FixedRotation = "true")
+                MovesWhenHit = false, FixedRotation = true)
         }
         
         Entity bottom_wall(){
             Component Transform(X = 400, Y = 600, Width = 800, Height = 2)
             Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, 
-                MovesWhenHit = "false" , FixedRotation = "true")
+                MovesWhenHit = false , FixedRotation = true)
         }
         Entity left_wall(){
             Component Transform(X = 0, Y = 300, Width = 2, Height = 600)
             Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0,
-                MovesWhenHit = "flase", FixedRotation = "true")
+                MovesWhenHit = false, FixedRotation = true)
         }
         Entity right_wall(){
             Component Transform(X = 800, Y = 300, Width = 2, Height = 600)
             Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0,
-                MovesWhenHit = "flase", FixedRotation = "true")
+                MovesWhenHit = false, FixedRotation = true)
         }
         
         Entity : primaryBall(){
@@ -236,7 +236,7 @@ Game (Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = "false", N
             Component Transform(X = 0, Y = 100, Width = 800)
             Component TextRenderComponent(Value = "", FontSize = 20, TextAlignment = "Center")
             Event AttributeChanges(Target = scene.show){
-				Set(Target = TextRenderComponent.Value, Value = "The value of scene.show " + scene.show)
+                Set(Target = TextRenderComponent.Value, Value = "The value of scene.show " + scene.show)
             }
         }
     }

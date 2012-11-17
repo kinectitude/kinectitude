@@ -23,7 +23,7 @@ namespace Kinectitude.Core.Loaders
         {
             Event evt = ClassFactory.Create<Event>(type);
             evt.Entity = entity;
-            setValues(evt, evt, entity);
+            setValues(evt, evt, entity, entity.Scene);
             foreach (LoadedBaseAction action in actions)
             {
                 evt.AddAction(action.Create(evt));

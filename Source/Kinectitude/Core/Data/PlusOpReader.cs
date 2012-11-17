@@ -7,6 +7,8 @@ namespace Kinectitude.Core.Data
 {
     internal sealed class PlusOpReader : BinOpReader
     {
+        internal override ConstantReader NullEquals { get { return ConstantReader.ZeroValue; } }
+
         internal PlusOpReader(ValueReader left, ValueReader right) : base(left, right) { }
 
         internal override bool  GetBoolValue()

@@ -17,17 +17,17 @@ namespace Kinectitude.Core.Data
 
         protected override ValueReader Reader
         {
-            get { return Watcher.GetTypeMatcher().getComponentValue(Component, Param); }
+            get { return Watcher.GetTypeMatcher().GetComponentValue(Component, Param); }
         }
 
-        internal static TypeMatcherProperyReader getTypeMatcherProperyReader
+        internal static TypeMatcherProperyReader GetTypeMatcherProperyReader
             (object obj, string objParam, string component, string param,  Entity owner)
         {
-            TypeMatcherWatcher watcher = TypeMatcherWatcher.getTypeMatcherWatcher(obj, objParam, owner);
+            TypeMatcherWatcher watcher = TypeMatcherWatcher.GetTypeMatcherWatcher(obj, objParam, owner);
             Func<TypeMatcherProperyReader> create = 
                 new Func<TypeMatcherProperyReader>(() => new TypeMatcherProperyReader(watcher, component, param));
             string fullParam = component + "." + param;
-            return DoubleDictionary<TypeMatcherWatcher, string, TypeMatcherProperyReader>.getItem(watcher, fullParam, create);
+            return DoubleDictionary<TypeMatcherWatcher, string, TypeMatcherProperyReader>.GetItem(watcher, fullParam, create);
         }
 
         private TypeMatcherProperyReader(TypeMatcherWatcher watcher, string component, string param)
@@ -48,7 +48,7 @@ namespace Kinectitude.Core.Data
             entity.NotifyOfComponentChange(What, Change);
             Change();
         }
-        //TODO
+
         internal override ValueWriter ConvertToWriter() { return new TypeMatcherProperyWriter(this); }
     }
 }
