@@ -1,8 +1,9 @@
 ﻿
 using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Storage;
 namespace Kinectitude.Editor.Models
 {
-    internal sealed class Define : BaseModel
+    internal sealed class Define : VisitableModel
     {
         private string name;
         private string className;
@@ -37,6 +38,11 @@ namespace Kinectitude.Editor.Models
         {
             this.name = name;
             this.className = className;
+        }
+
+        public override void Accept(IGameVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

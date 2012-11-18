@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using Kinectitude.Editor.Models.Interfaces;
 using System.Text.RegularExpressions;
+using Kinectitude.Editor.Storage;
 
 namespace Kinectitude.Editor.Models
 {
@@ -94,6 +95,11 @@ namespace Kinectitude.Editor.Models
             }
 
             Tokens = tokens;
+        }
+
+        public override void Accept(IGameVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         private void OnInheritedEventActionsChanged(object sender, NotifyCollectionChangedEventArgs args)

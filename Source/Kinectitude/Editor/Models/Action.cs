@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Storage;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows.Input;
 
 namespace Kinectitude.Editor.Models
 {
@@ -42,6 +45,8 @@ namespace Kinectitude.Editor.Models
             get { return true; }
         }
 
+        public ICommand InsertBeforeCommand { get; private set; }
+
         public Action(Plugin plugin)
         {
             if (plugin.Type != PluginType.Action)
@@ -61,18 +66,37 @@ namespace Kinectitude.Editor.Models
 
             foreach (string token in splitHeader)
             {
-                if (token.StartsWith("{"))
+                if (token.StartsWith("{", StringComparison.Ordinal))
                 {
                     string property = token.TrimStart('{').TrimEnd('}');
                     tokens.Add(GetProperty(property));
                 }
-                else if (token != string.Empty)
+                else if (!string.IsNullOrEmpty(token))
                 {
                     tokens.Add(token);
                 }
             }
 
             Tokens = tokens;
+
+            InsertBeforeCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    Action toInsert = parameter as Action;
+                    if (null != toInsert)
+                    {
+                        if (null != scope)
+                        {
+                            scope.InsertBefore(this, toInsert);
+                        }
+                    }
+                }
+            );
+        }
+
+        public override void Accept(IGameVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         public override bool InheritsFrom(AbstractAction action)

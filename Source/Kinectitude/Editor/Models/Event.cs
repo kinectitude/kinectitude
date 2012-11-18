@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Kinectitude.Editor.Models.Interfaces;
 using System.Text.RegularExpressions;
+using Kinectitude.Editor.Base;
+using System.Windows.Input;
+using Kinectitude.Editor.Storage;
 
 namespace Kinectitude.Editor.Models
 {
@@ -52,6 +55,8 @@ namespace Kinectitude.Editor.Models
             get { return Actions.SelectMany(x => x.Plugins).Union(Enumerable.Repeat(plugin, 1)).Distinct(); }
         }
 
+        public ICommand AddActionCommand { get; private set; }
+
         public Event(Plugin plugin)
         {
             if (plugin.Type != PluginType.Event)
@@ -71,18 +76,35 @@ namespace Kinectitude.Editor.Models
 
             foreach (string token in splitHeader)
             {
-                if (token.StartsWith("{"))
+                if (token.StartsWith("{", StringComparison.Ordinal))
                 {
                     string property = token.TrimStart('{').TrimEnd('}');
                     tokens.Add(GetProperty(property));
                 }
-                else if (token != string.Empty)
+                else if (!string.IsNullOrEmpty(token))
                 {
                     tokens.Add(token);
                 }
             }
 
             Tokens = tokens;
+
+            AddActionCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    Plugin actionPlugin = parameter as Plugin;
+                    if (null != actionPlugin)
+                    {
+                        Action action = new Action(actionPlugin);
+                        AddAction(action);
+                    }
+                }
+            );
+        }
+
+        public override void Accept(IGameVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         public override bool InheritsFrom(AbstractEvent evt)

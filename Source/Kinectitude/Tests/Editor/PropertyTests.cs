@@ -215,5 +215,41 @@ namespace Kinectitude.Editor.Tests
             Assert.IsTrue(childProperty.IsInherited);
             Assert.AreEqual(500, childProperty.Value);
         }
+
+        [TestMethod]
+        public void CreateDefaultProperty()
+        {
+            
+        }
+
+        [TestMethod]
+        public void CreateBooleanProperty()
+        {
+            
+        }
+
+        [TestMethod]
+        public void CreateEnumerationProperty()
+        {
+            
+        }
+
+        [TestMethod]
+        public void CreateKeyProperty()
+        {
+            
+        }
+
+        [TestMethod]
+        public void CreateExpressionProperty()
+        {
+            
+        }
+
+        [TestMethod]
+        public void CreateEntitySelectorProperty()
+        {
+            
+        }
     }
 }

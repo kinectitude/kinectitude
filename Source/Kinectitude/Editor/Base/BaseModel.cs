@@ -1,16 +1,17 @@
-﻿using System;
+﻿using Kinectitude.Editor.Storage;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
 namespace Kinectitude.Editor.Base
 {
-    internal class BaseModel : INotifyPropertyChanged
+    internal abstract class BaseModel : INotifyPropertyChanged
     {
         private Dictionary<string, IEnumerable<string>> dependencies;
 
         [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
-        protected class DependsOnAttribute : System.Attribute
+        protected sealed class DependsOnAttribute : System.Attribute
         {
             public string Property
             {

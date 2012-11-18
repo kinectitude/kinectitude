@@ -166,7 +166,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Editor\Storage\schema.xsd">
+    <EmbeddedResource Include="..\Editor\Storage\Xml\schema.xsd">
       <Link>Loaders\schema.xsd</Link>
       <SubType>Designer</SubType>
     </EmbeddedResource>

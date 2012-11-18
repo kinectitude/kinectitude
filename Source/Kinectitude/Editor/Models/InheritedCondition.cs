@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Kinectitude.Editor.Storage;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 
@@ -55,6 +56,11 @@ namespace Kinectitude.Editor.Models
             {
                 InheritAction(inheritedAction);
             }
+        }
+
+        public override void Accept(IGameVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         public override bool InheritsFrom(AbstractAction action)

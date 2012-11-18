@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Storage;
+using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Input;
 
 namespace Kinectitude.Editor.Models
 {
@@ -50,7 +53,27 @@ namespace Kinectitude.Editor.Models
             get { return Actions.SelectMany(x => x.Plugins).Distinct(); }
         }
 
-        public Condition() {}
+        public ICommand AddActionCommand { get; private set; }
+
+        public Condition()
+        {
+            AddActionCommand = new DelegateCommand(null,
+                (parameter) =>
+                {
+                    Plugin actionPlugin = parameter as Plugin;
+                    if (null != actionPlugin)
+                    {
+                        Action action = new Action(actionPlugin);
+                        AddAction(action);
+                    }
+                }
+            );
+        }
+
+        public override void Accept(IGameVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
 
         public override bool InheritsFrom(AbstractAction action)
         {

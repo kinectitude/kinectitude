@@ -3,7 +3,7 @@ using Kinectitude.Editor.Models.Interfaces;
 
 namespace Kinectitude.Editor.Models
 {
-    internal abstract class AbstractProperty : BaseModel
+    internal abstract class AbstractProperty : VisitableModel
     {
         protected IPropertyScope scope;
 

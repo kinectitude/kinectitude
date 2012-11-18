@@ -6,7 +6,7 @@ using Kinectitude.Editor.Models.Interfaces;
 
 namespace Kinectitude.Editor.Models
 {
-    internal abstract class AbstractEvent : BaseModel, IPropertyScope, IActionScope
+    internal abstract class AbstractEvent : VisitableModel, IPropertyScope, IActionScope
     {
         private readonly List<AbstractProperty> properties;
         private readonly ObservableCollection<AbstractAction> actions;
@@ -74,8 +74,13 @@ namespace Kinectitude.Editor.Models
 
         public void AddAction(AbstractAction action)
         {
+            PrivateAddAction(Actions.Count, action);
+        }
+
+        private void PrivateAddAction(int idx, AbstractAction action)
+        {
             action.SetScope(this);
-            Actions.Add(action);
+            Actions.Insert(idx, action);
 
             action.PluginAdded += OnActionPluginAdded;
 
@@ -101,6 +106,20 @@ namespace Kinectitude.Editor.Models
             action.SetScope(null);
             Actions.Remove(action);
             action.PluginAdded -= OnActionPluginAdded;
+        }
+
+        public void InsertBefore(AbstractAction action, AbstractAction toInsert)
+        {
+            int idx = Actions.IndexOf(action);
+            if (idx != -1)
+            {
+                if (Actions.Contains(toInsert))
+                {
+                    RemoveAction(toInsert);
+                }
+
+                PrivateAddAction(idx, toInsert);
+            }
         }
 
         private void OnActionPluginAdded(Plugin plugin)

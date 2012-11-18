@@ -3,10 +3,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
+using Kinectitude.Editor.Storage;
 
 namespace Kinectitude.Editor.Models
 {
-    internal sealed class Manager : BaseModel, IPropertyScope
+    internal sealed class Manager : VisitableModel, IPropertyScope
     {
         private readonly Plugin plugin;
         private IManagerScope scope;
@@ -43,6 +44,11 @@ namespace Kinectitude.Editor.Models
             this.plugin = plugin;
 
             Properties = new ObservableCollection<Property>();
+        }
+
+        public override void Accept(IGameVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         public Property GetProperty(string name)

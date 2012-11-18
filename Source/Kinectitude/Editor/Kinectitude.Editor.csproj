@@ -61,6 +61,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -78,14 +79,24 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Behaviors\DragAndDropAdorner.cs" />
     <Compile Include="Base\DelegateCommand.cs" />
     <Compile Include="Base\FilteredObservableCollection.cs" />
+    <Compile Include="Behaviors\DragBehavior.cs" />
+    <Compile Include="Behaviors\DropTargetBehavior.cs" />
     <Compile Include="Commands\CommandHistory.cs" />
     <Compile Include="Commands\DelegateUndoableCommand.cs" />
     <Compile Include="Commands\ICommandHistory.cs" />
     <Compile Include="Commands\IUndoableCommand.cs" />
+    <Compile Include="Models\BooleanProperty.cs" />
+    <Compile Include="Models\VisitableModel.cs" />
+    <Compile Include="Models\PluginProperty.cs" />
+    <Compile Include="Models\Value.cs" />
     <Compile Include="Storage\IGameStorage.cs" />
-    <Compile Include="Storage\XmlGameStorage.cs" />
+    <Compile Include="Storage\IGameVisitor.cs" />
+    <Compile Include="Storage\Xml\XmlGameVisitor.cs" />
+    <Compile Include="Storage\Xml\XmlConstants.cs" />
+    <Compile Include="Storage\Xml\XmlGameStorage.cs" />
     <Compile Include="Models\AbstractAction.cs" />
     <Compile Include="Models\AbstractCondition.cs" />
     <Compile Include="Models\AbstractEvent.cs" />
@@ -128,10 +139,6 @@
     <Compile Include="Views\ComponentDialog.xaml.cs">
       <DependentUpon>ComponentDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\EntityEditor\DragDropData.cs" />
-    <Compile Include="Views\EntityEditor\DraggableItem.xaml.cs">
-      <DependentUpon>DraggableItem.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\EntityEditor\EventHeader.xaml.cs">
       <DependentUpon>EventHeader.xaml</DependentUpon>
     </Compile>
@@ -145,9 +152,6 @@
       <DependentUpon>AddEntityDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SceneEditor\DragThumb.cs" />
-    <Compile Include="Views\EntityEditor\EventsList.xaml.cs">
-      <DependentUpon>EventsList.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\MainWindow\FolderConverter.cs" />
     <Compile Include="Views\MainWindow\EntityDialog.xaml.cs">
       <DependentUpon>EntityDialog.xaml</DependentUpon>
@@ -199,10 +203,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\EntityEditor\DraggableItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\EntityEditor\EventHeader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -227,10 +227,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\EntityEditor\EventsList.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\GameEditor\GameEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -282,7 +278,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <EmbeddedResource Include="Storage\schema.xsd">
+    <EmbeddedResource Include="Storage\Xml\schema.xsd">
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Resource Include="Samples\Breakout\game.xml">

@@ -8,14 +8,16 @@ using System.Windows.Input;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Views;
+using Kinectitude.Editor.Storage;
 
 namespace Kinectitude.Editor.Models
 {
     internal delegate void NameChangedEventHandler(Entity entity, string oldName, string newName);
 
-    internal sealed class Entity : BaseModel, IAttributeScope, IComponentScope, IEventScope
+    internal sealed class Entity : VisitableModel, IAttributeScope, IComponentScope, IEventScope
     {
         private string name;
+        private bool prototype;
         private IEntityScope scope;
         private int nextAttribute;
         
@@ -51,6 +53,19 @@ namespace Kinectitude.Editor.Models
             }
         }
 
+        public bool IsPrototype
+        {
+            get { return prototype; }
+            set
+            {
+                if (prototype != value)
+                {
+                    prototype = value;
+                    NotifyPropertyChanged("IsPrototype");
+                }
+            }
+        }
+
         [DependsOn("Name")]
         [DependsOn("Prototypes")]
         public string DisplayName
@@ -64,7 +79,7 @@ namespace Kinectitude.Editor.Models
 
                 if (Prototypes.Count > 0)
                 {
-                    string result = "<" + string.Join(" ", Prototypes.Select(x => x.Name)) + ">";
+                    return "<" + string.Join(" ", Prototypes.Select(x => x.Name)) + ">";
                 }
 
                 return "<Anonymous Entity>";
@@ -196,6 +211,11 @@ namespace Kinectitude.Editor.Models
                     }
                 }
             );
+        }
+
+        public override void Accept(IGameVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         public void SetScope(IEntityScope scope)

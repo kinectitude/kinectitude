@@ -3,12 +3,13 @@ using System.ComponentModel;
 using System.Linq;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
+using Kinectitude.Editor.Storage;
 
 namespace Kinectitude.Editor.Models
 {
     internal delegate void DefineChangedEventHandler(Define define);
 
-    internal sealed class Using : BaseModel
+    internal sealed class Using : VisitableModel
     {
         private string file;
 
@@ -37,6 +38,11 @@ namespace Kinectitude.Editor.Models
         public Using()
         {
             Defines = new ObservableCollection<Define>();
+        }
+
+        public override void Accept(IGameVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         public void AddDefine(Define define)

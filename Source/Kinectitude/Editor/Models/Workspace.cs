@@ -12,6 +12,7 @@ using Kinectitude.Editor.Commands;
 using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.Views;
 using Kinectitude.Render;
+using Kinectitude.Editor.Storage.Xml;
 
 namespace Kinectitude.Editor.Models
 {

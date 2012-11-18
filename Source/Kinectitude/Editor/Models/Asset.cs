@@ -1,8 +1,9 @@
 ﻿
 using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Storage;
 namespace Kinectitude.Editor.Models
 {
-    class Asset : BaseModel
+    class Asset : VisitableModel
     {
         private string name;
 
@@ -36,6 +37,11 @@ namespace Kinectitude.Editor.Models
         public Asset(string fileName)
         {
             FileName = fileName;
+        }
+
+        public override void Accept(IGameVisitor visitor)
+        {
+            
         }
     }
 }

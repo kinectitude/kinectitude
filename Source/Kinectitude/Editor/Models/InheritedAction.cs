@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Kinectitude.Editor.Storage;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Kinectitude.Editor.Models
@@ -56,18 +57,23 @@ namespace Kinectitude.Editor.Models
 
             foreach (string token in splitHeader)
             {
-                if (token.StartsWith("{"))
+                if (token.StartsWith("{", System.StringComparison.Ordinal))
                 {
                     string property = token.TrimStart('{').TrimEnd('}');
                     tokens.Add(GetProperty(property));
                 }
-                else if (token != string.Empty)
+                else if (!string.IsNullOrEmpty(token))
                 {
                     tokens.Add(token);
                 }
             }
 
             Tokens = tokens;
+        }
+
+        public override void Accept(IGameVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         public override bool InheritsFrom(AbstractAction action)

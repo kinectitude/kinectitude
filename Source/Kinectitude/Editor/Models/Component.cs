@@ -4,10 +4,11 @@ using System.ComponentModel;
 using System.Linq;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
+using Kinectitude.Editor.Storage;
 
 namespace Kinectitude.Editor.Models
 {
-    internal sealed class Component : BaseModel, IPropertyScope
+    internal sealed class Component : VisitableModel, IPropertyScope
     {
         private readonly Plugin plugin;
         private readonly List<Property> properties;
@@ -81,6 +82,11 @@ namespace Kinectitude.Editor.Models
             {
                 AddProperty(new Property(property));
             }
+        }
+
+        public override void Accept(IGameVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         private void AddProperty(Property property)

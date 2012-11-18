@@ -18,12 +18,7 @@ namespace Kinectitude.Editor.Views
             public static readonly string RenameDialog = typeof(RenameDialog).Name;
         }
 
-        private static readonly Dictionary<string, Type> views;
-
-        static DialogService()
-        {
-            views = new Dictionary<string, Type>();
-        }
+        private static readonly Dictionary<string, Type> views = new Dictionary<string, Type>();
 
         public static void ShowDialog<TViewModel>(string name, TViewModel viewModel, DialogCallback onDialogClose)
         {

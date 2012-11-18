@@ -16,65 +16,25 @@ namespace Kinectitude.Editor.Models
 
     internal sealed class Plugin : BaseModel
     {
-        public string File
-        {
-            get;
-            private set;
-        }
+        public string File { get; private set; }
 
-        public PluginType Type
-        {
-            get;
-            private set;
-        }
+        public PluginType Type { get; private set; }
 
-        public Type CoreType
-        {
-            get;
-            private set;
-        }
+        public Type CoreType { get; private set; }
 
-        public string Provides
-        {
-            get;
-            private set;
-        }
+        public string Provides { get; private set; }
 
-        public IEnumerable<string> Requires
-        {
-            get;
-            private set;
-        }
+        public IEnumerable<string> Requires { get; private set; }
 
-        public string Header
-        {
-            get;
-            private set;
-        }
+        public string Header { get; private set; }
 
-        public string Description
-        {
-            get;
-            private set;
-        }
+        public string Description { get; private set; }
 
-        public string ClassName
-        {
-            get;
-            private set;
-        }
+        public string ClassName { get; private set; }
 
-        public string ShortName
-        {
-            get;
-            private set;
-        }
+        public string ShortName { get; private set; }
 
-        public IEnumerable<string> Properties
-        {
-            get;
-            private set;
-        }
+        public IEnumerable<string> Properties { get; private set; }
 
         public Plugin(Type type)
         {

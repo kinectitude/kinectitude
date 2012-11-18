@@ -1,11 +1,12 @@
 ﻿using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
+using Kinectitude.Editor.Storage;
 
 namespace Kinectitude.Editor.Models
 {
     internal delegate void KeyChangedEventHandler(string oldKey, string newKey);
     
-    internal sealed class Attribute : BaseModel
+    internal sealed class Attribute : VisitableModel
     {
         private const string DefaultValue = "";
 
@@ -111,6 +112,11 @@ namespace Kinectitude.Editor.Models
         {
             this.key = key;
             this.value = DefaultValue;
+        }
+
+        public override void Accept(IGameVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         public void SetScope(IAttributeScope scope)

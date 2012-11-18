@@ -1,4 +1,5 @@
 ﻿
+using Kinectitude.Editor.Storage;
 namespace Kinectitude.Editor.Models
 {
     internal sealed class InheritedProperty : AbstractProperty
@@ -41,6 +42,11 @@ namespace Kinectitude.Editor.Models
         {
             this.inheritedProperty = inheritedProperty;
             inheritedProperty.PropertyChanged += (sender, args) => NotifyPropertyChanged(args.PropertyName);
+        }
+
+        public override void Accept(IGameVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

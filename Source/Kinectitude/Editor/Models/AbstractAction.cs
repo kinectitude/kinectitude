@@ -5,7 +5,7 @@ using Kinectitude.Editor.Models.Interfaces;
 
 namespace Kinectitude.Editor.Models
 {
-    internal abstract class AbstractAction : BaseModel, IPropertyScope
+    internal abstract class AbstractAction : VisitableModel, IPropertyScope
     {
         private readonly List<AbstractProperty> properties;
         protected IActionScope scope;

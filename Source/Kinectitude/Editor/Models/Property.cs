@@ -1,4 +1,5 @@
 ﻿
+using Kinectitude.Editor.Storage;
 namespace Kinectitude.Editor.Models
 {
     internal sealed class Property : AbstractProperty
@@ -74,6 +75,11 @@ namespace Kinectitude.Editor.Models
         {
             this.name = name;
             this.inherited = true;
+        }
+
+        public override void Accept(IGameVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         public T GetValue<T>()

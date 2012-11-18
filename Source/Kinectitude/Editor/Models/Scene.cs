@@ -7,10 +7,11 @@ using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Core.Components;
 using Kinectitude.Editor.Views;
+using Kinectitude.Editor.Storage;
 
 namespace Kinectitude.Editor.Models
 {
-    internal sealed class Scene : BaseModel, IEntityNamespace, IAttributeScope, IEntityScope, IManagerScope
+    internal sealed class Scene : VisitableModel, IEntityNamespace, IAttributeScope, IEntityScope, IManagerScope
     {
         private string name;
         private ISceneScope scope;
@@ -135,6 +136,11 @@ namespace Kinectitude.Editor.Models
                     RemoveEntity(entity);
                 }
             );
+        }
+
+        public override void Accept(IGameVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         public void SetScope(ISceneScope scope)

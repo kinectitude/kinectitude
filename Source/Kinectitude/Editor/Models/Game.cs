@@ -4,12 +4,13 @@ using System.Windows.Input;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Views;
+using Kinectitude.Editor.Storage;
 
 namespace Kinectitude.Editor.Models
 {
     internal delegate void PluginAddedEventHandler(Plugin plugin);   
     
-    internal sealed class Game : BaseModel, IAttributeScope, IEntityScope, ISceneScope
+    internal sealed class Game : VisitableModel, IAttributeScope, IEntityScope, ISceneScope
     {
         private string fileName;
         private string name;
@@ -308,6 +309,11 @@ namespace Kinectitude.Editor.Models
             );
         }
 
+        public override void Accept(IGameVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         public void AddUsing(Using use)
         {
             use.DefineAdded += OnDefineAdded;
@@ -344,6 +350,7 @@ namespace Kinectitude.Editor.Models
                     DefinePlugin(plugin);
                 }
 
+                prototype.IsPrototype = true;
                 Prototypes.Add(prototype);
 
                 Workspace.Instance.CommandHistory.Log(
@@ -358,6 +365,8 @@ namespace Kinectitude.Editor.Models
         {
             prototype.SetScope(null);
             prototype.PluginAdded -= OnPluginAdded;
+
+            prototype.IsPrototype = false;
             Prototypes.Remove(prototype);
 
             Workspace.Instance.CommandHistory.Log(
