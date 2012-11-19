@@ -77,7 +77,6 @@
     <Compile Include="Actions\CreateEntityAction.cs" />
     <Compile Include="Actions\DestroyAction.cs" />
     <Compile Include="Actions\FireTriggerAction.cs" />
-    <Compile Include="Actions\IncrementAction.cs" />
     <Compile Include="Actions\PopSceneAction.cs" />
     <Compile Include="Actions\PushSceneAction.cs" />
     <Compile Include="Actions\SetAction.cs" />
@@ -138,7 +137,7 @@
     <Compile Include="Data\TypeMatcherProperyReader.cs" />
     <Compile Include="Data\TypeMatcherProperyWriter.cs" />
     <Compile Include="Data\TypeMatcherWatcher.cs" />
-    <Compile Include="Data\TypeMatchreDCWriter.cs" />
+    <Compile Include="Data\TypeMatcherDCWriter.cs" />
     <Compile Include="Data\UniOpReader.cs" />
     <Compile Include="Data\ValueReader.cs" />
     <Compile Include="Data\ValueWriter.cs" />
@@ -153,6 +152,7 @@
     </Compile>
     <Compile Include="Loaders\KGLLoaderUtility.cs" />
     <Compile Include="Loaders\LoadedAction.cs" />
+    <Compile Include="Loaders\LoadedAssignment.cs" />
     <Compile Include="Loaders\LoadedBaseAction.cs" />
     <Compile Include="Loaders\LoadedComponent.cs" />
     <Compile Include="Loaders\LoadedCondition.cs" />

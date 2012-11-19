@@ -7,7 +7,6 @@ namespace Kinectitude.Core.Data
 {
     internal sealed class RightShiftOpReader : BinOpReader
     {
-        internal override ConstantReader NullEquals { get { return ConstantReader.ZeroValue; } }
         internal RightShiftOpReader(ValueReader left, ValueReader right) : base(left, right) { }
         internal override bool GetBoolValue() { return ToBool(Left.GetLongValue() >> Right.GetIntValue()); }
         internal override string GetStrValue() { return (Left.GetLongValue() >> Right.GetIntValue()).ToString(); }

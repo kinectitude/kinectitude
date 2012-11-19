@@ -7,7 +7,6 @@ namespace Kinectitude.Core.Data
 {
     internal sealed class PowOpReader : BinOpReader
     {
-        internal override ConstantReader NullEquals { get { return ConstantReader.OneValue; } }
         internal PowOpReader(ValueReader left, ValueReader right) : base(left, right) { }
         internal override bool GetBoolValue() { return ToBool(Math.Pow(Left.GetDoubleValue(), Right.GetDoubleValue())); }
         internal override string GetStrValue() { return Math.Pow(Left.GetDoubleValue(), Right.GetDoubleValue()).ToString(); }

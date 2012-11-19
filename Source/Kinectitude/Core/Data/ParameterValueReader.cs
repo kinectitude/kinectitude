@@ -12,8 +12,6 @@ namespace Kinectitude.Core.Data
         internal readonly string Param;
         internal readonly DataContainer Owner;
 
-        internal override ConstantReader NullEquals { get { return ConstantReader.NullValue; } }
-
         internal static ParameterValueReader GetParameterValueReader(object obj, string param, Scene scene)
         {
             Func<ParameterValueReader> create = new Func<ParameterValueReader>(() => new ParameterValueReader(obj, param, scene));
@@ -34,6 +32,10 @@ namespace Kinectitude.Core.Data
             else if (typeof(IManager).IsAssignableFrom(objType)) Owner = scene;
             else if (typeof(Service).IsAssignableFrom(objType)) Owner = scene.Game;
             else Owner = null;
+        }
+
+        internal override void SetupNotifications()
+        {
             if (null != Owner)
                 Owner.NotifyOfComponentChange(ClassFactory.GetReferedName(Obj.GetType()) + '.' + Param, Change);
         }

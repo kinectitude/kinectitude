@@ -28,7 +28,6 @@ namespace Kinectitude.Core.Data
         {
             Param = param;
             Watcher = watcher;
-            TypeMatcher matcher = Watcher.GetTypeMatcher();
             Watcher.NotifyOfChange(Change);
         }
 
@@ -40,7 +39,6 @@ namespace Kinectitude.Core.Data
             entity.StopNotifications(Param, Change);
             Change();
         }
-        //TODO make this
-        internal override ValueWriter ConvertToWriter() { return new TypeMatchreDCWriter(this); }
+        internal override ValueWriter ConvertToWriter() { return new TypeMatcherDCWriter(this); }
     }
 }

@@ -8,14 +8,10 @@ namespace Kinectitude.Core.Data
     internal abstract class UniOpReader : ValueReader
     {
         protected readonly ValueReader Reader;
-        private object oldVal;
 
-        protected UniOpReader(ValueReader reader)
-        { 
-            Reader = reader;
-            oldVal = GetPreferedValue();
-            reader.notifyOfChange(Change);
-        }
+        protected UniOpReader(ValueReader reader) { Reader = reader; }
+
+        internal override void SetupNotifications() { Reader.NotifyOfChange(Change); }
 
         internal override ValueWriter ConvertToWriter() { return new NullWriter(this); }
     }

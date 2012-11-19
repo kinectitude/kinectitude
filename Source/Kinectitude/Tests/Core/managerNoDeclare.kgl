@@ -11,7 +11,7 @@ Game (Width = 800, Height=600, FirstScene="test", IsFullScreen="false", X="15"){
         Entity runTests(){
 			Component MockComponent()
 			Event SceneStarts(){
-                Set(Target=game.runtests, Value=true)
+                game.runtests = true
 				Assertion(LS=true, RS=true, Assertion="no crash", OnlyRunIf=true)
             }
         }

@@ -17,7 +17,6 @@ namespace Kinectitude.Core.Base
         internal static readonly Dictionary<string, Type> TypesDict = new Dictionary<string, Type>();
 
         private static readonly MethodInfo EnumParse = typeof(Enum).GetMethod("Parse", new[] { typeof(Type), typeof(string) });
-        private static readonly MethodInfo WriterMaker = typeof(ValueReader).GetMethod("GetValueWriter",new[] {typeof(ValueReader)});
         
         //stores getters for components, and actions of primatives
         private static readonly Dictionary<Type, Dictionary<string, Func<object, object>>> gettersByType =
@@ -50,10 +49,8 @@ namespace Kinectitude.Core.Base
 
         static ClassFactory()
         {
-            RegisterType("Increment", typeof(IncrementAction));
             RegisterType("AttributeChanges", typeof(AttributeChangesEvent));
             RegisterType("AttributeEquals", typeof(AttributeEqualsEvent));
-            RegisterType("Set", typeof(SetAction));
             RegisterType("PushScene", typeof(PushSceneAction));
             RegisterType("PopScene", typeof(PopSceneAction));
             RegisterType("ChangeScene", typeof(ChangeSceneAction));
@@ -196,12 +193,7 @@ namespace Kinectitude.Core.Base
         {
             Expression setBody;
             ParameterExpression setAs = Expression.Parameter(typeof(object));
-
-            if (typeof(ValueWriter) == pi.PropertyType)
-            {
-                setBody = Expression.Call(WriterMaker, Expression.TypeAs(setAs, typeof(ValueReader)));
-            }
-            else if (pi.PropertyType.IsEnum)
+            if (pi.PropertyType.IsEnum)
             {
                 setBody = Expression.Convert(
                     Expression.Call(

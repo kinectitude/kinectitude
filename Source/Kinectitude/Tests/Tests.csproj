@@ -54,6 +54,7 @@
     <Compile Include="Core\Setup.cs" />
     <Compile Include="Core\Inheritence.cs" />
     <Compile Include="Core\TestMocks.cs" />
+    <Compile Include="Core\Actions2.cs" />
     <Compile Include="Core\TypeMatcherTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

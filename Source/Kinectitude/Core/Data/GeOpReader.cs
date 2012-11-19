@@ -7,7 +7,6 @@ namespace Kinectitude.Core.Data
 {
     internal sealed class GeOpReader : BinOpReader
     {
-        internal override ConstantReader NullEquals { get { return ConstantReader.TrueValue; } }
         internal GeOpReader(ValueReader left, ValueReader right) : base(left, right) { }
         internal override bool GetBoolValue() { return Left.GetDoubleValue() >= Right.GetDoubleValue(); }
         internal override string GetStrValue() { return (Left.GetDoubleValue() >= Right.GetDoubleValue()).ToString(); }

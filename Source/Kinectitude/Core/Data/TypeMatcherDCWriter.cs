@@ -5,10 +5,10 @@ using System.Text;
 
 namespace Kinectitude.Core.Data
 {
-    internal class TypeMatchreDCWriter : ValueWriter
+    internal class TypeMatcherDCWriter : ValueWriter
     {
         private readonly TypeMatcherDCReader reader;
-        internal TypeMatchreDCWriter(TypeMatcherDCReader reader) : base(reader)
+        internal TypeMatcherDCWriter(TypeMatcherDCReader reader) : base(reader)
         {
             this.reader = reader;
         }

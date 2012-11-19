@@ -60,7 +60,7 @@ Game (Width = 800, Height=600, FirstScene="test", IsFullScreen="false", X="15"){
         }
         Entity runTests(){
         Event SceneStarts(){
-                Set(Target=game.runtests, Value="true")
+                game.runtests = true
 				Assertion(LS=scene.score, RS=0, Assertion="scene score", OnlyRunIf=true)
 				Assertion(LS=scene.X, RS=15, Assertion="scene score", OnlyRunIf=true)
                 PopScene()

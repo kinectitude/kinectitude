@@ -63,10 +63,11 @@ namespace Kinectitude.Core.Loaders
         public string GetName(object from)
         {
             ParseTreeNode node = from as ParseTreeNode;
-            ParseTreeNode nameNode = node.ChildNodes.FirstOrDefault(child => child.Term == KinectitudeGrammar.Name);
+            ParseTreeNode nameNode = node.ChildNodes.FirstOrDefault(child => child.Term == KinectitudeGrammar.Identifier);
             if (nameNode == null) return null;
             string name = nameNode.Token.ValueString;
-            if (grammar.Constants.ContainsKey(name)) Game.CurrentGame.Die("Can't use keyword " + name + " as a name");
+            if (KinectitudeGrammar.Constants.Constants.ContainsKey(name))
+                Game.CurrentGame.Die("Can't use keyword " + name + " as a name");
             return name;
         }
 
@@ -79,7 +80,7 @@ namespace Kinectitude.Core.Loaders
             {
                 List<ParseTreeNode> firstType = new List<ParseTreeNode>();
                 NonTerminal pluralType = nonTerm == SceneType ? KinectitudeGrammar.Scenes :
-                    nonTerm == ComponentType || nonTerm == EventType? KinectitudeGrammar.EntityDefinition : 
+                    nonTerm == ComponentType || nonTerm == EventType ? KinectitudeGrammar.EntityDefinition :
                         KinectitudeGrammar.Entities;
 
                 getOfTypeHelper(node, pluralType, firstType);
@@ -91,6 +92,7 @@ namespace Kinectitude.Core.Loaders
                 HashSet<NonTerminal> valids = new HashSet<NonTerminal>();
                 valids.Add(KinectitudeGrammar.Action);
                 valids.Add(KinectitudeGrammar.Condition);
+                valids.Add(KinectitudeGrammar.Assignment);
                 getOfTypeHelper(node, nonTerm, firstType);
                 foreach (ParseTreeNode singular in firstType) getOfTypeHelper(singular, valids, nodes);
             }
@@ -113,6 +115,26 @@ namespace Kinectitude.Core.Loaders
             return node.Term == KinectitudeGrammar.Action;
         }
 
+        public bool IsAssignment(object obj)
+        {
+            ParseTreeNode node = obj as ParseTreeNode;
+            return node.Term == KinectitudeGrammar.Assignment;
+        }
+
+        public Tuple<object, object, object> GetAssignment(object obj)
+        {
+            ParseTreeNode node = obj as ParseTreeNode;
+            switch (node.ChildNodes.Count)
+            {
+                case 2:
+                    return new Tuple<object, object, object>(node.ChildNodes[0], null, node.ChildNodes[1]);
+                case 3:
+                    return new Tuple<object, object, object>(node.ChildNodes[0], node.ChildNodes[1], node.ChildNodes[2]);
+            }
+            Game.CurrentGame.Die("Error with assignment");
+            return null;
+        }
+
         public IEnumerable<string> GetPrototypes(object from)
         {
             ParseTreeNode node = from as ParseTreeNode;
@@ -121,14 +143,17 @@ namespace Kinectitude.Core.Loaders
             List<ParseTreeNode> names = new List<ParseTreeNode>();
             getOfTypeHelper(node, KinectitudeGrammar.Names, names);
             //Names should only have name as a child EVER.
-            foreach (ParseTreeNode name in names)prototypeNames.Add(name.ChildNodes[0].Token.ValueString);
+            foreach (ParseTreeNode name in names) prototypeNames.Add(name.ChildNodes[0].Token.ValueString);
             return prototypeNames;
         }
 
         public string GetType(object from)
         {
             ParseTreeNode node = from as ParseTreeNode;
-            if (node.Term == KinectitudeGrammar.Actions) node = node.ChildNodes.First(child => child.Term == KinectitudeGrammar.Action);
+            if (node.Term == KinectitudeGrammar.Actions)
+            {
+                node = node.ChildNodes.First(child => child.Term == KinectitudeGrammar.Action);
+            }
             return node.ChildNodes[0].Token.ValueString;
         }
 
@@ -156,7 +181,7 @@ namespace Kinectitude.Core.Loaders
             if (grammar.Or == op) return new OrOpReader(left, right);
             if (grammar.LeftShift == op) return new LeftShiftOpReader(left, right);
             if (grammar.RightShift == op) return new RightShiftOpReader(left, right);
-            if(grammar.Div == op) return new DivOpReader(left, right);
+            if (grammar.Div == op) return new DivOpReader(left, right);
             throw new NotImplementedException("Error with implementation of operator " + op.Name);
         }
 
@@ -194,56 +219,69 @@ namespace Kinectitude.Core.Loaders
         private void checkForConstant(ParseTreeNodeList list)
         {
             ParseTreeNode first;
-            if ((first = list.FirstOrDefault(key => grammar.Constants.ContainsKey(key.Token.ValueString))) != null) 
+            if ((first = list.FirstOrDefault(key =>
+                KinectitudeGrammar.Constants.Constants.ContainsKey(key.Token.ValueString))) != null)
+            {
                 Game.CurrentGame.Die("Invalid use of the term " + first.Token.ValueString);
+            }
         }
 
         private ValueReader makeValueReader(ParseTreeNode node, Scene scene, Entity entity, Event evt)
         {
-            BnfTerm child0 = node.ChildNodes[0].Term;
-            
-            if (child0 == KinectitudeGrammar.UniOp)
+            BnfTerm type0;
+            //From is used for assignments where the node is not an expr.  It can only be an exactvalue, but not constant
+            ParseTreeNode from;
+            if(node.Term == KinectitudeGrammar.Expr){
+                from = node.ChildNodes[0];
+                type0 = from.Term;
+            }else{
+                from = node;
+                type0 = node.Term;
+            }
+
+            if (type0 == KinectitudeGrammar.UniOp)
             {
                 ValueReader value = makeValueReader(node.ChildNodes[1], scene, entity, evt);
                 return uniOpCreate(node.ChildNodes[0].ChildNodes[0].Term, value);
             }
-            else if (child0 == KinectitudeGrammar.Number)
+            else if (type0 == KinectitudeGrammar.Number)
             {
                 return new ConstantReader(node.ChildNodes[0].Token.Value);
             }
-            else if (child0 == KinectitudeGrammar.ThreeVal)
+            else if (type0 == KinectitudeGrammar.ThreeVal)
             {
-                ParseTreeNodeList list = node.ChildNodes[0].ChildNodes;
+                ParseTreeNodeList list = from.ChildNodes;
                 checkForConstant(list);
-                return makeParameterReader(scene, entity, list[0].Token.ValueString, 
+                return makeParameterReader(scene, entity, list[0].Token.ValueString,
                     list[1].Token.ValueString, list[2].Token.ValueString);
             }
-            else if (child0 == KinectitudeGrammar.TwoVal)
+            else if (type0 == KinectitudeGrammar.TwoVal)
             {
-                ParseTreeNodeList list = node.ChildNodes[0].ChildNodes;
+                ParseTreeNodeList list = from.ChildNodes;
                 checkForConstant(list);
-                if (null == getDataContainer(scene, entity, list[0].Token.ValueString)) 
+                if (null == getDataContainer(scene, entity, list[0].Token.ValueString))
                     return makeParameterReader(scene, entity, "this", list[0].Token.ValueString, list[1].Token.ValueString);
                 return makeDcReader(scene, entity, list[0].Token.ValueString, list[1].Token.ValueString);
             }
-            else if (child0 == KinectitudeGrammar.Name)
+            else if (type0 == KinectitudeGrammar.Identifier)
             {
-                ConstantReader value;
-                if (grammar.Constants.TryGetValue(node.ChildNodes[0].Token.ValueString, out value)) return value;
-                return makeDcReader(scene, entity, "this", node.ChildNodes[0].Token.ValueString);
+                return makeDcReader(scene, entity, "this", from.Token.ValueString);
             }
-            else if (child0 == KinectitudeGrammar.ParentVal)
+            else if (type0 == KinectitudeGrammar.Constants)
             {
-                ParseTreeNode make = node.ChildNodes[0];
-                checkForConstant(make.ChildNodes);
-                switch (make.ChildNodes.Count)
+                return from.Token.Value as ConstantReader;
+            }
+            else if (type0 == KinectitudeGrammar.ParentVal)
+            {
+                checkForConstant(from.ChildNodes);
+                switch (from.ChildNodes.Count)
                 {
                     case 2:
-                        return TypeMatcherDCReader.GetTypeMatcherDCValueReader(evt, make.ChildNodes[0].Token.ValueString, 
-                            make.ChildNodes[1].Token.ValueString, entity); 
+                        return TypeMatcherDCReader.GetTypeMatcherDCValueReader(evt, from.ChildNodes[0].Token.ValueString,
+                            from.ChildNodes[1].Token.ValueString, entity);
                     case 3:
-                        return TypeMatcherProperyReader.GetTypeMatcherProperyReader(evt, make.ChildNodes[0].Token.ValueString,
-                            make.ChildNodes[1].Token.ValueString, make.ChildNodes[2].Token.ValueString, entity);
+                        return TypeMatcherProperyReader.GetTypeMatcherProperyReader(evt, from.ChildNodes[0].Token.ValueString,
+                            from.ChildNodes[1].Token.ValueString, from.ChildNodes[2].Token.ValueString, entity);
                 }
             }
             else if (node.ChildNodes.Count == 3 && node.ChildNodes[1].Term == KinectitudeGrammar.BinOp)
@@ -254,15 +292,16 @@ namespace Kinectitude.Core.Loaders
             }
             else
             {
-                return new ConstantReader(node.ChildNodes[0].Token.Value);
+                return new ConstantReader(from.Token.Value);
             }
-            throw new NotImplementedException("Error with implementation of operator");
+            Game.CurrentGame.Die("Error with implementation of operator");
+            return null;
         }
 
         private TypeMatcher makeTypeMatcherHelper(ParseTreeNode node, Scene scene)
         {
             string strVal = node.ChildNodes[0].Token.ValueString;
-            if (grammar.Constants.ContainsKey(strVal)) Game.CurrentGame.Die("Invalid use of the term " + strVal);
+            if (KinectitudeGrammar.Constants.Constants.ContainsKey(strVal)) Game.CurrentGame.Die("Invalid use of the term " + strVal);
 
             if (node.Term == KinectitudeGrammar.IsType)
                 return new PrototypeTypeMatcher(scene.GetOfPrototype(strVal, false));
@@ -279,7 +318,7 @@ namespace Kinectitude.Core.Loaders
             else
             {
                 List<TypeMatcher> readables = new List<TypeMatcher>();
-                for (; node.ChildNodes.Count != 1; node = node.ChildNodes[2]) 
+                for (; node.ChildNodes.Count != 1; node = node.ChildNodes[2])
                     readables.Add(makeTypeMatcherHelper(node.ChildNodes[0], scene));
                 readables.Add(makeTypeMatcherHelper(node.ChildNodes[0], scene));
                 return new ListedTypeMatcher(readables);
@@ -293,17 +332,25 @@ namespace Kinectitude.Core.Loaders
             return makeValueReader(node, scene, entity, evt);
         }
 
+        public ValueReader MakeAssignmentValue(ValueReader ls, object type, ValueReader rs)
+        {
+            if (type == null) return rs;
+            ParseTreeNode binOpNode = type as ParseTreeNode;
+            BnfTerm binOp = binOpNode.ChildNodes[0].Term;
+            return binOpCreate(binOp, ls, rs);
+        }
+
         public IEnumerable<Tuple<string, string>> GetDefines(object from)
         {
             List<Tuple<string, string>> definitions = new List<Tuple<string, string>>();
             ParseTreeNode node = from as ParseTreeNode;
             List<ParseTreeNode> defines = new List<ParseTreeNode>();
             getOfTypeHelper(node, KinectitudeGrammar.Definitions, defines);
-            
-            foreach(ParseTreeNode define in defines)
+
+            foreach (ParseTreeNode define in defines)
             {
                 string className = define.ChildNodes.First(child => child.Term == KinectitudeGrammar.ClassName).Token.ValueString;
-                definitions.Add(new Tuple<string,string>(GetName(define), className));
+                definitions.Add(new Tuple<string, string>(GetName(define), className));
             }
             return definitions;
         }
@@ -317,7 +364,7 @@ namespace Kinectitude.Core.Loaders
         private void getOfTypeHelper(ParseTreeNode node, NonTerminal type, List<ParseTreeNode> nodes, bool needsChildren = true)
         {
             int minCount = needsChildren ? 1 : 0;
-            IEnumerable<ParseTreeNode> correctTypedNodes =node.ChildNodes.Where(child => 
+            IEnumerable<ParseTreeNode> correctTypedNodes = node.ChildNodes.Where(child =>
                 child.Term == type && child.ChildNodes.Count >= minCount);
 
             nodes.AddRange(correctTypedNodes);
@@ -328,7 +375,7 @@ namespace Kinectitude.Core.Loaders
         {
             int minCount = needsChildren ? 1 : 0;
             IEnumerable<ParseTreeNode> correctTypedNodes = node.ChildNodes.Where(child =>
-                type.Contains(child.Term)  && child.ChildNodes.Count >= minCount);
+                type.Contains(child.Term) && child.ChildNodes.Count >= minCount);
 
             nodes.AddRange(correctTypedNodes);
             foreach (ParseTreeNode child in correctTypedNodes) getOfTypeHelper(child, type, nodes);

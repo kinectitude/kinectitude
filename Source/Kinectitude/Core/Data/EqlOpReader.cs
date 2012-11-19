@@ -7,7 +7,6 @@ namespace Kinectitude.Core.Data
 {
     internal sealed class EqlOpReader : BinOpReader
     {
-        internal override ConstantReader NullEquals { get { return ConstantReader.TrueValue; } }
         internal EqlOpReader(ValueReader left, ValueReader right) : base(left, right) { }
         internal override bool GetBoolValue() { return Left.HasSameVal(Right); }
         internal override string GetStrValue() { return Left.HasSameVal(Right).ToString(); }

@@ -14,8 +14,12 @@ namespace Kinectitude.Core.Data
         {
             Left = left;
             Right = right;
-            Left.notifyOfChange(Change);
-            Right.notifyOfChange(Change);
+        }
+
+        internal override void SetupNotifications()
+        {
+            Left.NotifyOfChange(Change);
+            Right.NotifyOfChange(Change);
         }
 
         internal override ValueWriter ConvertToWriter() { return new NullWriter(this); }

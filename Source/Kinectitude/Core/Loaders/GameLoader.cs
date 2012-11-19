@@ -154,22 +154,24 @@ namespace Kinectitude.Core.Loaders
 
             foreach (object action in actions)
             {
+                LoadedBaseAction actionToAdd;
                 if (loaderUtility.IsAciton(action))
                 {
                     PropertyHolder actionProperties = loaderUtility.GetProperties(action);
                     string type = loaderUtility.GetType(action);
-                    LoadedAction loadedAction = new LoadedAction(type, actionProperties, loaderUtility);
-                    if (null != cond) cond.AddAction(loadedAction);
-                    else loadedEvent.AddAction(loadedAction);
+                    actionToAdd = new LoadedAction(type, actionProperties, loaderUtility);
                 }
-                else if (null == cond)
+                else if (loaderUtility.IsAssignment(action))
                 {
-                    loadedEvent.AddAction(createCondition(game, loadedEvent, action));
+                    Tuple<object, object, object> assignment = loaderUtility.GetAssignment(action);
+                    actionToAdd = new LoadedAssignment(assignment.Item1, assignment.Item2, assignment.Item3, loaderUtility);
                 }
                 else
                 {
-                    cond.AddAction(createCondition(game, loadedEvent, action));
+                    actionToAdd = createCondition(game, loadedEvent, action);
                 }
+                if (null != cond) cond.AddAction(actionToAdd);
+                else loadedEvent.AddAction(actionToAdd);
             }
         }
 

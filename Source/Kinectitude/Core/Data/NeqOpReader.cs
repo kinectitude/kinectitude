@@ -7,7 +7,6 @@ namespace Kinectitude.Core.Data
 {
     internal sealed class NeqOpReader : BinOpReader
     {
-        internal override ConstantReader NullEquals { get { return ConstantReader.FalseValue; } }
         internal NeqOpReader(ValueReader left, ValueReader right) : base(left, right) { }
         internal override bool GetBoolValue() { return !Left.HasSameVal(Right); }
         internal override string GetStrValue() { return (!Left.HasSameVal(Right)).ToString(); }

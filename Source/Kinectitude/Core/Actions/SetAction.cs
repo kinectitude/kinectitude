@@ -4,16 +4,17 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Actions
 {
-    [Plugin("Set value {Target} to {Value}", "")]
-    public sealed class SetAction : Action
+    internal sealed class SetAction : Action
     {
-        [Plugin("Value", "Value to set with")]
-        public ValueReader Value { get; set; }
+        private readonly ValueReader Value;
+        private readonly ValueWriter Target;
 
-        [Plugin("Key", "Attribute Or property to change")]
-        public ValueWriter Target { get; set; }
-
-        public SetAction() { }
+        public SetAction(ValueWriter target, ValueReader value, Event evt) 
+        {
+            Target = target;
+            Value = value;
+            Event = evt;
+        }
 
         public override void Run()
         {

@@ -9,36 +9,36 @@ Game (Width = 800, Height=600, FirstScene="test", IsFullScreen=false){
         Entity runTests(){
             Component MockComponent()
             Event SceneStarts(){
-                Set(Target=val, Value=1)
+                val = 1
             }
             Event AttributeChanges(Target=runTests.val){
                 Assertion(LS=runTests.val, RS=1, Assertion="runTests.val is set", OnlyRunIf= true)
-                Set(Target=this.MockComponent.IntVal, Value=100)
+                this.MockComponent.IntVal = 100
                 Assertion(LS=runTests.MockComponent.IntVal, RS=200, Assertion="IntVal is set, and attribute equals is run first", OnlyRunIf= true)
-                Set(Target=scene.x, Value=99)
+                scene.x = 99
             }
             Event AttributeEquals(Target=this.MockComponent.IntVal, Value=100){
-                Set(Target=this.MockComponent.IntVal, Value=200)
+                MockComponent.IntVal = 200
             }
             Event AttributeChanges(Target=scene.x){
                 Assertion(LS=scene.x, RS=99, Assertion="scene.x", OnlyRunIf= true)
-                Set(Target = scene.balls, Value = 9)
-                Set(Target = scene.rofl, Value = 9)
-                Set(Target = scene.left, Value = 1.5)
-                Set(Target = scene.shift, Value = 0x100 << 2)
+                scene.balls = 9
+                scene.rofl = 9
+                scene.left = 1.5
+                scene.shift = 0x100 << 2
                 Assertion(LS=scene.shift, RS=0x400, Assertion="left shift", OnlyRunIf= true)
-                Set(Target = scene.shift, Value = 0x400 >> 2)
+                scene.shift  = 0x400 >> 2
                 Assertion(LS=scene.shift, RS=0x100, Assertion="right shift", OnlyRunIf= true)
-                Set(Target=this.bool2, Value=false)
-                Set(Target=this.bool, Value=true)
-                Set(Target=this.bool2, Value=true)
-                Set(Target=this.neg, Value=10)
-                Set(Target=this.not, Value=true)
-                Set(Target=this.lv, Value=1)
-                Set(Target=this.lv, Value=9)
-                Set(Target=this.lv, Value=9)
-                Set(Target=this.lv, Value=10)
-                Set(Target=this.lv, Value=1)
+                this.bool = false
+                this.bool = true
+                this.bool2 = true
+                neg = 10
+                not = true
+                this.lv = 1
+                this.lv = 9
+                lv = 9
+                this.lv = 10
+                this.lv = 1
             }
             Event AttributeChanges(Target=scene.balls + scene.rofl){
                 Assertion(LS=1, RS=1, Assertion="balls + rofl", OnlyRunIf= true)

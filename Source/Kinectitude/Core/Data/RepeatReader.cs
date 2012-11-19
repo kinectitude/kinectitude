@@ -4,7 +4,6 @@ namespace Kinectitude.Core.Data
     public abstract class RepeatReader : ValueReader
     {
         protected abstract ValueReader Reader { get; }
-        internal override ConstantReader NullEquals { get { return Reader.NullEquals; } }
         internal override double GetDoubleValue() { return Reader.GetDoubleValue(); }
         internal override float GetFloatValue() { return Reader.GetFloatValue(); }
         internal override int GetIntValue() { return Reader.GetIntValue(); }

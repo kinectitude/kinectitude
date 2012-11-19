@@ -7,8 +7,6 @@ namespace Kinectitude.Core.Data
 {
     internal sealed class DivOpReader : BinOpReader
     {
-        //Division changes if both are null, then we have a div 0 excepion
-        internal override ConstantReader NullEquals { get { return ConstantReader.NullValue; } }
         internal DivOpReader(ValueReader left, ValueReader right) : base(left, right) { }
         internal override bool GetBoolValue() { return ToBool(Left.GetDoubleValue() / Right.GetDoubleValue()); }
         internal override string GetStrValue() { return (Left.GetDoubleValue() / Right.GetDoubleValue()).ToString(); }

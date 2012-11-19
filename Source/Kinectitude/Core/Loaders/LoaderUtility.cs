@@ -27,9 +27,17 @@ namespace Kinectitude.Core.Loaders
         string GetFile(object from);
         IEnumerable<Tuple<string, string>> GetDefines(object from);
         bool IsAciton(object obj);
+        bool IsAssignment(object obj);
         IEnumerable<string> GetPrototypes(object from);
         string GetType(object from);
         object GetCondition(object from);
         object MakeAssignable(object obj, Scene scene = null, Entity entity = null, Event evt = null);
+        /// <summary>
+        /// Tuple is Target, type (*=, /= etc) or null for =, then Value
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        Tuple<object, object, object> GetAssignment(object obj);
+        ValueReader MakeAssignmentValue(ValueReader ls, object type, ValueReader rs);
     }
 }

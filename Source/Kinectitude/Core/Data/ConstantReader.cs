@@ -23,8 +23,6 @@ namespace Kinectitude.Core.Data
         internal static readonly ConstantReader ZeroValue = new ConstantReader(0);
         internal static readonly ConstantReader OneValue = new ConstantReader(1);
 
-        internal override ConstantReader NullEquals { get { return NullValue; } }
-
         internal ConstantReader(object value)
         {
             Type = NativeReturnType(value);

@@ -20,7 +20,7 @@ Game (Width = 800, Height=600, FirstScene="test", IsFullScreen="false", val=0, c
                 Assertion(LS=1, RS=1, Assertion="t2", OnlyRunIf= "true")
 				if(game.create == 1){
 					CreateTimer(Name="t3", Duration=1, Trigger="t3", Recurring="false")
-					Set(Target=game.create, Value = 0)
+					game.create = 0
 				}
             }
             Event TriggerOccurs(Trigger="t3"){
@@ -28,7 +28,7 @@ Game (Width = 800, Height=600, FirstScene="test", IsFullScreen="false", val=0, c
                 CreateTimer(Name="t4", Duration=5, Trigger="t4", Recurring="false")
                 if(game.val == 0){
                     PauseTimers(Name="t1")
-                    Set(Target = game.val, Value = 1)
+                    game.val = 1
                 }
             }
             Event TriggerOccurs(Trigger="t4"){

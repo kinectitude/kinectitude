@@ -187,20 +187,7 @@ namespace Kinectitude.Tests.Core
                 }
             }
         }
-        ValueWriter writerVal = null;
-        [Plugin("reader", "")]
-        public ValueWriter WriterVal
-        {
-            get { return WriterVal; }
-            set
-            {
-                if (writerVal != value)
-                {
-                    writerVal = value;
-                    Change("WriterVal");
-                }
-            }
-        }
+
         TypeMatcher matcherVal = null;
         [Plugin("Matcher", "")]
         public TypeMatcher MatcherVal

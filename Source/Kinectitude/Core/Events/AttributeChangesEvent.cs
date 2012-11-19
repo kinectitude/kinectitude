@@ -18,7 +18,7 @@ namespace Kinectitude.Core.Events
 
         public override void OnInitialize()
         {
-            Target.notifyOfChange(Trigger);
+            Target.NotifyOfChange(Trigger);
         }
 
         public void Trigger(ValueReader newValue)

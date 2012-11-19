@@ -7,7 +7,6 @@ namespace Kinectitude.Core.Data
 {
     internal sealed class MinusOpReader : BinOpReader
     {
-        internal override ConstantReader NullEquals { get { return ConstantReader.ZeroValue; } }
         internal MinusOpReader(ValueReader left, ValueReader right) : base(left, right) { }
         internal override bool GetBoolValue() { return ToBool(Left.GetDoubleValue() - Right.GetDoubleValue()); }
         internal override string GetStrValue() { return (Left.GetDoubleValue() - Right.GetDoubleValue()).ToString(); }

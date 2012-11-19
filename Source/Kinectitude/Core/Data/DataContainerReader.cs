@@ -31,6 +31,10 @@ namespace Kinectitude.Core.Data
         {
             DataContainer = dataContainer;
             Param = param;
+        }
+
+        internal override void SetupNotifications()
+        {
             DataContainer.NotifyOfChange(Param, Change);
         }
 
