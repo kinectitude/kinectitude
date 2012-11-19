@@ -201,6 +201,8 @@ namespace Kinectitude.Core.Language
             //Removes from the tree, we don't care about having these there
             MarkPunctuation("{", "}", "(", ")", ":", "$", "@", "#", "Game", "using", "define", "Scene", "Entity",
                  ",", "if", "Component", "Manager", "Prototype", "=", ".", "as", "Event");
+            MarkReservedWords("Game", "using", "define", "Scene", "Entity", "Component", "Manager", "Prototype",
+                "as", "Event", "if", "true", "false", "Pi", "E");
             MarkTransient(BasicDefinition, value, IsPrototype, term, exactValue, OptionalActions);
         }
     }

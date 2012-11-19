@@ -65,10 +65,7 @@ namespace Kinectitude.Core.Loaders
             ParseTreeNode node = from as ParseTreeNode;
             ParseTreeNode nameNode = node.ChildNodes.FirstOrDefault(child => child.Term == KinectitudeGrammar.Identifier);
             if (nameNode == null) return null;
-            string name = nameNode.Token.ValueString;
-            if (KinectitudeGrammar.Constants.Constants.ContainsKey(name))
-                Game.CurrentGame.Die("Can't use keyword " + name + " as a name");
-            return name;
+            return nameNode.Token.ValueString;
         }
 
         public IEnumerable<object> GetOfType(object from, object type)
@@ -216,16 +213,6 @@ namespace Kinectitude.Core.Loaders
             return DataContainerReader.GetDataContainerReader(dataContainer, param);
         }
 
-        private void checkForConstant(ParseTreeNodeList list)
-        {
-            ParseTreeNode first;
-            if ((first = list.FirstOrDefault(key =>
-                KinectitudeGrammar.Constants.Constants.ContainsKey(key.Token.ValueString))) != null)
-            {
-                Game.CurrentGame.Die("Invalid use of the term " + first.Token.ValueString);
-            }
-        }
-
         private ValueReader makeValueReader(ParseTreeNode node, Scene scene, Entity entity, Event evt)
         {
             BnfTerm type0;
@@ -251,14 +238,12 @@ namespace Kinectitude.Core.Loaders
             else if (type0 == KinectitudeGrammar.ThreeVal)
             {
                 ParseTreeNodeList list = from.ChildNodes;
-                checkForConstant(list);
                 return makeParameterReader(scene, entity, list[0].Token.ValueString,
                     list[1].Token.ValueString, list[2].Token.ValueString);
             }
             else if (type0 == KinectitudeGrammar.TwoVal)
             {
                 ParseTreeNodeList list = from.ChildNodes;
-                checkForConstant(list);
                 if (null == getDataContainer(scene, entity, list[0].Token.ValueString))
                     return makeParameterReader(scene, entity, "this", list[0].Token.ValueString, list[1].Token.ValueString);
                 return makeDcReader(scene, entity, list[0].Token.ValueString, list[1].Token.ValueString);
@@ -273,7 +258,6 @@ namespace Kinectitude.Core.Loaders
             }
             else if (type0 == KinectitudeGrammar.ParentVal)
             {
-                checkForConstant(from.ChildNodes);
                 switch (from.ChildNodes.Count)
                 {
                     case 2:
