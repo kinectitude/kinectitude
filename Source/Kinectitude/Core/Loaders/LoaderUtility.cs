@@ -19,6 +19,7 @@ namespace Kinectitude.Core.Loaders
         object DefineType { get; }
         object PrototypeType { get; }
         object SceneType { get; }
+        object Else { get; }
 
         object GetGame();
         PropertyHolder GetProperties(object from);

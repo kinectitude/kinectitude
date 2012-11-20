@@ -142,7 +142,17 @@ namespace Kinectitude.Core.Loaders
 
         private LoadedCondition createCondition(Game game, LoadedEvent e, object condition)
         {
-            LoadedCondition lc = new LoadedCondition(loaderUtility.GetCondition(condition), loaderUtility);
+            IEnumerable<object> elseStatements = loaderUtility.GetOfType(condition, loaderUtility.Else);
+            elseStatements = elseStatements.Reverse();
+            LoadedCondition next = null;
+
+            foreach (object elseStatement in elseStatements)
+            {
+                next = new LoadedCondition(loaderUtility.GetCondition(elseStatement), next, loaderUtility);
+                addActions(game, elseStatement, e, next);
+            }
+
+            LoadedCondition lc = new LoadedCondition(loaderUtility.GetCondition(condition), next, loaderUtility);
             addActions(game, condition, e, lc);
             return lc;
         }

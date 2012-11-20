@@ -25,6 +25,7 @@ namespace Kinectitude.Core.Loaders
         public object DefineType { get { return KinectitudeGrammar.Definitions; } }
         public object PrototypeType { get { return KinectitudeGrammar.Prototype; } }
         public object SceneType { get { return KinectitudeGrammar.Scene; } }
+        public object Else { get { return KinectitudeGrammar.Else; } }
         public object GetGame() { return Root; }
 
         internal KGLLoaderUtility(string fileName, GameLoader gameLoader)
@@ -311,6 +312,7 @@ namespace Kinectitude.Core.Loaders
 
         public object MakeAssignable(object obj, Scene scene, Entity entity, Event evt)
         {
+            if (null == obj) return ConstantReader.TrueValue;
             ParseTreeNode node = obj as ParseTreeNode;
             if (node.Term == KinectitudeGrammar.TypeMatcher) return makeTypeMatcher(node, scene);
             return makeValueReader(node, scene, entity, evt);
@@ -342,7 +344,7 @@ namespace Kinectitude.Core.Loaders
         public object GetCondition(object from)
         {
             ParseTreeNode node = from as ParseTreeNode;
-            return node.ChildNodes.First(child => child.Term == KinectitudeGrammar.Expr);
+            return node.ChildNodes.FirstOrDefault(child => child.Term == KinectitudeGrammar.Expr);
         }
 
         private void getOfTypeHelper(ParseTreeNode node, NonTerminal type, List<ParseTreeNode> nodes, bool needsChildren = true)

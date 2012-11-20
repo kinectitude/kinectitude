@@ -45,6 +45,7 @@ namespace Kinectitude.Core.Language
         internal static readonly NonTerminal Definitions = new NonTerminal("Definitions", "Definitions");
         internal static readonly NonTerminal Assignment = new NonTerminal("Assignment", "Assignment");
         internal static readonly ConstantTerminal Constants = new ConstantTerminal("Constants", typeof(ConstantReader));
+        internal static readonly NonTerminal Else = new NonTerminal("Else", "Else");
         #endregion
 
         #region Key Types of KGL
@@ -172,7 +173,14 @@ namespace Kinectitude.Core.Language
             Prototype.Rule = "Prototype" + Identifier + EntityDefinition + Prototype | Empty;
             Manager.Rule = "Manager" + ClassName + BasicDefinition + Manager | Empty;
             Component.Rule = "Component" + ClassName + BasicDefinition + Component | Empty;
-            Condition.Rule = "if" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace;
+
+            Else.Rule = ToTerm("else") + "if" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace + Else |
+                ToTerm("else") + "if" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace |
+                 "else" + openBrace + Actions + closeBrace + Else |
+                 "else" + openBrace + Actions + closeBrace;
+
+            Condition.Rule = "if" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace |
+                "if" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace + Else;
 
             NonTerminal OptionalActions = new NonTerminal("OptionalActions", "OptionalActions");
 
@@ -200,9 +208,8 @@ namespace Kinectitude.Core.Language
             Root = Game;
             //Removes from the tree, we don't care about having these there
             MarkPunctuation("{", "}", "(", ")", ":", "$", "@", "#", "Game", "using", "define", "Scene", "Entity",
-                 ",", "if", "Component", "Manager", "Prototype", "=", ".", "as", "Event");
-            MarkReservedWords("Game", "using", "define", "Scene", "Entity", "Component", "Manager", "Prototype",
-                "as", "Event", "if", "true", "false", "Pi", "E");
+                 ",", "if", "Component", "Manager", "Prototype", "=", ".", "as", "Event", "else");
+            MarkReservedWords("using", "define", "if", "true", "false", "Pi", "E", "else");
             MarkTransient(BasicDefinition, value, IsPrototype, term, exactValue, OptionalActions);
         }
     }

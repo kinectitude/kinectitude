@@ -10,18 +10,23 @@ namespace Kinectitude.Core.Loaders
 {
     class LoadedCondition : LoadedBaseAction
     {
-        private readonly object ifValue;
-        private readonly List<LoadedBaseAction> actions = new List<LoadedBaseAction>();
+        private readonly object IfValue;
+        private readonly List<LoadedBaseAction> Actions = new List<LoadedBaseAction>();
+        private readonly LoadedCondition ElseCond;
 
-        internal LoadedCondition(object ifVal, LoaderUtility loaderUtil) : base(null, loaderUtil)
+        internal LoadedCondition(object ifVal, LoadedCondition elseCond, LoaderUtility loaderUtil) : base(null, loaderUtil)
         {
-            ifValue = ifVal;
+            IfValue = ifVal;
+            ElseCond = elseCond;
         }
 
         internal override Action Create(Event evt)
         {
-            Condition condition = new Condition(LoaderUtil.MakeAssignable(ifValue, evt.Entity.Scene, evt.Entity, evt) as ValueReader);
-            foreach (LoadedBaseAction loadedAction in actions)
+            Condition cond = null;
+            if (ElseCond != null) cond = ElseCond.Create(evt) as Condition;
+            ValueReader reader = LoaderUtil.MakeAssignable(IfValue, evt.Entity.Scene, evt.Entity, evt) as ValueReader;
+            Condition condition = new Condition(reader, cond);
+            foreach (LoadedBaseAction loadedAction in Actions)
             {
                 Action action = loadedAction.Create(evt);
                 condition.AddAction(action);
@@ -31,7 +36,7 @@ namespace Kinectitude.Core.Loaders
 
         internal void AddAction(LoadedBaseAction action)
         {
-            actions.Add(action);
+            Actions.Add(action);
         }
 
     }

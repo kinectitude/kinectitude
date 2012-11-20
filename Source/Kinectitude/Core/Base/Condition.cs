@@ -5,29 +5,31 @@ namespace Kinectitude.Core.Base
 {
     internal class Condition : Action
     {
-        private List<Action> actions = new List<Action>();
-        private ValueReader expression;
+        private readonly List<Action> Actions = new List<Action>();
+        private readonly Condition ElseCond;
+        private readonly ValueReader Expression;
 
-        internal Condition(ValueReader expr)
+
+        internal Condition(ValueReader expr, Condition elseCond)
         {
-            expression = expr;
+            Expression = expr;
+            ElseCond = elseCond;
         }
 
         internal void AddAction(Action action)
         {
-            actions.Add(action);
+            Actions.Add(action);
         }
-
-        internal bool ShouldRun() { return expression.GetBoolValue(); }
         
         public override void Run()
         {
-            if (ShouldRun())
+            if (Expression)
             {
-                foreach (Action a in actions)
-                {
-                    a.Run();
-                }
+                foreach (Action a in Actions) a.Run();
+            }
+            else if(ElseCond != null)
+            {
+                ElseCond.Run();
             }
         }
     }
