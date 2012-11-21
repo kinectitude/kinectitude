@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cpptest", "cpptest\cpptest.vcxproj", "{0CB79137-896A-41B9-9572-C3D45049BA35}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "fstest", "fstest\fstest.fsproj", "{F754C158-6028-4F29-A455-74EF8B10345B}"

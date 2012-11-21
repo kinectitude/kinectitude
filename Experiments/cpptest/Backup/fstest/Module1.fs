@@ -8,12 +8,12 @@ open Kinectitude.Core.Data
 
 type FsComponent() =
     inherit Component()
-    let mutable matcher : TypeMatcher = null
+    let mutable matcher : ITypeMatcher = null
 
     [<Plugin("test type matcher", "")>]
     member public this.Type
-        with get() : TypeMatcher = matcher
-        and set(value : TypeMatcher) =
+        with get() : ITypeMatcher = matcher
+        and set(value : ITypeMatcher) =
             (if matcher <> value then
                 matcher <- value
                 this.Change("Type"))

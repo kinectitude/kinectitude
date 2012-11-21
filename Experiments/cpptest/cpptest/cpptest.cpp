@@ -12,12 +12,11 @@ void CppComponent::OnUpdate(float frameDelta){
 
 void CppComponent::Destroy(){}
 
-
-ITypeMatcher ^ CppComponent::Type::get() {
+TypeMatcher ^ CppComponent::Type::get() {
 	return type;
 }
 
-void CppComponent::Type::set(ITypeMatcher ^ matcher){
+void CppComponent::Type::set(TypeMatcher ^ matcher){
 	if(matcher != type){
 		type = matcher;
 		Change("Type");

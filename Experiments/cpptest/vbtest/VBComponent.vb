@@ -4,13 +4,12 @@ Imports Kinectitude.Core.Data
 Public Class VBComponent
     Inherits Component
 
-    Private matcher As ITypeMatcher
-
-    Public Property Type As ITypeMatcher
+    Private matcher As TypeMatcher
+    Public Property Type As TypeMatcher
         Get
             Return matcher
         End Get
-        Set(ByVal value As ITypeMatcher)
+        Set(ByVal value As TypeMatcher)
             If (Not matcher Is value) Then
                 matcher = value
                 Change("Type")
