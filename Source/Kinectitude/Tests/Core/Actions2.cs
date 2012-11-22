@@ -9,6 +9,7 @@ namespace Kinectitude.Tests.Core
     {
         private const string timerFile = "core/timers.kgl";
         private const string destroyEndGame = "core/destroyEndGame.kgl";
+        private const string alreadySet = "core/alreadySet.kgl";
         private static Game destroyGame;
 
         [TestMethod]
@@ -56,6 +57,14 @@ namespace Kinectitude.Tests.Core
             AssertionAction.CheckValue("t2", 4);
             AssertionAction.CheckValue("t3");
             AssertionAction.CheckValue("t4");
+        }
+
+        [TestMethod]
+        [DeploymentItem(alreadySet)]
+        public void alreadySetTest()
+        {
+            Game game = Setup.StartGame("alreadySet.kgl");
+            AssertionAction.CheckValue("changes", 2);
         }
     }
 }

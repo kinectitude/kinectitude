@@ -9,6 +9,7 @@ using System.Reflection;
 using System;
 using System.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Kinectitude.Core.Managers;
 
 namespace Kinectitude.Tests.Core
 {
@@ -239,6 +240,88 @@ namespace Kinectitude.Tests.Core
     [Requires(typeof(TransformComponent))]
     public class MockRequiersComponent : Component
     {
+        [Plugin("test", "test")]
+        public bool ShouldCheckNulls { get; set; }
+        public override void Ready()
+        {
+            if (ShouldCheckNulls)
+            {
+                Assert.IsNotNull(GetComponent<TransformComponent>());
+                Assert.IsNotNull(GetManager<TimeManager>());
+            }
+        }
+
         public override void Destroy() { }
+    }
+
+    [Plugin("InvalidProvides", "")]
+    [Provides(typeof(TransformComponent))]
+    public class InvalidProvidesComponent : Component
+    {
+        public override void Destroy() { }
+    }
+
+    [Plugin("Service test", "")]
+    public class ServiceNoAuto : Service
+    {
+        public static int started = 0;
+        public static int stopped = 0;
+        public static int setVal = 0;
+
+        [Plugin("setVal", "")]
+        public int SetVal
+        {
+            get { return setVal; }
+            set { setVal = value; }
+        }
+
+        public override void OnStart() { started++; }
+        public override void OnStop() { stopped++; }
+        public override bool AutoStart() { return false; }
+    }
+
+    [Plugin("Service test", "")]
+    public class ServiceAuto : Service
+    {
+        public static int setVal = 0;
+
+        [Plugin("setVal", "")]
+        public int SetVal
+        {
+            get { return setVal; }
+            set { setVal = value; }
+        }
+
+        public static int started = 0;
+        public static int stopped = 0;
+
+        public override void OnStart() { started++; }
+        public override void OnStop() { stopped++; }
+        public override bool AutoStart() { return true; }
+    }
+
+
+    [Plugin("Service test", "")]
+    public class ServiceAutoSelfStop : Service
+    {
+        public static int started = 0;
+        public static int stopped = 0;
+
+        public static int setVal = 0;
+
+        [Plugin("setVal", "")]
+        public int SetVal
+        {
+            get { return setVal; }
+            set { setVal = value; }
+        }
+
+        public override void OnStart() 
+        { 
+            started++;
+            Stop();
+        }
+        public override void OnStop() { stopped++; }
+        public override bool AutoStart() { return true; }
     }
 }

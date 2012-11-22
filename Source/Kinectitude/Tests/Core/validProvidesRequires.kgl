@@ -1,0 +1,12 @@
+﻿using Kinectitude.Tests.dll{
+    define MockRequiers as Kinectitude.Tests.Core.MockRequiersComponent
+}
+
+Game (Width = 800, Height=600, FirstScene="test", IsFullScreen=false, val=0){
+    Scene test(score = 0, val = 1){
+        Entity(){
+            Component MockRequiers(ShouldCheckNulls = true)
+            Component Transform(X = 10, Width = 200, Y = 10, Height = 10)
+        }
+    }
+}

@@ -4,7 +4,7 @@
     define Assertion as Kinectitude.Tests.Core.AssertionAction
 }
 
-Game (Width = 800, Height=600, FirstScene="test", IsFullScreen="false", val=0){
+Game (Width = 800, Height=600, FirstScene="test", IsFullScreen=false, val=0){
     Prototype prototype(){
         Event OnCreate(){
             if(scene.created){
@@ -13,7 +13,7 @@ Game (Width = 800, Height=600, FirstScene="test", IsFullScreen="false", val=0){
             if(!scene.created){
                 scene.created = 1
             }
-            Assertion(LS=scene.created, RS=1, Assertion="Created new entity", OnlyRunIf= "true")
+            Assertion(LS=scene.created, RS=1, Assertion="Created new entity", OnlyRunIf= true)
         }
     }
     
@@ -21,16 +21,16 @@ Game (Width = 800, Height=600, FirstScene="test", IsFullScreen="false", val=0){
         Entity runTests(val = 2){
             Event SceneStarts(){
                 CreateEntity(Prototype="prototype")
-                Assertion(LS=scene.created, RS=1, Assertion="Created new entity", OnlyRunIf= "true")
+                Assertion(LS=scene.created, RS=1, Assertion="Created new entity", OnlyRunIf= true)
                 game.val += 1
                 PushScene(Target="test" + this.val)
-                Assertion(LS=game.lastScene, RS=2, Assertion="Got back from scene 2", OnlyRunIf= "true")
+                Assertion(LS=game.lastScene, RS=2, Assertion="Got back from scene 2", OnlyRunIf= true)
                 runTests.val = this.val + scene.val
                 PushScene(Target="test" + this.val)
-                Assertion(LS=game.lastScene, RS=3, Assertion="Got back from scene 3", OnlyRunIf= "true")
+                Assertion(LS=game.lastScene, RS=3, Assertion="Got back from scene 3", OnlyRunIf= true)
                 ChangeScene(Target="test4")
                 game.val += 1
-                Assertion(LS=game.val, RS=4, Assertion="game's val is correct", OnlyRunIf= "true")
+                Assertion(LS=game.val, RS=4, Assertion="game's val is correct", OnlyRunIf= true)
             }
         }
     }

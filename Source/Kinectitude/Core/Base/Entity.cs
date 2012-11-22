@@ -46,7 +46,7 @@ namespace Kinectitude.Core.Base
             return component;
         }
 
-        internal override Changeable GetComponentOrManager(string name)
+        internal override Changeable GetChangeable(string name)
         {
             return GetComponent(name);
         }

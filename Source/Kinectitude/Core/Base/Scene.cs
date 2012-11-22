@@ -231,7 +231,7 @@ namespace Kinectitude.Core.Base
         }
 
 
-        internal override Changeable GetComponentOrManager(string name)
+        internal override Changeable GetChangeable(string name)
         {
             Type managerType = ClassFactory.TypesDict[name];
             IManager manager = null;

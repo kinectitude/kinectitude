@@ -124,8 +124,8 @@ namespace Kinectitude.Core.Data
         {
             if (!HasSameVal(oldValue))
             {
-                foreach (Action<ValueReader> callback in Callbacks) callback(this);
                 oldValue = new ConstantReader(this.GetPreferedValue());
+                foreach (Action<ValueReader> callback in Callbacks) callback(oldValue);
             }
         }
 

@@ -50,7 +50,6 @@ namespace Kinectitude.Core.Base
         static ClassFactory()
         {
             RegisterType("AttributeChanges", typeof(AttributeChangesEvent));
-            RegisterType("AttributeEquals", typeof(AttributeEqualsEvent));
             RegisterType("PushScene", typeof(PushSceneAction));
             RegisterType("PopScene", typeof(PopSceneAction));
             RegisterType("ChangeScene", typeof(ChangeSceneAction));
@@ -74,7 +73,6 @@ namespace Kinectitude.Core.Base
             {
                 Service service = Activator.CreateInstance(type) as Service;
                 Game.CurrentGame.SetService(service);
-                if (service.AutoStart()) service.Start();
             }
 
             foreach (Type type in assembly.GetTypes().Where(item => typeof(IManager).IsAssignableFrom(item)))
@@ -91,7 +89,7 @@ namespace Kinectitude.Core.Base
                 foreach (ProvidesAttribute provided in type.GetCustomAttributes(true).
                     Where(input => input.GetType() == typeof(ProvidesAttribute)))
                 {
-                    if (!provided.Type.IsAssignableFrom(type)) Game.CurrentGame.Die(type.FullName + " can't provide " + provided.Type.FullName);
+                    if (!provided.Type.IsAssignableFrom(type)) Game.CurrentGame.Die(registeredName + " can't provide " + provided.Type.FullName);
                     provides.Add(provided.Type);
                 }
                 componentProvides[type] = provides;
@@ -131,7 +129,7 @@ namespace Kinectitude.Core.Base
                 }
                 else
                 {
-                    //TODO throw exception
+                    Game.CurrentGame.Die("Can't get the setter for " + registeredName);
                 }
             }
         }

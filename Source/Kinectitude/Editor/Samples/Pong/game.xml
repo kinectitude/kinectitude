@@ -103,7 +103,7 @@
     </Entity>
 
     <Entity>
-      <Event Type="AttributeEqualsEvent" Value="scene.numReady" Target="2">
+      <Event Type="Event" Value="scene.numReady" Target="2">
         <Action Type="ChangeSceneAction" Target="Game" />
       </Event>
     </Entity>
@@ -157,12 +157,11 @@
 	</Entity>
 
     <Entity>
-      <Event Type="AttributeEqualsEvent" Value="paddle1.score" Target="7">
         <Action Type="SetAction" Key="game.winner" Value="1" />
         <Action Type="ChangeSceneAction" Target="Game Over" />
       </Event>
 
-      <Event Type="AttributeEqualsEvent" Value="paddle2.score" Target="7">
+      <Event Type="AttributeEqualsEvent" LS="paddle2.score" RS="7">
         <Action Type="SetAction" Key="game.winner" Value="2" />
         <Action Type="ChangeSceneAction" Target="Game Over" />
       </Event>

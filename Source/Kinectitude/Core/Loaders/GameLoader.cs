@@ -15,7 +15,7 @@ namespace Kinectitude.Core.Loaders
 
         public string FirstScene { get; private set; }
 
-        private static Dictionary<string, Assembly> LoadedFiles = new Dictionary<string, Assembly>();
+        private Dictionary<string, Assembly> LoadedFiles = new Dictionary<string, Assembly>();
 
         internal Game Game { get; private set; }
 
@@ -48,6 +48,18 @@ namespace Kinectitude.Core.Loaders
                 LoadedEntity loadedPrototype = entityParse(prototype, myName, -3);
             }
 
+            IEnumerable<object> services= loaderUtility.GetOfType(root, loaderUtility.ServiceType);
+            foreach (object serviceobj in services)
+            {
+                PropertyHolder values = loaderUtility.GetProperties(serviceobj);
+                string name = loaderUtility.GetName(serviceobj);
+                foreach (Tuple<string, object> value in values)
+                {
+                    Service service = Game.GetChangeable(name) as Service;
+                    ClassFactory.SetParam(service, value.Item1, loaderUtility.MakeAssignable(value.Item2));
+                }
+            }
+
             IEnumerable<object> scenes = loaderUtility.GetOfType(root, loaderUtility.SceneType);
 
             foreach (object scene in scenes)
@@ -65,15 +77,24 @@ namespace Kinectitude.Core.Loaders
         {
 
             Game = new Game(this, scaleX, scaleY, windowOffset, die);
+            string extention = null;
+            try
+            {
+                extention = fileName.Substring(fileName.IndexOf('.'));
+            }
+            catch (Exception e)
+            {
+                die("File " + fileName + " could Not be loaded");
+                return;
+            }
 
-            string extention = fileName.Substring(fileName.IndexOf('.'));
             if (".kgl" == extention)
             {
                 loaderUtility = new KGLLoaderUtility(fileName, this);
             }
             else
             {
-                throw new ArgumentException("File " + fileName + " could Not be loaded");
+                die("File " + fileName + " could Not be loaded");
             }
 
             foreach (Assembly loaded in preloads)

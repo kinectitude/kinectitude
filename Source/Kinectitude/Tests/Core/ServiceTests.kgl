@@ -1,0 +1,16 @@
+﻿using Kinectitude.Tests.dll{
+    define ServiceNoAuto as Kinectitude.Tests.Core.ServiceNoAuto
+    define Assertion as Kinectitude.Tests.Core.AssertionAction
+}
+
+Game (Width = 800, Height=600, FirstScene="test", IsFullScreen=false, val=0){
+    Service ServiceNoAuto(SetVal = 10)
+    Scene test(){
+        Entity(){
+            Event SceneStarts(){
+                Assertion(LS=10, RS=game.ServiceNoAuto.SetVal, Assertion="service value", OnlyRunIf=1 == 1)
+                PopScene()
+            }
+        }
+    }
+}

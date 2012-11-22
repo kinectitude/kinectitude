@@ -23,13 +23,14 @@ namespace Kinectitude.Core.Base
         {
             get
             {
-                if (Deleted || !attributes.ContainsKey(key)) return ConstantReader.NullValue;
+                if (Deleted) Game.CurrentGame.Die("Can't read from a deleted entity");
+                if (!attributes.ContainsKey(key)) return ConstantReader.NullValue;
                 return attributes[key];
             }
 
             set
             {
-                if (Deleted) return;
+                if (Deleted) Game.CurrentGame.Die("Can't write to a deleted entity");
 
                 ValueReader reader;
                 if (typeof(ConstantReader) == value.GetType()) reader = value;
@@ -85,7 +86,7 @@ namespace Kinectitude.Core.Base
                 callbacks.Add(callback);
                 CheckProperties[what] = callbacks;
                 string[] parts = what.Split('.');
-                Changeable ch = GetComponentOrManager(parts[0]);
+                Changeable ch = GetChangeable(parts[0]);
                 if(null != ch) ch.ShouldCheck = true;
             }
         }
@@ -98,7 +99,7 @@ namespace Kinectitude.Core.Base
                 callbacks.Remove(callback);
                 if (callbacks.Count == 0)
                 {
-                    Changeable ch = GetComponentOrManager(what.Split('.')[0]);
+                    Changeable ch = GetChangeable(what.Split('.')[0]);
                     if(null != ch) ch.ShouldCheck = false;
                 }
             }
@@ -113,6 +114,6 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        internal abstract Changeable GetComponentOrManager(string name);
+        internal abstract Changeable GetChangeable(string name);
     }
 }

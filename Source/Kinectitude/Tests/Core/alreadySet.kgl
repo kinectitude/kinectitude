@@ -1,0 +1,18 @@
+﻿using Kinectitude.Tests.dll{
+    define Assertion as Kinectitude.Tests.Core.AssertionAction
+}
+
+Game (Width = 800, Height=600, FirstScene="test", IsFullScreen=false){
+    Scene test(){
+        Entity runTests(val = true){
+            Event SceneStarts(){
+                val = true
+                val = false
+            }
+            Event AttributeChanges(Target = val){
+                Assertion(LS=true, RS=true, Assertion="changes", OnlyRunIf= true)
+                val = true
+            }
+        }
+    }
+}

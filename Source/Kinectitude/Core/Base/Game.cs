@@ -49,6 +49,11 @@ namespace Kinectitude.Core.Base
         public void Start()
         {
             //TODO check if the are us
+            foreach (Service service in services.Values)
+            {
+                if (service.AutoStart()) service.Start();
+            }
+
             Scene main = GameLoader.GetScene(GameLoader.FirstScene);
             Running = true;
             currentScenes.Push(main);
@@ -81,10 +86,7 @@ namespace Kinectitude.Core.Base
         {
             foreach (Service service in services.Values)
             {
-                if (service.Running)
-                {
-                    service.Stop();
-                }
+                if (service.Running) service.Stop();
             }
             Running = false;
         }
@@ -110,7 +112,7 @@ namespace Kinectitude.Core.Base
         }
 
 
-        internal override Changeable GetComponentOrManager(string name)
+        internal override Changeable GetChangeable(string name)
         {
             Type type;
             if (ClassFactory.TypesDict.TryGetValue(name, out type))

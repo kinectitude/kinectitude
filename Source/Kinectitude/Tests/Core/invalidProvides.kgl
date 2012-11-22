@@ -1,0 +1,11 @@
+﻿using Kinectitude.Tests.dll{
+    define InvalidProvides as Kinectitude.Tests.Core.InvalidProvidesComponent
+}
+
+Game (Width = 800, Height=600, FirstScene="test", IsFullScreen=false, val=0){
+    Scene test(score = 0, val = 1){
+        Entity(){
+            Component InvalidProvides()
+        }
+    }
+}

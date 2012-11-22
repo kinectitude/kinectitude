@@ -18,6 +18,7 @@ namespace Kinectitude.Core.Loaders
         public object EntityType { get { return KinectitudeGrammar.Entity; } }
         public object ActionType { get { return KinectitudeGrammar.Actions; } }
         public object ConditionType { get { return KinectitudeGrammar.Condition; } }
+        public object ServiceType { get { return KinectitudeGrammar.Service; } }
         public object ManagerType { get { return KinectitudeGrammar.Manager; } }
         public object EventType { get { return KinectitudeGrammar.Evt; } }
         public object ComponentType { get { return KinectitudeGrammar.Component; } }
@@ -204,7 +205,7 @@ namespace Kinectitude.Core.Loaders
 
         private ValueReader makeParameterReader(Scene scene, Entity entity, string name, string component, string param)
         {
-            object obj = getDataContainer(scene, entity, name).GetComponentOrManager(component);
+            object obj = getDataContainer(scene, entity, name).GetChangeable(component);
             return ParameterValueReader.GetParameterValueReader(obj, param, scene);
         }
 

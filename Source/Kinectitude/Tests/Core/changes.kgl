@@ -17,7 +17,7 @@ Game (Width = 800, Height=600, FirstScene="test", IsFullScreen=false){
                 Assertion(LS=runTests.MockComponent.IntVal, RS=200, Assertion="IntVal is set, and attribute equals is run first", OnlyRunIf= true)
                 scene.x = 99
             }
-            Event AttributeEquals(Target=this.MockComponent.IntVal, Value=100){
+            Event AttributeChanges(Target=this.MockComponent.IntVal){
                 MockComponent.IntVal = 200
             }
             Event AttributeChanges(Target=scene.x){

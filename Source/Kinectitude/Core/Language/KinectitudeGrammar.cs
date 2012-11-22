@@ -46,6 +46,7 @@ namespace Kinectitude.Core.Language
         internal static readonly NonTerminal Assignment = new NonTerminal("Assignment", "Assignment");
         internal static readonly ConstantTerminal Constants = new ConstantTerminal("Constants", typeof(ConstantReader));
         internal static readonly NonTerminal Else = new NonTerminal("Else", "Else");
+        internal static readonly NonTerminal Service = new NonTerminal("Service", "Service");
         #endregion
 
         #region Key Types of KGL
@@ -171,8 +172,10 @@ namespace Kinectitude.Core.Language
             EntityDefinition.Rule = IsPrototype + BasicDefinition + openBrace + Component + Evt + closeBrace;
 
             Prototype.Rule = "Prototype" + Identifier + EntityDefinition + Prototype | Empty;
-            Manager.Rule = "Manager" + ClassName + BasicDefinition + Manager | Empty;
-            Component.Rule = "Component" + ClassName + BasicDefinition + Component | Empty;
+
+            Manager.Rule = "Manager" + Identifier + BasicDefinition + Manager | Empty;
+            Component.Rule = "Component" + Identifier + BasicDefinition + Component | Empty;
+            Service.Rule = "Service" + Identifier + BasicDefinition + Service | Empty;
 
             Else.Rule = ToTerm("else") + "if" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace + Else |
                 ToTerm("else") + "if" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace |
@@ -202,13 +205,13 @@ namespace Kinectitude.Core.Language
             Uses.Rule = "using" + ClassName + openBrace + Definitions + closeBrace + Uses | Empty;
             Definitions.Rule = "define" + Identifier + "as" + ClassName + Definitions | "define" + Identifier + "as" + ClassName;
 
-            Game.Rule = Uses + "Game"  + BasicDefinition + openBrace + Prototype + Scenes + closeBrace;
+            Game.Rule = Uses + "Game"  + BasicDefinition + openBrace + Prototype + Service + Scenes + closeBrace;
             #endregion
 
             Root = Game;
             //Removes from the tree, we don't care about having these there
             MarkPunctuation("{", "}", "(", ")", ":", "$", "@", "#", "Game", "using", "define", "Scene", "Entity",
-                 ",", "if", "Component", "Manager", "Prototype", "=", ".", "as", "Event", "else");
+                 ",", "if", "Component", "Manager", "Prototype", "=", ".", "as", "Event", "else", "Service");
             MarkReservedWords("using", "define", "if", "true", "false", "Pi", "E", "else");
             MarkTransient(BasicDefinition, value, IsPrototype, term, exactValue, OptionalActions);
         }

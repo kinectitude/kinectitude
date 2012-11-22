@@ -19,17 +19,12 @@ namespace Kinectitude.Core.Loaders
         private readonly List<LoadedComponent> components = new List<LoadedComponent>();
         private readonly Dictionary<Type, LoadedComponent> componentDict = new Dictionary<Type, LoadedComponent>();
 
-        private readonly List<LoadedEvent> events = new List<LoadedEvent>();
-        
-#if TEST
-        internal readonly string Name;
-        internal readonly List<string> isType = new List<string>();
-        internal readonly List<string> isExactType = new List<string>();
-#else
+        private readonly List<LoadedEvent> events = new List<LoadedEvent>();        
+
         private readonly string Name;
         private readonly List<string> isType = new List<string>();
         private readonly List<string> isExactType = new List<string>();
-#endif
+
         private bool firstCreate = true;
 
         int id;
@@ -88,13 +83,20 @@ namespace Kinectitude.Core.Loaders
                 if (missing.Count != 0)
                 {
                     string identity = null != Name ? Name : "An unnamed entity";
-                    string message = identity + " is missing required components: " + string.Join(",", missing);
+                    string message = identity + " is missing required component(s): " + string.Join(",", missing);
                     Game.CurrentGame.Die(message);
                 }
                 firstCreate = false;
             }
 
             Entity entity = new Entity(id);
+
+            foreach (Tuple<string, object> value in Values)
+            {
+                object assignable = LoaderUtil.MakeAssignable(value.Item2, scene, entity);
+                entity[value.Item1] = assignable as ValueReader;
+            }
+
             if (Name != null)
             {
                 addToType(scene.IsExactType, Name, id);
@@ -120,12 +122,6 @@ namespace Kinectitude.Core.Loaders
                 Event evt = loadedEvent.Create(entity);
                 evt.Entity = entity;
                 evt.Initialize();
-            }
-
-            foreach (Tuple<string, object> value in Values)
-            {
-                object assignable = LoaderUtil.MakeAssignable(value.Item2, scene, entity);
-                entity[value.Item1] = assignable as ValueReader;
             }
 
             scene.EntityById[entity.Id] = entity;

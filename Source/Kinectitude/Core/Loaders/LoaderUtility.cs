@@ -12,6 +12,7 @@ namespace Kinectitude.Core.Loaders
         object EntityType { get; }
         object ActionType { get; }
         object ConditionType { get; }
+        object ServiceType { get; }
         object ManagerType { get; }
         object EventType { get; }
         object ComponentType { get; }
