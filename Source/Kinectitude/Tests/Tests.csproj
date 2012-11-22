@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Core\Actions.cs" />
     <Compile Include="Core\Changes.cs" />
+    <Compile Include="Core\Conditions.cs" />
     <Compile Include="Core\ManagerTest.cs" />
     <Compile Include="Core\RequiresProvides.cs" />
     <Compile Include="Core\ServicesTest.cs" />
@@ -79,10 +80,13 @@
     <None Include="Core\actions.kgl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Core\alreadySet.kgl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Core\changes.kgl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Core\alreadySet.kgl">
+    <None Include="Core\conditions.kgl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Core\ServiceTests.kgl">

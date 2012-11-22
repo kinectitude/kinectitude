@@ -33,7 +33,11 @@ namespace Kinectitude.Tests.Core
         public static void CheckValue(string value, int expectedRuns = 1)
         {
             List<bool> assertionList;
-            if (!Assertions.TryGetValue(value, out assertionList)) Assert.Fail("The assertion " + value + " was not run");
+            if (!Assertions.TryGetValue(value, out assertionList))
+            {
+                if(expectedRuns != 0) Assert.Fail("The assertion " + value + " was not run");
+                return;
+            }
 
             if (assertionList.Count != expectedRuns)
                 Assert.Fail("The assertion " + value + " was run " + assertionList.Count + " but expected to be run " + expectedRuns);

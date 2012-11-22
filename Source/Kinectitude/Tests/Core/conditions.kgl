@@ -1,0 +1,52 @@
+﻿using Kinectitude.Tests.dll{
+    define Assertion as Kinectitude.Tests.Core.AssertionAction
+}
+
+Game (Width = 800, Height=600, FirstScene="test", IsFullScreen=false){
+    Scene test(){
+        Entity runTests(val = 10){
+            Event SceneStarts(){
+                if(val < 10){
+                    Assertion(LS=true, RS=true, Assertion="Should not run", OnlyRunIf= true)
+                }
+                
+                if(val == 10){
+                    Assertion(LS=true, RS=true, Assertion="if ran", OnlyRunIf= true)
+                }else if(val == 10){
+                    Assertion(LS=true, RS=true, Assertion="Should not run", OnlyRunIf= true)                    
+                }
+                
+                Assertion(LS=true, RS=true, Assertion="Always run", OnlyRunIf= true)
+                
+                if(val < 10){
+                    Assertion(LS=true, RS=true, Assertion="Should not run", OnlyRunIf= true)
+                }else if(val == 10){
+                    Assertion(LS=true, RS=true, Assertion="else if ran", OnlyRunIf= true)
+                }
+                
+                if(val < 10){
+                    Assertion(LS=true, RS=true, Assertion="Should not run", OnlyRunIf= true)
+                }else if(val == 10){
+                    Assertion(LS=true, RS=true, Assertion="else if ran", OnlyRunIf= true)
+                }else{
+                    Assertion(LS=true, RS=true, Assertion="Should not run", OnlyRunIf= true)
+                }
+                
+                
+                if(val < 10){
+                    Assertion(LS=true, RS=true, Assertion="Should not run", OnlyRunIf= true)
+                }else if(val > 10){
+                    Assertion(LS=true, RS=true, Assertion="Should not run", OnlyRunIf= true)
+                }else{
+                    Assertion(LS=true, RS=true, Assertion="else ran", OnlyRunIf= true)
+                }
+                
+                if(val < 10){
+                    Assertion(LS=true, RS=true, Assertion="Should not run", OnlyRunIf= true)
+                }else{
+                    Assertion(LS=true, RS=true, Assertion="else ran", OnlyRunIf= true)
+                }
+            }
+        }
+    }
+}
