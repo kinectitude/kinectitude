@@ -101,8 +101,7 @@ namespace Kinectitude.Core.Data
 
         internal bool HasSameVal(ValueReader other)
         {
-            if (other == null) return false;
-            if (PreferedRetType() != other.PreferedRetType()) return false;
+            if (other == null || PreferedRetType() != other.PreferedRetType()) return false;
             switch (PreferedRetType())
             {
                 case PreferedType.Boolean: return GetBoolValue() == other.GetBoolValue();

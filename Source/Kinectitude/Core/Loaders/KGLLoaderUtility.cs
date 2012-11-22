@@ -66,8 +66,7 @@ namespace Kinectitude.Core.Loaders
         {
             ParseTreeNode node = from as ParseTreeNode;
             ParseTreeNode nameNode = node.ChildNodes.FirstOrDefault(child => child.Term == KinectitudeGrammar.Identifier);
-            if (nameNode == null) return null;
-            return nameNode.Token.ValueString;
+            return nameNode == null ? null : nameNode.Token.ValueString;
         }
 
         public IEnumerable<object> GetOfType(object from, object type)
@@ -75,30 +74,24 @@ namespace Kinectitude.Core.Loaders
             List<ParseTreeNode> nodes = new List<ParseTreeNode>();
             ParseTreeNode node = from as ParseTreeNode;
             NonTerminal nonTerm = type as NonTerminal;
-            if (nonTerm == SceneType || nonTerm == EntityType || nonTerm == ComponentType || nonTerm == EventType)
-            {
-                List<ParseTreeNode> firstType = new List<ParseTreeNode>();
-                NonTerminal pluralType = nonTerm == SceneType ? KinectitudeGrammar.Scenes :
-                    nonTerm == ComponentType || nonTerm == EventType ? KinectitudeGrammar.EntityDefinition :
-                        KinectitudeGrammar.Entities;
 
-                getOfTypeHelper(node, pluralType, firstType);
-                foreach (ParseTreeNode singular in firstType) getOfTypeHelper(singular, nonTerm, nodes);
-            }
-            else if (nonTerm == ActionType)
+            if (nonTerm == ActionType)
             {
                 List<ParseTreeNode> firstType = new List<ParseTreeNode>();
-                HashSet<NonTerminal> valids = new HashSet<NonTerminal>();
-                valids.Add(KinectitudeGrammar.Action);
-                valids.Add(KinectitudeGrammar.Condition);
-                valids.Add(KinectitudeGrammar.Assignment);
+                
+                HashSet<NonTerminal> valids = new HashSet<NonTerminal>() 
+                    { KinectitudeGrammar.Action, KinectitudeGrammar.Condition, KinectitudeGrammar.Assignment};
+
                 getOfTypeHelper(node, nonTerm, firstType);
                 foreach (ParseTreeNode singular in firstType) getOfTypeHelper(singular, valids, nodes);
+                return nodes;
             }
-            else
-            {
-                getOfTypeHelper(node, nonTerm, nodes);
-            }
+
+            //There should be one entity definition per entity
+            if (nonTerm == ComponentType || nonTerm == EventType) 
+                node = node.ChildNodes.First(child => child.Term == KinectitudeGrammar.EntityDefinition);
+
+            getOfTypeHelper(node, nonTerm, nodes);
             return nodes;
         }
 
@@ -137,13 +130,11 @@ namespace Kinectitude.Core.Loaders
         public IEnumerable<string> GetPrototypes(object from)
         {
             ParseTreeNode node = from as ParseTreeNode;
-            List<string> prototypeNames = new List<string>();
             node = node.ChildNodes.First(child => child.Term == KinectitudeGrammar.EntityDefinition);
             List<ParseTreeNode> names = new List<ParseTreeNode>();
             getOfTypeHelper(node, KinectitudeGrammar.Names, names);
             //Names should only have name as a child EVER.
-            foreach (ParseTreeNode name in names) prototypeNames.Add(name.ChildNodes[0].Token.ValueString);
-            return prototypeNames;
+            foreach (ParseTreeNode name in names) yield return name.ChildNodes[0].Token.ValueString;
         }
 
         public string GetType(object from)
@@ -329,7 +320,6 @@ namespace Kinectitude.Core.Loaders
 
         public IEnumerable<Tuple<string, string>> GetDefines(object from)
         {
-            List<Tuple<string, string>> definitions = new List<Tuple<string, string>>();
             ParseTreeNode node = from as ParseTreeNode;
             List<ParseTreeNode> defines = new List<ParseTreeNode>();
             getOfTypeHelper(node, KinectitudeGrammar.Definitions, defines);
@@ -337,9 +327,8 @@ namespace Kinectitude.Core.Loaders
             foreach (ParseTreeNode define in defines)
             {
                 string className = define.ChildNodes.First(child => child.Term == KinectitudeGrammar.ClassName).Token.ValueString;
-                definitions.Add(new Tuple<string, string>(GetName(define), className));
+                yield return (new Tuple<string, string>(GetName(define), className));
             }
-            return definitions;
         }
 
         public object GetCondition(object from)
@@ -348,21 +337,17 @@ namespace Kinectitude.Core.Loaders
             return node.ChildNodes.FirstOrDefault(child => child.Term == KinectitudeGrammar.Expr);
         }
 
-        private void getOfTypeHelper(ParseTreeNode node, NonTerminal type, List<ParseTreeNode> nodes, bool needsChildren = true)
+        private void getOfTypeHelper(ParseTreeNode node, NonTerminal type, List<ParseTreeNode> nodes)
         {
-            int minCount = needsChildren ? 1 : 0;
-            IEnumerable<ParseTreeNode> correctTypedNodes = node.ChildNodes.Where(child =>
-                child.Term == type && child.ChildNodes.Count >= minCount);
+            IEnumerable<ParseTreeNode> correctTypedNodes = node.ChildNodes.Where(child => child.Term == type);
 
             nodes.AddRange(correctTypedNodes);
             foreach (ParseTreeNode child in correctTypedNodes) getOfTypeHelper(child, type, nodes);
         }
 
-        private void getOfTypeHelper(ParseTreeNode node, HashSet<NonTerminal> type, List<ParseTreeNode> nodes, bool needsChildren = true)
+        private void getOfTypeHelper(ParseTreeNode node, HashSet<NonTerminal> type, List<ParseTreeNode> nodes)
         {
-            int minCount = needsChildren ? 1 : 0;
-            IEnumerable<ParseTreeNode> correctTypedNodes = node.ChildNodes.Where(child =>
-                type.Contains(child.Term) && child.ChildNodes.Count >= minCount);
+            IEnumerable<ParseTreeNode> correctTypedNodes = node.ChildNodes.Where(child => type.Contains(child.Term));
 
             nodes.AddRange(correctTypedNodes);
             foreach (ParseTreeNode child in correctTypedNodes) getOfTypeHelper(child, type, nodes);

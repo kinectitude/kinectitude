@@ -115,12 +115,9 @@ namespace Kinectitude.Core.Base
         internal override Changeable GetChangeable(string name)
         {
             Type type;
-            if (ClassFactory.TypesDict.TryGetValue(name, out type))
-            {
-                Service s;
-                if (services.TryGetValue(type, out s)) return s;
-            }
-            return null;
+            Service s = null;
+            if (ClassFactory.TypesDict.TryGetValue(name, out type)) services.TryGetValue(type, out s);
+            return s;
         }
     }
 }

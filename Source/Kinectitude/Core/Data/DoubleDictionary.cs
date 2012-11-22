@@ -39,9 +39,6 @@ namespace Kinectitude.Core.Data
             secondDict[key2] = item;
         }
 
-        internal static void DeleteDict(FirstHash key1)
-        {
-            if(itemHash.ContainsKey(key1)) itemHash.Remove(key1);
-        }
+        internal static void DeleteDict(FirstHash key1) { itemHash.Remove(key1); }
     }
 }

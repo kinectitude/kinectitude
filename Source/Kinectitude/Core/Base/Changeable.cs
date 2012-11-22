@@ -31,7 +31,7 @@ namespace Kinectitude.Core.Base
         protected Changeable()
         {
             string name = ClassFactory.GetReferedName(GetType());
-            change = name == null ? "!__INVALID__" : name;
+            change = name ?? "!__INVALID__";
         }
 
         protected void Change(string str)

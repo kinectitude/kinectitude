@@ -24,9 +24,7 @@ namespace Kinectitude.Core.Language
         #region kinectitude key words and parts
         internal static readonly NonTerminal Game = new NonTerminal("Game", "Game");
 
-        internal static readonly NonTerminal Scenes = new NonTerminal("Scenes", "Scenes");
         internal static readonly NonTerminal Scene = new NonTerminal("Scene", "Scene");
-        internal static readonly NonTerminal Entities = new NonTerminal("Entities", "Entities");
         internal static readonly NonTerminal Entity = new NonTerminal("Entity", "Entity");
         internal static readonly NonTerminal Properties = new NonTerminal("Properties");
         internal static readonly NonTerminal Names = new NonTerminal("Names", "Names");
@@ -47,6 +45,7 @@ namespace Kinectitude.Core.Language
         internal static readonly ConstantTerminal Constants = new ConstantTerminal("Constants", typeof(ConstantReader));
         internal static readonly NonTerminal Else = new NonTerminal("Else", "Else");
         internal static readonly NonTerminal Service = new NonTerminal("Service", "Service");
+        internal static readonly NonTerminal Loop = new NonTerminal("Loop", "Loop");
         #endregion
 
         #region Key Types of KGL
@@ -166,16 +165,36 @@ namespace Kinectitude.Core.Language
             Names.Rule = Identifier + comma + Names | Identifier;
             IsPrototype.Rule = colon + Names | Empty;
 
-            BasicDefinition.Rule = openBrac + Properties + closeBrac;
 
-            Properties.Rule = Identifier + Becomes + value | Identifier + Becomes + value + comma + Properties | Empty;
-            EntityDefinition.Rule = IsPrototype + BasicDefinition + openBrace + Component + Evt + closeBrace;
+            NonTerminal optionalProperties = new NonTerminal("optionalProperties", "optionalProperties");
+            optionalProperties.Rule = Properties | Empty;
+            Properties.Rule = Identifier + Becomes + value | Identifier + Becomes + value + comma + optionalProperties;
 
-            Prototype.Rule = "Prototype" + Identifier + EntityDefinition + Prototype | Empty;
+            BasicDefinition.Rule = openBrac + optionalProperties + closeBrac;
 
-            Manager.Rule = "Manager" + Identifier + BasicDefinition + Manager | Empty;
-            Component.Rule = "Component" + Identifier + BasicDefinition + Component | Empty;
-            Service.Rule = "Service" + Identifier + BasicDefinition + Service | Empty;
+            NonTerminal optionalEvt = new NonTerminal("optionalEvt", "optionalEvt");
+            optionalEvt.Rule = Evt | Empty;
+            Evt.Rule = "Event" + Identifier + BasicDefinition + openBrace + Actions + closeBrace + optionalEvt;
+
+            NonTerminal optionalComponent = new NonTerminal("optionalComponent", "optionalComponent");
+            optionalComponent.Rule = Component | Empty;
+            Component.Rule = "Component" + Identifier + BasicDefinition + optionalComponent;
+
+            EntityDefinition.Rule = IsPrototype + BasicDefinition + openBrace + optionalComponent + optionalEvt + closeBrace;
+
+
+            NonTerminal optionalPrototype = new NonTerminal("optionalPrototype", "optionalPrototype");
+            optionalPrototype.Rule = Prototype | Empty;
+            Prototype.Rule = "Prototype" + Identifier + EntityDefinition + optionalPrototype;
+
+            NonTerminal optionalManager = new NonTerminal("optionalManager", "optionalManager");
+            optionalManager.Rule = Manager | Empty;
+            Manager.Rule = "Manager" + Identifier + BasicDefinition + optionalManager;
+
+
+            NonTerminal optionalService = new NonTerminal("optionalService", "optionalService");
+            optionalService.Rule = Service | Empty;
+            Service.Rule = "Service" + Identifier + BasicDefinition + optionalService;
 
             Else.Rule = ToTerm("else") + "if" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace + Else |
                 ToTerm("else") + "if" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace |
@@ -185,35 +204,49 @@ namespace Kinectitude.Core.Language
             Condition.Rule = "if" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace |
                 "if" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace + Else;
 
-            NonTerminal OptionalActions = new NonTerminal("OptionalActions", "OptionalActions");
+            Loop.Rule = "while" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace |
+                "for" + openBrac + Assignment + ";" +  Expr + ";" + Assignment + closeBrac + openBrace + Actions + closeBrace |
+                "for" + openBrac + ";" + Expr + ";" + Assignment + closeBrac + openBrace + Actions + closeBrace;
+
+            NonTerminal optionalActions = new NonTerminal("OptionalActions", "OptionalActions");
 
             Action.Rule = Identifier + BasicDefinition;
 
             Assignment.Rule = exactValue + Becomes + Expr | exactValue + BinOp + Becomes + Expr;
 
-            Actions.Rule = Condition + OptionalActions | Action + OptionalActions | Assignment + OptionalActions;
-            OptionalActions.Rule = Actions | Empty;
+            Actions.Rule = Condition + optionalActions | Action + optionalActions | Assignment + optionalActions | Loop + optionalActions;
+            optionalActions.Rule = Actions | Empty;
 
-            Evt.Rule = "Event" + Identifier + BasicDefinition + openBrace + Actions + closeBrace + Evt | Empty;
+            NonTerminal optionalEntity = new NonTerminal("optionalEntity", "optionalEntity");
+            optionalEntity.Rule = Entity | Empty;
 
-            Entity.Rule = "Entity" + Identifier + EntityDefinition | "Entity" + EntityDefinition;
-            Entities.Rule = Entity + Entities | Entity;
+            NonTerminal optionalIdentifier = new NonTerminal("optionalIdentifier", "optionalIdentifier");
+            optionalIdentifier.Rule = Identifier | Empty;
+            Entity.Rule = "Entity" + optionalIdentifier + EntityDefinition + optionalEntity;
 
-            Scenes.Rule = Scene + Scenes | Scene;
-            Scene.Rule = "Scene" + Identifier + BasicDefinition + openBrace + Manager + Entities + closeBrace;
+            NonTerminal optionalScene = new NonTerminal("optionalScene", "optionalScene");
+            optionalScene.Rule = Scene | Empty;
+            Scene.Rule = "Scene" + Identifier + BasicDefinition + openBrace + optionalManager + Entity + closeBrace + optionalScene;
 
-            Uses.Rule = "using" + ClassName + openBrace + Definitions + closeBrace + Uses | Empty;
-            Definitions.Rule = "define" + Identifier + "as" + ClassName + Definitions | "define" + Identifier + "as" + ClassName;
+            NonTerminal optionalDefinitions = new NonTerminal("optionalDefinitions", "optionalDefinitions");
+            optionalDefinitions.Rule = Definitions | Empty;
+            Definitions.Rule = "define" + Identifier + "as" + ClassName + optionalDefinitions;
 
-            Game.Rule = Uses + "Game"  + BasicDefinition + openBrace + Prototype + Service + Scenes + closeBrace;
+            NonTerminal optionalUses = new NonTerminal("optionalUses", "optionalUses");
+            optionalUses.Rule = Uses | Empty;
+            Uses.Rule = "using" + ClassName + openBrace + Definitions + closeBrace + optionalUses;
+
+            Game.Rule = optionalUses + "Game" + BasicDefinition + openBrace + optionalPrototype + optionalService + Scene + closeBrace;
             #endregion
 
             Root = Game;
             //Removes from the tree, we don't care about having these there
             MarkPunctuation("{", "}", "(", ")", ":", "$", "@", "#", "Game", "using", "define", "Scene", "Entity",
-                 ",", "if", "Component", "Manager", "Prototype", "=", ".", "as", "Event", "else", "Service");
-            MarkReservedWords("using", "define", "if", "true", "false", "Pi", "E", "else");
-            MarkTransient(BasicDefinition, value, IsPrototype, term, exactValue, OptionalActions);
+                 ",", "if", "Component", "Manager", "Prototype", "=", ".", "as", "Event", "else", "Service", ";", "while", "for");
+            MarkReservedWords("using", "define", "if", "true", "false", "Pi", "E", "else", "while", "for");
+            MarkTransient(BasicDefinition, value, IsPrototype, term, exactValue, optionalActions, optionalEvt, 
+                optionalComponent, optionalProperties, optionalManager, optionalPrototype, optionalService,
+                optionalUses, optionalDefinitions, optionalEntity, optionalScene, optionalIdentifier);
         }
     }
 }

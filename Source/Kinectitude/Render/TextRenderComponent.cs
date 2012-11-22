@@ -19,7 +19,7 @@ namespace Kinectitude.Render
         [Plugin("Value", "")]
         public string Value
         {
-            get { return _value == null ? "" : _value; }
+            get { return _value ?? ""; }
             set
             {
                 if (value != _value)
