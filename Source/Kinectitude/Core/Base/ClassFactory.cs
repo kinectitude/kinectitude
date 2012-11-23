@@ -12,7 +12,7 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Base
 {
-    internal class ClassFactory
+    internal sealed class ClassFactory
     {
         internal static readonly Dictionary<string, Type> TypesDict = new Dictionary<string, Type>();
 

@@ -1,0 +1,32 @@
+﻿using Kinectitude.Tests.dll{
+    define Assertion as Kinectitude.Tests.Core.AssertionAction
+}
+
+Game (FirstScene="test"){
+    Scene test(){
+        Entity runTests(x = 8){
+            Event SceneStarts(){
+                
+                for(i = 0; i < 10; i += 1){
+                    Assertion(LS=true, RS=true, Assertion="basic for", OnlyRunIf=true)
+                }
+                
+                i = 0
+                for(; i < 10; i += 1){
+                    Assertion(LS=true, RS=true, Assertion="for no first", OnlyRunIf=true)
+                }
+                
+                i = 0
+                while(i < 10){
+                    Assertion(LS=true, RS=true, Assertion="while", OnlyRunIf=true)
+                     i += 1
+                }
+                
+                while(x < 10){
+                    Assertion(LS=true, RS=true, Assertion="while part in", OnlyRunIf=true)
+                    x += 1
+                }
+            }
+        }
+    }
+}

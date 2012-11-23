@@ -204,9 +204,10 @@ namespace Kinectitude.Core.Language
             Condition.Rule = "if" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace |
                 "if" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace + Else;
 
+            NonTerminal optionalAssignment = new NonTerminal("optionalAssignment", "optionalAssignment");
+            optionalAssignment.Rule = Assignment | Empty;
             Loop.Rule = "while" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace |
-                "for" + openBrac + Assignment + ";" +  Expr + ";" + Assignment + closeBrac + openBrace + Actions + closeBrace |
-                "for" + openBrac + ";" + Expr + ";" + Assignment + closeBrac + openBrace + Actions + closeBrace;
+                "for" + openBrac + optionalAssignment + ";" + Expr + ";" + Assignment + closeBrac + openBrace + Actions + closeBrace;
 
             NonTerminal optionalActions = new NonTerminal("OptionalActions", "OptionalActions");
 
@@ -246,7 +247,7 @@ namespace Kinectitude.Core.Language
             MarkReservedWords("using", "define", "if", "true", "false", "Pi", "E", "else", "while", "for");
             MarkTransient(BasicDefinition, value, IsPrototype, term, exactValue, optionalActions, optionalEvt, 
                 optionalComponent, optionalProperties, optionalManager, optionalPrototype, optionalService,
-                optionalUses, optionalDefinitions, optionalEntity, optionalScene, optionalIdentifier);
+                optionalUses, optionalDefinitions, optionalEntity, optionalScene, optionalIdentifier, optionalAssignment);
         }
     }
 }

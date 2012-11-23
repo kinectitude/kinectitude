@@ -7,8 +7,7 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Loaders
 {
-    //TODO make this <string, Expression>
-    internal class PropertyHolder : IEnumerable<Tuple<string, object>>
+    internal sealed class PropertyHolder : IEnumerable<Tuple<string, object>>
     {
         internal List<Tuple<string, object>> Values = new List<Tuple<string, object>>();
         internal Dictionary<string, object> Properties = new Dictionary<string, object>();

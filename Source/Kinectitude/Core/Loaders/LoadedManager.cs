@@ -6,7 +6,7 @@ using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Loaders
 {
-    internal class LoadedManager : LoadedObject
+    internal sealed class LoadedManager : LoadedObject
     {
         private readonly string Type;
         private static readonly Dictionary<LoadedScene, Dictionary<string, LoadedManager>> ManagerMap =

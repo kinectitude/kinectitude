@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Kinectitude.Core.Data
 {
-    internal class TypeMatcherProperyWriter : ValueWriter
+    internal sealed class TypeMatcherProperyWriter : ValueWriter
     {
         private readonly TypeMatcherProperyReader reader;
         internal TypeMatcherProperyWriter(TypeMatcherProperyReader reader) : base(reader)

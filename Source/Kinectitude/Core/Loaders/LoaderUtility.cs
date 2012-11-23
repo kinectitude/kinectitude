@@ -11,7 +11,6 @@ namespace Kinectitude.Core.Loaders
     {
         object EntityType { get; }
         object ActionType { get; }
-        object ConditionType { get; }
         object ServiceType { get; }
         object ManagerType { get; }
         object EventType { get; }
@@ -30,6 +29,7 @@ namespace Kinectitude.Core.Loaders
         IEnumerable<Tuple<string, string>> GetDefines(object from);
         bool IsAciton(object obj);
         bool IsAssignment(object obj);
+        bool IsCondition(object obj);
         IEnumerable<string> GetPrototypes(object from);
         string GetType(object from);
         object GetCondition(object from);
@@ -40,6 +40,8 @@ namespace Kinectitude.Core.Loaders
         /// <param name="obj"></param>
         /// <returns></returns>
         Tuple<object, object, object> GetAssignment(object obj);
+        object GetBeforeAction(object obj);
+        object GetAfterAction(object obj);
         ValueReader MakeAssignmentValue(ValueReader ls, object type, ValueReader rs);
     }
 }

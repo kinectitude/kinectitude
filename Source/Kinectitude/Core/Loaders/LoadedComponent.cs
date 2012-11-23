@@ -6,7 +6,7 @@ using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Loaders
 {
-    internal class LoadedComponent : LoadedObject
+    internal sealed class LoadedComponent : LoadedObject
     {
         internal readonly string Name;
         internal readonly Type Type;

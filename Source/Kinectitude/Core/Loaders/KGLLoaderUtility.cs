@@ -17,7 +17,6 @@ namespace Kinectitude.Core.Loaders
 
         public object EntityType { get { return KinectitudeGrammar.Entity; } }
         public object ActionType { get { return KinectitudeGrammar.Actions; } }
-        public object ConditionType { get { return KinectitudeGrammar.Condition; } }
         public object ServiceType { get { return KinectitudeGrammar.Service; } }
         public object ManagerType { get { return KinectitudeGrammar.Manager; } }
         public object EventType { get { return KinectitudeGrammar.Evt; } }
@@ -79,8 +78,8 @@ namespace Kinectitude.Core.Loaders
             {
                 List<ParseTreeNode> firstType = new List<ParseTreeNode>();
                 
-                HashSet<NonTerminal> valids = new HashSet<NonTerminal>() 
-                    { KinectitudeGrammar.Action, KinectitudeGrammar.Condition, KinectitudeGrammar.Assignment};
+                HashSet<NonTerminal> valids = new HashSet<NonTerminal>() { KinectitudeGrammar.Action, KinectitudeGrammar.Condition, 
+                    KinectitudeGrammar.Assignment, KinectitudeGrammar.Loop};
 
                 getOfTypeHelper(node, nonTerm, firstType);
                 foreach (ParseTreeNode singular in firstType) getOfTypeHelper(singular, valids, nodes);
@@ -88,7 +87,7 @@ namespace Kinectitude.Core.Loaders
             }
 
             //There should be one entity definition per entity
-            if (nonTerm == ComponentType || nonTerm == EventType) 
+            if (nonTerm == ComponentType || nonTerm == EventType)
                 node = node.ChildNodes.First(child => child.Term == KinectitudeGrammar.EntityDefinition);
 
             getOfTypeHelper(node, nonTerm, nodes);
@@ -111,6 +110,30 @@ namespace Kinectitude.Core.Loaders
         {
             ParseTreeNode node = obj as ParseTreeNode;
             return node.Term == KinectitudeGrammar.Assignment;
+        }
+
+        public bool IsCondition(object obj)
+        {
+            ParseTreeNode node = obj as ParseTreeNode;
+            return node.Term == KinectitudeGrammar.Condition;
+        }
+
+        public object GetBeforeAction(object obj)
+        {
+            ParseTreeNode node = obj as ParseTreeNode;
+            //First assignment, expression, assignment, actions
+            if (node.ChildNodes.Count == 4) return node.ChildNodes[0];
+            return null;
+        }
+
+        public object GetAfterAction(object obj)
+        {
+            ParseTreeNode node = obj as ParseTreeNode;
+            //First assignment, expression, assignment, actions
+            if (node.ChildNodes.Count == 4) return node.ChildNodes[2];
+            //expression, assignment, actions
+            if (node.ChildNodes.Count == 3) return node.ChildNodes[1];
+            return null;
         }
 
         public Tuple<object, object, object> GetAssignment(object obj)

@@ -7,7 +7,7 @@ using Action = Kinectitude.Core.Base.Action;
 
 namespace Kinectitude.Core.Loaders
 {
-    internal class LoadedAction : LoadedBaseAction
+    internal sealed class LoadedAction : LoadedBaseAction
     {
         private readonly string type;
 

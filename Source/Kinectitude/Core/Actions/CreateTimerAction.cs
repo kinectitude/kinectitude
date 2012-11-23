@@ -8,7 +8,7 @@ using Kinectitude.Core.Data;
 namespace Kinectitude.Core.Actions
 {
     [Plugin("Create timer {Name}: (Duration: {Duration}, Trigger: {Trigger}, Recurring? {Recurring})", "")]
-    internal class CreateTimerAction : Action
+    internal sealed class CreateTimerAction : Action
     {
         [Plugin("Name", "Name of the timer to create")]
         public ValueReader Name { get; set; }

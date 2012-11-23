@@ -6,7 +6,7 @@ using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Loaders
 {
-    internal class LoadedEvent : LoadedObject
+    internal sealed class LoadedEvent : LoadedObject
     {
         private readonly string type;
         private readonly List<LoadedBaseAction> actions = new List<LoadedBaseAction>();

@@ -94,6 +94,7 @@
     <Compile Include="Base\Game.cs" />
     <Compile Include="Base\IEntity.cs" />
     <Compile Include="Base\Component.cs" />
+    <Compile Include="Base\Loop.cs" />
     <Compile Include="Base\ReadonlyArray.cs" />
     <Compile Include="Base\Service.cs" />
     <Compile Include="Base\Scene.cs" />
@@ -151,12 +152,14 @@
     </Compile>
     <Compile Include="Loaders\KGLLoaderUtility.cs" />
     <Compile Include="Loaders\LoadedAction.cs" />
+    <Compile Include="Loaders\LoadedActionable.cs" />
     <Compile Include="Loaders\LoadedAssignment.cs" />
     <Compile Include="Loaders\LoadedBaseAction.cs" />
     <Compile Include="Loaders\LoadedComponent.cs" />
     <Compile Include="Loaders\LoadedCondition.cs" />
     <Compile Include="Loaders\LoadedEntity.cs" />
     <Compile Include="Loaders\LoadedEvent.cs" />
+    <Compile Include="Loaders\LoadedLoop.cs" />
     <Compile Include="Loaders\LoadedManager.cs" />
     <Compile Include="Loaders\LoadedObject.cs" />
     <Compile Include="Loaders\LoadedScene.cs" />

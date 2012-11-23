@@ -8,7 +8,7 @@ namespace Kinectitude.Core.Base
 
     internal enum EType { Create, Pause, Resume }
 
-    internal class TimerEvt
+    internal sealed class TimerEvt
     {
         internal string Name { get; private set; }
         internal EType Type { get; private set; }

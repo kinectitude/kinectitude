@@ -3,7 +3,7 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Base
 {
-    internal class Condition : Action
+    internal sealed class Condition : Action
     {
         private readonly List<Action> Actions = new List<Action>();
         private readonly Condition ElseCond;

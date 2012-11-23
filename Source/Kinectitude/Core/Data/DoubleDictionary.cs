@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Kinectitude.Core.Data
 {
-    internal class DoubleDictionary<FirstHash, SecondHash, Item> where Item : class
+    internal sealed class DoubleDictionary<FirstHash, SecondHash, Item> where Item : class
     {
         private static readonly Dictionary<FirstHash, Dictionary<SecondHash, Item>> itemHash = 
             new Dictionary<FirstHash, Dictionary<SecondHash, Item>>();

@@ -8,7 +8,7 @@ using Action = Kinectitude.Core.Base.Action;
 
 namespace Kinectitude.Core.Data
 {
-    internal class TypeMatcherWatcher
+    internal sealed class TypeMatcherWatcher
     {
         private readonly object Obj;
         private readonly string Param;

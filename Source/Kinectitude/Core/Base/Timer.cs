@@ -6,7 +6,7 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Base
 {
-    internal class Timer
+    internal sealed class Timer
     {
         internal string Name { get; private set; }
         internal bool Recurring { get; private set; }

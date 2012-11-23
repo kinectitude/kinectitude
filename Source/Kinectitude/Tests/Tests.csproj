@@ -51,6 +51,7 @@
     <Compile Include="Core\Actions.cs" />
     <Compile Include="Core\Changes.cs" />
     <Compile Include="Core\Conditions.cs" />
+    <Compile Include="Core\Loops.cs" />
     <Compile Include="Core\ManagerTest.cs" />
     <Compile Include="Core\RequiresProvides.cs" />
     <Compile Include="Core\ServicesTest.cs" />
@@ -87,6 +88,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Core\conditions.kgl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Core\loops.kgl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Core\ServiceTests.kgl">

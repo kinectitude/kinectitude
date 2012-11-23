@@ -5,19 +5,15 @@ using System.Linq;
 
 namespace Kinectitude.Core.Loaders
 {
-    internal class SceneLoader
+    internal sealed class SceneLoader
     {
         private readonly LoaderUtility loaderUtility;
-        protected int Onid = 0;
+        private readonly GameLoader GameLoader;
+        private int onid = 0;
 
-        internal protected LoadedScene LoadedScene { get; protected set; }
+        internal LoadedScene LoadedScene { get; private set; }
         internal Game Game { get; private set; }
-        protected GameLoader GameLoader { get; private set; }
-
-#if TEST
-        public Entity EntityCreated = null;
-#endif
-
+        
         internal SceneLoader(string sceneName, object scene, LoaderUtility loaderUtility, GameLoader gameLoader)
         {    
             GameLoader = gameLoader;
@@ -43,7 +39,7 @@ namespace Kinectitude.Core.Loaders
             foreach (object entity in entities)
             {
                 string name = loaderUtility.GetName(entity);
-                LoadedEntity loadedEntity = gameLoader.entityParse(entity, name, Onid++);
+                LoadedEntity loadedEntity = gameLoader.entityParse(entity, name, onid++);
                 LoadedScene.addLoadedEntity(loadedEntity);
             }
 
@@ -56,12 +52,9 @@ namespace Kinectitude.Core.Loaders
             {
                 //TODO throw exception?
             }
-            Entity entity = loadedEntity.Create(Onid++, scene, true);
+            Entity entity = loadedEntity.Create(onid++, scene, true);
             entity.Scene = scene;
             entity.Ready();
-#if TEST
-            EntityCreated = entity;
-#endif
         }
     }
 }

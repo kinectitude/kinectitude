@@ -6,7 +6,7 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Base
 {    
-    internal class Scene : DataContainer
+    internal sealed class Scene : DataContainer
     {
         private readonly Dictionary<string, List<TriggerOccursEvent>> triggers;
         private readonly SceneLoader seceneLoader;

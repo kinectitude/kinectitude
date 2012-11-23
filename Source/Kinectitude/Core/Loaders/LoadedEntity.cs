@@ -7,7 +7,7 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Loaders
 {
-    internal class LoadedEntity : LoadedObject
+    internal sealed class LoadedEntity : LoadedObject
     {
         //used to see that the entity has everything it needs
         private readonly HashSet<Type> componentSet = new HashSet<Type>();

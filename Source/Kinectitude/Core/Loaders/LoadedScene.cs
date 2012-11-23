@@ -7,7 +7,7 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Loaders
 {
-    internal class LoadedScene : LoadedObject
+    internal sealed class LoadedScene : LoadedObject
     {
         private readonly List<LoadedManager> Managers = new List<LoadedManager>();
 

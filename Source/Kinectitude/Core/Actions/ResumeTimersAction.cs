@@ -8,7 +8,7 @@ using Kinectitude.Core.Data;
 namespace Kinectitude.Core.Actions
 {
     [Plugin("Resume timers {Name}", "")]
-    internal class ResumeTimersAction : Action
+    internal sealed class ResumeTimersAction : Action
     {
         [Plugin("Name", "Name of the timers to resume")]
         public ValueReader Name { get; set; }

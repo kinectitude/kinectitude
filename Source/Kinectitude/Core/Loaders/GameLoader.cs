@@ -82,7 +82,7 @@ namespace Kinectitude.Core.Loaders
             {
                 extention = fileName.Substring(fileName.IndexOf('.'));
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 die("File " + fileName + " could Not be loaded");
                 return;
@@ -178,8 +178,29 @@ namespace Kinectitude.Core.Loaders
             return lc;
         }
 
+        private LoadedLoop createLoadedLoop(Game game, LoadedEvent e, object loop)
+        {
+            object beforeAction = loaderUtility.GetBeforeAction(loop);
+            if (beforeAction != null)
+            {
+                object before = loaderUtility.GetBeforeAction(loop);
+                Tuple<object, object, object> assignment = loaderUtility.GetAssignment(before);
+                e.AddAction(new LoadedAssignment(assignment.Item1, assignment.Item2, assignment.Item3, loaderUtility));
+            }
+
+            object after = loaderUtility.GetAfterAction(loop);
+            LoadedBaseAction afterAction = null;
+            if(after != null){
+                Tuple<object, object, object> assignment = loaderUtility.GetAssignment(after);
+                afterAction = new LoadedAssignment(assignment.Item1, assignment.Item2, assignment.Item3, loaderUtility);
+            }
+            LoadedLoop ll = new LoadedLoop(loaderUtility.GetCondition(loop), loaderUtility, afterAction);;
+            addActions(game, loop, e, ll);
+            return ll;
+        }
+
         //Adds actions to an event or trigger
-        private void addActions(Game game, object evt, LoadedEvent loadedEvent, LoadedCondition cond = null)
+        private void addActions(Game game, object evt, LoadedEvent loadedEvent, LoadedActionable cond = null)
         {
             IEnumerable<object> actions = loaderUtility.GetOfType(evt, loaderUtility.ActionType);
 
@@ -197,11 +218,20 @@ namespace Kinectitude.Core.Loaders
                     Tuple<object, object, object> assignment = loaderUtility.GetAssignment(action);
                     actionToAdd = new LoadedAssignment(assignment.Item1, assignment.Item2, assignment.Item3, loaderUtility);
                 }
-                else
+                else if (loaderUtility.IsCondition(action))
                 {
                     actionToAdd = createCondition(game, loadedEvent, action);
                 }
-                if (null != cond) cond.AddAction(actionToAdd);
+                else
+                {
+                    actionToAdd = createLoadedLoop(game, loadedEvent, action);
+                }
+
+                if (null != cond)
+                {
+                    cond.AddAction(actionToAdd);
+                    cond.Ready();
+                }
                 else loadedEvent.AddAction(actionToAdd);
             }
         }
