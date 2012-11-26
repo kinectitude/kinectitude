@@ -19,10 +19,6 @@ namespace Kinectitude.Core.Data
         internal static readonly ConstantReader TrueValue = new ConstantReader(true);
         internal static readonly ConstantReader FalseValue = new ConstantReader(false);
 
-        //Used by number based value readers for defaults
-        internal static readonly ConstantReader ZeroValue = new ConstantReader(0);
-        internal static readonly ConstantReader OneValue = new ConstantReader(1);
-
         internal ConstantReader(object value)
         {
             Type = NativeReturnType(value);

@@ -36,6 +36,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
 #if TEST
-[assembly: InternalsVisibleTo("Kinectitude.Tests")
-          , InternalsVisibleTo("Kinectitude.Core.Moles")]
+[assembly: InternalsVisibleTo("Kinectitude.Tests")]
 #endif

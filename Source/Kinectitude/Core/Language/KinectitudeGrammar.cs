@@ -14,66 +14,64 @@ namespace Kinectitude.Core.Language
     [Language("Kinectitude Game Language", "1.0.0", "Used to create Kinectitude games")]
     internal sealed class KinectitudeGrammar : Grammar
     {
-        //TODO known issue is that all terminals can have a space entity.component == entity . component
-        //internal static readonly IdentifierTerminal Identifier = TerminalFactory.CreateCSharpIdentifier("Identifier");
-        internal static readonly IdentifierTerminal Identifier = new IdentifierTerminal("Identifier");
-        internal static readonly Terminal Number = TerminalFactory.CreateCSharpNumber("Number");
-        internal static readonly Terminal Str = TerminalFactory.CreateCSharpString("Str");
-        internal static readonly Terminal ClassName = new RegexBasedTerminal("ClassName", @"@?[a-z_A-Z]\w+(?:\.@?[a-z_A-Z]\w+)*");
+        internal readonly IdentifierTerminal Identifier = TerminalFactory.CreateCSharpIdentifier("Identifier");
+        internal readonly Terminal Number = TerminalFactory.CreateCSharpNumber("Number");
+        internal readonly Terminal Str = TerminalFactory.CreateCSharpString("Str");
+        internal readonly Terminal ClassName = new RegexBasedTerminal("ClassName", @"@?[a-z_A-Z]\w+(?:\.@?[a-z_A-Z]\w+)*");
 
         #region kinectitude key words and parts
-        internal static readonly NonTerminal Game = new NonTerminal("Game", "Game");
+        internal readonly NonTerminal Game = new NonTerminal("Game", "Game");
 
-        internal static readonly NonTerminal Scene = new NonTerminal("Scene", "Scene");
-        internal static readonly NonTerminal Entity = new NonTerminal("Entity", "Entity");
-        internal static readonly NonTerminal Properties = new NonTerminal("Properties");
-        internal static readonly NonTerminal Names = new NonTerminal("Names", "Names");
-        internal static readonly NonTerminal Prototype = new NonTerminal("Prototype", "Prototype");
-        internal static readonly NonTerminal EntityDefinition = new NonTerminal("EntityDefinition", "EntityDefinition");
-        internal static readonly NonTerminal BasicDefinition = new NonTerminal("BasicDefinition", "BasicDefinition");
-        internal static readonly NonTerminal Manager = new NonTerminal("Manager", "Manager");
-        internal static readonly NonTerminal Component = new NonTerminal("Component", "Component");
-        internal static readonly NonTerminal Evt = new NonTerminal("Event", "Event");
-        internal static readonly NonTerminal EvtDefinition = new NonTerminal("EvtDefinition", "EvtDefinition");
-        internal static readonly NonTerminal Action = new NonTerminal("Action", "Action");
-        internal static readonly NonTerminal Condition = new NonTerminal("Condition", "Condition");
-        internal static readonly NonTerminal Actions = new NonTerminal("Actions", "Actions");
-        internal static readonly NonTerminal Uses = new NonTerminal("Uses", "Uses");
-        internal static readonly NonTerminal Classes = new NonTerminal("Classes", "Classes");
-        internal static readonly NonTerminal Definitions = new NonTerminal("Definitions", "Definitions");
-        internal static readonly NonTerminal Assignment = new NonTerminal("Assignment", "Assignment");
-        internal static readonly ConstantTerminal Constants = new ConstantTerminal("Constants", typeof(ConstantReader));
-        internal static readonly NonTerminal Else = new NonTerminal("Else", "Else");
-        internal static readonly NonTerminal Service = new NonTerminal("Service", "Service");
-        internal static readonly NonTerminal Loop = new NonTerminal("Loop", "Loop");
+        internal readonly NonTerminal Scene = new NonTerminal("Scene", "Scene");
+        internal readonly NonTerminal Entity = new NonTerminal("Entity", "Entity");
+        internal readonly NonTerminal Properties = new NonTerminal("Properties");
+        internal readonly NonTerminal Names = new NonTerminal("Names", "Names");
+        internal readonly NonTerminal Prototype = new NonTerminal("Prototype", "Prototype");
+        internal readonly NonTerminal EntityDefinition = new NonTerminal("EntityDefinition", "EntityDefinition");
+        internal readonly NonTerminal BasicDefinition = new NonTerminal("BasicDefinition", "BasicDefinition");
+        internal readonly NonTerminal Manager = new NonTerminal("Manager", "Manager");
+        internal readonly NonTerminal Component = new NonTerminal("Component", "Component");
+        internal readonly NonTerminal Evt = new NonTerminal("Event", "Event");
+        internal readonly NonTerminal EvtDefinition = new NonTerminal("EvtDefinition", "EvtDefinition");
+        internal readonly NonTerminal Action = new NonTerminal("Action", "Action");
+        internal readonly NonTerminal Condition = new NonTerminal("Condition", "Condition");
+        internal readonly NonTerminal Actions = new NonTerminal("Actions", "Actions");
+        internal readonly NonTerminal Uses = new NonTerminal("Uses", "Uses");
+        internal readonly NonTerminal Classes = new NonTerminal("Classes", "Classes");
+        internal readonly NonTerminal Definitions = new NonTerminal("Definitions", "Definitions");
+        internal readonly NonTerminal Assignment = new NonTerminal("Assignment", "Assignment");
+        internal readonly ConstantTerminal Constants = new ConstantTerminal("Constants", typeof(ConstantReader));
+        internal readonly NonTerminal Else = new NonTerminal("Else", "Else");
+        internal readonly NonTerminal Service = new NonTerminal("Service", "Service");
+        internal readonly NonTerminal Loop = new NonTerminal("Loop", "Loop");
         #endregion
 
         #region Key Types of KGL
-        internal static readonly NonTerminal TypeMatcher = new NonTerminal("TypeMatcher", "TypeMatcher");
-        internal static readonly NonTerminal IsType = new NonTerminal("IsType", "IsType");
-        internal static readonly NonTerminal IsExactType = new NonTerminal("IsExactType", "IsExactType");
-        internal static readonly NonTerminal ThreeVal = new NonTerminal("ThreeVal", "ThreeVal");
-        internal static readonly NonTerminal TwoVal = new NonTerminal("TwoVal", "TwoVal");
-        internal static readonly NonTerminal ParentVal = new NonTerminal("ParentVal", "ParentVal");
+        internal readonly NonTerminal TypeMatcher = new NonTerminal("TypeMatcher", "TypeMatcher");
+        internal readonly NonTerminal IsType = new NonTerminal("IsType", "IsType");
+        internal readonly NonTerminal IsExactType = new NonTerminal("IsExactType", "IsExactType");
+        internal readonly NonTerminal ThreeVal = new NonTerminal("ThreeVal", "ThreeVal");
+        internal readonly NonTerminal TwoVal = new NonTerminal("TwoVal", "TwoVal");
+        internal readonly NonTerminal ParentVal = new NonTerminal("ParentVal", "ParentVal");
         #endregion
 
         #region expressions
-        internal static readonly NonTerminal Expr = new NonTerminal("Expr", "Expr");
-        internal static readonly NonTerminal BinOp = new NonTerminal("BinOp", "BinOp");
-        internal static readonly NonTerminal UniOp = new NonTerminal("UniOp", "UniOp");
+        internal readonly NonTerminal Expr = new NonTerminal("Expr", "Expr");
+        internal readonly NonTerminal BinOp = new NonTerminal("BinOp", "BinOp");
+        internal readonly NonTerminal UniOp = new NonTerminal("UniOp", "UniOp");
         #endregion
 
         #region operator terminals
         //ToTerm needs an instance, but reference to these are needed.
-        internal Terminal Becomes, Eql, Lt, Gt, Le, Ge, Neq, Plus, Minus, Mult, Div, Rem, Pow, And, Or, Not,
-            LeftShift, RightShift, PlusEq, MinusEq, MultEq, DivEq, RemEq, PowEq, RshiftEq, LshiftEq;
+        internal readonly Terminal Becomes, Eql, Lt, Gt, Le, Ge, Neq, Plus, Minus, Mult, Div, Rem, Pow, And, Or, Not,
+            LeftShift, RightShift;
         #endregion
 
         public KinectitudeGrammar()
         {
             #region constants
             Constants.Add("true", ConstantReader.TrueValue);
-            Constants.Add("false", ConstantReader.FalseValue);
+            Constants.Add("false",ConstantReader.FalseValue);
             Constants.Add("Pi", new ConstantReader(Math.PI));
             Constants.Add("E", new ConstantReader(Math.E));
             #endregion
@@ -103,14 +101,6 @@ namespace Kinectitude.Core.Language
             Not = new RegexBasedTerminal("Not", @"!|(not)");
             LeftShift = ToTerm("<<", "leftShitf");
             RightShift = ToTerm(">>", "RightShift");
-            PlusEq = ToTerm("+=", "PlusEq");
-            MinusEq = ToTerm("-=", "MinusEq");
-            MultEq = ToTerm("*=", "MultEq");
-            DivEq = ToTerm("/=", "DivEq");
-            RemEq = ToTerm("%=", "RemEq");
-            PowEq = ToTerm("^=", "PowEq");
-            RshiftEq = ToTerm(">>=", "RshiftEq");
-            LshiftEq = ToTerm("<<=", "LshiftEq");
             #endregion
 
             #region values
@@ -125,7 +115,7 @@ namespace Kinectitude.Core.Language
             RegisterBracePair("(", ")");
             RegisterBracePair("{", "}");
             IsExactType.Rule = "#" + Identifier;
-            ParentVal.Rule =  "@" + Identifier + "." + Identifier | "@" + Identifier + "." + Identifier + "." + Identifier;
+            ParentVal.Rule =  "^" + Identifier + "." + Identifier | "^" + Identifier + "." + Identifier + "." + Identifier;
             exactValue.Rule = Identifier | TwoVal | ThreeVal | ParentVal;
             TypeMatcher.Rule = IsType | IsExactType| IsType + Plus + TypeMatcher | IsExactType + Plus + TypeMatcher;
             #endregion
@@ -242,7 +232,7 @@ namespace Kinectitude.Core.Language
 
             Root = Game;
             //Removes from the tree, we don't care about having these there
-            MarkPunctuation("{", "}", "(", ")", ":", "$", "@", "#", "Game", "using", "define", "Scene", "Entity",
+            MarkPunctuation("{", "}", "(", ")", ":", "$", "@", "#", "^", "Game", "using", "define", "Scene", "Entity",
                  ",", "if", "Component", "Manager", "Prototype", "=", ".", "as", "Event", "else", "Service", ";", "while", "for");
             MarkReservedWords("using", "define", "if", "true", "false", "Pi", "E", "else", "while", "for");
             MarkTransient(BasicDefinition, value, IsPrototype, term, exactValue, optionalActions, optionalEvt, 

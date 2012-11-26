@@ -79,7 +79,7 @@ Game (Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = false, Nam
             CreateEntity(Prototype = "extraBall")
             CreateEntity(Prototype = "extraBall")
             CreateEntity(Prototype = "extraBall")
-            scene.show  ="A " + @CollidesWith.ball + " at X " + @CollidesWith.Transform.X
+            scene.show  ="A " + ^CollidesWith.ball + " at X " + ^CollidesWith.Transform.X
         }
     }
 

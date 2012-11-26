@@ -13,6 +13,7 @@ using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.Views;
 using Kinectitude.Render;
 using Kinectitude.Editor.Storage.Xml;
+using Kinectitude.Editor.Storage.Kgl;
 
 namespace Kinectitude.Editor.Models
 {
@@ -276,7 +277,7 @@ namespace Kinectitude.Editor.Models
 
         public void SaveGame()
         {
-            IGameStorage storage = new XmlGameStorage(Game.FileName);
+            IGameStorage storage = new KglGameStorage(Game.FileName);
             storage.SaveGame(Game);
         }
 

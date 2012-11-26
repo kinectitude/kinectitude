@@ -60,6 +60,16 @@
     <Compile Include="Core\TestMocks.cs" />
     <Compile Include="Core\Actions2.cs" />
     <Compile Include="Core\TypeMatcherTests.cs" />
+    <Compile Include="Editor\ActionTests.cs" />
+    <Compile Include="Editor\AttributeTests.cs" />
+    <Compile Include="Editor\ComponentTests.cs" />
+    <Compile Include="Editor\ConditionTests.cs" />
+    <Compile Include="Editor\EntityTests.cs" />
+    <Compile Include="Editor\EventTests.cs" />
+    <Compile Include="Editor\GameTests.cs" />
+    <Compile Include="Editor\PropertyTests.cs" />
+    <Compile Include="Editor\SceneTests.cs" />
+    <Compile Include="Editor\WorkspaceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
