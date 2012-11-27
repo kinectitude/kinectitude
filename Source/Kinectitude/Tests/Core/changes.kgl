@@ -6,7 +6,7 @@
 
 Game (Width = 800, Height=600, FirstScene="test", IsFullScreen=false){
     Scene test(lol = "lollol"){
-        Entity runTests(){
+        Entity runTests(valueX = true, valueY = false){
             Component MockComponent()
             Event SceneStarts(){
                 val = 1
@@ -39,6 +39,7 @@ Game (Width = 800, Height=600, FirstScene="test", IsFullScreen=false){
                 lv = 9
                 this.lv = 10
                 this.lv = 1
+				valueY = true
             }
             Event AttributeChanges(Target=scene.balls + scene.rofl){
                 Assertion(LS=1, RS=1, Assertion="balls + rofl", OnlyRunIf= true)
@@ -74,10 +75,6 @@ Game (Width = 800, Height=600, FirstScene="test", IsFullScreen=false){
                 Assertion(LS=81, RS=scene.balls**2, Assertion="balls ** 2", OnlyRunIf= true)
             }
 
-            Event AttributeChanges(Target=this.bool and this.bool2){
-                Assertion(LS=true, RS=this.bool && this.bool2, Assertion="and", OnlyRunIf= true)
-            }
-
             Event AttributeChanges(Target=this.bool or this.bool2){
                 Assertion(LS=true, RS=this.bool || this.bool2, Assertion="or", OnlyRunIf= true)
             }
@@ -104,6 +101,13 @@ Game (Width = 800, Height=600, FirstScene="test", IsFullScreen=false){
 
             Event AttributeChanges(Target= this.lv >= scene.balls){
                 Assertion(LS=true, RS=true, Assertion="ge", OnlyRunIf= true)
+            }
+			Event AttributeChanges(Target= valueX && valueY){
+                Assertion(LS=true, RS=true, Assertion="and", OnlyRunIf= true)
+				valueX = false
+            }
+			Event AttributeChanges(Target= valueX && valueY){
+                Assertion(LS=true, RS=true, Assertion="and", OnlyRunIf= true)
             }
         }
     }

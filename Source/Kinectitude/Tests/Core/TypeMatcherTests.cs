@@ -25,6 +25,7 @@ namespace Kinectitude.Tests.Core
             AssertionAction.CheckValue("#p2", 2);
             AssertionAction.CheckValue("#p3");
             AssertionAction.CheckValue("#p4");
+            AssertionAction.CheckValue("^e1.value");
         }
     }
 }

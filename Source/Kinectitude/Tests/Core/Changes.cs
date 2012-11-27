@@ -29,7 +29,6 @@ namespace Kinectitude.Tests.Core
             AssertionAction.CheckValue("balls / 1");
             AssertionAction.CheckValue("balls % 2");
             AssertionAction.CheckValue("balls ** 2");
-            AssertionAction.CheckValue("and");
             AssertionAction.CheckValue("or");
             AssertionAction.CheckValue("eql", 2);
             AssertionAction.CheckValue("neq", 2);
@@ -37,7 +36,7 @@ namespace Kinectitude.Tests.Core
             AssertionAction.CheckValue("le", 2);
             AssertionAction.CheckValue("gt", 2);
             AssertionAction.CheckValue("ge", 3);
-
+            AssertionAction.CheckValue("and", 4);
         }
     }
 }
