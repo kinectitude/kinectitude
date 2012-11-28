@@ -9,7 +9,7 @@ namespace Kinectitude.Core.Events
     // Use this as a base class for any attribute change.  It will always fire
 
     [Plugin("Expression {Target} changes", "")]
-    internal sealed class AttributeChangesEvent : Event
+    internal sealed class AttributeChangesEvent : Event, IChangeable
     {
         [Plugin("Expression", "")]
         public ValueReader Target { get; set; }
@@ -18,12 +18,11 @@ namespace Kinectitude.Core.Events
 
         public override void OnInitialize()
         {
-            Target.NotifyOfChange(Trigger);
+            Target.NotifyOfChange(this);
         }
 
-        public void Trigger(ValueReader newValue)
-        {
-            DoActions();
-        }
+        void IChangeable.Prepare() { }
+
+        void IChangeable.Change() { DoActions(); }
     }
 }

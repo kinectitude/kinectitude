@@ -18,8 +18,8 @@ namespace Kinectitude.Core.Data
 
         internal override void SetupNotifications()
         {
-            Left.NotifyOfChange(Change);
-            Right.NotifyOfChange(Change);
+            Left.NotifyOfChange(this);
+            Right.NotifyOfChange(this);
         }
 
         internal override ValueWriter ConvertToWriter() { return new NullWriter(this); }

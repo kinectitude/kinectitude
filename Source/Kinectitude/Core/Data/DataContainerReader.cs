@@ -35,7 +35,7 @@ namespace Kinectitude.Core.Data
 
         internal override void SetupNotifications()
         {
-            DataContainer.NotifyOfChange(Param, Change);
+            DataContainer.NotifyOfChange(Param, this);
         }
 
         internal override ValueWriter ConvertToWriter()

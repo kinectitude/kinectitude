@@ -37,7 +37,7 @@ namespace Kinectitude.Core.Data
         internal override void SetupNotifications()
         {
             if (null != Owner)
-                Owner.NotifyOfComponentChange(ClassFactory.GetReferedName(Obj.GetType()) + '.' + Param, Change);
+                Owner.NotifyOfComponentChange(ClassFactory.GetReferedName(Obj.GetType()) + '.' + Param, this);
         }
 
         internal override double GetDoubleValue() { return ToNumber<double>(ClassFactory.GetParam(Obj, Param)); }

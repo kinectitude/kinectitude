@@ -107,6 +107,7 @@
     <Compile Include="Components\TransformComponent.cs" />
     <Compile Include="Data\DataContainerWriter.cs" />
     <Compile Include="Data\DoubleDictionary.cs" />
+    <Compile Include="Data\IChangeable.cs" />
     <Compile Include="Data\NeqOpReader.cs" />
     <Compile Include="Data\DataContainerReader.cs" />
     <Compile Include="Data\NullWriter.cs" />

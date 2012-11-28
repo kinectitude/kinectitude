@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using Kinectitude.Core.Data;
-using SysAction = System.Action;
 
 namespace Kinectitude.Core.Base
 {
     public abstract class DataContainer
     {
         private readonly Dictionary<string, ValueReader> attributes = new Dictionary<string, ValueReader>();
-        private readonly Dictionary<string, List<SysAction>> callbacks = new Dictionary<string, List<SysAction>>();
+        private readonly Dictionary<string, List<IChangeable>> callbacks = new Dictionary<string, List<IChangeable>>();
 
-        internal readonly Dictionary<string, List<SysAction>> CheckProperties = new Dictionary<string, List<SysAction>>();
-        protected readonly List<Tuple<DataContainer, string, SysAction>> PropertyChanges = new List<Tuple<DataContainer, string, SysAction>>();
+        internal readonly Dictionary<string, List<IChangeable>> CheckProperties = new Dictionary<string, List<IChangeable>>();
+        internal readonly List<Tuple<DataContainer, string, IChangeable>> PropertyChanges = new List<Tuple<DataContainer, string, IChangeable>>();
 
         public bool Deleted { get; protected set; }
 
@@ -39,7 +38,8 @@ namespace Kinectitude.Core.Base
                 attributes[key] = reader;
                 if (callbacks.ContainsKey(key))
                 {
-                    foreach (SysAction Callable in callbacks[key]) Callable();
+                    foreach (IChangeable callable in callbacks[key]) callable.Prepare();
+                    foreach (IChangeable callable in callbacks[key]) callable.Change();
                 }
             }
         }
@@ -50,13 +50,13 @@ namespace Kinectitude.Core.Base
             Deleted = false;
         }
 
-        internal void NotifyOfChange(string key, SysAction callback)
+        internal void NotifyOfChange(string key, IChangeable callback)
         {
-            List<SysAction> addTo = null;
+            List<IChangeable> addTo = null;
             callbacks.TryGetValue(key, out addTo);
             if (null == addTo)
             {
-                addTo = new List<SysAction>();
+                addTo = new List<IChangeable>();
                 callbacks[key] = addTo;
                 addTo.Add(callback);
             }
@@ -66,23 +66,23 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        internal void StopNotifications(string key, SysAction callback)
+        internal void StopNotifications(string key, IChangeable callback)
         {
-            List<SysAction> removeFrom = callbacks[key];
+            List<IChangeable> removeFrom = callbacks[key];
             removeFrom.Remove(callback);
         }
 
 
-        internal void NotifyOfComponentChange(string what, SysAction callback)
+        internal void NotifyOfComponentChange(string what, IChangeable callback)
         {
-            List<SysAction> callbacks;
+            List<IChangeable> callbacks;
             if (CheckProperties.TryGetValue(what, out callbacks))
             {
                 callbacks.Add(callback);
             }
             else
             {
-                callbacks = new List<SysAction>();
+                callbacks = new List<IChangeable>();
                 callbacks.Add(callback);
                 CheckProperties[what] = callbacks;
                 string[] parts = what.Split('.');
@@ -91,9 +91,9 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        internal void UnnotifyOfComponentChange(string what, SysAction callback)
+        internal void UnnotifyOfComponentChange(string what, IChangeable callback)
         {
-            List<SysAction> callbacks;
+            List<IChangeable> callbacks;
             if (CheckProperties.TryGetValue(what, out callbacks))
             {
                 callbacks.Remove(callback);
@@ -107,10 +107,11 @@ namespace Kinectitude.Core.Base
 
         internal void ChangedProperty(string what)
         {
-            List<SysAction> callbacks;
+            List<IChangeable> callbacks;
             if (CheckProperties.TryGetValue(what, out callbacks))
             {
-                foreach (SysAction callback in callbacks) callback();
+                foreach (IChangeable callback in callbacks) callback.Prepare();
+                foreach (IChangeable callback in callbacks) callback.Change();
             }
         }
 

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Kinectitude.Core.Events;
 using Kinectitude.Core.Data;
-using SysAction = System.Action;
 
 namespace Kinectitude.Core.Base
 {
@@ -18,8 +17,8 @@ namespace Kinectitude.Core.Base
         private readonly List<Component> componentList = new List<Component>();
 
         //Used to automatically unsuscribe all components' and events' change listeners
-        internal readonly List<Tuple<DataContainer, string, SysAction>> Changes = 
-            new List<Tuple<DataContainer, string, SysAction>>();
+        internal readonly List<Tuple<DataContainer, string, IChangeable>> Changes =
+            new List<Tuple<DataContainer, string, IChangeable>>();
 
         private readonly List<OnCreateEvent> CreateEvents = new List<OnCreateEvent>();
 
@@ -74,10 +73,10 @@ namespace Kinectitude.Core.Base
 
         internal void Destroy()
         {
-            foreach (Tuple<DataContainer, string, SysAction> unsubscribe in Changes) 
+            foreach (Tuple<DataContainer, string, IChangeable> unsubscribe in Changes) 
                 unsubscribe.Item1.StopNotifications(unsubscribe.Item2, unsubscribe.Item3);
 
-            foreach (Tuple<DataContainer, string, SysAction> unsubscribe in PropertyChanges)
+            foreach (Tuple<DataContainer, string, IChangeable> unsubscribe in PropertyChanges)
                 unsubscribe.Item1.UnnotifyOfComponentChange(unsubscribe.Item2, unsubscribe.Item3);
 
             foreach (Event evt in Events) evt.Destroy();

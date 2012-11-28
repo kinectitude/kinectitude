@@ -37,16 +37,16 @@ namespace Kinectitude.Core.Data
             What = component + "." + param;
             Watcher = watcher;
             TypeMatcher matcher = Watcher.GetTypeMatcher();
-            Watcher.NotifyOfChange(typeMatcherChange);
+            Watcher.NotifyOfChange(this);
         }
 
         private void typeMatcherChange()
         {
-            if (lastEntity != null) lastEntity.UnnotifyOfComponentChange(What, Change);
+            if (lastEntity != null) lastEntity.UnnotifyOfComponentChange(What, this);
             Entity entity = Watcher.GetTypeMatcher().Entity;
             lastEntity = entity;
-            entity.NotifyOfComponentChange(What, Change);
-            Change();
+            entity.NotifyOfComponentChange(What, this);
+            ((IChangeable)this).Change();
         }
 
         internal override ValueWriter ConvertToWriter() { return new TypeMatcherProperyWriter(this); }

@@ -28,16 +28,16 @@ namespace Kinectitude.Core.Data
         {
             Param = param;
             Watcher = watcher;
-            Watcher.NotifyOfChange(Change);
+            Watcher.NotifyOfChange(this);
         }
 
         private void typeMatcherChange()
         {
-            if (lastEntity != null) lastEntity.NotifyOfChange(Param, Change);
+            if (lastEntity != null) lastEntity.NotifyOfChange(Param, this);
             Entity entity = Watcher.GetTypeMatcher().Entity;
             lastEntity = entity;
-            entity.StopNotifications(Param, Change);
-            Change();
+            entity.StopNotifications(Param, this);
+            ((IChangeable)this).Change();
         }
         internal override ValueWriter ConvertToWriter() { return new TypeMatcherDCWriter(this); }
     }

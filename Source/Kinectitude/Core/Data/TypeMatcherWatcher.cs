@@ -3,18 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using SysAction = System.Action;
 using Action = Kinectitude.Core.Base.Action;
 
 namespace Kinectitude.Core.Data
 {
-    internal sealed class TypeMatcherWatcher
+    internal sealed class TypeMatcherWatcher : IChangeable
     {
         private readonly object Obj;
         private readonly string Param;
         private readonly DataContainer Owner;
 
-        private readonly List<SysAction> Callbacks = new List<SysAction>();
+        private readonly List<IChangeable> Callbacks = new List<IChangeable>();
 
         internal static TypeMatcherWatcher GetTypeMatcherWatcher(object obj, string param, Entity owner)
         {
@@ -30,14 +29,14 @@ namespace Kinectitude.Core.Data
             Type objType = obj.GetType();
             Owner = owner;
             if(typeof(Changeable).IsAssignableFrom(obj.GetType()))
-                Owner.NotifyOfComponentChange(ClassFactory.GetReferedName(Obj.GetType()) + '.' + Param, change);
+                Owner.NotifyOfComponentChange(ClassFactory.GetReferedName(Obj.GetType()) + '.' + Param, this);
         }
 
         internal TypeMatcher GetTypeMatcher() { return ClassFactory.GetParam(Obj, Param) as TypeMatcher; }
 
-        internal void NotifyOfChange(SysAction callback) { Callbacks.Add(callback); }
+        internal void NotifyOfChange(IChangeable callback) { Callbacks.Add(callback); }
 
-        //If it makes it easier, make the callback with TypeMatcher or change dc to callback empty
-        private void change() { foreach (SysAction callback in Callbacks) callback(); }
+        void IChangeable.Change() { foreach (IChangeable callback in Callbacks) callback.Change(); }
+        void IChangeable.Prepare() { foreach (IChangeable callback in Callbacks) callback.Prepare(); }
     }
 }

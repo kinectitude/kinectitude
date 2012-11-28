@@ -14,7 +14,6 @@ namespace Kinectitude.Tests.Core
         public void ChangeTests()
         {
             Game game = Setup.StartGame("changes.kgl");
-            game.OnUpdate(1 / 60f);
             AssertionAction.CheckValue("runTests.val is set");
             AssertionAction.CheckValue("IntVal is set, and attribute equals is run first");
             AssertionAction.CheckValue("scene.x");
@@ -36,6 +35,7 @@ namespace Kinectitude.Tests.Core
             AssertionAction.CheckValue("le", 2);
             AssertionAction.CheckValue("gt", 2);
             AssertionAction.CheckValue("ge", 3);
+            AssertionAction.CheckValue("and 2", 4);
             AssertionAction.CheckValue("and", 4);
         }
     }

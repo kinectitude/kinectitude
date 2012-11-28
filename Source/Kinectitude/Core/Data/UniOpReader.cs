@@ -11,7 +11,7 @@ namespace Kinectitude.Core.Data
 
         protected UniOpReader(ValueReader reader) { Reader = reader; }
 
-        internal override void SetupNotifications() { Reader.NotifyOfChange(Change); }
+        internal override void SetupNotifications() { Reader.NotifyOfChange(this); }
 
         internal override ValueWriter ConvertToWriter() { return new NullWriter(this); }
     }

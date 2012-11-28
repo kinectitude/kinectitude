@@ -7,11 +7,11 @@ namespace Kinectitude.Core.Data
 {
     internal enum PreferedType { String, Number, Boolean, Null }
 
-    public abstract class ValueReader
+    public abstract class ValueReader : IChangeable
     {
-        protected readonly List<Action<ValueReader>> Callbacks = new List<Action<ValueReader>>();
+        internal readonly List<IChangeable> Callbacks = new List<IChangeable>();
         //TODO change to a null reader when I make one
-        private ConstantReader oldValue = null;
+        private readonly Queue<ConstantReader> Values = new Queue<ConstantReader>();
 
         protected ValueWriter Writer { get; private set; }
 
@@ -88,12 +88,12 @@ namespace Kinectitude.Core.Data
 
         internal virtual void SetupNotifications() { }
 
-        public void NotifyOfChange(Action<ValueReader> change)
+        internal void NotifyOfChange(IChangeable change)
         {
-            if (oldValue == null)
+            if (Values.Count == 0)
             {
                 SetupNotifications();
-                oldValue = new ConstantReader(GetPreferedValue());
+                Values.Enqueue(new ConstantReader(GetPreferedValue()));
             }
             Callbacks.Add(change); 
         }
@@ -118,16 +118,17 @@ namespace Kinectitude.Core.Data
 
         internal static ValueWriter GetValueWriter(ValueReader reader) { return reader.GetValueWriter(); }
 
-        protected void Change()
+
+        void IChangeable.Prepare() { Values.Enqueue(new ConstantReader(GetPreferedValue())); }
+
+        void IChangeable.Change()
         {
-            if (!HasSameVal(oldValue))
+            ConstantReader curVal = Values.Dequeue();
+            if (!Values.Peek().HasSameVal(curVal))
             {
-                oldValue = new ConstantReader(this.GetPreferedValue());
-                foreach (Action<ValueReader> callback in Callbacks) callback(oldValue);
+                foreach (IChangeable callback in Callbacks) callback.Prepare();
+                foreach (IChangeable callback in Callbacks) callback.Change();
             }
         }
-
-        //many value readers notify of change from another vr so use this function instead of creating delegates
-        protected void Change(ValueReader vr) { Change(); }
     }
 }
