@@ -5,11 +5,12 @@ using Microsoft.Xna.Framework;
 
 namespace Kinectitude.Physics
 {
+    [Plugin("Physics Manager", "")]
     public class PhysicsManager : Manager<PhysicsComponent>
     {
 
         private float yGravity;
-        [Plugin("Y gravity", "How fast things are pulled down")]
+        [PluginProperty("Y gravity", "How fast things are pulled down")]
         public float YGravity 
         {
             get { return yGravity; }
@@ -25,7 +26,7 @@ namespace Kinectitude.Physics
         }
 
         private float xGravity;
-        [Plugin("X gravity", "How fast things are pulled to the left")]
+        [PluginProperty("X gravity", "How fast things are pulled to the left")]
         public float XGravity 
         {
             get { return xGravity; }

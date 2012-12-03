@@ -22,7 +22,7 @@ namespace Kinectitude.Core.AbstractComponents
         private bool exactMove = false;
 
         private FollowType direction;
-        [Plugin("Axis", "")]
+        [PluginProperty("Axis", "")]
         public FollowType Direction
         {
             get { return direction; }
@@ -37,7 +37,7 @@ namespace Kinectitude.Core.AbstractComponents
         }
 
         private float minXFollow = float.NegativeInfinity;
-        [Plugin("Minimum X position to follow to","")]
+        [PluginProperty("Minimum X position to follow to","")]
         public float MinXFollow
         {
             get {return minXFollow;}
@@ -52,7 +52,7 @@ namespace Kinectitude.Core.AbstractComponents
         }
 
         private float minYFollow = float.NegativeInfinity;
-        [Plugin("Minimum Y position to follow to", "")]
+        [PluginProperty("Minimum Y position to follow to", "")]
         public float MinYFollow
         {
             get { return minYFollow; }
@@ -67,7 +67,7 @@ namespace Kinectitude.Core.AbstractComponents
         }
 
         private float maxXFollow = float.PositiveInfinity;
-        [Plugin("Maximum X position to follow to", "")]
+        [PluginProperty("Maximum X position to follow to", "")]
         public float MaxXFollow
         {
             get { return maxXFollow; }
@@ -82,7 +82,7 @@ namespace Kinectitude.Core.AbstractComponents
         }
 
         private float maxYFollow = float.PositiveInfinity;
-        [Plugin("Maximum Y position to follow to", "")]
+        [PluginProperty("Maximum Y position to follow to", "")]
         public float MaxYFollow
         {
             get { return maxYFollow; }
@@ -97,7 +97,7 @@ namespace Kinectitude.Core.AbstractComponents
         }
 
         private bool ignoresPhysics = false;
-        [Plugin("Ignore Physics", "Ignores physics Component, use if motion should Not care about physics")]
+        [PluginProperty("Ignore Physics", "Ignores physics component, use if motion should not care about physics")]
         public bool IgnoresPhysics
         {
             get { return ignoresPhysics; }

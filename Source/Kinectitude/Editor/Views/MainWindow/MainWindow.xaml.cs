@@ -24,7 +24,7 @@ namespace Kinectitude.Editor.Views
             DataContext = Workspace.Instance;
             Workspace.Instance.Initialize();
 
-            Workspace.Instance.NewGame();
+            Workspace.Instance.NewProject();
 
             InitializeComponent();
         }

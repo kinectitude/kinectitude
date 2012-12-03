@@ -10,7 +10,7 @@ namespace Kinectitude.Core.Actions
     [Plugin("Pause timers {Name}", "")]
     internal sealed class PauseTimersAction : Action
     {
-        [Plugin("Name", "Name of the timers to pause")]
+        [PluginProperty("Name", "Name of the timers to pause")]
         public ValueReader Name { get; set; }
 
         public override void Run()

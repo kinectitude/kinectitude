@@ -2,15 +2,15 @@
 
 namespace Kinectitude.Core.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class PluginAttribute : Attribute
     {
-        private readonly string name;
+        private readonly string header;
         private readonly string description;
 
-        public string Name
+        public string Header
         {
-            get { return name; }
+            get { return header; }
         }
 
         public string Description
@@ -18,9 +18,9 @@ namespace Kinectitude.Core.Attributes
             get { return description; }
         }
 
-        public PluginAttribute(string name, string description)
+        public PluginAttribute(string header, string description)
         {
-            this.name = name;
+            this.header = header;
             this.description = description;
         }
     }

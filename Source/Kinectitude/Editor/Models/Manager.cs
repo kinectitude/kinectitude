@@ -4,23 +4,21 @@ using System.Linq;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Storage;
+using Kinectitude.Editor.Models.Notifications;
 
 namespace Kinectitude.Editor.Models
 {
-    internal sealed class Manager : VisitableModel, IPropertyScope
+    internal sealed class Manager : GameModel<IManagerScope>, IPropertyScope
     {
         private readonly Plugin plugin;
-        private IManagerScope scope;
 
-        public event ScopeChangedEventHandler ScopeChanged;
         public event PropertyEventHandler InheritedPropertyAdded { add { } remove { } }
         public event PropertyEventHandler InheritedPropertyRemoved { add { } remove { } }
         public event PropertyEventHandler InheritedPropertyChanged { add { } remove { } }
 
-        [DependsOn("Scope")]
         public string Type
         {
-            get { return null != scope ? scope.GetDefinedName(plugin) : plugin.ClassName; }
+            get { return null != Scope ? Scope.GetDefinedName(plugin) : plugin.ClassName; }
         }
 
         public Plugin Plugin
@@ -28,11 +26,17 @@ namespace Kinectitude.Editor.Models
             get { return plugin; }
         }
 
-        public ObservableCollection<Property> Properties
+        public string DisplayName
         {
-            get;
-            private set;
+            get { return plugin.Header; }
         }
+
+        public bool IsRequired
+        {
+            get { return null != Scope ? Scope.RequiresManager(this) : false; }
+        }
+
+        public ObservableCollection<Property> Properties { get; private set; }
 
         public Manager(Plugin plugin)
         {
@@ -44,6 +48,8 @@ namespace Kinectitude.Editor.Models
             this.plugin = plugin;
 
             Properties = new ObservableCollection<Property>();
+
+            AddDependency<ScopeChanged>("Type");
         }
 
         public override void Accept(IGameVisitor visitor)
@@ -73,31 +79,6 @@ namespace Kinectitude.Editor.Models
         object IPropertyScope.GetInheritedValue(string name)
         {
             return null;
-        }
-
-        public void SetScope(IManagerScope scope)
-        {
-            if (null != this.scope)
-            {
-                this.scope.ScopeChanged -= OnScopeChanged;
-            }
-
-            this.scope = scope;
-
-            if (null != this.scope)
-            {
-                this.scope.ScopeChanged += OnScopeChanged;
-            }
-
-            NotifyPropertyChanged("Scope");
-        }
-
-        private void OnScopeChanged()
-        {
-            if (null != ScopeChanged)
-            {
-                ScopeChanged();
-            }
         }
     }
 }

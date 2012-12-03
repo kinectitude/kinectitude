@@ -7,7 +7,7 @@ namespace Kinectitude.Core.Actions
     [Plugin("Fire trigger {Name}", "")]
     internal sealed class FireTriggerAction : Action
     {
-        [Plugin("Trigger", "")]
+        [PluginProperty("Trigger", "")]
         public ValueReader Name { get; set; }
 
         public FireTriggerAction() { }

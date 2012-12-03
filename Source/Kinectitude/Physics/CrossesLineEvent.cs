@@ -21,13 +21,13 @@ namespace Kinectitude.Physics
             Both = Positive | Negative
         };
 
-        [Plugin("Axis", "")]
+        [PluginProperty("Axis", "")]
         public LineType Line { set; get; }
 
-        [Plugin("Location", "")]
+        [PluginProperty("Location", "")]
         public double Location { set; get; }
 
-        [Plugin("Direction", "")]
+        [PluginProperty("Direction", "")]
         public FromDirection Direction { set; get; }
 
         public CrossesLineEvent()

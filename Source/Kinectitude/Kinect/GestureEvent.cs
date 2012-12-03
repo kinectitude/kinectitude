@@ -19,13 +19,13 @@ namespace Kinectitude.Kinect
 
         public TemplatedGestureDetector GestureDetector { get; private set; }
 
-        [Plugin("Gesture", "Name of the gesture to detect")]
+        [PluginProperty("Gesture", "Name of the gesture to detect")]
         public string GestureName { get; set; }
 
-        [Plugin("Joint", "Joint to detect gesture on")]
+        [PluginProperty("Joint", "Joint to detect gesture on")]
         public JointType Joint { get; set; }
 
-        [Plugin("Player", "player to detect gesture from")]
+        [PluginProperty("Player", "player to detect gesture from")]
         public int Player { get; set; }
 
         public override void OnInitialize()

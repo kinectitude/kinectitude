@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 namespace Kinectitude.Sound
 {
+    [Plugin("Sound Manager", "")]
     public class SoundManager : Manager<SoundComponent>
     {
         public XAudio2 device;

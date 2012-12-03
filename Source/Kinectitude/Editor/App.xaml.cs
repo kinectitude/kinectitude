@@ -10,11 +10,11 @@ namespace Kinectitude.Editor
     {
         public App()
         {
-            DialogService.RegisterWindow<SceneDialog>(DialogService.Constants.SceneDialog);
             DialogService.RegisterWindow<EntityDialog>(DialogService.Constants.EntityDialog);
             DialogService.RegisterWindow<ComponentDialog>(DialogService.Constants.ComponentDialog);
             DialogService.RegisterWindow<AddEntityDialog>(DialogService.Constants.AddEntityDialog);
-            DialogService.RegisterWindow<RenameDialog>(DialogService.Constants.RenameDialog);
+            DialogService.RegisterWindow<NameDialog>(DialogService.Constants.NameDialog);
+            DialogService.RegisterWindow<SceneDialog>(DialogService.Constants.SceneDialog);
         }
     }
 }

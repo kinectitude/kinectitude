@@ -7,7 +7,7 @@ namespace Kinectitude.Core.Actions
     [Plugin("Change Scene to {Target}", "")]
     internal sealed class ChangeSceneAction : Action
     {
-        [Plugin("Scene", "")]
+        [PluginProperty("Scene", "")]
         public ValueReader Target { get; set; }
 
         public ChangeSceneAction() { }

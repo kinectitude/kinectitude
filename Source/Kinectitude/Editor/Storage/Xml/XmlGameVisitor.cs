@@ -7,6 +7,8 @@ using System.Xml.Linq;
 using Kinectitude.Editor.Models;
 using Action = Kinectitude.Editor.Models.Action;
 using Attribute = Kinectitude.Editor.Models.Attribute;
+using Kinectitude.Editor.Models.Statements.Assignments;
+using Kinectitude.Editor.Models.Statements;
 
 namespace Kinectitude.Editor.Storage.Xml
 {
@@ -16,7 +18,7 @@ namespace Kinectitude.Editor.Storage.Xml
 
         public XmlGameVisitor() { }
 
-        public XObject Apply(VisitableModel model)
+        public XObject Apply(GameModel model)
         {
             model.Accept(this);
             return result;
@@ -35,6 +37,11 @@ namespace Kinectitude.Editor.Storage.Xml
             }
 
             result = element;
+        }
+
+        public void Visit(Assignment assignment)
+        {
+
         }
 
         public void Visit(Attribute attribute)
@@ -61,9 +68,9 @@ namespace Kinectitude.Editor.Storage.Xml
         {
             XElement element = new XElement(XmlConstants.Condition, new XAttribute(XmlConstants.If, condition.If));
 
-            foreach (AbstractAction action in condition.Actions)
+            foreach (AbstractStatement statement in condition.Statements)
             {
-                element.Add(Apply(action));
+                element.Add(Apply(statement));
             }
 
             result = element;
@@ -129,12 +136,17 @@ namespace Kinectitude.Editor.Storage.Xml
                 }
             }
 
-            foreach (AbstractAction action in evt.Actions)
+            foreach (AbstractStatement statement in evt.Statements)
             {
-                element.Add(Apply(action));
+                element.Add(Apply(statement));
             }
 
             result = element;
+        }
+
+        public void Visit(ForLoop loop)
+        {
+
         }
 
         public void Visit(Game game)
@@ -174,22 +186,37 @@ namespace Kinectitude.Editor.Storage.Xml
 
         public void Visit(InheritedAction action)
         {
-            result = null;
+
+        }
+
+        public void Visit(InheritedAssignment assignment)
+        {
+
         }
 
         public void Visit(InheritedCondition condition)
         {
-            result = null;
+
         }
 
         public void Visit(InheritedEvent evt)
         {
-            result = null;
+
+        }
+
+        public void Visit(InheritedForLoop loop)
+        {
+
         }
 
         public void Visit(InheritedProperty property)
         {
-            result = null;
+
+        }
+
+        public void Visit(InheritedWhileLoop loop)
+        {
+
         }
 
         public void Visit(Manager manager)
@@ -244,6 +271,11 @@ namespace Kinectitude.Editor.Storage.Xml
             }
 
             result = element;
+        }
+
+        public void Visit(WhileLoop loop)
+        {
+
         }
     }
 }

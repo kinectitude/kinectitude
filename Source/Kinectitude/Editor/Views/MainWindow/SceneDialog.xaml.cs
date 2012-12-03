@@ -14,7 +14,7 @@ using System.Windows.Shapes;
 namespace Kinectitude.Editor.Views
 {
     /// <summary>
-    /// Interaction logic for Window1.xaml
+    /// Interaction logic for SceneDialog.xaml
     /// </summary>
     public partial class SceneDialog : Window
     {

@@ -6,15 +6,14 @@ using Kinectitude.Core.Attributes;
 
 namespace Kinectitude.Render
 {
-    [Requires(typeof(TransformComponent))]
-    [Provides(typeof(IRender))]
+    [Provides(typeof(IRender)), Requires(typeof(RenderManager)), Requires(typeof(TransformComponent))]
     public abstract class BaseRenderComponent : Component, IRender
     {
         protected TransformComponent transformComponent;
         protected RenderManager renderManager;
 
         private float opacity;
-        [Plugin("Opacity", "")]
+        [PluginProperty("Opacity", "", 1.0f)]
         public float Opacity
         {
             get { return opacity; }

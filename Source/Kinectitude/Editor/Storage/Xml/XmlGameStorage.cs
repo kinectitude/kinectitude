@@ -9,6 +9,7 @@ using System.Xml.Schema;
 using Kinectitude.Editor.Models;
 using Action = Kinectitude.Editor.Models.Action;
 using Attribute = Kinectitude.Editor.Models.Attribute;
+using Kinectitude.Editor.Models.Statements;
 
 namespace Kinectitude.Editor.Storage.Xml
 {
@@ -19,18 +20,18 @@ namespace Kinectitude.Editor.Storage.Xml
         private static readonly XName[] EntityProperties = new[] { XmlConstants.Name, XmlConstants.Prototype };
 
         private Game game;
-        private readonly string fileName;
+        private readonly FileInfo file;
         private readonly Queue<Tuple<XElement, Entity>> entities;
 
-        public XmlGameStorage(string fileName)
+        public XmlGameStorage(FileInfo file)
         {
-            this.fileName = fileName;
+            this.file = file;
             entities = new Queue<Tuple<XElement, Entity>>();
         }
 
         public Game LoadGame()
         {
-            XDocument document = XDocument.Load(fileName);
+            XDocument document = XDocument.Load(file.ToString());
             XElement gameElement = document.Root;
 
             XmlSchemaSet schemas = new XmlSchemaSet();
@@ -41,7 +42,6 @@ namespace Kinectitude.Editor.Storage.Xml
 
             game = new Game((string)gameElement.Attribute(XmlConstants.Name))
             {
-                FileName = fileName,
                 Width = (int)gameElement.Attribute(XmlConstants.Width),
                 Height = (int)gameElement.Attribute(XmlConstants.Height),
                 IsFullScreen = (bool)gameElement.Attribute(XmlConstants.IsFullScreen)
@@ -213,18 +213,18 @@ namespace Kinectitude.Editor.Storage.Xml
 
             foreach (XElement actionElement in element.Elements())
             {
-                AbstractAction action = null;
+                AbstractStatement statement = null;
 
                 if (actionElement.Name == XmlConstants.Action)
                 {
-                    action = CreateAction(actionElement);
+                    statement = CreateAction(actionElement);
                 }
                 else if (actionElement.Name == XmlConstants.Condition)
                 {
-                    action = CreateCondition(actionElement);
+                    statement = CreateCondition(actionElement);
                 }
 
-                evt.AddAction(action);
+                evt.AddStatement(statement);
             }
 
             return evt;
@@ -236,18 +236,18 @@ namespace Kinectitude.Editor.Storage.Xml
 
             foreach (XElement actionElement in element.Elements())
             {
-                AbstractAction action = null;
+                AbstractStatement statement = null;
 
                 if (actionElement.Name == XmlConstants.Action)
                 {
-                    action = CreateAction(actionElement);
+                    statement = CreateAction(actionElement);
                 }
                 else if (actionElement.Name == XmlConstants.Condition)
                 {
-                    action = CreateCondition(actionElement);
+                    statement = CreateCondition(actionElement);
                 }
 
-                condition.AddAction(action);
+                condition.AddStatement(statement);
             }
 
             return condition;
@@ -274,27 +274,27 @@ namespace Kinectitude.Editor.Storage.Xml
         {
             // Check if the project file exists
 
-            string projectFolder = Path.GetDirectoryName(fileName);
-            string assetFolder = Path.GetFileNameWithoutExtension(fileName);
-            string gameFile = Path.Combine(projectFolder, assetFolder, "game.xml");
+            //string projectFolder = Path.GetDirectoryName(file);
+            //string assetFolder = Path.GetFileNameWithoutExtension(file);
+            //string gameFile = Path.Combine(projectFolder, assetFolder, "game.xml");
 
-            if (!File.Exists(fileName))
-            {
-                XElement project = new XElement
-                (
-                    XmlConstants.Project,
-                    new XElement(XmlConstants.Root, assetFolder)
-                );
-                project.Save(fileName);
-            }
+            //if (!File.Exists(file))
+            //{
+            //    XElement project = new XElement
+            //    (
+            //        XmlConstants.Project,
+            //        new XElement(XmlConstants.Root, assetFolder)
+            //    );
+            //    project.Save(file);
+            //}
 
-            FileInfo file = new FileInfo(gameFile);
-            file.Directory.Create();
+            //FileInfo file = new FileInfo(gameFile);
+            //file.Directory.Create();
 
-            // Check if the project folder exists
+            //// Check if the project folder exists
 
             XDocument document = new XDocument(new XmlGameVisitor().Apply(game));
-            document.Save(gameFile);
+            document.Save(file.ToString());
         }
     }
 }

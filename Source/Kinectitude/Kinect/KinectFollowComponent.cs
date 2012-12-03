@@ -6,13 +6,13 @@ using Kinectitude.Core.AbstractComponents;
 
 namespace Kinectitude.Kinect
 {
-    [Plugin("Kinect Motion Component", "")]
+    [Plugin("Kinect Motion Component", ""), Requires(typeof(KinectManager))]
     public class KinectFollowComponent : BasicFollowComponent
     {
         private KinectManager manager;
 
         private JointType joint;
-        [Plugin("Joint", "")]
+        [PluginProperty("Joint", "")]
         public JointType Joint 
         {
             get { return joint; }
@@ -27,7 +27,7 @@ namespace Kinectitude.Kinect
         }
 
         private int player;
-        [Plugin("Player", "")]
+        [PluginProperty("Player", "")]
         public int Player
         {
             get { return player; }
@@ -40,8 +40,6 @@ namespace Kinectitude.Kinect
                 }
             }
         }
-
-        
 
         public override void Ready()
         {

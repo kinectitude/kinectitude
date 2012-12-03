@@ -5,9 +5,11 @@ using System.Text;
 using Kinectitude.Core.Base;
 using SlimDX.DirectInput;
 using SlimDX;
+using Kinectitude.Core.Attributes;
 
 namespace Kinectitude.DirectInput
 {
+    [Plugin("Keyboard Manager", "")]
     public class KeyboardManager : Manager<Component>
     {
         private static Keyboard keyboard = null;

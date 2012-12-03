@@ -5,12 +5,12 @@ using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Views;
 using Kinectitude.Editor.Storage;
+using Kinectitude.Editor.Models.Notifications;
+using System.Collections.Generic;
 
 namespace Kinectitude.Editor.Models
 {
-    internal delegate void PluginAddedEventHandler(Plugin plugin);   
-    
-    internal sealed class Game : VisitableModel, IAttributeScope, IEntityScope, ISceneScope
+    internal sealed class Game : GameModel<IScope>, IAttributeScope, IEntityScope, ISceneScope
     {
         private string fileName;
         private string name;
@@ -21,15 +21,6 @@ namespace Kinectitude.Editor.Models
         private int nextAttribute;
         private int nextScene;
         private int nextPrototype;
-
-        public event ScopeChangedEventHandler ScopeChanged { add { } remove { } }
-
-        public event DefineAddedEventHandler DefineAdded;
-        public event DefinedNameChangedEventHandler DefineChanged;
-
-        public event AttributeEventHandler InheritedAttributeAdded { add { } remove { } }
-        public event AttributeEventHandler InheritedAttributeRemoved { add { } remove { } }
-        public event AttributeEventHandler InheritedAttributeChanged { add { } remove { } }
 
         public string FileName
         {
@@ -149,35 +140,10 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        public ObservableCollection<Using> Usings
-        {
-            get;
-            private set;
-        }
-
-        public ObservableCollection<Entity> Prototypes
-        {
-            get;
-            private set;
-        }
-
-        public ObservableCollection<Scene> Scenes
-        {
-            get;
-            private set;
-        }
-
-        public ObservableCollection<Attribute> Attributes
-        {
-            get;
-            private set;
-        }
-
-        public ObservableCollection<Asset> Assets
-        {
-            get;
-            private set;
-        }
+        public ObservableCollection<Using> Usings { get; private set; }
+        public ObservableCollection<Entity> Prototypes { get; private set; }
+        public ObservableCollection<Scene> Scenes { get; private set; }
+        public ObservableCollection<Attribute> Attributes { get; private set; }
 
         public ICommand RenameCommand { get; private set; }
         public ICommand AddPrototypeCommand { get; private set; }
@@ -186,8 +152,6 @@ namespace Kinectitude.Editor.Models
         public ICommand RemoveAttributeCommand { get; private set; }
         public ICommand AddSceneCommand { get; private set; }
         public ICommand RemoveSceneCommand { get; private set; }
-        public ICommand AddAssetCommand { get; private set; }
-        public ICommand RemoveAssetCommand { get; private set; }
         public ICommand RemoveItemCommand { get; private set; }
 
         public Game(string name)
@@ -195,118 +159,83 @@ namespace Kinectitude.Editor.Models
             this.name = name;
             
             Usings = new ObservableCollection<Using>();
-            Assets = new ObservableCollection<Asset>();
             Prototypes = new ObservableCollection<Entity>();
             Scenes = new ObservableCollection<Scene>();
             Attributes = new ObservableCollection<Attribute>();
 
-            RenameCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    DialogService.ShowDialog(DialogService.Constants.RenameDialog, this);
-                }
-            );
+            AddHandler<PluginUsed>(OnPluginUsed);
 
-            AddPrototypeCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Entity prototype = CreatePrototype();
+            RenameCommand = new DelegateCommand(null, (parameter) =>
+            {
+                DialogService.ShowDialog(DialogService.Constants.NameDialog, this);
+            });
 
-                    DialogService.ShowDialog(DialogService.Constants.EntityDialog, prototype,
-                        (result) =>
-                        {
-                            if (result == true)
-                            {
-                                AddPrototype(prototype);
-                            }
-                        }
-                    );
-                }
-            );
-
-            RemovePrototypeCommand = new DelegateCommand(null,
-                (parameter) =>
+            AddPrototypeCommand = new DelegateCommand(null, (parameter) =>
+            {
+                Entity prototype = CreatePrototype();
+                EntityTransaction transaction = new EntityTransaction(Prototypes, prototype);
+                    
+                DialogService.ShowDialog(DialogService.Constants.EntityDialog, transaction, (result) =>
                 {
-                    Entity prototype = parameter as Entity;
+                    if (result == true)
+                    {
+                        AddPrototype(prototype);
+                    }
+                });
+            });
+
+            RemovePrototypeCommand = new DelegateCommand(null, (parameter) =>
+            {
+                Entity prototype = parameter as Entity;
+                RemovePrototype(prototype);
+            });
+
+            AddSceneCommand = new DelegateCommand(null, (parameter) =>
+            {
+                Scene scene = CreateScene();
+
+                DialogService.ShowDialog(DialogService.Constants.NameDialog, new SceneTransaction(scene), (result) =>
+                {
+                    if (result == true)
+                    {
+                        AddScene(scene);
+                    }
+                });
+            });
+
+            RemoveSceneCommand = new DelegateCommand(null, (parameter) =>
+            {
+                Scene scene = parameter as Scene;
+                RemoveScene(scene);
+            });
+
+            AddAttributeCommand = new DelegateCommand(null, (parameter) =>
+            {
+                CreateAttribute();
+            });
+
+            RemoveAttributeCommand = new DelegateCommand(null, (parameter) =>
+            {
+                Attribute attribute = parameter as Attribute;
+                RemoveAttribute(attribute);
+            });
+
+            RemoveItemCommand = new DelegateCommand(null, (parameter) =>
+            {
+                Entity prototype = parameter as Entity;
+                if (null != prototype)
+                {
                     RemovePrototype(prototype);
                 }
-            );
-
-            AddSceneCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Scene scene = CreateScene();
-
-                    DialogService.ShowDialog(DialogService.Constants.SceneDialog, scene,
-                        (result) =>
-                        {
-                            if (result == true)
-                            {
-                                AddScene(scene);
-                            }
-                        }
-                    );
-                }
-            );
-
-            RemoveSceneCommand = new DelegateCommand(null,
-                (parameter) =>
+                else
                 {
                     Scene scene = parameter as Scene;
-                    RemoveScene(scene);
-                }
-            );
-
-            AddAttributeCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    CreateAttribute();
-                }
-            );
-
-            RemoveAttributeCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Attribute attribute = parameter as Attribute;
-                    RemoveAttribute(attribute);
-                }
-            );
-
-            AddAssetCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    // TODO: File Chooser
-                    Asset asset = new Asset("An Asset");
-                    AddAsset(asset);
-                }
-            );
-
-            RemoveAssetCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Asset asset = parameter as Asset;
-                    RemoveAsset(asset);
-                }
-            );
-
-            RemoveItemCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Entity prototype = parameter as Entity;
-                    if (null != prototype)
+                    if (null != scene)
                     {
-                        RemovePrototype(prototype);
-                    }
-                    else
-                    {
-                        Scene scene = parameter as Scene;
-                        if (null != scene)
-                        {
-                            RemoveScene(scene);
-                        }
+                        RemoveScene(scene);
                     }
                 }
-            );
+            });
         }
 
         public override void Accept(IGameVisitor visitor)
@@ -316,15 +245,13 @@ namespace Kinectitude.Editor.Models
 
         public void AddUsing(Using use)
         {
-            use.DefineAdded += OnDefineAdded;
-            use.DefineChanged += OnDefineChanged;
+            use.Scope = this;
             Usings.Add(use);
         }
 
         public void RemoveUsing(Using use)
         {
-            use.DefineAdded -= OnDefineAdded;
-            use.DefineChanged -= OnDefineChanged;
+            use.Scope = null;
             Usings.Remove(use);
         }
 
@@ -342,9 +269,8 @@ namespace Kinectitude.Editor.Models
         {
             if (null != prototype.Name && !HasPrototypeWithName(prototype.Name))
             {
-                prototype.SetScope(this);
+                prototype.Scope = this;
 
-                prototype.PluginAdded += OnPluginAdded;
                 foreach (Plugin plugin in prototype.Plugins)
                 {
                     DefinePlugin(plugin);
@@ -363,9 +289,7 @@ namespace Kinectitude.Editor.Models
 
         public void RemovePrototype(Entity prototype)
         {
-            prototype.SetScope(null);
-            prototype.PluginAdded -= OnPluginAdded;
-
+            prototype.Scope = null;
             prototype.IsPrototype = false;
             Prototypes.Remove(prototype);
 
@@ -383,9 +307,8 @@ namespace Kinectitude.Editor.Models
 
         public void AddScene(Scene scene)
         {
-            scene.SetScope(this);
+            scene.Scope = this;
 
-            scene.PluginAdded += OnPluginAdded;
             foreach (Plugin plugin in scene.Plugins)
             {
                 DefinePlugin(plugin);
@@ -407,8 +330,7 @@ namespace Kinectitude.Editor.Models
 
         public void RemoveScene(Scene scene)
         {
-            scene.SetScope(null);
-            scene.PluginAdded -= OnPluginAdded;
+            scene.Scope = null;
             Scenes.Remove(scene);
 
             Workspace.Instance.CommandHistory.Log(
@@ -430,7 +352,7 @@ namespace Kinectitude.Editor.Models
 
         public void AddAttribute(Attribute attribute)
         {
-            attribute.SetScope(this);
+            attribute.Scope = this;
             Attributes.Add(attribute);
 
             Workspace.Instance.CommandHistory.Log(
@@ -442,7 +364,7 @@ namespace Kinectitude.Editor.Models
 
         public void RemoveAttribute(Attribute attribute)
         {
-            attribute.SetScope(null);
+            attribute.Scope = null;
             Attributes.Remove(attribute);
 
             Workspace.Instance.CommandHistory.Log(
@@ -456,43 +378,6 @@ namespace Kinectitude.Editor.Models
         {
             Attribute attribute = new Attribute(GetNextAttributeKey());
             AddAttribute(attribute);
-        }
-
-        public void AddAsset(Asset asset)
-        {
-            Assets.Add(asset);
-
-            Workspace.Instance.CommandHistory.Log(
-                "add asset '" + asset.FileName + "'",
-                () => AddAsset(asset),
-                () => RemoveAsset(asset)
-            );
-        }
-
-        public void RemoveAsset(Asset asset)
-        {
-            Assets.Remove(asset);
-
-            Workspace.Instance.CommandHistory.Log(
-                "remove asset '" + asset.FileName + "'",
-                () => RemoveAsset(asset),
-                () => AddAsset(asset)
-            );
-        }
-
-        public Plugin GetPlugin(string name)
-        {
-            foreach (Using use in Usings)
-            {
-                Define define = use.GetDefineByName(name);
-                if (null != define)
-                {
-                    name = define.Class;
-                    break;
-                }
-            }
-
-            return Workspace.Instance.GetPlugin(name);
         }
 
         private string GetNextAttributeKey()
@@ -534,9 +419,9 @@ namespace Kinectitude.Editor.Models
             return ret;
         }
 
-        private void OnPluginAdded(Plugin plugin)
+        private void OnPluginUsed(PluginUsed n)
         {
-            DefinePlugin(plugin);
+            DefinePlugin(n.Plugin);
         }
 
         private bool HasDefineWithName(string name)
@@ -581,44 +466,55 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        private void OnDefineAdded(Define define)
+        #region IEntityScope implementation
+
+        IEnumerable<Entity> IEntityScope.Prototypes
         {
-            if (null != DefineAdded)
-            {
-                DefineAdded(define);
-            }
+            get { return Prototypes; }
         }
 
-        private void OnDefineChanged(Define define)
-        {
-            if (null != DefineChanged)
-            {
-                Plugin plugin = GetPlugin(define.Class);
-                DefineChanged(plugin, define.Name);
-            }
-        }
-
-        bool IEntityNamespace.EntityNameExists(string name)
+        public bool EntityNameExists(string name)
         {
             return HasPrototypeWithName(name);
         }
 
-        string IAttributeScope.GetInheritedValue(string key)
+        #endregion
+
+        #region ISceneScope implementation
+
+        IEnumerable<Entity> ISceneScope.Prototypes
+        {
+            get { return Prototypes; }
+        }
+
+        #endregion
+
+        #region IAttributeScope implementation
+
+        public event AttributeEventHandler InheritedAttributeAdded { add { } remove { } }
+        public event AttributeEventHandler InheritedAttributeRemoved { add { } remove { } }
+        public event AttributeEventHandler InheritedAttributeChanged { add { } remove { } }
+
+        public string GetInheritedValue(string key)
         {
             return null;
         }
 
-        bool IAttributeScope.HasInheritedAttribute(string key)
+        public bool HasInheritedAttribute(string key)
         {
             return false;
         }
 
-        bool IAttributeScope.HasLocalAttribute(string key)
+        public bool HasLocalAttribute(string key)
         {
             return Attributes.Any(x => x.Key == key);
         }
 
-        string IPluginNamespace.GetDefinedName(Plugin plugin)
+        #endregion
+
+        #region IPluginNamespace implementation
+
+        public string GetDefinedName(Plugin plugin)
         {
             foreach (Using use in Usings)
             {
@@ -631,5 +527,22 @@ namespace Kinectitude.Editor.Models
 
             return plugin.ClassName;
         }
+
+        public Plugin GetPlugin(string name)
+        {
+            foreach (Using use in Usings)
+            {
+                Define define = use.GetDefineByName(name);
+                if (null != define)
+                {
+                    name = define.Class;
+                    break;
+                }
+            }
+
+            return Workspace.Instance.GetPlugin(name);
+        }
+
+        #endregion
     }
 }

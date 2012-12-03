@@ -21,7 +21,7 @@ namespace Kinectitude.Render
         private float scaleY;
 
         private string image;
-        [Plugin("Image", "")]
+        [PluginProperty("Image", "")]
         public string Image
         {
             get { return image; }
@@ -42,7 +42,7 @@ namespace Kinectitude.Render
         }
 
         private bool animated;
-        [Plugin("Animated", "")]
+        [PluginProperty("Animated", "")]
         public bool Animated
         {
             get { return animated; }
@@ -57,7 +57,7 @@ namespace Kinectitude.Render
         }
 
         private int row;
-        [Plugin("Row", "")]
+        [PluginProperty("Row", "")]
         public int Row
         {
             get { return row; }
@@ -72,7 +72,7 @@ namespace Kinectitude.Render
         }
 
         private float duration;
-        [Plugin("Duration", "")]
+        [PluginProperty("Duration", "")]
         public float Duration
         {
             get { return duration; }

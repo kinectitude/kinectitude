@@ -1,30 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models.Interfaces;
+using Kinectitude.Editor.Models.Notifications;
+using Kinectitude.Editor.Storage;
+using Kinectitude.Editor.Views;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Windows.Input;
-using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Models.Interfaces;
-using Kinectitude.Core.Components;
-using Kinectitude.Editor.Views;
-using Kinectitude.Editor.Storage;
 
 namespace Kinectitude.Editor.Models
 {
-    internal sealed class Scene : VisitableModel, IEntityNamespace, IAttributeScope, IEntityScope, IManagerScope
+    internal sealed class Scene : GameModel<ISceneScope>, IAttributeScope, IEntityScope, IManagerScope
     {
         private string name;
-        private ISceneScope scope;
         private int nextAttribute;
-
-        public event DefineAddedEventHandler DefineAdded;
-        public event DefinedNameChangedEventHandler DefineChanged;
-        public event ScopeChangedEventHandler ScopeChanged;
-        public event PluginAddedEventHandler PluginAdded;
-
-        public event AttributeEventHandler InheritedAttributeAdded { add { } remove { } }
-        public event AttributeEventHandler InheritedAttributeRemoved { add { } remove { } }
-        public event AttributeEventHandler InheritedAttributeChanged { add { } remove { } }
 
         public string Name
         {
@@ -47,34 +37,15 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        public ObservableCollection<Attribute> Attributes
-        {
-            get;
-            private set;
-        }
-
-        public ObservableCollection<Manager> Managers
-        {
-            get;
-            private set;
-        }
-
-        public ObservableCollection<Entity> Entities
-        {
-            get;
-            private set;
-        }
-
-        public ObservableCollection<Entity> SelectedEntities
-        {
-            get;
-            private set;
-        }
-
         public IEnumerable<Plugin> Plugins
         {
             get { return Entities.SelectMany(x => x.Plugins).Union(Managers.Select(x => x.Plugin)).Distinct(); }
         }
+
+        public ObservableCollection<Attribute> Attributes { get; private set; }
+        public ObservableCollection<Manager> Managers { get; private set; }
+        public ObservableCollection<Entity> Entities { get; private set; }
+        public ObservableCollection<Entity> SelectedEntities { get; private set; }
 
         public ICommand RenameCommand { get; private set; }
         public ICommand SelectCommand { get; private set; }
@@ -83,6 +54,7 @@ namespace Kinectitude.Editor.Models
         public ICommand PromptAddEntityCommand { get; private set; }
         public ICommand AddEntityCommand { get; private set; }
         public ICommand RemoveEntityCommand { get; private set; }
+        public ICommand PropertiesCommand { get; private set; }
 
         public Scene(string name)
         {
@@ -93,49 +65,44 @@ namespace Kinectitude.Editor.Models
             Entities = new ObservableCollection<Entity>();
             SelectedEntities = new ObservableCollection<Entity>();
 
-            RenameCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    DialogService.ShowDialog(DialogService.Constants.RenameDialog, this);
-                }
-            );
+            RenameCommand = new DelegateCommand(null, (parameter) =>
+            {
+                DialogService.ShowDialog(DialogService.Constants.NameDialog, new SceneTransaction(this));
+            });
 
-            AddAttributeCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    CreateAttribute();
-                }
-            );
+            AddAttributeCommand = new DelegateCommand(null, (parameter) =>
+            {
+                CreateAttribute();
+            });
 
-            RemoveAttributeCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Attribute attribute = parameter as Attribute;
-                    RemoveAttribute(attribute);
-                }
-            );
+            RemoveAttributeCommand = new DelegateCommand(null, (parameter) =>
+            {
+                Attribute attribute = parameter as Attribute;
+                RemoveAttribute(attribute);
+            });
 
-            AddEntityCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    Entity preset = parameter as Entity;
+            AddEntityCommand = new DelegateCommand(null, (parameter) =>
+            {
+                Entity preset = parameter as Entity;
                     
-                    if (null != preset)
-                    {
-                        Entity entity = preset.DeepCopy();
-                        AddEntity(entity);
-                        SelectEntity(entity);
-                    }
-                }
-            );
-
-            RemoveEntityCommand = new DelegateCommand(null,
-                (parameter) =>
+                if (null != preset)
                 {
-                    Entity entity = parameter as Entity;
-                    RemoveEntity(entity);
+                    Entity entity = preset.DeepCopy();
+                    AddEntity(entity);
+                    SelectEntity(entity);
                 }
-            );
+            });
+
+            RemoveEntityCommand = new DelegateCommand(null, (parameter) =>
+            {
+                Entity entity = parameter as Entity;
+                RemoveEntity(entity);
+            });
+
+            PropertiesCommand = new DelegateCommand(null, (parameter) =>
+            {
+                DialogService.ShowDialog(DialogService.Constants.SceneDialog, new SceneTransaction(this));
+            });
         }
 
         public override void Accept(IGameVisitor visitor)
@@ -143,36 +110,15 @@ namespace Kinectitude.Editor.Models
             visitor.Visit(this);
         }
 
-        public void SetScope(ISceneScope scope)
-        {
-            if (null != this.scope)
-            {
-                this.scope.DefineAdded -= OnDefineAdded;
-                this.scope.DefineChanged -= OnDefinedNameChanged;
-                this.scope.ScopeChanged -= OnScopeChanged;
-            }
-
-            this.scope = scope;
-
-            if (null != this.scope)
-            {
-                this.scope.DefineAdded += OnDefineAdded;
-                this.scope.DefineChanged += OnDefinedNameChanged;
-                this.scope.ScopeChanged += OnScopeChanged;
-            }
-
-            NotifyScopeChanged();
-        }
-
         public void AddAttribute(Attribute attribute)
         {
-            attribute.SetScope(this);
+            attribute.Scope = this;
             Attributes.Add(attribute);
         }
 
         public void RemoveAttribute(Attribute attribute)
         {
-            attribute.SetScope(null);
+            attribute.Scope = null;
             Attributes.Remove(attribute);
 
             Workspace.Instance.CommandHistory.Log(
@@ -190,22 +136,24 @@ namespace Kinectitude.Editor.Models
 
         public void AddManager(Manager manager)
         {
-            manager.SetScope(this);
+            manager.Scope = this;
             Managers.Add(manager);
         }
 
         public void RemoveManager(Manager manager)
         {
-            manager.SetScope(null);
-            Managers.Remove(manager);
+            if (!manager.IsRequired)
+            {
+                manager.Scope = null;
+                Managers.Remove(manager);
+            }
         }
 
         public void AddEntity(Entity entity)
         {
             if (!EntityNameExists(entity.Name))
             {
-                entity.SetScope(this);
-
+                entity.Scope = this;
                 Entities.Add(entity);
 
                 entity.Components.CollectionChanged += OnEntityComponentChanged;
@@ -214,7 +162,10 @@ namespace Kinectitude.Editor.Models
                     ResolveComponentDependencies(component);
                 }
 
-                entity.PluginAdded += OnEntityPluginAdded;
+                foreach (Plugin plugin in entity.Plugins)
+                {
+                    Notify(new PluginUsed(plugin));
+                }
 
                 Workspace.Instance.CommandHistory.Log(
                     "add entity",
@@ -226,10 +177,10 @@ namespace Kinectitude.Editor.Models
 
         public void RemoveEntity(Entity entity)
         {
-            entity.SetScope(null);
+            entity.Scope = null;
             Entities.Remove(entity);
+
             entity.Components.CollectionChanged -= OnEntityComponentChanged;
-            entity.PluginAdded -= OnEntityPluginAdded;
 
             Workspace.Instance.CommandHistory.Log(
                 "remove entity",
@@ -269,8 +220,11 @@ namespace Kinectitude.Editor.Models
                 Plugin plugin = GetPlugin(require);
                 if (plugin.Type == PluginType.Manager)
                 {
-                    Manager manager = new Manager(plugin);
-                    AddManager(manager);
+                    if (!HasManagerOfType(plugin))
+                    {
+                        Manager manager = new Manager(plugin);
+                        AddManager(manager);
+                    }
                 }
             }
         }
@@ -286,73 +240,80 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        public Plugin GetPlugin(string type)
+        public bool HasManagerOfType(Plugin type)
         {
-            return null != scope ? scope.GetPlugin(type) : Workspace.Instance.GetPlugin(type);
+            return Managers.Any(x => x.Plugin == type);
         }
 
-        private void OnEntityPluginAdded(Plugin plugin)
-        {
-            if (null != PluginAdded)
-            {
-                PluginAdded(plugin);
-            }
-        }
+        #region IEntityScope implementation
 
-        private void NotifyScopeChanged()
+        public IEnumerable<Entity> Prototypes
         {
-            if (null != ScopeChanged)
-            {
-                ScopeChanged();
-            }
-
-            NotifyPropertyChanged("Scope");
-        }
-
-        private void OnScopeChanged()
-        {
-            NotifyScopeChanged();
-        }
-
-        private void OnDefineAdded(Define define)
-        {
-            if (null != DefineAdded)
-            {
-                DefineAdded(define);
-            }
-        }
-
-        private void OnDefinedNameChanged(Plugin plugin, string newName)
-        {
-            if (null != DefineChanged)
-            {
-                DefineChanged(plugin, newName);
-            }
+            get { return null != Scope ? Scope.Prototypes : null; }
         }
 
         public bool EntityNameExists(string name)
         {
-            return Entities.Any(x => x.Name != null && x.Name == name) || null != scope && scope.EntityNameExists(name);
+            return Entities.Any(x => x.Name != null && x.Name == name) || null != Scope && Scope.EntityNameExists(name);
         }
 
-        string IPluginNamespace.GetDefinedName(Plugin plugin)
+        #endregion
+
+        #region IPluginNamespace implementation
+
+        public Plugin GetPlugin(string type)
         {
-            return null != scope ? scope.GetDefinedName(plugin) : plugin.ClassName;
+            return null != Scope ? Scope.GetPlugin(type) : Workspace.Instance.GetPlugin(type);
         }
 
-        bool IAttributeScope.HasInheritedAttribute(string key)
+        public string GetDefinedName(Plugin plugin)
+        {
+            return null != Scope ? Scope.GetDefinedName(plugin) : plugin.ClassName;
+        }
+
+        #endregion
+
+        #region IAttributeScope implementation
+
+        public event AttributeEventHandler InheritedAttributeAdded { add { } remove { } }
+        public event AttributeEventHandler InheritedAttributeRemoved { add { } remove { } }
+        public event AttributeEventHandler InheritedAttributeChanged { add { } remove { } }
+
+        public bool HasInheritedAttribute(string key)
         {
             return false;
         }
 
-        string IAttributeScope.GetInheritedValue(string key)
+        public string GetInheritedValue(string key)
         {
             return null;
         }
 
-        bool IAttributeScope.HasLocalAttribute(string key)
+        public bool HasLocalAttribute(string key)
         {
             return Attributes.Any(x => x.Key == key);
         }
+
+        #endregion
+
+        #region IManagerScope implementation
+
+        public bool RequiresManager(Manager manager)
+        {
+            foreach (Entity entity in Entities)
+            {
+                foreach (Component component in entity.Components)
+                {
+                    if (component.Requires.Contains(manager.Plugin.ClassName))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        #endregion
     }
 }

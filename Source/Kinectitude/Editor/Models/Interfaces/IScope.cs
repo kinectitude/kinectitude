@@ -1,10 +1,13 @@
-﻿
+﻿using Kinectitude.Editor.Models.Notifications;
+using System.Collections.Generic;
+
 namespace Kinectitude.Editor.Models.Interfaces
 {
-    internal delegate void ScopeChangedEventHandler();
-
     internal interface IScope
     {
-        event ScopeChangedEventHandler ScopeChanged;
+        IScope Parent { get; }
+        IList<GameModel> Children { get; }
+
+        void Notify<T>(T notification) where T : Notification;
     }
 }

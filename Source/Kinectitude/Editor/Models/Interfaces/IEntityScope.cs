@@ -1,5 +1,9 @@
 ﻿
+using System.Collections.Generic;
 namespace Kinectitude.Editor.Models.Interfaces
 {
-    interface IEntityScope : IScope, IEntityNamespace, IPluginNamespace { }
+    internal interface IEntityScope : IScope, IEntityNamespace, IPluginNamespace
+    {
+        IEnumerable<Entity> Prototypes { get; }
+    }
 }

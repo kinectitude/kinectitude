@@ -11,11 +11,11 @@ namespace Kinectitude.Editor.Views
 
         public static class Constants
         {
-            public static readonly string SceneDialog = typeof(SceneDialog).Name;
             public static readonly string EntityDialog = typeof(EntityDialog).Name;
             public static readonly string ComponentDialog = typeof(ComponentDialog).Name;
             public static readonly string AddEntityDialog = typeof(AddEntityDialog).Name;
-            public static readonly string RenameDialog = typeof(RenameDialog).Name;
+            public static readonly string NameDialog = typeof(NameDialog).Name;
+            public static readonly string SceneDialog = typeof(SceneDialog).Name;
         }
 
         private static readonly Dictionary<string, Type> views = new Dictionary<string, Type>();

@@ -7,7 +7,7 @@ namespace Kinectitude.Sound
     [Plugin("Stop the sound associated with this Entity", "")]
     public class StopSoundAction : Action
     {
-        [Plugin("Filename", "File name of the sound to stop")]
+        [PluginProperty("Filename", "File name of the sound to stop")]
         public string Filename { get; set; }
 
         public override void Run()

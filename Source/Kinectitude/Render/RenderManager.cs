@@ -1,9 +1,11 @@
-﻿using Kinectitude.Core.Base;
+﻿using Kinectitude.Core.Attributes;
+using Kinectitude.Core.Base;
 using SlimDX;
 using SlimDX.Direct2D;
 
 namespace Kinectitude.Render
-{    
+{
+    [Plugin("Render Manager", "")]
     public class RenderManager : Manager<IRender>
     {
         private readonly RenderService renderService;

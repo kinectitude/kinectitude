@@ -7,7 +7,7 @@ namespace Kinectitude.Physics
     [Plugin("Entity collides with {CollidesWith}", "")]
     public class CollisionEvent : Event
     {
-        [Plugin("Collides with","")]
+        [PluginProperty("Collides with","")]
         public TypeMatcher CollidesWith { get; set; }
 
         public CollisionEvent() { }

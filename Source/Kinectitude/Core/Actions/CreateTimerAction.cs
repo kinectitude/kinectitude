@@ -10,16 +10,16 @@ namespace Kinectitude.Core.Actions
     [Plugin("Create timer {Name}: (Duration: {Duration}, Trigger: {Trigger}, Recurring? {Recurring})", "")]
     internal sealed class CreateTimerAction : Action
     {
-        [Plugin("Name", "Name of the timer to create")]
+        [PluginProperty("Name", "Name of the timer to create")]
         public ValueReader Name { get; set; }
 
-        [Plugin("Duration", "Duration, in seconds, to wait before triggering the trigger")]
+        [PluginProperty("Duration", "Duration, in seconds, to wait before triggering the trigger")]
         public ValueReader Duration { get; set; }
 
-        [Plugin("Trigger", "Trigger to fire")]
+        [PluginProperty("Trigger", "Trigger to fire")]
         public ValueReader Trigger { get; set; }
 
-        [Plugin("Recurring", "Determines if the timer should start again when it has finished")]
+        [PluginProperty("Recurring", "Determines if the timer should start again when it has finished", false)]
         public ValueReader Recurring { get; set; }
 
         public CreateTimerAction()

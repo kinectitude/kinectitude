@@ -1,4 +1,6 @@
-﻿using Kinectitude.Editor.Base;
+﻿using Kinectitude.Core.Attributes;
+using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models.Values;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,22 +11,49 @@ namespace Kinectitude.Editor.Models
 {
     internal class PluginProperty : BaseModel
     {
-        public Type Type { get; private set; }
+        private readonly PropertyInfo info;
+        private readonly PluginPropertyAttribute attribute;
 
-        public PluginProperty(PropertyInfo info)
+        public string Name
         {
-            Type = info.PropertyType;
+            get { return info.Name; }
+        }
+
+        public string DisplayName
+        {
+            get { return attribute.Name; }
+        }
+
+        public string Description
+        {
+            get { return attribute.Description; }
+        }
+
+        public object DefaultValue
+        {
+            get { return attribute.DefaultValue; }
+        }
+
+        public PluginProperty(PropertyInfo info, PluginPropertyAttribute attribute)
+        {
+            this.info = info;
+            this.attribute = attribute;
         }
 
         public Value CreateValue()
         {
-            //if (Type.IsEnum)
-            //{
-            //    return new EnumerationValue(this);
-            //}
+            Type type = info.PropertyType;
 
-            //return BasicValue(this);
-            return null;
+            if (type.IsEnum)
+            {
+                return new EnumerationValue(type);
+            }
+            else if (type == typeof(bool))
+            {
+                return new BooleanValue();
+            }
+
+            return new StringValue();
         }
     }
 }

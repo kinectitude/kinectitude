@@ -31,11 +31,16 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void SetValue()
         {
+            bool eventFired = false;
+
             Component component = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             
             Property property = component.GetProperty("X");
+            property.PropertyChanged += (o, e) => eventFired = (e.PropertyName == "Value");
+
             property.Value = 500;
 
+            Assert.IsTrue(eventFired);
             Assert.AreEqual(500, component.Properties.Single(x => x.Name == "X").Value);
             Assert.IsTrue(property.IsRoot);
             Assert.IsFalse(property.IsInherited);

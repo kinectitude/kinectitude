@@ -1,12 +1,12 @@
-﻿
-using Kinectitude.Editor.Base;
+﻿using Kinectitude.Editor.Models.Interfaces;
+using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Storage;
+
 namespace Kinectitude.Editor.Models
 {
-    internal sealed class Define : VisitableModel
+    internal sealed class Define : GameModel<IScope>
     {
         private string name;
-        private string className;
 
         public string Name
         {
@@ -16,28 +16,19 @@ namespace Kinectitude.Editor.Models
                 if (name != value)
                 {
                     name = value;
+
+                    Notify(new DefinedNameChanged(Workspace.Instance.GetPlugin(Class)));
                     NotifyPropertyChanged("Name");
                 }
             }
         }
 
-        public string Class
-        {
-            get { return className; }
-            set
-            {
-                if (className != value)
-                {
-                    className = value;
-                    NotifyPropertyChanged("Class");
-                }
-            }
-        }
+        public string Class { get; private set; }
 
         public Define(string name, string className)
         {
             this.name = name;
-            this.className = className;
+            Class = className;
         }
 
         public override void Accept(IGameVisitor visitor)

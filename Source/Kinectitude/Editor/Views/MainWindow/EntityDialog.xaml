@@ -1,46 +1,128 @@
 ﻿<Window x:Class="Kinectitude.Editor.Views.EntityDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="clr-namespace:Kinectitude.Editor.Models"
-        Title="Entity"
+        xmlns:m="clr-namespace:Kinectitude.Editor.Models"
+        Title="Entity Properties"
         ResizeMode="NoResize"
         SizeToContent="WidthAndHeight"
         FocusManager.FocusedElement="{Binding ElementName=txtPrototypeName}"
         Background="{DynamicResource WindowBackgroundBrush}"
-        WindowStartupLocation="CenterScreen">
-    <StackPanel Orientation="Vertical">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <Label Foreground="{StaticResource ForegroundBrush}" Grid.Column="0" Grid.Row="0" Margin="4">Name</Label>
-            <TextBox Name="txtPrototypeName" Width="300" Grid.Column="1" Grid.Row="0" Text="{Binding Name}" Margin="0,4,4,4" />
-        </Grid>
-        <Separator />
-        <Label Foreground="{StaticResource ForegroundBrush}" Margin="4">Prototypes</Label>
-        <StackPanel Orientation="Horizontal">
-            <StackPanel.Resources>
-                <DataTemplate DataType="{x:Type vm:Entity}">
+        WindowStartupLocation="CenterScreen"
+        SnapsToDevicePixels="True"
+        x:Name="self">
+    
+    <Window.Resources>
+        <CompositeCollection x:Key="AllComponents">
+            <CollectionContainer Collection="{Binding Source={x:Reference self}, Path=DataContext.InheritedComponents}" />
+            <CollectionContainer Collection="{Binding Source={x:Reference self}, Path=DataContext.SelectedComponents}" />
+        </CompositeCollection>
+        <SolidColorBrush x:Key="DisabledBrush" Color="Gray" />
+        <Style x:Key="PluginSelectionStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsRequired}" Value="True">
+                    <Setter Property="Foreground" Value="{StaticResource DisabledBrush}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <DataTemplate DataType="{x:Type m:Entity}">
+            <Border Padding="8">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="{StaticResource icoEntity}" Width="16" Height="16" Margin="0,0,8,0" />
                     <TextBlock Foreground="{StaticResource ForegroundBrush}" Text="{Binding Name}" />
-                </DataTemplate>
-            </StackPanel.Resources>
-            <ListBox Name="lstPrototypes" ItemsSource="{Binding Source={x:Static vm:Workspace.Instance}, Path=Game.Prototypes}" Width="200" Height="300" Margin="4,0,4,4" />
-            <StackPanel Orientation="Vertical">
-                <Button Content="&gt;&gt;" Command="{Binding AddPrototypeCommand}" CommandParameter="{Binding ElementName=lstPrototypes, Path=SelectedItem}" Margin="0,0,0,4"></Button>
-                <Button Content="&lt;&lt;" Command="{Binding RemovePrototypeCommand}" CommandParameter="{Binding ElementName=lstPrototypes, Path=SelectedItem}"></Button>
-            </StackPanel>
-            <ListBox ItemsSource="{Binding Prototypes}" Width="200" Height="300" Margin="4,0,4,4" />
-        </StackPanel>
-        <Separator />
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type m:Plugin}">
+            <Border Padding="8">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="{StaticResource icoComponent}" Width="16" Height="16" Margin="0,0,8,0" />
+                    <TextBlock Foreground="{StaticResource ForegroundBrush}" Text="{Binding Header}" />
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type m:PluginSelection}">
+            <Border Padding="8">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="{StaticResource icoComponent}" Width="16" Height="16" Margin="0,0,8,0" />
+                    <TextBlock Style="{StaticResource PluginSelectionStyle}" Text="{Binding Plugin.Header}" />
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+    </Window.Resources>
+    
+    <DockPanel Width="800" Height="600">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom">
             <Button Name="btnCancel" IsCancel="True" Width="100" Margin="4">Cancel</Button>
-            <Button Name="btnOK" IsDefault="True" Click="btnOK_Click" Width="100" Margin="0,4,4,4" >OK</Button>
+            <Button Name="btnOK" IsDefault="True" Click="btnOK_Click" Width="100" Margin="0,4,4,4" Command="{Binding CommitCommand}">OK</Button>
         </StackPanel>
-    </StackPanel>
+        <Separator DockPanel.Dock="Bottom" />
+        <TabControl>
+            <TabItem Header="General">
+                <DockPanel>
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                        <Label Foreground="{StaticResource ForegroundBrush}" Margin="4">Name</Label>
+                        <TextBox Name="txtPrototypeName" Width="300" Text="{Binding Name}" Margin="0,4,4,4" />
+                    </StackPanel>
+                    <Separator DockPanel.Dock="Top" />
+                    <Label Foreground="{StaticResource ForegroundBrush}" Margin="4" DockPanel.Dock="Top">Prototypes</Label>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.5*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="0.5*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ListBox Grid.Column="0" ItemsSource="{Binding AvailablePrototypes}" SelectedItem="{Binding PrototypeToAdd}" />
+                        <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+                            <Button Command="{Binding AddPrototypeCommand}" Margin="4">
+                                <Image Source="{StaticResource icoArrowRight}" Width="16" Height="16" />
+                            </Button>
+                            <Button Command="{Binding RemovePrototypeCommand}" Margin="4,0,4,4">
+                                <Image Source="{StaticResource icoArrowLeft}" Width="16" Height="16" />
+                            </Button>
+                        </StackPanel>
+                        <ListBox Grid.Column="2" ItemsSource="{Binding SelectedPrototypes}" SelectedItem="{Binding SelectedPrototype}" />
+                        <StackPanel Grid.Column="3" Orientation="Vertical" VerticalAlignment="Center">
+                            <Button Command="{Binding MovePrototypeUpCommand}" Margin="4">
+                                <Image Source="{StaticResource icoArrowUp}" Width="16" Height="16" />
+                            </Button>
+                            <Button Command="{Binding MovePrototypeDownCommand}" Margin="4,0,4,4">
+                                <Image Source="{StaticResource icoArrowDown}" Width="16" Height="16" />
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="Components">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.5*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="0.5*" />
+                    </Grid.ColumnDefinitions>
+                    <ListBox Grid.Column="0" ItemsSource="{Binding AvailableComponents}" SelectedItem="{Binding ComponentToAdd}" />
+                    <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+                        <Button Command="{Binding AddComponentCommand}" Margin="4">
+                            <Image Source="{StaticResource icoArrowRight}" Width="16" Height="16" />
+                        </Button>
+                        <Button Command="{Binding RemoveComponentCommand}" Margin="4,0,4,4">
+                            <Image Source="{StaticResource icoArrowLeft}" Width="16" Height="16" />
+                        </Button>
+                    </StackPanel>
+                    <ListBox Grid.Column="2" ItemsSource="{StaticResource AllComponents}" SelectedItem="{Binding SelectedComponent}">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="{x:Type ListBoxItem}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRequired}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
 </Window>

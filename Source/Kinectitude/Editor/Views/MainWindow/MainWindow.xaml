@@ -55,11 +55,11 @@
 
         <Menu DockPanel.Dock="Top" Background="Transparent">
             <MenuItem Header="_File">
-                <MenuItem Header="_New Game" Command="{Binding NewGameCommand, Mode=OneWay}" InputGestureText="Ctrl+N" />
-                <MenuItem Header="_Open Game" Command="{Binding LoadGameCommand, Mode=OneWay}" InputGestureText="Ctrl+O" />
-                <MenuItem Header="_Save Game" Command="{Binding SaveGameCommand, Mode=OneWay}" InputGestureText="Ctrl+S" />
-                <MenuItem Header="Save Game _As..." Command="{Binding SaveGameAsCommand, Mode=OneWay}" />
-                <MenuItem Header="_Revert To Saved" Command="{Binding RevertGameCommand, Mode=OneWay}" />
+                <MenuItem Header="_New Game" Command="{Binding NewProjectCommand, Mode=OneWay}" InputGestureText="Ctrl+N" />
+                <MenuItem Header="_Open Game" Command="{Binding LoadProjectCommand, Mode=OneWay}" InputGestureText="Ctrl+O" />
+                <MenuItem Header="_Save Game" Command="{Binding SaveProjectCommand, Mode=OneWay}" InputGestureText="Ctrl+S" />
+                <MenuItem Header="Save Game _As..." Command="{Binding SaveProjectAsCommand, Mode=OneWay}" />
+                <MenuItem Header="_Revert To Saved" Command="{Binding RevertProjectCommand, Mode=OneWay}" />
                 <Separator />
                 <MenuItem Header="_Exit" Command="{Binding ExitCommand, Mode=OneWay}" InputGestureText="Alt+F4" />
             </MenuItem>
@@ -103,7 +103,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <DockPanel Grid.Row="0">
+                <DockPanel Grid.Row="0" DataContext="{Binding Project}">
                     <Border DockPanel.Dock="Bottom" Padding="0,4,4,0">
                         <StackPanel Orientation="Horizontal">
                             <Button ToolTip="Delete" Margin="0,0,4,0" Command="{Binding Game.RemoveItemCommand, Mode=OneWay}" CommandParameter="{Binding ElementName=treGame, Path=SelectedItem}">
@@ -169,6 +169,8 @@
                                             <ContextMenu>
                                                 <MenuItem Header="Rename..." Command="{Binding RenameCommand}" />
                                                 <MenuItem Header="Delete" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=Game.RemoveItemCommand}" CommandParameter="{Binding}" />
+                                                <Separator />
+                                                <MenuItem Header="Properties..." Command="{Binding PropertiesCommand}" />
                                             </ContextMenu>
                                         </StackPanel.ContextMenu>
                                     </StackPanel>
@@ -216,30 +218,27 @@
                                     </Border>
                                 </Expander.Header>
                                 <Expander.Content>
-                                    <DockPanel>
+                                    <ListBox Name="lstAttributes" ItemsSource="{Binding Attributes}" HorizontalContentAlignment="Stretch">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid HorizontalAlignment="Stretch">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="0.5*" />
+                                                        <ColumnDefinition Width="24" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBox IsEnabled="{Binding IsLocal}" Text="{Binding Key}" Grid.Column="0" />
+                                                    <CheckBox IsChecked="{Binding IsInherited}" IsEnabled="{Binding CanInherit}" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                                    <TextBox IsEnabled="{Binding IsLocal}" Text="{Binding Value}" Grid.Column="2" />
 
-                                        <ListBox Name="lstAttributes" ItemsSource="{Binding Attributes}" HorizontalContentAlignment="Stretch">
-                                            <ListBox.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Grid HorizontalAlignment="Stretch">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="0.5*" />
-                                                            <ColumnDefinition Width="24" />
-                                                            <ColumnDefinition Width="*" />
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBox IsEnabled="{Binding IsLocal}" Text="{Binding Key}" Grid.Column="0" />
-                                                        <CheckBox IsChecked="{Binding IsInherited}" IsEnabled="{Binding CanInherit}" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" />
-                                                        <TextBox IsEnabled="{Binding IsLocal}" Text="{Binding Value}" Grid.Column="2" />
-
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ListBox.ItemTemplate>
-                                        </ListBox>
-
-                                    </DockPanel>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
                                 </Expander.Content>
                             </Expander>
                             <CollectionContainer Collection="{Binding DataContext.Components, Source={x:Reference dockDetails}}" />
+                            <CollectionContainer Collection="{Binding DataContext.Managers, Source={x:Reference dockDetails}}" />
                         </CompositeCollection>
                         <DataTemplate DataType="{x:Type m:Component}">
                             <Expander IsExpanded="True">
@@ -260,7 +259,32 @@
                                                     </Grid.ColumnDefinitions>
                                                     <TextBlock Text="{Binding Name}" Grid.Column="0" />
                                                     <CheckBox IsChecked="{Binding IsInherited}" IsEnabled="{Binding CanInherit}" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" />
-                                                    <TextBox IsEnabled="{Binding IsLocal}" Text="{Binding Value}" Grid.Column="2" />
+                                                    <v:PropertyView DataContext="{Binding}" Grid.Column="2" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </Expander.Content>
+                            </Expander>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type m:Manager}">
+                            <Expander IsExpanded="True">
+                                <Expander.Header>
+                                    <Border Padding="8">
+                                        <TextBlock FontWeight="Bold" Foreground="{StaticResource ForegroundBrush}" Text="{Binding DisplayName}" />
+                                    </Border>
+                                </Expander.Header>
+                                <Expander.Content>
+                                    <ListBox ItemsSource="{Binding Properties}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid HorizontalAlignment="Stretch">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="0.5*" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding Name}" Grid.Column="0" />
+                                                    <v:PropertyView IsEnabled="{Binding IsLocal}" DataContext="{Binding TypedValue}" Grid.Column="1" />
                                                 </Grid>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
@@ -274,9 +298,6 @@
                         <StackPanel Orientation="Horizontal">
                             <Button ToolTip="Delete" Margin="0,0,4,0">
                                 <Image Source="{StaticResource icoDelete}" Stretch="None" />
-                            </Button>
-                            <Button ToolTip="Add Component" Margin="0,0,4,0" Command="{Binding AddComponentCommand, Mode=OneWay}">
-                                <Image Source="{StaticResource icoAddComponent}" Stretch="None" />
                             </Button>
                             <Button ToolTip="Add Attribute" Margin="0,0,4,0" Command="{Binding AddAttributeCommand, Mode=OneWay}">
                                 <Image Source="{StaticResource icoAddAttribute}" Stretch="None" />

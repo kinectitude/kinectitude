@@ -29,7 +29,7 @@ namespace Kinectitude.Sound
         }
 
         private string filename;
-        [Plugin("Filename", "")]
+        [PluginProperty("Filename", "")]
         public string Filename
         {
             get { return filename; }
@@ -43,7 +43,7 @@ namespace Kinectitude.Sound
         }
 
         private bool looping = false;
-        [Plugin("Looping", "")]
+        [PluginProperty("Looping", "")]
         public bool Looping
         {
             get { return looping; }
@@ -54,7 +54,7 @@ namespace Kinectitude.Sound
         }
 
         private float volume = 1.0f;
-        [Plugin("Volume", "")]
+        [PluginProperty("Volume", "")]
         public float Volume
         {
             get { return volume; }

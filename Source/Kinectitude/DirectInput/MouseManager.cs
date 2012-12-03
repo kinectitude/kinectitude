@@ -10,9 +10,9 @@ using Kinectitude.Core.Attributes;
 
 namespace Kinectitude.DirectInput
 {
-
     public enum Button {Left = 0, Right, Scroll, Other};
 
+    [Plugin("Mouse Manager", "")]
     public class MouseManager : Manager<MouseFollowComponent>
     {
         private static Mouse mouse;
@@ -21,7 +21,7 @@ namespace Kinectitude.DirectInput
         private readonly List<MouseClickEvent> mouseClickEvens = new List<MouseClickEvent>();
 
         private bool visibleCursor = true;
-        [Plugin("Cursor is shown when true", "")]
+        [PluginProperty("Cursor is shown when true", "")]
         public bool VisibleCursor {
             get { return visibleCursor; }
             set

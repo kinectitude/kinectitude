@@ -11,7 +11,7 @@ namespace Kinectitude.Core.Events
     [Plugin("Expression {Target} changes", "")]
     internal sealed class AttributeChangesEvent : Event, IChangeable
     {
-        [Plugin("Expression", "")]
+        [PluginProperty("Expression", "")]
         public ValueReader Target { get; set; }
 
         public AttributeChangesEvent() { }

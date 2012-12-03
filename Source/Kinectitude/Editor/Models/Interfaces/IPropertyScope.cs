@@ -1,7 +1,7 @@
 ﻿
 namespace Kinectitude.Editor.Models.Interfaces
 {
-    internal delegate void PropertyEventHandler(string name);
+    internal delegate void PropertyEventHandler(PluginProperty property);
 
     internal interface IPropertyScope : IScope
     {

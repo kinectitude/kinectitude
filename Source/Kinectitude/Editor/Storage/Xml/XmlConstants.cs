@@ -33,8 +33,5 @@ namespace Kinectitude.Editor.Storage.Xml
         public static readonly XName File = "File";
         public static readonly XName Class = "Class";
         public static readonly XName If = "If";
-
-        public static readonly XName Project = "Project";
-        public static readonly XName Root = "Root";
     }
 }

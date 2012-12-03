@@ -1,9 +1,10 @@
-﻿
-using Kinectitude.Editor.Base;
+﻿using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Storage;
+
 namespace Kinectitude.Editor.Models
 {
-    class Asset : VisitableModel
+    class Asset : BaseModel
     {
         private string name;
 
@@ -28,20 +29,11 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        public string FileName
-        {
-            get;
-            private set;
-        }
+        public string File { get; private set; }
 
-        public Asset(string fileName)
+        public Asset(string file)
         {
-            FileName = fileName;
-        }
-
-        public override void Accept(IGameVisitor visitor)
-        {
-            
+            File = file;
         }
     }
 }

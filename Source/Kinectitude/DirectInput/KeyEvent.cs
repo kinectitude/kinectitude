@@ -13,10 +13,10 @@ namespace Kinectitude.DirectInput
     [Plugin("Key {Button} is {KeyState}", "")]
     public class KeyEvent : Event, IKeyChange
     {
-        [Plugin("Key State", "State of the key. Down, Pressed Or Released")]
+        [PluginProperty("Key State", "State of the key. Down, Pressed or Released")]
         public KeyState KeyState { get; set; }
 
-        [Plugin("Button", "Button to follow")]
+        [PluginProperty("Button", "Button to follow")]
         public Key Button { get; set; }
 
         public override void OnInitialize()

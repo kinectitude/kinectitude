@@ -16,7 +16,7 @@ namespace Kinectitude.Render
 
 
         private string _value = "";
-        [Plugin("Value", "")]
+        [PluginProperty("Value", "")]
         public string Value
         {
             get { return _value ?? ""; }
@@ -31,7 +31,7 @@ namespace Kinectitude.Render
         }
 
         private string fontFamily;
-        [Plugin("Font Family", "")]
+        [PluginProperty("Font Family", "")]
         public string FontFamily
         {
             get { return fontFamily; }
@@ -46,7 +46,7 @@ namespace Kinectitude.Render
         }
 
         private FontWeight fontWeight;
-        [Plugin("Font Weight", "")]
+        [PluginProperty("Font Weight", "")]
         public FontWeight FontWeight
         {
             get { return fontWeight; }
@@ -61,7 +61,7 @@ namespace Kinectitude.Render
         }
 
         public FontStyle fontStyle;
-        [Plugin("Font Style", "")]
+        [PluginProperty("Font Style", "")]
         public FontStyle FontStyle
         {
             get { return fontStyle; }
@@ -76,7 +76,7 @@ namespace Kinectitude.Render
         }
 
         private FontStretch fontStretch;
-        [Plugin("Font Stretch", "")]
+        [PluginProperty("Font Stretch", "")]
         public FontStretch FontStretch
         {
             get { return fontStretch; }
@@ -91,7 +91,7 @@ namespace Kinectitude.Render
         }
 
         private float fontSize;
-        [Plugin("Font Size", "")]
+        [PluginProperty("Font Size", "")]
         public float FontSize
         {
             get { return fontSize; }
@@ -106,7 +106,7 @@ namespace Kinectitude.Render
         }
 
         private string fontColor;
-        [Plugin("Font Color", "")]
+        [PluginProperty("Font Color", "")]
         public string FontColor
         {
             get { return fontColor; }
@@ -121,7 +121,7 @@ namespace Kinectitude.Render
         }
 
         private string locale;
-        [Plugin("Locale", "")]
+        [PluginProperty("Locale", "")]
         public string Locale
         {
             get { return locale; }
@@ -136,7 +136,7 @@ namespace Kinectitude.Render
         }
 
         private FlowDirection flowDirection;
-        [Plugin("Flow Direction", "")]
+        [PluginProperty("Flow Direction", "")]
         public FlowDirection FlowDirection
         {
             get { return flowDirection; }
@@ -151,7 +151,7 @@ namespace Kinectitude.Render
         }
 
         private int tabSize;
-        [Plugin("Tab Size", "")]
+        [PluginProperty("Tab Size", "")]
         public int TabSize
         {
             get { return tabSize; }
@@ -166,7 +166,7 @@ namespace Kinectitude.Render
         }
 
         private ParagraphAlignment paragraphAlignment;
-        [Plugin("Paragraph Alignment", "")]
+        [PluginProperty("Paragraph Alignment", "")]
         public ParagraphAlignment ParagraphAlignment
         {
             get { return paragraphAlignment; }
@@ -181,7 +181,7 @@ namespace Kinectitude.Render
         }
 
         private ReadingDirection readingDirection;
-        [Plugin("Reading Direction", "")]
+        [PluginProperty("Reading Direction", "")]
         public ReadingDirection ReadingDirection
         {
             get { return readingDirection; }
@@ -196,7 +196,7 @@ namespace Kinectitude.Render
         }
 
         private TextAlignment textAlignment;
-        [Plugin("Text Alignment", "")]
+        [PluginProperty("Text Alignment", "")]
         public TextAlignment TextAlignment
         {
             get { return textAlignment; }
@@ -211,7 +211,7 @@ namespace Kinectitude.Render
         }
 
         private WordWrapping wordWrapping;
-        [Plugin("Word Wrapping", "")]
+        [PluginProperty("Word Wrapping", "")]
         public WordWrapping WordWrapping
         {
             get { return wordWrapping; }
@@ -226,7 +226,7 @@ namespace Kinectitude.Render
         }
 
         private float offsetX;
-        [Plugin("Horizontal Offset", "")]
+        [PluginProperty("Horizontal Offset", "")]
         public float OffsetX
         {
             get { return offsetX; }
@@ -241,7 +241,7 @@ namespace Kinectitude.Render
         }
 
         private float offsetY;
-        [Plugin("Vertical Offset", "")]
+        [PluginProperty("Vertical Offset", "")]
         public float OffsetY
         {
             get { return offsetY; }

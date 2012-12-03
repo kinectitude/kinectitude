@@ -1,19 +1,21 @@
-﻿using System;
+﻿using Kinectitude.Core.Attributes;
+using Kinectitude.Core.Components;
+using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Commands;
+using Kinectitude.Editor.Models.Notifications;
+using Kinectitude.Editor.Models.Statements.Assignments;
+using Kinectitude.Editor.Storage;
+using Kinectitude.Editor.Storage.Xml;
+using Kinectitude.Editor.Views;
+using Kinectitude.Render;
+using System;
+using Kinectitude.Editor.Storage.Kgl;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
-using Kinectitude.Core.Attributes;
-using Kinectitude.Core.Components;
-using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Commands;
-using Kinectitude.Editor.Storage;
-using Kinectitude.Editor.Views;
-using Kinectitude.Render;
-using Kinectitude.Editor.Storage.Xml;
-using Kinectitude.Editor.Storage.Kgl;
 
 namespace Kinectitude.Editor.Models
 {
@@ -23,26 +25,25 @@ namespace Kinectitude.Editor.Models
 
         private static readonly Lazy<Workspace> instance = new Lazy<Workspace>();
 
-        private readonly Lazy<CommandHistory> commandHistory;
-
         public static Workspace Instance
         {
             get { return instance.Value; }
         }
 
-        private Game game;
+        private readonly Lazy<CommandHistory> commandHistory;
+        private readonly List<Entity> entityPresets;
         private BaseModel activeItem;
-        private List<Entity> entityPresets;
+        private Project project;
 
-        public Game Game
+        public Project Project
         {
-            get { return game; }
+            get { return project; }
             set
             {
-                if (game != value)
+                if (project != value)
                 {
-                    game = value;
-                    NotifyPropertyChanged("Game");
+                    project = value;
+                    NotifyPropertyChanged("Project");
                 }
             }
         }
@@ -60,34 +61,9 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        public ObservableCollection<BaseModel> OpenItems
+        public ICommandHistory CommandHistory
         {
-            get;
-            private set;
-        }
-
-        public ObservableCollection<Plugin> Plugins
-        {
-            get;
-            private set;
-        }
-
-        public ObservableCollection<Plugin> Actions
-        {
-            get;
-            private set;
-        }
-
-        public ObservableCollection<Plugin> Events
-        {
-            get;
-            private set;
-        }
-
-        public ObservableCollection<Plugin> Components
-        {
-            get;
-            private set;
+            get { return commandHistory.Value; }
         }
 
         public IEnumerable<Entity> EntityPresets
@@ -95,113 +71,83 @@ namespace Kinectitude.Editor.Models
             get { return entityPresets; }
         }
 
-        public ICommand NewGameCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand LoadGameCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand SaveGameCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand SaveGameAsCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand OpenItemCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand CloseItemCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommandHistory CommandHistory
-        {
-            get { return commandHistory.Value; }
-        }
-
+        public ObservableCollection<BaseModel> OpenItems { get; private set; }
+        public ObservableCollection<Plugin> Plugins { get; private set; }
+        public ObservableCollection<Plugin> Managers { get; private set; }
+        public ObservableCollection<Plugin> Components { get; private set; }
+        public ObservableCollection<StatementFactory> Events { get; private set; }
+        public ObservableCollection<StatementFactory> Actions { get; private set; }
+        public ObservableCollection<StatementFactory> Statements { get; private set; }
+        
+        public ICommand NewProjectCommand { get; private set; }
+        public ICommand LoadProjectCommand { get; private set; }
+        public ICommand SaveProjectCommand { get; private set; }
+        public ICommand SaveProjectAsCommand { get; private set; }
+        public ICommand OpenItemCommand { get; private set; }
+        public ICommand CloseItemCommand { get; private set; }
+        
         public Workspace()
         {
             OpenItems = new ObservableCollection<BaseModel>();
             Plugins = new ObservableCollection<Plugin>();
 
-            Actions = new FilteredObservableCollection<Plugin>(Plugins, (plugin) => plugin.Type == PluginType.Action);
-            Events = new FilteredObservableCollection<Plugin>(Plugins, (plugin) => plugin.Type == PluginType.Event);
+            Managers = new FilteredObservableCollection<Plugin>(Plugins, (plugin) => plugin.Type == PluginType.Manager);
+            //Events = new FilteredObservableCollection<Plugin>(Plugins, (plugin) => plugin.Type == PluginType.Event);
             Components = new FilteredObservableCollection<Plugin>(Plugins, (plugin) => plugin.Type == PluginType.Component);
+
+            Events = new ObservableCollection<StatementFactory>();
+            Actions = new ObservableCollection<StatementFactory>();
+            Statements = new ObservableCollection<StatementFactory>();
 
             commandHistory = new Lazy<CommandHistory>();
 
-            NewGameCommand = new DelegateCommand(null, (parameter) => NewGame());
+            NewProjectCommand = new DelegateCommand(null, (parameter) => NewProject());
 
-            LoadGameCommand = new DelegateCommand(null,
-                (parameter) =>
+            LoadProjectCommand = new DelegateCommand(null, (parameter) =>
+            {
+                DialogService.ShowLoadDialog((result, fileName) =>
                 {
-                    DialogService.ShowLoadDialog(
-                        (result, fileName) =>
-                        {
-                            if (result == true)
-                            {
-                                LoadGame(fileName);
-                            }
-                        }
-                    );
-                }
-            );
-
-            SaveGameCommand = new DelegateCommand(null,
-                (parameter) =>
-                {
-                    if (null == Game.FileName)
+                    if (result == true)
                     {
-                        DialogService.ShowSaveDialog(
-                            (result, fileName) =>
-                            {
-                                if (result == true)
-                                {
-                                    Game.FileName = fileName;
-                                }
-                            }
-                        );
+                        LoadProject(fileName);
                     }
+                });
+            });
 
-                    if (null != Game.FileName)
-                    {
-                        SaveGame();
-                    }
-                }
-            );
-
-            SaveGameAsCommand = new DelegateCommand(null,
-                (parameter) =>
+            SaveProjectCommand = new DelegateCommand(null, (parameter) =>
+            {
+                if (null == Project.File)
                 {
                     DialogService.ShowSaveDialog(
                         (result, fileName) =>
                         {
                             if (result == true)
                             {
-                                Game.FileName = fileName;
-                                SaveGame();
+                                Project.File = fileName;
                             }
                         }
                     );
                 }
-            );
+
+                if (null != Project.File)
+                {
+                    SaveProject();
+                }
+            });
+
+            SaveProjectAsCommand = new DelegateCommand(null, (parameter) =>
+            {
+                DialogService.ShowSaveDialog(
+                    (result, fileName) =>
+                    {
+                        if (result == true)
+                        {
+                            Project.File = fileName;
+                            SaveProject();
+                        }
+                    }
+                );
+            });
 
             OpenItemCommand = new DelegateCommand(null, (parameter) => OpenItem(parameter as BaseModel));
 
@@ -259,26 +205,32 @@ namespace Kinectitude.Editor.Models
             textEntity.AddComponent(textEntityText);
 
             entityPresets.Add(textEntity);
+
+            Statements.Add(new StatementFactory("Condition", StatementType.Condition, () => new Condition()));
+            Statements.Add(new StatementFactory("While Loop", StatementType.WhileLoop, () => new WhileLoop()));
+            Statements.Add(new StatementFactory("For Loop", StatementType.ForLoop, () => new ForLoop()));
+            Statements.Add(new StatementFactory("Assign a Value", StatementType.Assignment, () => new Assignment()));
         }
 
-        public void NewGame()
+        public void NewProject()
         {
             Game game = new Game("Untitled Game") { Width = 800, Height = 600 };
             game.AddScene(new Scene("Scene 1"));
 
-            Game = game;
+            Project project = new Project() { GameRoot = "Data/" };
+            project.Game = game;
+
+            Project = project;
         }
 
-        public void LoadGame(string fileName)
+        public void LoadProject(string fileName)
         {
-            IGameStorage storage = new XmlGameStorage(fileName);
-            Game = storage.LoadGame();
+            Project = ProjectStorage.LoadProject(fileName);
         }
 
-        public void SaveGame()
+        public void SaveProject()
         {
-            IGameStorage storage = new KglGameStorage(Game.FileName);
-            storage.SaveGame(Game);
+            ProjectStorage.SaveProject(Project);
         }
 
         public void OpenItem(BaseModel item)
@@ -322,6 +274,15 @@ namespace Kinectitude.Editor.Models
         public void AddPlugin(Plugin plugin)
         {
             Plugins.Add(plugin);
+
+            if (plugin.Type == PluginType.Action)
+            {
+                Actions.Add(new StatementFactory(plugin.ShortName, StatementType.Action, () => new Action(plugin)));
+            }
+            else if (plugin.Type == PluginType.Event)
+            {
+                Events.Add(new StatementFactory(plugin.ShortName, StatementType.Event, () => new Event(plugin)));
+            }
         }
 
         public void RemovePlugin(Plugin plugin)
@@ -344,6 +305,11 @@ namespace Kinectitude.Editor.Models
         public Plugin GetPlugin(Type type)
         {
             return GetPlugin(type.FullName);
+        }
+
+        public void Broadcast<T>(T notification) where T : Notification
+        {
+            Project.Game.Notify(notification);
         }
     }
 }

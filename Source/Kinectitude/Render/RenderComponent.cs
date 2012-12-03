@@ -23,7 +23,7 @@ namespace Kinectitude.Render
         private Ellipse ellipse;
         private RectangleF rectangle;
         private ShapeType shape;
-        [Plugin("Shape", "")]
+        [PluginProperty("Shape", "")]
         public ShapeType Shape
         {
             get { return shape; }
@@ -38,7 +38,7 @@ namespace Kinectitude.Render
         }
 
         private string fillColor;
-        [Plugin("Fill Color", "")]
+        [PluginProperty("Fill Color", "")]
         public string FillColor
         {
             get { return fillColor; }
@@ -53,7 +53,7 @@ namespace Kinectitude.Render
         }
 
         private float lineThickness;
-        [Plugin("Line Thickness", "")]
+        [PluginProperty("Line Thickness", "")]
         public float LineThickness
         {
             get { return lineThickness; }
@@ -68,7 +68,7 @@ namespace Kinectitude.Render
         }
 
         private string linecolor;
-        [Plugin("Line Color", "")]
+        [PluginProperty("Line Color", "")]
         public string LineColor
         {
             get { return linecolor; }

@@ -12,7 +12,7 @@ namespace Kinectitude.Core.Events
 
         public TriggerOccursEvent() { }
 
-        [Plugin("Trigger", "")]
+        [PluginProperty("Trigger", "")]
         public string Trigger { get; set; }
 
         public override void OnInitialize()

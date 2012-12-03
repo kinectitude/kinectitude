@@ -7,8 +7,9 @@
              xmlns:m="clr-namespace:Kinectitude.Editor.Models"
              xmlns:v="clr-namespace:Kinectitude.Editor.Views"
              xmlns:b="clr-namespace:Kinectitude.Editor.Behaviors"
+             xmlns:s="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d">
-    
+
     <UserControl.Resources>
 
         <SolidColorBrush x:Key="DropTargetBackgroundBrush" Color="#66A3D2" />
@@ -18,12 +19,28 @@
 
         <DropShadowEffect x:Key="DropShadow" BlurRadius="8" ShadowDepth="0" />
 
-        <DataTemplate DataType="{x:Type m:Plugin}">
-            <TextBlock Foreground="{StaticResource ForegroundBrush}" Text="{Binding ShortName}" Padding="16">
+        <Style x:Key="PluginIconStyle" TargetType="{x:Type Image}">
+            <Setter Property="Source" Value="{StaticResource icoStatement}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Type}" Value="{x:Static m:StatementType.Event}">
+                    <Setter Property="Source" Value="{StaticResource icoEvent}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Type}" Value="{x:Static m:StatementType.Action}">
+                    <Setter Property="Source" Value="{StaticResource icoAction}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
+        <DataTemplate DataType="{x:Type m:StatementFactory}">
+            <Border Padding="16" Background="Transparent">
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="16" Height="16" Style="{StaticResource PluginIconStyle}" Margin="0,0,16,0" />
+                    <TextBlock Foreground="{StaticResource ForegroundBrush}" Text="{Binding Name}" />
+                </StackPanel>
                 <i:Interaction.Behaviors>
                     <b:DragBehavior DragParameter="{Binding}" />
                 </i:Interaction.Behaviors>
-            </TextBlock>
+            </Border>
         </DataTemplate>
 
         <Style x:Key="DropTarget" TargetType="{x:Type Border}">
@@ -34,9 +51,14 @@
             <Setter Property="Margin" Value="8" />
             <Setter Property="CornerRadius" Value="4" />
             <Setter Property="BorderThickness" Value="2" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsInherited}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
 
-        <Style x:Key="ActionsListControl" TargetType="{x:Type ItemsControl}">
+        <Style x:Key="StatementsListControl" TargetType="{x:Type ItemsControl}">
             <Setter Property="ItemsControl.ItemsPanel">
                 <Setter.Value>
                     <ItemsPanelTemplate>
@@ -46,55 +68,52 @@
             </Setter>
         </Style>
 
-        <Style x:Key="ActionContainer" TargetType="{x:Type Border}">
+        <Style x:Key="StatementContainer" TargetType="{x:Type Border}">
             <Setter Property="Background" Value="DarkGray" />
             <Setter Property="CornerRadius" Value="8" />
             <Setter Property="Effect" Value="{StaticResource DropShadow}" />
             <Setter Property="Margin" Value="16,16,16,0" />
         </Style>
 
-        <!--DataTemplate DataType="{x:Type m:InheritedAction}">
-            <v:EventHeader DataContext="{Binding Tokens}" />
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type m:InheritedCondition}">
-            <StackPanel Orientation="Vertical">
-                <TextBlock Text="{Binding If}" TextWrapping="Wrap" FontWeight="Bold" Padding="8" Background="DarkGray" Effect="{StaticResource DropShadow}" />
-                <ItemsControl ItemsSource="{Binding Actions}" Padding="16,0,0,0" />
+        <DataTemplate DataType="{x:Type m:Header}">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="{StaticResource icoLock}" Width="16" Height="16" Margin="8,0,0,0" Visibility="{Binding IsInherited, Converter={StaticResource BoolToVis}}" />
+                <ItemsControl ItemsSource="{Binding Tokens}">
+                    <ItemsControl.Resources>
+                        <DataTemplate DataType="{x:Type m:AbstractProperty}">
+                            <v:PropertyView MinWidth="75" Margin="0,8,8,8" />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type s:String}">
+                            <TextBlock Text="{Binding}" FontWeight="Bold" Margin="0,8,8,8" />
+                        </DataTemplate>
+                    </ItemsControl.Resources>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" Margin="8,0,0,0" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
             </StackPanel>
         </DataTemplate>
-
-        <DataTemplate DataType="{x:Type m:InheritedEvent}">
-            <StackPanel Orientation="Vertical" Visibility="{Binding ElementName=self, Path=ShowInheritedEvents, Converter={StaticResource BoolToVis}}">
-                <StackPanel Orientation="Horizontal" Effect="{StaticResource DropShadow}" Width="Auto" HorizontalAlignment="Stretch">
-                    <Border Padding="8,8,0,8">
-                        <Image Source="{StaticResource icoLock}" />
-                    </Border>
-
-                    <v:EventHeader DataContext="{Binding Tokens}" />
-                </StackPanel>
-                <ItemsControl ItemsSource="{Binding Actions}" Padding="16,0,0,0" Style="{StaticResource ActionsListControl}" />
-            </StackPanel>
-        </DataTemplate-->
-
-        <DataTemplate DataType="{x:Type m:Action}">
+        
+        <DataTemplate DataType="{x:Type m:AbstractAction}">
             <Border Background="LightGray" CornerRadius="4" Margin="8,8,8,0">
                 <i:Interaction.Behaviors>
                     <b:DragBehavior DragParameter="{Binding}" />
                     <b:DropTargetBehavior DropCommand="{Binding InsertBeforeCommand}" />
                 </i:Interaction.Behaviors>
-                <v:EventHeader DataContext="{Binding Tokens}" />
+                <ContentPresenter Content="{Binding Header}" />
             </Border>
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type m:Condition}">
-            <Border Style="{StaticResource ActionContainer}">
+        <DataTemplate DataType="{x:Type m:AbstractCondition}">
+            <Border Style="{StaticResource StatementContainer}">
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock FontWeight="Bold" Margin="0,8,8,8">When</TextBlock>
+                        <TextBlock FontWeight="Bold" Margin="8">If</TextBlock>
                         <TextBox Text="{Binding If}" MinWidth="75" Margin="0,8,8,8" />
                     </StackPanel>
-                    <ItemsControl ItemsSource="{Binding Actions}" Style="{StaticResource ActionsListControl}" />
+                    <ItemsControl ItemsSource="{Binding Statements}" Style="{StaticResource StatementsListControl}" />
                     <Border Style="{StaticResource DropTarget}">
                         <i:Interaction.Behaviors>
                             <b:DropTargetBehavior DropCommand="{Binding AddActionCommand}" />
@@ -105,11 +124,51 @@
             </Border>
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type m:Event}">
-            <Border Style="{StaticResource ActionContainer}">
+        <DataTemplate DataType="{x:Type m:AbstractWhileLoop}">
+            <Border Style="{StaticResource StatementContainer}">
                 <StackPanel Orientation="Vertical">
-                    <v:EventHeader DataContext="{Binding Tokens}" />
-                    <ItemsControl ItemsSource="{Binding Actions}" Style="{StaticResource ActionsListControl}" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontWeight="Bold" Margin="8">While</TextBlock>
+                        <TextBox Text="{Binding Expression}" MinWidth="75" Margin="0,8,8,8" />
+                    </StackPanel>
+                    <ItemsControl ItemsSource="{Binding Statements}" Style="{StaticResource StatementsListControl}" />
+                    <Border Style="{StaticResource DropTarget}">
+                        <i:Interaction.Behaviors>
+                            <b:DropTargetBehavior DropCommand="{Binding AddActionCommand}" />
+                        </i:Interaction.Behaviors>
+                        <TextBlock>Drop here to add actions</TextBlock>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type m:AbstractForLoop}">
+            <Border Style="{StaticResource StatementContainer}">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontWeight="Bold" Margin="8">For</TextBlock>
+                        <TextBox Text="{Binding PreExpression}" MinWidth="75" Margin="0,8,8,8" />
+                        <TextBlock FontWeight="Bold" Margin="0,8,8,8">;</TextBlock>
+                        <TextBox Text="{Binding Expression}" MinWidth="75" Margin="0,8,8,8" />
+                        <TextBlock FontWeight="Bold" Margin="0,8,8,8">;</TextBlock>
+                        <TextBox Text="{Binding PostExpression}" MinWidth="75" Margin="0,8,8,8" />
+                    </StackPanel>
+                    <ItemsControl ItemsSource="{Binding Statements}" Style="{StaticResource StatementsListControl}" />
+                    <Border Style="{StaticResource DropTarget}">
+                        <i:Interaction.Behaviors>
+                            <b:DropTargetBehavior DropCommand="{Binding AddActionCommand}" />
+                        </i:Interaction.Behaviors>
+                        <TextBlock>Drop here to add actions</TextBlock>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type m:AbstractEvent}">
+            <Border Style="{StaticResource StatementContainer}">
+                <StackPanel Orientation="Vertical">
+                    <ContentPresenter Content="{Binding Header}" />
+                    <ItemsControl ItemsSource="{Binding Statements}" Style="{StaticResource StatementsListControl}" />
                     <Border Style="{StaticResource DropTarget}">
                         <i:Interaction.Behaviors>
                             <b:DropTargetBehavior DropCommand="{Binding AddActionCommand}" />
@@ -131,7 +190,7 @@
 
         <ScrollViewer>
             <StackPanel Orientation="Vertical">
-                
+
                 <Expander IsExpanded="True">
                     <Expander.Header>
                         <Border Padding="8">
@@ -139,11 +198,7 @@
                         </Border>
                     </Expander.Header>
                     <Expander.Content>
-                        <ListBox>
-                            <Border>
-                                <TextBlock Text="Condition" Foreground="{StaticResource ForegroundBrush}" Padding="16" />
-                            </Border>
-                        </ListBox>
+                        <ListBox ItemsSource="{Binding Source={x:Static m:Workspace.Instance}, Path=Statements}" />
                     </Expander.Content>
                 </Expander>
 
@@ -168,14 +223,13 @@
                         <ListBox ItemsSource="{Binding Source={x:Static m:Workspace.Instance}, Path=Actions}" />
                     </Expander.Content>
                 </Expander>
-                
+
             </StackPanel>
-            
-            
+
         </ScrollViewer>
-        
+
         <GridSplitter Width="4" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Style="{StaticResource gridSplitter}" />
-        
+
         <DockPanel Grid.Column="2">
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0,0,0,4">
                 <Border Padding="8">

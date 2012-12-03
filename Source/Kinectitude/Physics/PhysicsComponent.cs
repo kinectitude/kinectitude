@@ -17,6 +17,7 @@ namespace Kinectitude.Physics
     [Plugin("Physics Component", "")]
     [Provides(typeof(IPhysics))]
     [Requires(typeof(TransformComponent))]
+    [Requires(typeof(PhysicsManager))]
     public class PhysicsComponent : Component, IPhysics
     {
         private const float sizeRatio = 1f / 100f;
@@ -31,7 +32,7 @@ namespace Kinectitude.Physics
         [Preset("Bouncy Ball", "circle")]
         [Preset("Collision Event Line", "rectangle")]
         [Preset("Wall", "rectangle")]
-        [Plugin("Shape", "")]
+        [PluginProperty("Shape", "")]
         public string Shape 
         {
             get { return shape; }
@@ -49,7 +50,7 @@ namespace Kinectitude.Physics
         [Preset("Bouncy Ball", 1.0)]
         [Preset("Collision Event Line", 0.0)]
         [Preset("Wall", 0.0)]
-        [Plugin("Restitution", "")]
+        [PluginProperty("Restitution", "")]
         public float Restitution
         {
             get { return restitution; }
@@ -68,7 +69,7 @@ namespace Kinectitude.Physics
         [Preset("Bouncy Ball", 1.0)]
         [Preset("Collision Event Line", 1.0)]
         [Preset("Wall", 1.0)]
-        [Plugin("Mass", "")]
+        [PluginProperty("Mass", "")]
         public float Mass
         {
             get { return mass; }
@@ -87,7 +88,7 @@ namespace Kinectitude.Physics
         [Preset("Bouncy Ball", 0.0)]
         [Preset("Collision Event Line", 0.0)]
         [Preset("Wall", 0.0)]
-        [Plugin("Friction", "")]
+        [PluginProperty("Friction", "")]
         public float Friction
         {
             get { return friction; }
@@ -106,7 +107,7 @@ namespace Kinectitude.Physics
         [Preset("Bouncy Ball", 0.0)]
         [Preset("Collision Event Line", 0.0)]
         [Preset("Wall", 0.0)]
-        [Plugin("Linear Damping", "")]
+        [PluginProperty("Linear Damping", "")]
         public float LinearDamping
         {
             get { return linearDamping; }
@@ -121,7 +122,7 @@ namespace Kinectitude.Physics
         }
 
         private float maximumVelocity = float.PositiveInfinity;
-        [Plugin("Maximum velocity", "")]
+        [PluginProperty("Maximum velocity", "")]
         public float MaximumVelocity
         {
             get { return maximumVelocity; }
@@ -136,7 +137,7 @@ namespace Kinectitude.Physics
         }
 
         private float minimumVelocity = 0f;
-        [Plugin("Minimum velocity", "")]
+        [PluginProperty("Minimum velocity", "")]
         public float MinimumVelocity
         {
             get { return minimumVelocity; }
@@ -163,7 +164,7 @@ namespace Kinectitude.Physics
         }
 
         private float xVelocity = 0;
-        [Plugin("X Velocity", "")]
+        [PluginProperty("X Velocity", "")]
         public float XVelocity
         {
             get { return xVelocity; }
@@ -179,7 +180,7 @@ namespace Kinectitude.Physics
         }
 
         private float yVelocity = 0;
-        [Plugin("Y Velocity", "")]
+        [PluginProperty("Y Velocity", "")]
         public float YVelocity
         {
             get { return yVelocity; }
@@ -195,7 +196,7 @@ namespace Kinectitude.Physics
         }
 
         private float angularVelocity = 0;
-        [Plugin("Angular Velocity Velocity", "")]
+        [PluginProperty("Angular Velocity", "")]
         public float AngularVelocity
         {
             get { return angularVelocity; }
@@ -214,7 +215,7 @@ namespace Kinectitude.Physics
         [Preset("Bouncy Ball", true)]
         [Preset("Collision Event Line", false)]
         [Preset("Wall", false)]
-        [Plugin("Object moves when hit", "")]
+        [PluginProperty("Object moves when hit", "")]
         public bool MovesWhenHit {
             get { return movesWhenHit; }
             set
@@ -233,7 +234,7 @@ namespace Kinectitude.Physics
         [Preset("Bouncy Ball", true)]
         [Preset("Collision Event Line", false)]
         [Preset("Wall", false)]
-        [Plugin("Object can rotate as it moves", "")]
+        [PluginProperty("Object can rotate as it moves", "")]
         public bool FixedRotation
         {
             get { return fixedRotation; }
@@ -249,7 +250,7 @@ namespace Kinectitude.Physics
 
         private TypeMatcher ignoreCollisionsWith = null;
 
-        [Plugin("Ignores collisions with", "Any Entities that match this type matcher will pass through this object")]
+        [PluginProperty("Ignores collisions with", "Any entities that match this type matcher will pass through this object")]
         public TypeMatcher IgnoreCollisionsWith
         {
             get { return ignoreCollisionsWith; }

@@ -10,18 +10,28 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void SetKey()
         {
+            bool propertyChanged = false;
+
             Attribute attribute = new Attribute("test");
+            attribute.PropertyChanged += (o, e) => propertyChanged = (e.PropertyName == "Key");
+
             attribute.Key = "test2";
 
+            Assert.IsTrue(propertyChanged);
             Assert.AreEqual("test2", attribute.Key);
         }
 
         [TestMethod]
         public void SetValue()
         {
+            bool propertyChanged = false;
+
             Attribute attribute = new Attribute("test");
+            attribute.PropertyChanged += (o, e) => propertyChanged = (e.PropertyName == "Value");
+            
             attribute.Value = "value";
 
+            Assert.IsTrue(propertyChanged);
             Assert.AreEqual("value", attribute.Value);
         }
 
@@ -48,6 +58,8 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void ValueFollowsInheritedAttribute()
         {
+            //bool propertyChanged = false;
+
             Entity parent = new Entity() { Name = "parent" };
             
             Attribute parentAttribute = new Attribute("test");
@@ -57,15 +69,19 @@ namespace Kinectitude.Editor.Tests
             child.AddPrototype(parent);
 
             Attribute childAttribute = child.GetAttribute("test");
+            //childAttribute.PropertyChanged += (o, e) => propertyChanged = (e.PropertyName == "Value");
 
             parentAttribute.Value = "value";
 
+            //Assert.IsTrue(propertyChanged);
             Assert.AreEqual("value", childAttribute.Value);
         }
 
         [TestMethod]
         public void SetInheritedAttributeToLocal()
         {
+            bool propertyChanged = false;
+
             Entity parent = new Entity() { Name = "parent" };
             
             Attribute parentAttribute = new Attribute("test");
@@ -77,12 +93,14 @@ namespace Kinectitude.Editor.Tests
             Assert.AreEqual(1, child.Attributes.Count(x => x.IsInherited));
 
             Attribute childAttribute = child.GetAttribute("test");
+            childAttribute.PropertyChanged += (o, e) => propertyChanged |= (e.PropertyName == "IsInherited");
 
             Assert.IsTrue(childAttribute.CanInherit);
 
             childAttribute.IsInherited = false;
             childAttribute.Value = "value";
 
+            Assert.IsTrue(propertyChanged);
             Assert.AreEqual(0, child.Attributes.Count(x => x.IsInherited));
         }
 

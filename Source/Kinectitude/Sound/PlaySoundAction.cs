@@ -7,13 +7,13 @@ namespace Kinectitude.Sound
     [Plugin("Play the sound associated with this Entity", "")]
     public class PlaySoundAction : Action
     {
-        [Plugin("Filename", "File name of sound to play")]
+        [PluginProperty("Filename", "File name of sound to play")]
         public string Filename { get; set; }
 
-        [Plugin("Looping", "Whether this sound loops Or Not")]
+        [PluginProperty("Looping", "Whether this sound loops or not")]
         public bool Looping { get; set; }
 
-        [Plugin("Volume", "The volume to play this sound at")]
+        [PluginProperty("Volume", "The volume to play this sound at")]
         public float Volume { get; set; }
 
         public override void Run()

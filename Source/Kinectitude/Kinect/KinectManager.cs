@@ -2,9 +2,11 @@
 using Microsoft.Kinect;
 using System.Collections.Generic;
 using System;
+using Kinectitude.Core.Attributes;
 
 namespace Kinectitude.Kinect
 {
+    [Plugin("Kinect Manager", "")]
     public class KinectManager : Manager<KinectFollowComponent>
     {
         private static KinectService service;

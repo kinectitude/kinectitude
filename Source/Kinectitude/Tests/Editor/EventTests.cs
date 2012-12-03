@@ -7,16 +7,20 @@ namespace Kinectitude.Editor.Tests
     [TestClass]
     public class EventTests
     {
-        private static readonly string TriggerOccursEventType = "Kinectitude.Core.Events.TriggerOccursEvent";
+        private static readonly string TriggerOccursEventType = typeof(Kinectitude.Core.Events.TriggerOccursEvent).FullName;
 
         [TestMethod]
         public void AddLocalEvent()
         {
+            bool collectionChanged = false;
+
             Entity entity = new Entity();
+            entity.Events.CollectionChanged += (o, e) => collectionChanged = true;
 
             Event evt = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
             entity.AddEvent(evt);
 
+            Assert.IsTrue(collectionChanged);
             Assert.IsTrue(evt.IsLocal);
             Assert.AreEqual(1, entity.Events.Count);
         }
@@ -24,46 +28,66 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void RemoveLocalEvent()
         {
+            int eventsFired = 0;
+
             Entity entity = new Entity();
+            entity.Events.CollectionChanged += (o, e) => eventsFired++;
 
             Event evt = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
             entity.AddEvent(evt);
             entity.RemoveEvent(evt);
 
+            Assert.AreEqual(2, eventsFired);
             Assert.AreEqual(0, entity.Events.Count);
         }
 
         [TestMethod]
         public void AddMultipleEventsOfSameType()
         {
+            int eventsFired = 0;
+
             Entity entity = new Entity();
+            entity.Events.CollectionChanged += (o, e) => eventsFired++;
 
             entity.AddEvent(new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType)));
             entity.AddEvent(new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType)));
 
+            Assert.AreEqual(2, eventsFired);
             Assert.AreEqual(2, entity.Events.Count);
         }
 
         [TestMethod]
         public void SetEventProperty()
         {
+            bool propertyChanged = false;
+
             Event evt = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
+
+            AbstractProperty property = evt.GetProperty("Trigger");
+            property.PropertyChanged += (o, e) => propertyChanged = (e.PropertyName == "Value");
+
             evt.SetProperty("Trigger", "test");
 
-            Assert.AreEqual("test", evt.GetProperty("Trigger").Value);
+            Assert.IsTrue(propertyChanged);
+            Assert.AreEqual("test", property.Value);
         }
 
         [TestMethod]
         public void EventsInheritedFromPrototype()
         {
+            bool collectionChanged = false;
+
             Entity parent = new Entity() { Name = "parent" };
 
             Entity child = new Entity();
+            child.Events.CollectionChanged += (o, e) => collectionChanged = true;
+
             child.AddPrototype(parent);
 
             Event parentEvent = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
             parent.AddEvent(parentEvent);
 
+            Assert.IsTrue(collectionChanged);
             Assert.AreEqual(1, parent.Events.Count(x => x.IsLocal));
             Assert.AreEqual(1, child.Events.Count(x => x.IsInherited));
         }
@@ -71,16 +95,21 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void EventsInheritedFromAllPrototypes()
         {
+            int eventsFired = 0;
+
             Entity parent = new Entity() { Name = "parent" };
             Entity otherParent = new Entity() { Name = "otherParent" };
 
             Entity child = new Entity();
+            child.Events.CollectionChanged += (o, e) => eventsFired++;
+
             child.AddPrototype(parent);
             child.AddPrototype(otherParent);
 
             parent.AddEvent(new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType)));
             otherParent.AddEvent(new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType)));
 
+            Assert.AreEqual(2, eventsFired);
             Assert.AreEqual(1, parent.Events.Count(x => x.IsLocal));
             Assert.AreEqual(1, otherParent.Events.Count(x => x.IsLocal));
             Assert.AreEqual(2, child.Events.Count(x => x.IsInherited));
@@ -89,15 +118,20 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void RemoveInheritedEvent()
         {
+            int eventsFired = 0;
+
             Entity parent = new Entity() { Name = "parent" };
 
             Entity child = new Entity();
+            child.Events.CollectionChanged += (o, e) => eventsFired++;
+
             child.AddPrototype(parent);
 
             Event parentEvent = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
             parent.AddEvent(parentEvent);
             parent.RemoveEvent(parentEvent);
 
+            Assert.AreEqual(2, eventsFired);
             Assert.AreEqual(0, parent.Events.Count);
             Assert.AreEqual(0, child.Events.Count);
         }
@@ -105,9 +139,13 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void EventRemovedAfterRemovePrototype()
         {
+            int eventsFired = 0;
+
             Entity parent = new Entity() { Name = "parent" };
 
             Entity child = new Entity();
+            child.Events.CollectionChanged += (o, e) => eventsFired++;
+
             child.AddPrototype(parent);
 
             Event parentEvent = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
@@ -115,6 +153,7 @@ namespace Kinectitude.Editor.Tests
 
             child.RemovePrototype(parent);
 
+            Assert.AreEqual(2, eventsFired);
             Assert.AreEqual(1, parent.Events.Count);
             Assert.AreEqual(0, child.Events.Count);
         }
@@ -122,14 +161,19 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void EventsAddedAfterAddPrototype()
         {
+            bool collectionChanged = false;
+
             Entity parent = new Entity() { Name = "parent" };
 
             Event parentEvent = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
             parent.AddEvent(parentEvent);
 
             Entity child = new Entity();
+            child.Events.CollectionChanged += (o, e) => collectionChanged = true;
+
             child.AddPrototype(parent);
 
+            Assert.IsTrue(collectionChanged);
             Assert.AreEqual(1, parent.Events.Count(x => x.IsLocal));
             Assert.AreEqual(1, child.Events.Count(x => x.IsInherited));
         }
@@ -155,6 +199,8 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void CannotRemoveInheritedEventFromInheritingEntity()
         {
+            bool collectionChanged = false;
+
             Entity parent = new Entity() { Name = "parent" };
 
             Event parentEvent = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
@@ -164,9 +210,12 @@ namespace Kinectitude.Editor.Tests
             Entity child = new Entity();
             child.AddPrototype(parent);
 
+            child.Events.CollectionChanged += (o, e) => collectionChanged = true;
+
             AbstractEvent childEvent = child.Events.Single();
             child.RemoveEvent(childEvent);
 
+            Assert.IsFalse(collectionChanged);
             Assert.AreEqual(1, child.Events.Count);
         }
     }

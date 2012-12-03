@@ -113,7 +113,7 @@ namespace Kinectitude.Core.Base
             gettersByType[type] = new Dictionary<string, Func<object, object>>();
             TypesDict[registeredName] = type;
 
-            foreach (PropertyInfo pi in type.GetProperties().Where(item => Attribute.IsDefined(item, typeof(PluginAttribute))))
+            foreach (PropertyInfo pi in type.GetProperties().Where(item => Attribute.IsDefined(item, typeof(PluginPropertyAttribute))))
             {
                 paramType[type][pi.Name] = pi.PropertyType;
 

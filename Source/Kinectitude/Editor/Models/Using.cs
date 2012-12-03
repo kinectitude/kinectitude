@@ -1,20 +1,14 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Models.Interfaces;
+﻿using Kinectitude.Editor.Models.Interfaces;
+using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Storage;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Kinectitude.Editor.Models
 {
-    internal delegate void DefineChangedEventHandler(Define define);
-
-    internal sealed class Using : VisitableModel
+    internal sealed class Using : GameModel<IScope>
     {
         private string file;
-
-        public event DefineAddedEventHandler DefineAdded;
-        public event DefineChangedEventHandler DefineChanged;
 
         public string File
         {
@@ -29,11 +23,7 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        public ObservableCollection<Define> Defines
-        {
-            get;
-            private set;
-        }
+        public ObservableCollection<Define> Defines { get; private set; }
 
         public Using()
         {
@@ -47,18 +37,15 @@ namespace Kinectitude.Editor.Models
 
         public void AddDefine(Define define)
         {
-            define.PropertyChanged += OnDefinePropertyChanged;
+            define.Scope = this;
             Defines.Add(define);
 
-            if (null != DefineAdded)
-            {
-                DefineAdded(define);
-            }
+            Broadcast(new DefineAdded(define));
         }
 
         public void RemoveDefine(Define define)
         {
-            define.PropertyChanged -= OnDefinePropertyChanged;
+            define.Scope = null;
             Defines.Remove(define);
         }
 
@@ -80,18 +67,6 @@ namespace Kinectitude.Editor.Models
         public bool HasDefineWithClass(string name)
         {
             return Defines.Any(x => x.Class == name);
-        }
-
-        private void OnDefinePropertyChanged(object sender, PropertyChangedEventArgs args)
-        {
-            if (args.PropertyName == "Name")
-            {
-                if (null != DefineChanged)
-                {
-                    Define define = sender as Define;
-                    DefineChanged(define);
-                }
-            }
         }
     }
 }

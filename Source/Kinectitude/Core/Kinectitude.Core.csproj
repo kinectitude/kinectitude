@@ -82,6 +82,7 @@
     <Compile Include="Actions\SetAction.cs" />
     <Compile Include="Actions\CreateTimerAction.cs" />
     <Compile Include="Attributes\PluginAttribute.cs" />
+    <Compile Include="Attributes\PluginPropertyAttribute.cs" />
     <Compile Include="Attributes\PresetAttribute.cs" />
     <Compile Include="Attributes\ProvidesAttribute.cs" />
     <Compile Include="Attributes\RequiresAttribute.cs" />

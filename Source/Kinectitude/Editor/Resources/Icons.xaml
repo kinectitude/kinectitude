@@ -49,8 +49,13 @@
     <!-- Entity Editor -->
 
     <ImageSource x:Key="icoComponent">..\Icons\cog.png</ImageSource>
+    <ImageSource x:Key="icoStatement">..\Icons\timeline_marker.png</ImageSource>
     <ImageSource x:Key="icoEvent">..\Icons\clock.png</ImageSource>
     <ImageSource x:Key="icoAction">..\Icons\lightning.png</ImageSource>
     <ImageSource x:Key="icoLock">..\Icons\lock.png</ImageSource>
+    <ImageSource x:Key="icoArrowLeft">..\Icons\arrow_left.png</ImageSource>
+    <ImageSource x:Key="icoArrowRight">..\Icons\arrow_right.png</ImageSource>
+    <ImageSource x:Key="icoArrowUp">..\Icons\arrow_up.png</ImageSource>
+    <ImageSource x:Key="icoArrowDown">..\Icons\arrow_down.png</ImageSource>
 
 </ResourceDictionary>

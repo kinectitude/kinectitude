@@ -6,7 +6,7 @@ namespace Kinectitude.Core.Actions
     [Plugin("Create Entity based on {Prototype}", "")]
     class CreateEntityAction : Action
     {
-        [Plugin("Prototype", "Name of Prototype to make")]
+        [PluginProperty("Prototype", "Name of Prototype to make")]
         public string Prototype { get; set; }
 
         public override void Run()

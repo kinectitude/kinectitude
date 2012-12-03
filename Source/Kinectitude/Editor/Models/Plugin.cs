@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Kinectitude.Core.Attributes;
 using Kinectitude.Editor.Base;
+using System.Reflection;
 
 namespace Kinectitude.Editor.Models
 {
@@ -34,7 +35,7 @@ namespace Kinectitude.Editor.Models
 
         public string ShortName { get; private set; }
 
-        public IEnumerable<string> Properties { get; private set; }
+        public IEnumerable<PluginProperty> Properties { get; private set; }
 
         public Plugin(Type type)
         {
@@ -42,7 +43,7 @@ namespace Kinectitude.Editor.Models
 
             CoreType = type;
             File = type.Module.Name;
-            Header = pluginAttribute.Name;
+            Header = pluginAttribute.Header;
             Description = pluginAttribute.Description;
             ClassName = type.FullName;
             ShortName = type.Name;
@@ -65,7 +66,15 @@ namespace Kinectitude.Editor.Models
                 Type = PluginType.Action;
             }
 
-            var properties = from property in type.GetProperties() where System.Attribute.IsDefined(property, typeof(PluginAttribute)) select property.Name;
+            List<PluginProperty> properties = new List<PluginProperty>();
+            foreach (PropertyInfo info in type.GetProperties())
+            {
+                PluginPropertyAttribute pluginPropertyAttribute = System.Attribute.GetCustomAttribute(info, typeof(PluginPropertyAttribute)) as PluginPropertyAttribute;
+                if (null != pluginPropertyAttribute)
+                {
+                    properties.Add(new PluginProperty(info, pluginPropertyAttribute));
+                }
+            }
             Properties = properties.ToArray();
 
             ProvidesAttribute providesAttribute = System.Attribute.GetCustomAttribute(type, typeof(ProvidesAttribute)) as ProvidesAttribute;

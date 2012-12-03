@@ -1,18 +1,18 @@
 ﻿using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
+using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Storage;
 
 namespace Kinectitude.Editor.Models
 {
     internal delegate void KeyChangedEventHandler(string oldKey, string newKey);
     
-    internal sealed class Attribute : VisitableModel
+    internal sealed class Attribute : GameModel<IAttributeScope>
     {
         private const string DefaultValue = "";
 
         private string key;
         private string value;
-        private IAttributeScope scope;
         private bool inherited;
 
         public event KeyChangedEventHandler KeyChanged;
@@ -71,14 +71,12 @@ namespace Kinectitude.Editor.Models
             get { return !IsInherited; }
         }
 
-        [DependsOn("Scope")]
         public bool CanInherit
         {
-            get { return null != scope ? scope.HasInheritedAttribute(Key) : false; }
+            get { return null != Scope ? Scope.HasInheritedAttribute(Key) : false; }
         }
 
         [DependsOn("IsLocal")]
-        [DependsOn("Scope")]
         public string Value
         {
             get
@@ -88,7 +86,7 @@ namespace Kinectitude.Editor.Models
                     return value;
                 }
 
-                return null != scope ? scope.GetInheritedValue(Key) : DefaultValue;
+                return null != Scope ? Scope.GetInheritedValue(Key) : DefaultValue;
             }
             set
             {
@@ -112,6 +110,9 @@ namespace Kinectitude.Editor.Models
         {
             this.key = key;
             this.value = DefaultValue;
+
+            AddDependency<ScopeChanged>("CanInherit");
+            AddDependency<ScopeChanged>("Value");
         }
 
         public override void Accept(IGameVisitor visitor)
@@ -119,33 +120,28 @@ namespace Kinectitude.Editor.Models
             visitor.Visit(this);
         }
 
-        public void SetScope(IAttributeScope scope)
+        protected override void OnScopeDetaching(IAttributeScope scope)
         {
-            if (null != this.scope)
-            {
-                this.scope.InheritedAttributeAdded -= OnInheritedAttributeChanged;
-                this.scope.InheritedAttributeRemoved -= OnInheritedAttributeChanged;
-                this.scope.InheritedAttributeChanged -= OnInheritedAttributeChanged;
-            }
+            scope.InheritedAttributeAdded -= OnInheritedAttributeChanged;
+            scope.InheritedAttributeRemoved -= OnInheritedAttributeChanged;
+            scope.InheritedAttributeChanged -= OnInheritedAttributeChanged;
+        }
 
-            this.scope = scope;
-
-            if (null != this.scope)
-            {
-                this.scope.InheritedAttributeAdded += OnInheritedAttributeChanged;
-                this.scope.InheritedAttributeRemoved += OnInheritedAttributeChanged;
-                this.scope.InheritedAttributeChanged += OnInheritedAttributeChanged;
-            }
+        protected override void OnScopeAttaching(IAttributeScope scope)
+        {
+            scope.InheritedAttributeAdded += OnInheritedAttributeChanged;
+            scope.InheritedAttributeRemoved += OnInheritedAttributeChanged;
+            scope.InheritedAttributeChanged += OnInheritedAttributeChanged;
         }
 
         private bool KeyExists(string key)
         {
-            if (null == scope)
+            if (null == Scope)
             {
                 return false;
             }
 
-            return scope.HasInheritedAttribute(key) || scope.HasLocalAttribute(key);
+            return Scope.HasInheritedAttribute(key) || Scope.HasLocalAttribute(key);
         }
 
         private void OnInheritedAttributeChanged(string key)

@@ -10,8 +10,9 @@ namespace Kinectitude.Core.Components
     public class TransformComponent : Component
     {
         private float x;
-        [Plugin("X Position", "")]
-        public float X {
+        [PluginProperty("X Position", "")]
+        public float X
+        {
             get { return x; }
             set
             {
@@ -24,7 +25,7 @@ namespace Kinectitude.Core.Components
         }
 
         private float y;
-        [Plugin("Y Position", "")]
+        [PluginProperty("Y Position", "")]
         public float Y 
         {
             get { return y; }
@@ -39,7 +40,7 @@ namespace Kinectitude.Core.Components
         }
 
         private int width;
-        [Plugin("Width", "")]
+        [PluginProperty("Width", "")]
         public int Width 
         {
             get { return width; }
@@ -54,7 +55,7 @@ namespace Kinectitude.Core.Components
         }
 
         private int height;
-        [Plugin("Height", "")]
+        [PluginProperty("Height", "")]
         public int Height
         {
             get { return height; }
@@ -69,7 +70,7 @@ namespace Kinectitude.Core.Components
         }
 
         private float rotation;
-        [Plugin("Rotation", "")]
+        [PluginProperty("Rotation", "")]
         public float Rotation 
         {
             get { return rotation; }
