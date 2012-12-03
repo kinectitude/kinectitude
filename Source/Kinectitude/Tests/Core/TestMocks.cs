@@ -19,15 +19,15 @@ namespace Kinectitude.Tests.Core
     public class AssertionAction : Action
     {
         public static readonly Dictionary<string, List<bool>> Assertions = new Dictionary<string, List<bool>>();
-        [Plugin("ls", "")]
+        [PluginProperty("ls", "")]
         public ValueReader LS { get; set; }
-        [Plugin("rs", "")]
+        [PluginProperty("rs", "")]
         public ValueReader RS { get; set; }
-        [Plugin("assertion string", "")]
+        [PluginProperty("assertion string", "")]
         public string Assertion { get; set; }
-        [Plugin("same type needed", "")]
+        [PluginProperty("same type needed", "")]
         public bool Type { get; set; }
-        [Plugin("Run iff matches", "")]
+        [PluginProperty("Run iff matches", "")]
         public ValueReader OnlyRunIf { get; set; }
 
         public static void CheckValue(string value, int expectedRuns = 1)
@@ -97,7 +97,7 @@ namespace Kinectitude.Tests.Core
 
     public class MockMatchHappensEvent : Event
     {
-        [Plugin("Matcher", "")]
+        [PluginProperty("Matcher", "")]
         public TypeMatcher MatcherVal { get; set; }
 
         public override void OnInitialize()
@@ -110,7 +110,7 @@ namespace Kinectitude.Tests.Core
     public class MockComponent : Component
     {
         private int intVal = 0;
-        [Plugin("int", "")]
+        [PluginProperty("int", "")]
         public int IntVal { 
             get { return intVal; }
             set
@@ -123,7 +123,7 @@ namespace Kinectitude.Tests.Core
             }
         }
         double doubleVal = 0;
-        [Plugin("double", "")]
+        [PluginProperty("double", "")]
         public double DoubleVal
         {
             get { return doubleVal; }
@@ -137,7 +137,7 @@ namespace Kinectitude.Tests.Core
             }
         }
         string strVal = "";
-        [Plugin("string", "")]
+        [PluginProperty("string", "")]
         public string StrVal
         {
             get { return strVal; }
@@ -151,7 +151,7 @@ namespace Kinectitude.Tests.Core
             }
         }
         bool boolVal = false;
-        [Plugin("bool", "")]
+        [PluginProperty("bool", "")]
         public bool BoolVal
         {
             get { return boolVal; }
@@ -165,7 +165,7 @@ namespace Kinectitude.Tests.Core
             }
         }
         TestEnum enumVal = TestEnum.value1;
-        [Plugin("enum", "")]
+        [PluginProperty("enum", "")]
         public TestEnum EnumVal
         {
             get { return enumVal; }
@@ -179,7 +179,7 @@ namespace Kinectitude.Tests.Core
             }
         }
         ValueReader readerVal = null;
-        [Plugin("reader", "")]
+        [PluginProperty("reader", "")]
         public ValueReader ReaderVal
         {
             get { return readerVal; }
@@ -194,7 +194,7 @@ namespace Kinectitude.Tests.Core
         }
 
         TypeMatcher matcherVal = null;
-        [Plugin("Matcher", "")]
+        [PluginProperty("Matcher", "")]
         public TypeMatcher MatcherVal
         {
             get { return matcherVal; }
@@ -218,7 +218,7 @@ namespace Kinectitude.Tests.Core
     [Plugin("Manager", "")]
     public class MockManager : Manager<SubscribeComponent>
     {
-        [Plugin("bool", "")]
+        [PluginProperty("bool", "")]
         public bool BoolVal { get; set; }
         public static int Added = 0;
         public override void OnUpdate(float frameDelta) { }
@@ -244,7 +244,7 @@ namespace Kinectitude.Tests.Core
     [Requires(typeof(TransformComponent))]
     public class MockRequiersComponent : Component
     {
-        [Plugin("test", "test")]
+        [PluginProperty("test", "test")]
         public bool ShouldCheckNulls { get; set; }
         public override void Ready()
         {
@@ -272,7 +272,7 @@ namespace Kinectitude.Tests.Core
         public static int stopped = 0;
         public static int setVal = 0;
 
-        [Plugin("setVal", "")]
+        [PluginProperty("setVal", "")]
         public int SetVal
         {
             get { return setVal; }
@@ -289,7 +289,7 @@ namespace Kinectitude.Tests.Core
     {
         public static int setVal = 0;
 
-        [Plugin("setVal", "")]
+        [PluginProperty("setVal", "")]
         public int SetVal
         {
             get { return setVal; }
@@ -313,7 +313,7 @@ namespace Kinectitude.Tests.Core
 
         public static int setVal = 0;
 
-        [Plugin("setVal", "")]
+        [PluginProperty("setVal", "")]
         public int SetVal
         {
             get { return setVal; }

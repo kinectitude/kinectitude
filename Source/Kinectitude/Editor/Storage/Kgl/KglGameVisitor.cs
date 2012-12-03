@@ -1,5 +1,7 @@
 ﻿using Kinectitude.Core.Language;
 using Kinectitude.Editor.Models;
+using Kinectitude.Editor.Models.Statements;
+using Kinectitude.Editor.Models.Statements.Assignments;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,14 +17,14 @@ namespace Kinectitude.Editor.Storage.Kgl
         private const string CloseDef = "}\n";
 
         private static readonly Func<AbstractProperty, bool> validProperties = (property => property.IsLocal);
-        private static readonly Func<VisitableModel, bool> allValid = (model => true);
+        private static readonly Func<GameModel, bool> allValid = (model => true);
         private static readonly Func<Component, bool> validComponent = (component => component.IsRoot || component.HasLocalProperties);
         private static readonly Func<AbstractEvent, bool> validEvt = (evt => evt.IsLocal);
 
         private int numTabs = 0;
         private string result;
 
-        public string Apply(VisitableModel model)
+        public string Apply(GameModel model)
         {
             model.Accept(this);
             return result;
@@ -31,6 +33,11 @@ namespace Kinectitude.Editor.Storage.Kgl
         public void Visit(Action action)
         {
             result = tabs() + action.Type + properties<AbstractProperty>(action.Properties);
+        }
+
+        public void Visit(Assignment assignment)
+        {
+            throw new NotImplementedException();
         }
 
         public void Visit(Attribute attribute)
@@ -51,7 +58,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             StringBuilder conditionBuilder = new StringBuilder(tabStr)
                 .Append("if(").Append(condition.If).Append(')').Append(OpenDef);
             numTabs++;
-            conditionBuilder.Append(visitMembers<AbstractAction>(condition.Actions, "\n", allValid));
+            conditionBuilder.Append(visitMembers<AbstractStatement>(condition.Statements, "\n", allValid));
             numTabs--;
             conditionBuilder.Append('\n').Append(tabStr).Append(CloseDef);
             result = conditionBuilder.ToString();
@@ -89,7 +96,12 @@ namespace Kinectitude.Editor.Storage.Kgl
         {
             result = new StringBuilder("\t\t\tEvent ").Append(evt.Type)
                 .Append(properties<AbstractProperty>(evt.Properties)).Append(OpenDef)
-                .Append(visitMembers<AbstractAction>(evt.Actions, "\n", allValid)).Append("\t\t\t").ToString();
+                .Append(visitMembers<AbstractStatement>(evt.Statements, "\n", allValid)).Append("\t\t\t").ToString();
+        }
+
+        public void Visit(ForLoop loop)
+        {
+            throw new NotImplementedException();
         }
 
         public void Visit(Game game)
@@ -104,6 +116,11 @@ namespace Kinectitude.Editor.Storage.Kgl
             result = "";
         }
 
+        public void Visit(InheritedAssignment assignment)
+        {
+            result = "";
+        }
+
         public void Visit(InheritedCondition condition)
         {
             result = "";
@@ -114,7 +131,17 @@ namespace Kinectitude.Editor.Storage.Kgl
             result = "";
         }
 
+        public void Visit(InheritedForLoop loop)
+        {
+            result = "";
+        }
+
         public void Visit(InheritedProperty property)
+        {
+            result = "";
+        }
+
+        public void Visit(InheritedWhileLoop loop)
         {
             result = "";
         }
@@ -148,6 +175,11 @@ namespace Kinectitude.Editor.Storage.Kgl
                 .Append(visitMembers<Define>(use.Defines, "\n", allValid)).Append(CloseDef).ToString();
         }
 
+        public void Visit(WhileLoop loop)
+        {
+            throw new NotImplementedException();
+        }
+
         private string properties<T>(IEnumerable<T> properties) where T : AbstractProperty
         {
             return '(' + visitMembers<T>(properties, ", ", validProperties) + ')';
@@ -158,7 +190,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             return '(' + visitMembers<Attribute>(properties, ", ", allValid) + ')';
         }
 
-        private string visitMembers<T>(IEnumerable<T> members, string joinWith, Func<T, bool> valid) where T : VisitableModel
+        private string visitMembers<T>(IEnumerable<T> members, string joinWith, Func<T, bool> valid) where T : GameModel
         {
             List<string> memberStrings = new List<string>();
             foreach (T member in members.Where(member => valid(member)))

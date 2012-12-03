@@ -6,7 +6,7 @@ using Kinectitude.Core.AbstractComponents;
 
 namespace Kinectitude.Kinect
 {
-    [Plugin("Kinect Motion Component", ""), Requires(typeof(KinectManager))]
+    [Plugin("Kinect Motion Component", "")]
     public class KinectFollowComponent : BasicFollowComponent
     {
         private KinectManager manager;

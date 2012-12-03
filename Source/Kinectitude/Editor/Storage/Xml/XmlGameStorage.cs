@@ -272,27 +272,6 @@ namespace Kinectitude.Editor.Storage.Xml
 
         public void SaveGame(Game game)
         {
-            // Check if the project file exists
-
-            //string projectFolder = Path.GetDirectoryName(file);
-            //string assetFolder = Path.GetFileNameWithoutExtension(file);
-            //string gameFile = Path.Combine(projectFolder, assetFolder, "game.xml");
-
-            //if (!File.Exists(file))
-            //{
-            //    XElement project = new XElement
-            //    (
-            //        XmlConstants.Project,
-            //        new XElement(XmlConstants.Root, assetFolder)
-            //    );
-            //    project.Save(file);
-            //}
-
-            //FileInfo file = new FileInfo(gameFile);
-            //file.Directory.Create();
-
-            //// Check if the project folder exists
-
             XDocument document = new XDocument(new XmlGameVisitor().Apply(game));
             document.Save(file.ToString());
         }

@@ -17,7 +17,6 @@ namespace Kinectitude.Physics
     [Plugin("Physics Component", "")]
     [Provides(typeof(IPhysics))]
     [Requires(typeof(TransformComponent))]
-    [Requires(typeof(PhysicsManager))]
     public class PhysicsComponent : Component, IPhysics
     {
         private const float sizeRatio = 1f / 100f;
