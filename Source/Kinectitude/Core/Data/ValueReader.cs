@@ -57,8 +57,14 @@ namespace Kinectitude.Core.Data
         internal static PreferedType NativeReturnType(object value)
         {
             if (null == value) return PreferedType.Null;
-            if (value.GetType() == typeof(string)) return PreferedType.String;
-            else if (value.GetType() == typeof(bool)) return PreferedType.Boolean;
+            return NativeReturnType(value.GetType());
+        }
+
+        internal static PreferedType NativeReturnType(Type type)
+        {
+            if (null == type) return PreferedType.Null;
+            if (type == typeof(string)) return PreferedType.String;
+            else if (type == typeof(bool)) return PreferedType.Boolean;
             return PreferedType.Number;
         }
 

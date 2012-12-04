@@ -1,12 +1,9 @@
 ﻿using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Base;
 
-public delegate void ChangeDelegate();
-
 namespace Kinectitude.Core.Components
 {
     [Plugin("Transform Component", "")]
-    [Provides(typeof(TransformComponent))]
     public class TransformComponent : Component
     {
         private float x;

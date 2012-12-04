@@ -9,7 +9,9 @@ using Kinectitude.Core.Components;
 using Kinectitude.Core.Events;
 using Kinectitude.Core.Managers;
 using Kinectitude.Core.Data;
+using Kinectitude.Core.Functions;
 
+using Math = Kinectitude.Core.Functions.Math;
 namespace Kinectitude.Core.Base
 {
     internal sealed class ClassFactory
@@ -47,6 +49,9 @@ namespace Kinectitude.Core.Base
         //used to get the provided types of a component
         private static readonly Dictionary<Type, List<Type>> componentProvides = new Dictionary<Type, List<Type>>();
 
+        //used for each funciton name
+        private static readonly Dictionary<string, FunctionHolder> functions = new Dictionary<string, FunctionHolder>();
+
         static ClassFactory()
         {
             RegisterType("AttributeChanges", typeof(AttributeChangesEvent));
@@ -65,6 +70,10 @@ namespace Kinectitude.Core.Base
             RegisterType("ResumeTimers", typeof(ResumeTimersAction));
             RegisterType("OnCreate", typeof(OnCreateEvent));
             RegisterType("Quit", typeof(QuitAction));
+            foreach(MethodInfo mi in typeof(Math).GetMethods().Where(mi => Attribute.IsDefined(mi, typeof(PluginAttribute))))
+                FunctionHolder.AddFunction(mi.Name, mi);
+            foreach (MethodInfo mi in typeof(Conversions).GetMethods().Where(mi => Attribute.IsDefined(mi, typeof(PluginAttribute))))
+                FunctionHolder.AddFunction(mi.Name, mi);
         }
 
         internal static void LoadServicesAndManagers(Assembly assembly)
@@ -79,6 +88,11 @@ namespace Kinectitude.Core.Base
             {
                 ConstructorTypes[type] = createConstructorDelegate(type);
             }
+        }
+
+        internal static void RegisterFunction(string registeredName, MethodInfo methodInfo)
+        {
+            FunctionHolder.AddFunction(registeredName, methodInfo);
         }
 
         internal static void RegisterType(string registeredName, Type type)

@@ -118,6 +118,12 @@ namespace Kinectitude.Core.Loaders
             return node.Term == grammar.Condition;
         }
 
+        public bool IsFunction(object obj)
+        {
+            ParseTreeNode node = obj as ParseTreeNode;
+            return node.Term == grammar.Function;
+        }
+
         public object GetBeforeAction(object obj)
         {
             ParseTreeNode node = obj as ParseTreeNode;
@@ -284,18 +290,22 @@ namespace Kinectitude.Core.Loaders
                             from.ChildNodes[1].Token.ValueString, from.ChildNodes[2].Token.ValueString, entity);
                 }
             }
+            else if (type0 == grammar.Function)
+            {
+                string name = GetName(from);
+                List<ParseTreeNode> arguments  = new List<ParseTreeNode>();
+                getOfTypeHelper(from, grammar.Argument, arguments);
+                List<ValueReader> argReaders = new List<ValueReader>();
+                foreach (ParseTreeNode argument in arguments) argReaders.Add(makeValueReader(argument.ChildNodes[0], scene, entity, evt));
+                return FunctionReader.getFunctionReader(name, argReaders);
+            }
             else if (node.ChildNodes.Count == 3 && node.ChildNodes[1].Term == grammar.BinOp)
             {
                 ValueReader left = makeValueReader(node.ChildNodes[0], scene, entity, evt);
                 ValueReader right = makeValueReader(node.ChildNodes[2], scene, entity, evt);
                 return binOpCreate(node.ChildNodes[1].ChildNodes[0].Term, left, right);
             }
-            else
-            {
-                return new ConstantReader(from.Token.Value);
-            }
-            Game.CurrentGame.Die("Error with implementation of operator");
-            return null;
+            return new ConstantReader(from.Token.Value);
         }
 
         private TypeMatcher makeTypeMatcherHelper(ParseTreeNode node, Scene scene)

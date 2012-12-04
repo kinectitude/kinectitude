@@ -80,7 +80,7 @@ namespace Kinectitude.Core.Loaders
             string extention = null;
             try
             {
-                extention = fileName.Substring(fileName.IndexOf('.'));
+                extention = fileName.Substring(fileName.LastIndexOf('.'));
             }
             catch (Exception)
             {
@@ -123,8 +123,18 @@ namespace Kinectitude.Core.Loaders
             {
                 assembly = LoadedFiles[file];
             }
-            ClassFactory.RegisterType(named, assembly.GetType(fullName));
 
+            Type registeredType = assembly.GetType(fullName);
+            if (null != registeredType)
+            {
+                ClassFactory.RegisterType(named, registeredType);
+                return;
+            }
+            int lastdot = fullName.LastIndexOf('.');
+            string inClass = fullName.Substring(0, lastdot);
+            string funcName = fullName.Substring(lastdot + 1);
+            MethodInfo mi = assembly.GetType(inClass).GetMethod(funcName, BindingFlags.Static);
+            ClassFactory.RegisterFunction(named, mi);
         }
 
         internal LoadedEntity entityParse(object entity, string name, int id)

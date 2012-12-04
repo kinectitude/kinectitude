@@ -219,7 +219,7 @@ Game (Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = false, Nam
             Component Transform(X = 0, Y = 0, Width = 800)
             Component TextRenderComponent(Value = "", FontSize = 20, TextAlignment = "Center")
             Event AttributeChanges(Target = scene.balls + scene.blocks){
-                TextRenderComponent.Value  = "Extra Balls: " + scene.balls + " blocks left " + scene.blocks + "."
+                TextRenderComponent.Value  = "Extra Balls: " + scene.balls + " blocks left " + scene.blocks + ". log of 100 is " + Log(100) + " log of 8, base 2 is " + Log(8, 2)
                 if (scene.blocks == 0){
                     TextRenderComponent.Value  = "YOU WIN!"
                     FireTrigger(Name="gameOver")

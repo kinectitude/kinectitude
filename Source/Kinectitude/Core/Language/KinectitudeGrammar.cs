@@ -44,6 +44,8 @@ namespace Kinectitude.Core.Language
         internal readonly NonTerminal Else = new NonTerminal("Else", "Else");
         internal readonly NonTerminal Service = new NonTerminal("Service", "Service");
         internal readonly NonTerminal Loop = new NonTerminal("Loop", "Loop");
+        internal readonly NonTerminal Function = new NonTerminal("Function", "Function");
+        internal readonly NonTerminal Argument = new NonTerminal("Argument", "Argument");
         #endregion
 
         #region Key Types of KGL
@@ -118,6 +120,8 @@ namespace Kinectitude.Core.Language
             ParentVal.Rule =  "^" + Identifier + "." + Identifier | "^" + Identifier + "." + Identifier + "." + Identifier;
             exactValue.Rule = Identifier | TwoVal | ThreeVal | ParentVal;
             TypeMatcher.Rule = IsType | IsExactType| IsType + Plus + TypeMatcher | IsExactType + Plus + TypeMatcher;
+            Argument.Rule = Expr | Expr + "," + Argument;
+            Function.Rule = Identifier + ToTerm("(") +")" | Identifier + "(" + Argument + ")";
             #endregion
 
             #region expressions
@@ -125,7 +129,7 @@ namespace Kinectitude.Core.Language
             Expr.Rule = Expr + BinOp + Expr | UniOp + Expr | term;
             BinOp.Rule = Plus | Minus | Div | Mult | Rem | Pow | And | Or | Eql | Neq | Gt | Ge | Lt | Le | LeftShift | RightShift;
             UniOp.Rule = Not | Minus;
-            term.Rule = Number | Str | openBrac + Expr + closeBrac | exactValue | Constants;
+            term.Rule = Number | Str | openBrac + Expr + closeBrac | exactValue | Constants | Function;
             #endregion
 
             #region operator precedence
@@ -150,7 +154,7 @@ namespace Kinectitude.Core.Language
             #region game creation rules
             NonTerminal IsPrototype = new NonTerminal("IsPrototype", "IsPrototype");
 
-            value.Rule =  TypeMatcher | Expr;
+            value.Rule = TypeMatcher | Expr;
 
             Names.Rule = Identifier + comma + Names | Identifier;
             IsPrototype.Rule = colon + Names | Empty;
@@ -235,9 +239,9 @@ namespace Kinectitude.Core.Language
             MarkPunctuation("{", "}", "(", ")", ":", "$", "@", "#", "^", "Game", "using", "define", "Scene", "Entity",
                  ",", "if", "Component", "Manager", "Prototype", "=", ".", "as", "Event", "else", "Service", ";", "while", "for");
             MarkReservedWords("using", "define", "if", "true", "false", "Pi", "E", "else", "while", "for");
-            MarkTransient(BasicDefinition, value, IsPrototype, term, exactValue, optionalActions, optionalEvt, 
-                optionalComponent, optionalProperties, optionalManager, optionalPrototype, optionalService,
-                optionalUses, optionalDefinitions, optionalEntity, optionalScene, optionalIdentifier, optionalAssignment);
+            MarkTransient(BasicDefinition, value, IsPrototype, term, exactValue, optionalActions, optionalEvt, optionalComponent, 
+                optionalProperties, optionalManager, optionalPrototype, optionalService, optionalUses, optionalDefinitions,
+                optionalEntity, optionalScene, optionalIdentifier, optionalAssignment);
         }
     }
 }

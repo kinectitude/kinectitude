@@ -31,9 +31,7 @@ namespace Kinectitude.Core.Base
             {
                 if (Deleted) Game.CurrentGame.Die("Can't write to a deleted entity");
 
-                ValueReader reader;
-                if (typeof(ConstantReader) == value.GetType()) reader = value;
-                else reader = new ConstantReader(value.GetPreferedValue());
+                ValueReader reader = value as ConstantReader ?? new ConstantReader(value.GetPreferedValue());
 
                 attributes[key] = reader;
                 if (callbacks.ContainsKey(key))
