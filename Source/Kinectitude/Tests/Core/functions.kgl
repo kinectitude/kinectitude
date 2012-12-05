@@ -1,0 +1,34 @@
+﻿using Kinectitude.Tests.dll{
+    define NumArgs as Kinectitude.Tests.Core.FuncHolder.NumArgs
+    define Assertion as Kinectitude.Tests.Core.AssertionAction
+}
+
+Game (Width = 800, Height=600, FirstScene="test", IsFullScreen=false, val=0){
+    Scene test(score = 0, val = 1){
+        Entity runTests(val = 2){
+            Event SceneStarts(){
+                Assertion(LS=0, RS=NumArgs(), Assertion="0", OnlyRunIf= true)
+                Assertion(LS=Floor(1.1), RS=NumArgs(arg1), Assertion="1", OnlyRunIf= true)
+                Assertion(LS="params 0", RS=NumArgs(arg1, arg2), Assertion="params 0", OnlyRunIf= true)
+                Assertion(LS=3, RS=NumArgs(arg1,arg2, arg3), Assertion="3", OnlyRunIf= true)
+                Assertion(LS="params 0", RS=NumArgs(arg1, arg2, arg3, arg4), Assertion="params 0", OnlyRunIf= true)
+                Assertion(LS="params 0", RS=NumArgs(arg1, arg2, arg3, arg4, arg5), Assertion="params 5", OnlyRunIf= true)
+				Assertion(LS=Min(1.1, 10, 100), RS=1.1, Assertion="min", OnlyRunIf= true)
+				Assertion(LS=Max(1.1, 10, 100), RS=100, Assertion="max", OnlyRunIf= true)
+				Assertion(LS=Bool("lol"), RS=true, Assertion="bool", OnlyRunIf= true)
+				Assertion(LS=Decimal(true), RS=1, Assertion="decimal", OnlyRunIf= true)
+				Assertion(LS=String(1) + 1, RS="11", Assertion="str", OnlyRunIf= true)
+				Assertion(LS=Ln(E), RS=1, Assertion="ln", OnlyRunIf= true)
+				Assertion(LS=Log(10), RS=1, Assertion="log", OnlyRunIf= true)
+				Assertion(LS=Log(8,2), RS=3, Assertion="log", OnlyRunIf= true)
+				Assertion(LS=Abs(-1), RS=1, Assertion="absolute", OnlyRunIf= true)
+				lastRandom = Random()
+				Assertion(LS=true, RS=(lastRandom < 1) && (lastRandom > 0), Assertion="random", OnlyRunIf= true)
+				lastRandom = Random(10)
+				Assertion(LS=true, RS=(lastRandom < 10) && (lastRandom > 0), Assertion="random", OnlyRunIf= true)
+				lastRandom = Random(10, 100)
+				Assertion(LS=true, RS= (lastRandom < 100) && (lastRandom > 10), Assertion="random", OnlyRunIf= true)
+            }
+        }
+    }
+}

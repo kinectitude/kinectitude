@@ -305,6 +305,10 @@ namespace Kinectitude.Core.Loaders
                 ValueReader right = makeValueReader(node.ChildNodes[2], scene, entity, evt);
                 return binOpCreate(node.ChildNodes[1].ChildNodes[0].Term, left, right);
             }
+            else if (node.ChildNodes.Count == 1 && node.ChildNodes[0].Term == grammar.Expr)
+            {
+                return makeValueReader(node.ChildNodes[0], scene, entity, evt);
+            }
             return new ConstantReader(from.Token.Value);
         }
 

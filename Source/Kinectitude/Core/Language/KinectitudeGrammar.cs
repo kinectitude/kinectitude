@@ -148,6 +148,7 @@ namespace Kinectitude.Core.Language
             RegisterOperators(70, Associativity.Left, Plus, Minus);
             RegisterOperators(80, Associativity.Left, Div, Mult, Rem);
             RegisterOperators(90, Associativity.Left, Pow);
+            RegisterOperators(100, Associativity.Left, Not);
 
             #endregion
 
