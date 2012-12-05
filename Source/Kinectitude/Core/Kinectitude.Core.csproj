@@ -149,6 +149,7 @@
     <Compile Include="Events\OnCreateEvent.cs" />
     <Compile Include="Events\SceneStartsEvent.cs" />
     <Compile Include="Events\TriggerOccursEvent.cs" />
+    <Compile Include="Functions\Conversions.cs" />
     <Compile Include="Functions\Math.cs" />
     <Compile Include="Language\KinectitudeGrammar.cs" />
     <Compile Include="Loaders\GameLoader.cs">

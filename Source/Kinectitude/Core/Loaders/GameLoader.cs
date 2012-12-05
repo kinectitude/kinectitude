@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Data;
+using Kinectitude.Core.Attributes;
 
 namespace Kinectitude.Core.Loaders
 {
@@ -133,8 +134,8 @@ namespace Kinectitude.Core.Loaders
             int lastdot = fullName.LastIndexOf('.');
             string inClass = fullName.Substring(0, lastdot);
             string funcName = fullName.Substring(lastdot + 1);
-            MethodInfo mi = assembly.GetType(inClass).GetMethod(funcName, BindingFlags.Static);
-            ClassFactory.RegisterFunction(named, mi);
+            IEnumerable<MethodInfo> methodInfos = assembly.GetType(inClass).GetMethods().Where(mi => Attribute.IsDefined(mi, typeof(PluginAttribute)));
+            foreach(MethodInfo mi in methodInfos) ClassFactory.RegisterFunction(named, mi);
         }
 
         internal LoadedEntity entityParse(object entity, string name, int id)

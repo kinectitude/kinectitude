@@ -12,6 +12,7 @@ using Kinectitude.Core.Data;
 using Kinectitude.Core.Functions;
 
 using Math = Kinectitude.Core.Functions.Math;
+
 namespace Kinectitude.Core.Base
 {
     internal sealed class ClassFactory

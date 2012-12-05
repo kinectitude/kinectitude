@@ -328,4 +328,23 @@ namespace Kinectitude.Tests.Core
         public override void OnStop() { stopped++; }
         public override bool AutoStart() { return true; }
     }
+
+    [Plugin("FuncHolder", "function holder")]
+    public class FuncHolder
+    {
+        [Plugin("function", "test")]
+        public static int NumArgs() { return 0; }
+
+        [Plugin("function", "test")]
+        public static int NumArgs(ValueReader vr) { return 1; }
+
+        [Plugin("function", "test")]
+        public static int NumArgs(ValueReader vr, ValueReader vr2, ValueReader vr3) { return 3; }
+
+        [Plugin("function", "test")]
+        public static string NumArgs(params ValueReader [] vrs) { return "params 0"; }
+
+        [Plugin("function", "test")]
+        public static string NumArgs(ValueReader vr, ValueReader vr2, ValueReader vr3, ValueReader vr4, ValueReader vr5, params ValueReader [] vrs) { return "params 5"; }
+    }
 }
