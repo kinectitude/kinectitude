@@ -49,7 +49,7 @@ namespace Kinectitude.Physics
         [Preset("Bouncy Ball", 1.0)]
         [Preset("Collision Event Line", 0.0)]
         [Preset("Wall", 0.0)]
-        [PluginProperty("Restitution", "")]
+        [PluginProperty("Restitution", "", 0)]
         public float Restitution
         {
             get { return restitution; }
@@ -68,7 +68,7 @@ namespace Kinectitude.Physics
         [Preset("Bouncy Ball", 1.0)]
         [Preset("Collision Event Line", 1.0)]
         [Preset("Wall", 1.0)]
-        [PluginProperty("Mass", "")]
+        [PluginProperty("Mass", "", 1.0f)]
         public float Mass
         {
             get { return mass; }
@@ -87,7 +87,7 @@ namespace Kinectitude.Physics
         [Preset("Bouncy Ball", 0.0)]
         [Preset("Collision Event Line", 0.0)]
         [Preset("Wall", 0.0)]
-        [PluginProperty("Friction", "")]
+        [PluginProperty("Friction", "", 0.0f)]
         public float Friction
         {
             get { return friction; }
@@ -106,7 +106,7 @@ namespace Kinectitude.Physics
         [Preset("Bouncy Ball", 0.0)]
         [Preset("Collision Event Line", 0.0)]
         [Preset("Wall", 0.0)]
-        [PluginProperty("Linear Damping", "")]
+        [PluginProperty("Linear Damping", "", 0.0f)]
         public float LinearDamping
         {
             get { return linearDamping; }
@@ -120,32 +120,32 @@ namespace Kinectitude.Physics
             }
         }
 
-        private float maximumVelocity = float.PositiveInfinity;
-        [PluginProperty("Maximum velocity", "")]
-        public float MaximumVelocity
+        private float maximumSpeed = float.PositiveInfinity;
+        [PluginProperty("Maximum velocity", "", float.PositiveInfinity)]
+        public float MaximumSpeed
         {
-            get { return maximumVelocity; }
+            get { return maximumSpeed; }
             set
             {
-                if (value != maximumVelocity && value > 0)
+                if (value != maximumSpeed && value > 0)
                 {
-                    maximumVelocity = value;
-                    Change("MaximumVelocity");
+                    maximumSpeed = value;
+                    Change("MaximumSpeed");
                 }
             }
         }
 
-        private float minimumVelocity = 0f;
-        [PluginProperty("Minimum velocity", "")]
-        public float MinimumVelocity
+        private float minimumSpeed = 0f;
+        [PluginProperty("Minimum velocity", "", 0)]
+        public float MinimumSpeed
         {
-            get { return minimumVelocity; }
+            get { return minimumSpeed; }
             set
             {
-                if (value != minimumVelocity && value > 0)
+                if (value != minimumSpeed && value > 0)
                 {
-                    minimumVelocity = value;
-                    Change("MinimumVelocity");
+                    minimumSpeed = value;
+                    Change("MinimumSpeed");
                 }
             }
         }
@@ -163,7 +163,7 @@ namespace Kinectitude.Physics
         }
 
         private float xVelocity = 0;
-        [PluginProperty("X Velocity", "")]
+        [PluginProperty("X Velocity", "", 0.0f)]
         public float XVelocity
         {
             get { return xVelocity; }
@@ -179,7 +179,7 @@ namespace Kinectitude.Physics
         }
 
         private float yVelocity = 0;
-        [PluginProperty("Y Velocity", "")]
+        [PluginProperty("Y Velocity", "", 0.0f)]
         public float YVelocity
         {
             get { return yVelocity; }
@@ -195,7 +195,7 @@ namespace Kinectitude.Physics
         }
 
         private float angularVelocity = 0;
-        [PluginProperty("Angular Velocity", "")]
+        [PluginProperty("Angular Velocity", "", 0.0f)]
         public float AngularVelocity
         {
             get { return angularVelocity; }
@@ -233,7 +233,7 @@ namespace Kinectitude.Physics
         [Preset("Bouncy Ball", true)]
         [Preset("Collision Event Line", false)]
         [Preset("Wall", false)]
-        [PluginProperty("Object can rotate as it moves", "")]
+        [PluginProperty("Object can rotate as it moves", "", false)]
         public bool FixedRotation
         {
             get { return fixedRotation; }
@@ -329,19 +329,19 @@ namespace Kinectitude.Physics
         {
             float speed = body.LinearVelocity.Length() / speedRatio;
 
-            if (maximumVelocity == 0 || speed == 0)
+            if (maximumSpeed == 0 || speed == 0)
             {
                 body.LinearVelocity = new Vector2(0f, 0f);
             }
             else
             {
-                if (speed > maximumVelocity) body.LinearVelocity = body.LinearVelocity / speed * maximumVelocity;
+                if (speed > maximumSpeed) body.LinearVelocity = body.LinearVelocity / speed * maximumSpeed;
 
-                if (speed < minimumVelocity)
+                if (speed < minimumSpeed)
                 {
                     //TODO decide what is good to do here
-                    if (0 == speed) body.LinearVelocity = new Vector2(minimumVelocity, 0);
-                    else body.LinearVelocity = body.LinearVelocity / speed * minimumVelocity;
+                    if (0 == speed) body.LinearVelocity = new Vector2(minimumSpeed, 0);
+                    else body.LinearVelocity = body.LinearVelocity / speed * minimumSpeed;
                 }
             }
         }

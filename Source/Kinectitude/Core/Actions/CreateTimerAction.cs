@@ -19,7 +19,7 @@ namespace Kinectitude.Core.Actions
         [PluginProperty("Trigger", "Trigger to fire")]
         public ValueReader Trigger { get; set; }
 
-        [PluginProperty("Recurring", "Determines if the timer should start again when it has finished", false)]
+        [PluginProperty("Recurring", "Determines if the timer should start again when it has finished", true)]
         public ValueReader Recurring { get; set; }
 
         public CreateTimerAction()

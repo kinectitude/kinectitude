@@ -22,7 +22,7 @@ namespace Kinectitude.Core.AbstractComponents
         private bool exactMove = false;
 
         private FollowType direction;
-        [PluginProperty("Axis", "")]
+        [PluginProperty("Axis", "", FollowType.Both)]
         public FollowType Direction
         {
             get { return direction; }
@@ -37,7 +37,7 @@ namespace Kinectitude.Core.AbstractComponents
         }
 
         private float minXFollow = float.NegativeInfinity;
-        [PluginProperty("Minimum X position to follow to","")]
+        [PluginProperty("Minimum X position to follow to","", float.NegativeInfinity)]
         public float MinXFollow
         {
             get {return minXFollow;}
@@ -52,7 +52,7 @@ namespace Kinectitude.Core.AbstractComponents
         }
 
         private float minYFollow = float.NegativeInfinity;
-        [PluginProperty("Minimum Y position to follow to", "")]
+        [PluginProperty("Minimum Y position to follow to", "", float.NegativeInfinity)]
         public float MinYFollow
         {
             get { return minYFollow; }
@@ -67,7 +67,7 @@ namespace Kinectitude.Core.AbstractComponents
         }
 
         private float maxXFollow = float.PositiveInfinity;
-        [PluginProperty("Maximum X position to follow to", "")]
+        [PluginProperty("Maximum X position to follow to", "", float.PositiveInfinity)]
         public float MaxXFollow
         {
             get { return maxXFollow; }
@@ -82,7 +82,7 @@ namespace Kinectitude.Core.AbstractComponents
         }
 
         private float maxYFollow = float.PositiveInfinity;
-        [PluginProperty("Maximum Y position to follow to", "")]
+        [PluginProperty("Maximum Y position to follow to", "", float.PositiveInfinity)]
         public float MaxYFollow
         {
             get { return maxYFollow; }

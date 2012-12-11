@@ -53,12 +53,8 @@ namespace Kinectitude.Core.Functions
         [Plugin("ATan", "Returns the angle whose tangent is the quotient of {x} an {y}")]
         public static double ATan2(ValueReader x, ValueReader y) { return System.Math.Atan2(x.GetDoubleValue(), y.GetDoubleValue()); }
 
-        [Plugin("Ceiling", "Returns the smallest integer that is bigger or equal to {value}")]
-        public static int Ceiling(ValueReader value)
-        {
-            //will round down the -1 number and add one to it :).
-            return 1 + (int)(value.GetIntValue() - 1);
-        }
+        [Plugin("Ceiling", "Returns the smallest whole number that is bigger or equal to {value}")]
+        public static long Ceiling(ValueReader value) { return (long)System.Math.Ceiling(value.GetDoubleValue()); }
 
         [Plugin("Cos", "Returns cos of {value}")]
         public static double Cos(ValueReader value) { return System.Math.Cos(value.GetDoubleValue()); }
@@ -66,8 +62,8 @@ namespace Kinectitude.Core.Functions
         [Plugin("Cosh", "Returns hyperbolic cosh of the angle {value}")]
         public static double Cosh(ValueReader value) { return System.Math.Cosh(value.GetDoubleValue()); }
 
-        [Plugin("Floor", "Returns the largest integer that is smaller or equal to {value}")]
-        public static int Floor(ValueReader value) { return value.GetIntValue(); }
+        [Plugin("Floor", "Returns the largest whole number that is smaller or equal to {value}")]
+        public static long Floor(ValueReader value) { return value.GetLongValue(); }
 
         [Plugin("Ln", "Returns the Log base e of {value}")]
         public static double Ln(ValueReader value) { return System.Math.Log(value.GetDoubleValue()); }

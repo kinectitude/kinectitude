@@ -39,7 +39,7 @@
   <Prototype Name="asteroid">
     <Component Type="TransformComponent" X="-100" Y="-100" Width="36" Height="38"/>
     <Component Type="ImageRenderComponent" Image="asteroid.png" />
-    <Component Type="PhysicsComponent" MinimumVelocity="3" MaximumVelocity="3" XVelocity="0" YVelocity="0" Shape="Ellipse" Mass="1" Restitution="1" Friction="0" LinearDamping="0" MovesWhenHit="true" FixedRotation="false" IgnoreCollisionsWith="$shield_boundary"/>
+    <Component Type="PhysicsComponent" MinimumSpeed="3" MaximumSpeed="3" XVelocity="0" YVelocity="0" Shape="Ellipse" Mass="1" Restitution="1" Friction="0" LinearDamping="0" MovesWhenHit="true" FixedRotation="false" IgnoreCollisionsWith="$shield_boundary"/>
 
     <Event Type="TriggerOccursEvent" Trigger="spawn_asteroid{scene.next}">
       <Condition If="scene.edge &gt;= 0 and scene.edge &lt; 1">

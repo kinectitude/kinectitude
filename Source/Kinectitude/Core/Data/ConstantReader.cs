@@ -14,18 +14,36 @@ namespace Kinectitude.Core.Data
         private readonly PreferedType Type;
 
         //Used by DataContainer for null values and ConstantValueReader default
-        internal static readonly ConstantReader NullValue = new ConstantReader(null);
+        public static readonly ConstantReader NullValue = new ConstantReader(null);
         //Used by boolean based value reader defaults
-        internal static readonly ConstantReader TrueValue = new ConstantReader(true);
-        internal static readonly ConstantReader FalseValue = new ConstantReader(false);
+        public static readonly ConstantReader TrueValue = new ConstantReader(true);
+        public static readonly ConstantReader FalseValue = new ConstantReader(false);
 
-        internal ConstantReader(object value)
+       private static readonly Dictionary<object, ConstantReader> SavedValues = new Dictionary<object,ConstantReader>(){{true, TrueValue}, {false, FalseValue}};
+
+        public ConstantReader(object value)
         {
             Type = NativeReturnType(value);
             Dval = ToNumber<double>(value);
             if (value != null) Sval = value.ToString();
             else Sval = "";
             Bval = ToBool(value);
+        }
+
+        /*TODO decide if this should actually be public.
+         * Advantage is that less are created, disadvantage it can be misused by mistake and tons of dict items could be created
+         * Maybe use WeakReference and check the dict every once in a while?
+         */
+        public static ConstantReader CacheOrCreate(object value)
+        {
+            if (null == value) return NullValue;
+            ConstantReader val;
+            if(!SavedValues.TryGetValue(value, out val))
+            {
+                val = new ConstantReader(val);
+                SavedValues[val] = val;
+            }
+            return val;
         }
 
         internal override double GetDoubleValue() { return Dval; }

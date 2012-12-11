@@ -40,13 +40,46 @@ namespace Kinectitude.Core.Data
                 Owner.NotifyOfComponentChange(ClassFactory.GetReferedName(Obj.GetType()) + '.' + Param, this);
         }
 
-        internal override double GetDoubleValue() { return ToNumber<double>(ClassFactory.GetParam(Obj, Param)); }
-        internal override float GetFloatValue() { return ToNumber<float>(ClassFactory.GetParam(Obj, Param)); }
-        internal override int GetIntValue() { return ToNumber<int>(ClassFactory.GetParam(Obj, Param)); }
-        internal override long GetLongValue() { return ToNumber<long>(ClassFactory.GetParam(Obj, Param)); }
-        internal override bool GetBoolValue() { return ToBool(ClassFactory.GetParam(Obj, Param)); }
-        internal override string GetStrValue() { return ClassFactory.GetParam(Obj, Param).ToString(); }
-        internal override PreferedType PreferedRetType() { return NativeReturnType(ClassFactory.GetParam(Obj, Param)); }
+        internal override double GetDoubleValue() 
+        {
+            object value = ClassFactory.GetParam(Obj, Param);
+            return value as ValueReader ?? ToNumber<double>(value); 
+        }
+        internal override float GetFloatValue()
+        {
+            object value = ClassFactory.GetParam(Obj, Param);
+            return value as ValueReader ?? ToNumber<float>(value); 
+        }
+        internal override int GetIntValue()
+        {
+            object value = ClassFactory.GetParam(Obj, Param);
+            return value as ValueReader ?? ToNumber<int>(value); 
+        }
+        
+        internal override long GetLongValue() 
+        {
+            object value = ClassFactory.GetParam(Obj, Param);
+            return value as ValueReader ?? ToNumber<long>(value); 
+        }
+
+        internal override bool GetBoolValue()
+        {
+            object value = ClassFactory.GetParam(Obj, Param);
+            return value as ValueReader ?? ToBool(value); 
+        }
+
+        internal override string GetStrValue()
+        {
+            object value = ClassFactory.GetParam(Obj, Param);
+            return value as ValueReader ?? value.ToString();
+        }
+
+        internal override PreferedType PreferedRetType()
+        {
+            object value = ClassFactory.GetParam(Obj, Param);
+            ValueReader reader = value as ValueReader;
+            return reader == null? NativeReturnType(value) : reader.PreferedRetType();
+        }
 
         internal override ValueWriter ConvertToWriter() { return new ParameterValueWriter(this); }
     }

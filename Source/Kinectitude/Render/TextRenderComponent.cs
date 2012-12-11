@@ -91,7 +91,7 @@ namespace Kinectitude.Render
         }
 
         private float fontSize;
-        [PluginProperty("Font Size", "")]
+        [PluginProperty("Font Size", "", 12)]
         public float FontSize
         {
             get { return fontSize; }
@@ -106,7 +106,7 @@ namespace Kinectitude.Render
         }
 
         private string fontColor;
-        [PluginProperty("Font Color", "")]
+        [PluginProperty("Font Color", "", "black")]
         public string FontColor
         {
             get { return fontColor; }
@@ -121,7 +121,7 @@ namespace Kinectitude.Render
         }
 
         private string locale;
-        [PluginProperty("Locale", "")]
+        [PluginProperty("Locale", "", "en-us")]
         public string Locale
         {
             get { return locale; }
@@ -151,7 +151,7 @@ namespace Kinectitude.Render
         }
 
         private int tabSize;
-        [PluginProperty("Tab Size", "")]
+        [PluginProperty("Tab Size", "", 4)]
         public int TabSize
         {
             get { return tabSize; }

@@ -37,12 +37,10 @@ namespace Kinectitude.Core.Base
             new Dictionary<Type, Dictionary<string, Action<object, object>>>();
 
         //empty constructors
-        private static readonly Dictionary<string, Func<object>> constructors =
-            new Dictionary<string, Func<object>>();
+        private static readonly Dictionary<string, Func<object>> Constructors = new Dictionary<string, Func<object>>();
 
         //empty constructors
-        private static readonly Dictionary<Type, Func<object>> ConstructorTypes =
-            new Dictionary<Type, Func<object>>();
+        private static readonly Dictionary<Type, Func<object>> ConstructorTypes = new Dictionary<Type, Func<object>>();
 
         //used to get the required types of a component
         private static readonly Dictionary<Type, List<Type>> componentNeeds = new Dictionary<Type, List<Type>>();
@@ -93,11 +91,13 @@ namespace Kinectitude.Core.Base
 
         internal static void RegisterFunction(string registeredName, MethodInfo methodInfo)
         {
+            //if (FunctionHolder.HasFunction(registeredName)) Game.CurrentGame.Die("The function " + registeredName + " is declared twice");
             FunctionHolder.AddFunction(registeredName, methodInfo);
         }
 
         internal static void RegisterType(string registeredName, Type type)
         {
+            //if (Constructors.ContainsKey(registeredName)) Game.CurrentGame.Die("The class " + registeredName + "  is declared twice");
             if (typeof(Component).IsAssignableFrom(type))
             {
                 List<Type> provides = new List<Type>();
@@ -119,8 +119,8 @@ namespace Kinectitude.Core.Base
             }
 
             Func<object> creator;
-            if (ConstructorTypes.TryGetValue(type, out creator)) constructors[registeredName] = creator;
-            else constructors[registeredName] = ConstructorTypes[type] = createConstructorDelegate(type);
+            if (ConstructorTypes.TryGetValue(type, out creator)) Constructors[registeredName] = creator;
+            else Constructors[registeredName] = ConstructorTypes[type] = createConstructorDelegate(type);
 
             settersByType[type] = new Dictionary<string, Action<object, object>>();
             referedDictionary[type] = registeredName;
@@ -158,7 +158,7 @@ namespace Kinectitude.Core.Base
 
         internal static T Create<T>(string name) where T : class
         {
-            return CreateHelper<T, string>(name, constructors);
+            return CreateHelper<T, string>(name, Constructors);
         }
 
         internal static T Create<T>(Type type) where T : class
@@ -177,12 +177,6 @@ namespace Kinectitude.Core.Base
 
             Action<object, object> action = setters[param] as Action<object, object>;
 
-            var p = Expression.Parameter(typeof(ValueReader));
-            var tmp = new ConstantReader(10);
-            var convert = Expression.Convert(p, typeof(string));
-            var call = Expression.Lambda<Func<ValueReader, string>>(convert, p);
-            var compiled = call.Compile();
-
             //TODO make this more effecient, just make the set in here.
             action(obj, val);
         }
@@ -195,11 +189,43 @@ namespace Kinectitude.Core.Base
 
         private static Func<object> createConstructorDelegate(Type type)
         {
-            return Expression.Lambda<Func<object>>(
-                Expression.New(
-                    type.GetConstructor(Type.EmptyTypes)
-                )
-            ).Compile();
+            ParameterExpression setAs = Expression.Parameter(typeof(object));
+            ParameterExpression var = Expression.Variable(type);
+            List<Expression> rest = new List<Expression>();
+            rest.Add(Expression.Assign(var, Expression.New(type.GetConstructor(Type.EmptyTypes))));
+            List<ParameterExpression> varExprs = new List<ParameterExpression>();
+            varExprs.Add(var);
+            LabelTarget target = Expression.Label(typeof(object));
+
+            foreach (PropertyInfo pi in type.GetProperties().Where(pi => Attribute.IsDefined(pi, typeof(PluginPropertyAttribute))))
+            {
+                PluginPropertyAttribute pluginAttribute = pi.GetCustomAttributes(typeof(PluginPropertyAttribute), true)[0] as PluginPropertyAttribute;
+
+                Type propertyType = pi.PropertyType;
+
+                
+                Expression setBody;
+                if (propertyType == typeof(ValueReader))
+                {
+                    ValueReader value = ConstantReader.CacheOrCreate(pluginAttribute.DefaultValue);
+                    setBody = pluginAttribute.DefaultValue == null ? (Expression)Expression.Constant(ConstantReader.NullValue) : Expression.Constant(value);
+                }
+                else
+                {
+                    Expression set;
+                    set = pluginAttribute.DefaultValue == null ? (Expression)Expression.Default(propertyType) : Expression.Constant(pluginAttribute.DefaultValue);
+                    setBody = Expression.Convert(set, propertyType);
+                }
+                
+                MethodCallExpression setExpr = Expression.Call(var, pi.GetSetMethod(), setBody);
+                rest.Add(setExpr);
+            }
+
+            rest.Add(Expression.Return(target, var, typeof(object)));
+            rest.Add(Expression.Label(target, var));
+            Expression<Func<object>> createAndSet = Expression.Lambda<Func<object>>(Expression.Block(varExprs, rest));
+            while (createAndSet.CanReduce)createAndSet = (Expression<Func<object>>) createAndSet.Reduce();
+            return createAndSet.Compile();
         }
 
         private static void createDelegate(PropertyInfo pi, out Action<object,object> setter, out Func<object, object> getter)

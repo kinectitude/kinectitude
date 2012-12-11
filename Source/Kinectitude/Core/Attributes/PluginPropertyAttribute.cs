@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Kinectitude.Core.Attributes
 {
-    [AttributeUsage(AttributeTargets.Property, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public class PluginPropertyAttribute : Attribute
     {
         private readonly string name;

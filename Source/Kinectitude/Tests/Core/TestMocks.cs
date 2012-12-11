@@ -13,7 +13,7 @@ using Kinectitude.Core.Managers;
 
 namespace Kinectitude.Tests.Core
 {
-    public enum TestEnum { value1, value2 }
+    public enum TestEnum { value1, value2, value3 }
 
     [Plugin("Assertion", "")]
     public class AssertionAction : Action
@@ -109,8 +109,8 @@ namespace Kinectitude.Tests.Core
     [Plugin("MockComponent", "")]
     public class MockComponent : Component
     {
-        private int intVal = 0;
-        [PluginProperty("int", "")]
+        private int intVal;
+        [PluginProperty("int", "", 10)]
         public int IntVal { 
             get { return intVal; }
             set
@@ -123,7 +123,7 @@ namespace Kinectitude.Tests.Core
             }
         }
         double doubleVal = 0;
-        [PluginProperty("double", "")]
+        [PluginProperty("double", "", 10.1)]
         public double DoubleVal
         {
             get { return doubleVal; }
@@ -137,7 +137,7 @@ namespace Kinectitude.Tests.Core
             }
         }
         string strVal = "";
-        [PluginProperty("string", "")]
+        [PluginProperty("string", "", "ROFL")]
         public string StrVal
         {
             get { return strVal; }
@@ -151,7 +151,7 @@ namespace Kinectitude.Tests.Core
             }
         }
         bool boolVal = false;
-        [PluginProperty("bool", "")]
+        [PluginProperty("bool", "", true)]
         public bool BoolVal
         {
             get { return boolVal; }
@@ -164,8 +164,8 @@ namespace Kinectitude.Tests.Core
                 }
             }
         }
-        TestEnum enumVal = TestEnum.value1;
-        [PluginProperty("enum", "")]
+        TestEnum enumVal;
+        [PluginProperty("enum", "", TestEnum.value3)]
         public TestEnum EnumVal
         {
             get { return enumVal; }
@@ -178,8 +178,8 @@ namespace Kinectitude.Tests.Core
                 }
             }
         }
-        ValueReader readerVal = null;
-        [PluginProperty("reader", "")]
+        ValueReader readerVal;
+        [PluginProperty("reader", "", true)]
         public ValueReader ReaderVal
         {
             get { return readerVal; }

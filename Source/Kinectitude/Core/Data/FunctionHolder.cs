@@ -27,6 +27,8 @@ namespace Kinectitude.Core.Data
             fh.addFunction(callInfo);
         }
 
+        internal static bool HasFunction(string name) { return Holders.ContainsKey(name); }
+
         internal static FunctionHolder getFunctionHolder(string name)
         {
             FunctionHolder fh = null;

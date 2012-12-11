@@ -53,7 +53,7 @@ namespace Kinectitude.Render
         }
 
         private float lineThickness;
-        [PluginProperty("Line Thickness", "")]
+        [PluginProperty("Line Thickness", "", 0.0f)]
         public float LineThickness
         {
             get { return lineThickness; }
@@ -68,7 +68,7 @@ namespace Kinectitude.Render
         }
 
         private string linecolor;
-        [PluginProperty("Line Color", "")]
+        [PluginProperty("Line Color", "", "Black")]
         public string LineColor
         {
             get { return linecolor; }
@@ -82,11 +82,7 @@ namespace Kinectitude.Render
             }
         }
 
-        public RenderComponent()
-        {
-            LineColor = "Black";
-            LineThickness = 0.0f;
-        }
+        public RenderComponent() { }
 
         protected override void OnRender(RenderTarget renderTarget)
         {

@@ -14,7 +14,7 @@ Game (Width = 800, Height=600, FirstScene="test", IsFullScreen="false", X="15"){
             Assertion(LS=this.Transform.X, RS=1000, Assertion="Prototype1 X", OnlyRunIf=this.TESTVAL == 1)
             Assertion(LS=this.Transform.Y, RS=2000, Assertion="Prototype1 Y", OnlyRunIf=this.TESTVAL == 1)
             Assertion(LS=this.score, RS=100, Assertion="Prototype1 score", OnlyRunIf=this.TESTVAL == 1)
-            Assertion(LS=this.MockComponent2.DoubleVal, RS=0, Assertion="Prototype1 mock2 double val", OnlyRunIf=this.TESTVAL == 1)
+            Assertion(LS=this.MockComponent2.DoubleVal, RS=10.1, Assertion="Prototype1 mock2 double val", OnlyRunIf=this.TESTVAL == 1)
             Assertion(LS=this.Z, RS="X", Assertion="Prototype1 inheritance Z", OnlyRunIf= "true")
             Assertion(LS=this.MockComponent.IntVal, RS=1000, Assertion="Prototype1 mock int val", OnlyRunIf=this.TESTVAL == 1)
         }

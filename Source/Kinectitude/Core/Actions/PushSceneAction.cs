@@ -7,7 +7,7 @@ namespace Kinectitude.Core.Actions
     [Plugin("Push Scene {Target}", "")]
     public sealed class PushSceneAction : Action
     {
-        [PluginProperty("Scene", "")]
+        [PluginProperty("Target", "")]
         public ValueReader Target { get; set; }
 
         public PushSceneAction() { }

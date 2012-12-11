@@ -27,7 +27,7 @@
     <Component Type="RenderComponent" FillColor="Yellow" Shape="Ellipse" />
     <!--<Component Type="ImageRenderComponent" Image="tennisball.png" Animated="false"/>-->
     <Component Type="TransformComponent" X="400" Y="300" Width="32" Height="32"/>
-    <Component Type="PhysicsComponent" MinimumVelocity="10" MaximumVelocity="25" Shape="Ellipse" Restitution="1" Mass="1" Friction="0" FixedRotation="true"/>
+    <Component Type="PhysicsComponent" MinimumSpeed="10" MaximumSpeed="25" Shape="Ellipse" Restitution="1" Mass="1" Friction="0" FixedRotation="true"/>
     
     <Event Type="TriggerOccursEvent" Trigger="create{scene.next}">
       <Action Type="SetAction" Target="id" Value="{scene.next}"/>
@@ -76,7 +76,7 @@
   <Prototype Name="basePlayer" lr="true" positive="true">
     <Component Type="TransformComponent" X="400" Y="558" Width="39" Height="44" />
     <Component Type="ImageRenderComponent" Image="sonicSprites.png" Animated="false" Duration="1.4" />
-    <Component Type="PhysicsComponent" MaximumVelocity="70" Shape="Rectangle" Restitution="1" Friction="0" MovesWhenHit="false" FixedRotation="true" IgnoreCollisionsWith="$wall $basePlayer"/>
+    <Component Type="PhysicsComponent" MaximumSpeed="70" Shape="Rectangle" Restitution="1" Friction="0" MovesWhenHit="false" FixedRotation="true" IgnoreCollisionsWith="$wall $basePlayer"/>
 
     <Event Type="AttributeChangesEvent" Target="{this.PhysicsComponent.XVelocity}">
       <Action Type="FireTriggerAction" Name="motionChange"/>

@@ -16,7 +16,7 @@ Game (Width = 800, Height=600, FirstScene="test", IsFullScreen=false, val=0){
 				Assertion(LS=Min(1.1, 10, 100), RS=1.1, Assertion="min", OnlyRunIf= true)
 				Assertion(LS=Max(1.1, 10, 100), RS=100, Assertion="max", OnlyRunIf= true)
 				Assertion(LS=Bool("lol"), RS=true, Assertion="bool", OnlyRunIf= true)
-				Assertion(LS=Decimal(true), RS=1, Assertion="decimal", OnlyRunIf= true)
+				Assertion(LS=Number(true), RS=1, Assertion="number", OnlyRunIf= true)
 				Assertion(LS=String(1) + 1, RS="11", Assertion="str", OnlyRunIf= true)
 				Assertion(LS=Ln(E), RS=1, Assertion="ln", OnlyRunIf= true)
 				Assertion(LS=Log(10), RS=1, Assertion="log", OnlyRunIf= true)

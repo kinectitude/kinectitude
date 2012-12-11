@@ -2,7 +2,7 @@
 
 namespace Kinectitude.Core.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
     public class PluginAttribute : Attribute
     {
         private readonly string header;

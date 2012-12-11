@@ -19,7 +19,7 @@ namespace Kinectitude.Tests.Core
             AssertionAction.CheckValue("min");
             AssertionAction.CheckValue("max");
             AssertionAction.CheckValue("bool");
-            AssertionAction.CheckValue("decimal");
+            AssertionAction.CheckValue("number");
             AssertionAction.CheckValue("str");
             AssertionAction.CheckValue("ln");
             AssertionAction.CheckValue("log", 2);

@@ -18,9 +18,9 @@ namespace Kinectitude.Core.ComponentInterfaces
 
         float LinearDamping { get; set; }
 
-        float MaximumVelocity { get; set; }
+        float MaximumSpeed { get; set; }
 
-        float MinimumVelocity { get; set; }
+        float MinimumSpeed { get; set; }
 
         bool MovesWhenHit { get; set; }
     }

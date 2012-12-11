@@ -1,0 +1,20 @@
+﻿using Kinectitude.Tests.dll{
+    define MockComponent as Kinectitude.Tests.Core.MockComponent
+    define Assertion as Kinectitude.Tests.Core.AssertionAction
+}
+
+Game (Width = 800, Height=600, FirstScene="test", IsFullScreen=false, val=0){
+    Scene test(score = 0, val = 1){
+        Entity runTests(val = 2){
+            Component MockComponent()
+            Event SceneStarts(){
+                Assertion(LS=10, RS=MockComponent.IntVal, Assertion="Int", OnlyRunIf= true)
+                Assertion(LS=10.1, RS=MockComponent.DoubleVal, Assertion="Double", OnlyRunIf= true)
+                Assertion(LS="ROFL", RS=MockComponent.StrVal, Assertion="Str", OnlyRunIf= true)
+                Assertion(LS=true, RS=MockComponent.BoolVal, Assertion="Bool", OnlyRunIf= true)
+                Assertion(LS="value3", RS=MockComponent.EnumVal, Assertion="Enum", OnlyRunIf= true)
+                Assertion(LS=true, RS=MockComponent.ReaderVal, Assertion="Reader", OnlyRunIf= true, Type=true)
+            }
+        }
+    }
+}
