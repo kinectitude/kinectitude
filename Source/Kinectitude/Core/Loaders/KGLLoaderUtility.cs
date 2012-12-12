@@ -183,25 +183,32 @@ namespace Kinectitude.Core.Loaders
             throw new NotImplementedException("Error with implementation of operator " + op.Name);
         }
 
-        private ValueReader binOpCreate(BnfTerm op, ValueReader left, ValueReader right)
+        private ValueReader binOpCreate(KinectitudeGrammar.OpCode op, ValueReader left, ValueReader right)
         {
-            if (grammar.Eql == op) return new EqlOpReader(left, right);
-            if (grammar.Lt == op) return new GtOpReader(right, left);
-            if (grammar.Gt == op) return new GtOpReader(left, right);
-            if (grammar.Le == op) return new GeOpReader(right, left);
-            if (grammar.Ge == op) return new GeOpReader(left, right);
-            if (grammar.Neq == op) return new NeqOpReader(left, right);
-            if (grammar.Plus == op) return new PlusOpReader(left, right);
-            if (grammar.Minus == op) return new MinusOpReader(left, right);
-            if (grammar.Mult == op) return new MultOpReader(left, right);
-            if (grammar.Rem == op) return new RemOpReader(left, right);
-            if (grammar.Pow == op) return new PowOpReader(left, right);
-            if (grammar.And == op) return new AndOpReader(left, right);
-            if (grammar.Or == op) return new OrOpReader(left, right);
-            if (grammar.LeftShift == op) return new LeftShiftOpReader(left, right);
-            if (grammar.RightShift == op) return new RightShiftOpReader(left, right);
-            if (grammar.Div == op) return new DivOpReader(left, right);
-            throw new NotImplementedException("Error with implementation of operator " + op.Name);
+            switch (op)
+            {
+                case KinectitudeGrammar.OpCode.And: return new AndOpReader(left, right);
+                case KinectitudeGrammar.OpCode.Div: return new DivOpReader(left, right);
+                case KinectitudeGrammar.OpCode.Eql: return new EqlOpReader(left, right);
+                case KinectitudeGrammar.OpCode.Ge: return new GeOpReader(left, right);
+                case KinectitudeGrammar.OpCode.Gt: return new GtOpReader(left, right);
+                case KinectitudeGrammar.OpCode.Le: return new GeOpReader(right, left);
+                case KinectitudeGrammar.OpCode.LeftShift: return new LeftShiftOpReader(left, right);
+                case KinectitudeGrammar.OpCode.Lt: return new GtOpReader(right, left);
+                case KinectitudeGrammar.OpCode.Minus: return new MinusOpReader(left, right);
+                case KinectitudeGrammar.OpCode.Mult: return new MultOpReader(left, right);
+                case KinectitudeGrammar.OpCode.Neq: return new NeqOpReader(left, right);
+                case KinectitudeGrammar.OpCode.Or: return new OrOpReader(left, right);
+                case KinectitudeGrammar.OpCode.Plus: return new PlusOpReader(left, right);
+                case KinectitudeGrammar.OpCode.Pow: return new PowOpReader(left, right);
+                case KinectitudeGrammar.OpCode.Rem: return new RemOpReader(left, right);
+                case KinectitudeGrammar.OpCode.RightShift: return new RightShiftOpReader(left, right);
+                case KinectitudeGrammar.OpCode.Becomes: return right;
+                default: 
+                    Game.CurrentGame.Die("Error with implementation of operator " + op);
+                    return null;
+
+            }
         }
 
         private DataContainer getDataContainer(Scene scene, Entity entity, string name)
@@ -303,7 +310,8 @@ namespace Kinectitude.Core.Loaders
             {
                 ValueReader left = makeValueReader(node.ChildNodes[0], scene, entity, evt);
                 ValueReader right = makeValueReader(node.ChildNodes[2], scene, entity, evt);
-                return binOpCreate(node.ChildNodes[1].ChildNodes[0].Term, left, right);
+                KinectitudeGrammar.OpCode opCode = grammar.OpLookup[node.ChildNodes[1].ChildNodes[0].Term];
+                return binOpCreate(opCode, left, right);
             }
             else if (node.ChildNodes.Count == 1 && node.ChildNodes[0].Term == grammar.Expr)
             {
@@ -351,8 +359,8 @@ namespace Kinectitude.Core.Loaders
         {
             if (type == null) return rs;
             ParseTreeNode binOpNode = type as ParseTreeNode;
-            BnfTerm binOp = binOpNode.ChildNodes[0].Term;
-            return binOpCreate(binOp, ls, rs);
+            KinectitudeGrammar.OpCode opCode = grammar.OpLookup[binOpNode.Term];
+            return binOpCreate(opCode, ls, rs);
         }
 
         public IEnumerable<Tuple<string, string>> GetDefines(object from)

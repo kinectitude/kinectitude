@@ -37,12 +37,48 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         public void Visit(Assignment assignment)
         {
-            throw new NotImplementedException();
+            StringBuilder sb = new StringBuilder(tabs()).Append(assignment.Key).Append(" ");
+
+            switch (assignment.Operator)
+            {
+                case AssignmentOperator.And:
+                    sb.Append("&");
+                    break;
+                case AssignmentOperator.Decrement:
+                    sb.Append("-");
+                    break;
+                case AssignmentOperator.Divide:
+                    sb.Append("/");
+                    break;
+                case AssignmentOperator.Increment:
+                    sb.Append("+");
+                    break;
+                case AssignmentOperator.Multiply:
+                    sb.Append("*");
+                    break;
+                case AssignmentOperator.Or:
+                    sb.Append("|");
+                    break;
+                case AssignmentOperator.Power:
+                    sb.Append("^");
+                    break;
+                case AssignmentOperator.Remainder:
+                    sb.Append("%");
+                    break;
+                case AssignmentOperator.ShiftLeft:
+                    sb.Append("<<");
+                    break;
+                case AssignmentOperator.ShiftRight:
+                    sb.Append(">>");
+                    break;
+            }
+            sb.Append("= ").Append(assignment.Value);
+            result = sb.ToString();
         }
 
         public void Visit(Attribute attribute)
         {
-            result = attribute.Key + '=' + attribute.Value;
+            result = attribute.Key + " = " + attribute.Value;
         }
 
         public void Visit(Component component)
@@ -101,7 +137,16 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         public void Visit(ForLoop loop)
         {
-            throw new NotImplementedException();
+            string tabin = tabs();
+            StringBuilder sb = new StringBuilder(tabin).Append("for(").Append(loop.PreExpression).Append("; ")
+                .Append(loop.Expression).Append("; ").Append(loop.PostExpression).Append(")").Append(OpenDef);
+
+            numTabs++;
+            sb.Append(visitMembers<GameModel>(loop.Children, "\n", allValid)).Append(tabs());
+            numTabs--;
+
+            sb.Append("\n").Append(tabin).Append(CloseDef);
+            result = sb.ToString();
         }
 
         public void Visit(Game game)
@@ -177,7 +222,16 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         public void Visit(WhileLoop loop)
         {
-            throw new NotImplementedException();
+            string tabin = tabs();
+            StringBuilder sb = new StringBuilder(tabin).Append("while(").Append("; ")
+                .Append(loop.Expression).Append("; ").Append(")").Append(OpenDef);
+
+            numTabs++;
+            sb.Append(visitMembers<GameModel>(loop.Children, "\n", allValid)).Append(tabs());
+            numTabs--;
+
+            sb.Append("\n").Append(tabin).Append(CloseDef);
+            result = sb.ToString();
         }
 
         private string properties<T>(IEnumerable<T> properties) where T : AbstractProperty

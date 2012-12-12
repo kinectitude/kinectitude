@@ -13,10 +13,12 @@ namespace Kinectitude.Editor.Models.Statements.Assignments
         Decrement,
         Divide,
         Multiply,
+        Remainder,
+        Power,
         ShiftRight,
         ShiftLeft,
-        BitwiseAnd,
-        BitwiseOr
+        And,
+        Or
     }
 
     internal abstract class AbstractAssignment : AbstractStatement

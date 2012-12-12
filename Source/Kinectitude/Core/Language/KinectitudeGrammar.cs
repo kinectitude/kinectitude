@@ -15,7 +15,7 @@ namespace Kinectitude.Core.Language
     internal sealed class KinectitudeGrammar : Grammar
     {
         internal readonly IdentifierTerminal Identifier = TerminalFactory.CreateCSharpIdentifier("Identifier");
-        internal readonly Terminal Number = TerminalFactory.CreateCSharpNumber("Number");
+        internal readonly NumberLiteral Number = TerminalFactory.CreateCSharpNumber("Number");
         internal readonly Terminal Str = TerminalFactory.CreateCSharpString("Str");
         internal readonly Terminal ClassName = new RegexBasedTerminal("ClassName", @"@?[a-z_A-Z]\w+(?:\.@?[a-z_A-Z]\w+)*");
 
@@ -66,11 +66,23 @@ namespace Kinectitude.Core.Language
         #region operator terminals
         //ToTerm needs an instance, but reference to these are needed.
         internal readonly Terminal Becomes, Eql, Lt, Gt, Le, Ge, Neq, Plus, Minus, Mult, Div, Rem, Pow, And, Or, Not,
-            LeftShift, RightShift;
+            LeftShift, RightShift, BPlus, BMinus, BMult, BDiv, BRem, BPow, BAnd, BOr, BLeftShift, BRightShift;
         #endregion
+
+        internal enum OpCode { Becomes, Plus, Minus, Div, Mult, Rem, Pow, And, Or, Eql, Neq, Gt, Ge, Lt, Le, LeftShift, RightShift };
+
+        public readonly Dictionary<BnfTerm, OpCode> OpLookup = new Dictionary<BnfTerm, OpCode>();
 
         public KinectitudeGrammar()
         {
+            Number.DefaultFloatType = TypeCode.Double;
+            Number.DefaultIntTypes =  new TypeCode [] { TypeCode.Int64 };
+
+            CommentTerminal lineComment = new CommentTerminal("Line Comment", "//", "\r\n", "\n");
+            CommentTerminal blockComment = new CommentTerminal("Block Comment", "/*", "*/");
+            NonGrammarTerminals.Add(lineComment);
+            NonGrammarTerminals.Add(blockComment);
+
             #region constants
             Constants.Add("true", ConstantReader.TrueValue);
             Constants.Add("false",ConstantReader.FalseValue);
@@ -103,6 +115,38 @@ namespace Kinectitude.Core.Language
             Not = new RegexBasedTerminal("Not", @"!|(not)");
             LeftShift = ToTerm("<<", "leftShitf");
             RightShift = ToTerm(">>", "RightShift");
+            BPlus = ToTerm("+=", "Plus Equals");
+            BMinus = ToTerm("-=", "Minus Equals");
+            BMult = ToTerm("*=", "Mult Equals");
+            BDiv = ToTerm("/=", "Div Equals");
+            BRem = ToTerm("%=", "Rem Equals");
+            BPow = ToTerm("^=", "Pow Equals");
+            BAnd = ToTerm("&=", "And Equals");
+            BOr = ToTerm("|=", "Or Equals");
+            BLeftShift = ToTerm("<<=", "LShift Equals");
+            BRightShift = ToTerm(">>=", "RShift Equals");
+
+            NonTerminal becomesExpr = new NonTerminal("Becomes expr");
+            becomesExpr.Rule = BPlus | BMinus | BDiv | BMult | BRem | BPow | BAnd | BOr | BLeftShift | BRightShift | Becomes;
+
+            OpLookup[Plus] = OpLookup[BPlus] = OpCode.Plus;
+            OpLookup[Minus] = OpLookup[BMinus] = OpCode.Minus;
+            OpLookup[Div] = OpLookup[BDiv] = OpCode.Div;
+            OpLookup[Mult] = OpLookup[BMult] = OpCode.Mult;
+            OpLookup[Rem] = OpLookup[BRem] = OpCode.Rem;
+            OpLookup[Pow] = OpLookup[BPow] = OpCode.Pow;
+            OpLookup[And] = OpLookup[BAnd] = OpCode.And;
+            OpLookup[Or] = OpLookup[BOr] = OpCode.Or;
+            OpLookup[LeftShift] = OpLookup[BLeftShift] = OpCode.LeftShift;
+            OpLookup[RightShift] = OpLookup[BRightShift] = OpCode.RightShift;
+            OpLookup[Becomes] = OpCode.Becomes;
+
+            OpLookup[Lt] = OpCode.Lt;
+            OpLookup[Le] = OpCode.Le;
+            OpLookup[Gt] = OpCode.Gt;
+            OpLookup[Ge] = OpCode.Ge;
+            OpLookup[Neq] = OpCode.Neq;
+            OpLookup[Eql] = OpCode.Eql;
             #endregion
 
             #region values
@@ -208,7 +252,7 @@ namespace Kinectitude.Core.Language
 
             Action.Rule = Identifier + BasicDefinition;
 
-            Assignment.Rule = exactValue + Becomes + Expr | exactValue + BinOp + Becomes + Expr;
+            Assignment.Rule = exactValue + becomesExpr + Expr;
 
             Actions.Rule = Condition + optionalActions | Action + optionalActions | Assignment + optionalActions | Loop + optionalActions;
             optionalActions.Rule = Actions | Empty;
@@ -242,7 +286,7 @@ namespace Kinectitude.Core.Language
             MarkReservedWords("using", "define", "if", "true", "false", "Pi", "E", "else", "while", "for");
             MarkTransient(BasicDefinition, value, IsPrototype, term, exactValue, optionalActions, optionalEvt, optionalComponent, 
                 optionalProperties, optionalManager, optionalPrototype, optionalService, optionalUses, optionalDefinitions,
-                optionalEntity, optionalScene, optionalIdentifier, optionalAssignment);
+                optionalEntity, optionalScene, optionalIdentifier, optionalAssignment, becomesExpr);
         }
     }
 }

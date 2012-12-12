@@ -34,6 +34,7 @@ Game (Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = false, Nam
             YVelocity = -20, Shape = "Ellipse", Restitution = 1, Mass = 1, Friction = 0, 
             LinearDamping = 0, MovesWhenHit = true, AngularVelocity = 1, FixedRotation = false)
         Event TriggerOccurs(Trigger = "gameOver"){
+			//Destroy can only be called in the same entity
             Destroy()
         }
     }
