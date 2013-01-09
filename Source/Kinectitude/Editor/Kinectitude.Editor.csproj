@@ -56,6 +56,12 @@
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>signature.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Irony, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ca48ace7223ead47, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -130,9 +136,6 @@
     <Compile Include="Storage\ProjectStorage.cs" />
     <Compile Include="Storage\Kgl\KglGameStorage.cs" />
     <Compile Include="Storage\Kgl\KglGameVisitor.cs" />
-    <Compile Include="Storage\Xml\XmlGameVisitor.cs" />
-    <Compile Include="Storage\Xml\XmlConstants.cs" />
-    <Compile Include="Storage\Xml\XmlGameStorage.cs" />
     <Compile Include="Models\Statements\Actions\AbstractAction.cs" />
     <Compile Include="Models\Statements\Conditions\AbstractCondition.cs" />
     <Compile Include="Models\Statements\Events\AbstractEvent.cs" />
@@ -313,9 +316,8 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <EmbeddedResource Include="Storage\Xml\schema.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
+    <None Include="public.snk" />
+    <None Include="signature.snk" />
     <Resource Include="Icons\bin_closed.png" />
     <Resource Include="Icons\cog_add.png" />
     <Resource Include="Icons\tag.png" />

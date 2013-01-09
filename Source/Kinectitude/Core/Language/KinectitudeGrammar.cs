@@ -73,6 +73,57 @@ namespace Kinectitude.Core.Language
 
         public readonly Dictionary<BnfTerm, OpCode> OpLookup = new Dictionary<BnfTerm, OpCode>();
 
+        public string GetName(ParseTreeNode node)
+        {
+            ParseTreeNode nameNode = node.ChildNodes.FirstOrDefault(child => child.Term == Identifier);
+            return nameNode == null ? null : nameNode.Token.ValueString;
+        }
+
+        public IEnumerable<string> GetPrototypes(ParseTreeNode node)
+        {
+            node = node.ChildNodes.First(child => child.Term == EntityDefinition);
+            List<ParseTreeNode> names = new List<ParseTreeNode>();
+            getOfTypeHelper(node, Names, names);
+            //Names should only have name as a child EVER.
+            foreach (ParseTreeNode name in names) yield return name.ChildNodes[0].Token.ValueString;
+        }
+
+        public IEnumerable<ParseTreeNode> GetOfType(ParseTreeNode node, NonTerminal nonTerm)
+        {
+            List<ParseTreeNode> nodes = new List<ParseTreeNode>();
+
+            if (nonTerm == Actions)
+            {
+                List<ParseTreeNode> firstType = new List<ParseTreeNode>();
+
+                HashSet<NonTerminal> valids = new HashSet<NonTerminal>() { Action, Condition, Assignment, Loop };
+
+                getOfTypeHelper(node, nonTerm, firstType);
+                foreach (ParseTreeNode singular in firstType) getOfTypeHelper(singular, valids, nodes);
+                return nodes;
+            }
+
+            //There should be one entity definition per entity
+            if (nonTerm == Component || nonTerm == Evt) node = node.ChildNodes.First(child => child.Term == EntityDefinition);
+
+            getOfTypeHelper(node, nonTerm, nodes);
+            return nodes;
+        }
+
+        private void getOfTypeHelper(ParseTreeNode node, NonTerminal type, List<ParseTreeNode> nodes)
+        {
+            IEnumerable<ParseTreeNode> correctTypedNodes = node.ChildNodes.Where(child => child.Term == type);
+            nodes.AddRange(correctTypedNodes);
+            foreach (ParseTreeNode child in correctTypedNodes) getOfTypeHelper(child, type, nodes);
+        }
+
+        private void getOfTypeHelper(ParseTreeNode node, HashSet<NonTerminal> type, List<ParseTreeNode> nodes)
+        {
+            IEnumerable<ParseTreeNode> correctTypedNodes = node.ChildNodes.Where(child => type.Contains(child.Term));
+            nodes.AddRange(correctTypedNodes);
+            foreach (ParseTreeNode child in correctTypedNodes) getOfTypeHelper(child, type, nodes);
+        }
+
         public KinectitudeGrammar()
         {
             Number.DefaultFloatType = TypeCode.Double;

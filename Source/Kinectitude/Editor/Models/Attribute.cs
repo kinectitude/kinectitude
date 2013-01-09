@@ -77,7 +77,7 @@ namespace Kinectitude.Editor.Models
         }
 
         [DependsOn("IsLocal")]
-        public string Value
+        public object Value
         {
             get
             {
@@ -100,7 +100,7 @@ namespace Kinectitude.Editor.Models
                         () => Value = oldValue
                     );
 
-                    this.value = value;
+                    this.value = value.ToString();
                     NotifyPropertyChanged("Value");
                 }
             }

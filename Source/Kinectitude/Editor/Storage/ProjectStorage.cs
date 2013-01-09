@@ -1,5 +1,5 @@
 ﻿using Kinectitude.Editor.Models;
-using Kinectitude.Editor.Storage.Xml;
+using Kinectitude.Editor.Storage.Kgl;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,11 +26,7 @@ namespace Kinectitude.Editor.Storage
 
             if (file.Extension == ".kgl")
             {
-                //storage = new KglGameStorage(file);
-            }
-            else if (file.Extension == ".xml")
-            {
-                storage = new XmlGameStorage(file);
+                storage = new KglGameStorage(file);
             }
 
             return storage;
@@ -48,7 +44,7 @@ namespace Kinectitude.Editor.Storage
 
             if (string.IsNullOrEmpty(project.GameFile))
             {
-                project.GameFile = "game.xml";  // TODO: This is a temporary fix until we require GameFile to always exist
+                project.GameFile = "game.kgl";  // TODO: This is a temporary fix until we require GameFile to always exist
             }
 
             IGameStorage storage = CreateGameStorage(new FileInfo(Path.Combine(gameRoot.ToString(), project.GameFile)));

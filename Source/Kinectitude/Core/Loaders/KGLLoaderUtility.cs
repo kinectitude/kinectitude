@@ -22,7 +22,6 @@ namespace Kinectitude.Core.Loaders
         public object EventType { get { return grammar.Evt; } }
         public object ComponentType { get { return grammar.Component; } }
         public object UsingType { get { return grammar.Uses; } }
-        public object DefineType { get { return grammar.Definitions; } }
         public object PrototypeType { get { return grammar.Prototype; } }
         public object SceneType { get { return grammar.Scene; } }
         public object Else { get { return grammar.Else; } }
@@ -45,53 +44,19 @@ namespace Kinectitude.Core.Loaders
             PropertyHolder propertyHolder = new PropertyHolder();
 
             if (grammar.Prototype == node.Term || grammar.Entity == node.Term)
-            {
-                foreach (ParseTreeNode entityDef in GetOfType(from, grammar.EntityDefinition))
-                {
-                    foreach (ParseTreeNode property in GetOfType(entityDef, grammar.Properties))
-                        propertyHolder.AddValue(property.ChildNodes[0].Token.ValueString, property.ChildNodes[1]);
-                }
-            }
-            else
-            {
-                foreach (ParseTreeNode property in GetOfType(from, grammar.Properties))
-                    propertyHolder.AddValue(property.ChildNodes[0].Token.ValueString, property.ChildNodes[1]);
-            }
+                node = node.ChildNodes.First(child => child.Term == grammar.EntityDefinition);
+
+            foreach (ParseTreeNode property in GetOfType(node, grammar.Properties))
+                propertyHolder.AddValue(property.ChildNodes[0].Token.ValueString, property.ChildNodes[1]);
 
             return propertyHolder;
         }
 
-        public string GetName(object from)
-        {
-            ParseTreeNode node = from as ParseTreeNode;
-            ParseTreeNode nameNode = node.ChildNodes.FirstOrDefault(child => child.Term == grammar.Identifier);
-            return nameNode == null ? null : nameNode.Token.ValueString;
-        }
+        public string GetName(object from) { return grammar.GetName(from as ParseTreeNode); }
 
         public IEnumerable<object> GetOfType(object from, object type)
-        {
-            List<ParseTreeNode> nodes = new List<ParseTreeNode>();
-            ParseTreeNode node = from as ParseTreeNode;
-            NonTerminal nonTerm = type as NonTerminal;
-
-            if (nonTerm == ActionType)
-            {
-                List<ParseTreeNode> firstType = new List<ParseTreeNode>();
-                
-                HashSet<NonTerminal> valids = new HashSet<NonTerminal>() { grammar.Action, grammar.Condition, 
-                    grammar.Assignment, grammar.Loop};
-
-                getOfTypeHelper(node, nonTerm, firstType);
-                foreach (ParseTreeNode singular in firstType) getOfTypeHelper(singular, valids, nodes);
-                return nodes;
-            }
-
-            //There should be one entity definition per entity
-            if (nonTerm == ComponentType || nonTerm == EventType)
-                node = node.ChildNodes.First(child => child.Term == grammar.EntityDefinition);
-
-            getOfTypeHelper(node, nonTerm, nodes);
-            return nodes;
+        { 
+            return grammar.GetOfType(from as ParseTreeNode, type as NonTerminal);
         }
 
         public string GetFile(object from)
@@ -156,15 +121,7 @@ namespace Kinectitude.Core.Loaders
             return null;
         }
 
-        public IEnumerable<string> GetPrototypes(object from)
-        {
-            ParseTreeNode node = from as ParseTreeNode;
-            node = node.ChildNodes.First(child => child.Term == grammar.EntityDefinition);
-            List<ParseTreeNode> names = new List<ParseTreeNode>();
-            getOfTypeHelper(node, grammar.Names, names);
-            //Names should only have name as a child EVER.
-            foreach (ParseTreeNode name in names) yield return name.ChildNodes[0].Token.ValueString;
-        }
+        public IEnumerable<string> GetPrototypes(object from) { return grammar.GetPrototypes(from as ParseTreeNode); }
 
         public string GetType(object from)
         {
@@ -180,7 +137,8 @@ namespace Kinectitude.Core.Loaders
         {
             if (grammar.Not == op) return new NotOpReader(value);
             if (grammar.Minus == op) return new NegOpReader(value);
-            throw new NotImplementedException("Error with implementation of operator " + op.Name);
+            Game.CurrentGame.Die("Error with implementation of operator " + op.Name);
+            return null;
         }
 
         private ValueReader binOpCreate(KinectitudeGrammar.OpCode op, ValueReader left, ValueReader right)
@@ -232,8 +190,9 @@ namespace Kinectitude.Core.Loaders
 
         private ValueReader makeParameterReader(Scene scene, Entity entity, string name, string component, string param)
         {
-            object obj = getDataContainer(scene, entity, name).GetChangeable(component);
-            return ParameterValueReader.GetParameterValueReader(obj, param, scene);
+            DataContainer who = getDataContainer(scene, entity, name);
+            object obj = who.GetChangeable(component);
+            return ParameterValueReader.GetParameterValueReader(obj, param, who);
         }
 
         private ValueReader makeDcReader(Scene scene, Entity entity, string name, string param)
@@ -300,8 +259,7 @@ namespace Kinectitude.Core.Loaders
             else if (type0 == grammar.Function)
             {
                 string name = GetName(from);
-                List<ParseTreeNode> arguments  = new List<ParseTreeNode>();
-                getOfTypeHelper(from, grammar.Argument, arguments);
+                IEnumerable<ParseTreeNode> arguments = grammar.GetOfType(from, grammar.Argument);
                 List<ValueReader> argReaders = new List<ValueReader>();
                 foreach (ParseTreeNode argument in arguments) argReaders.Add(makeValueReader(argument.ChildNodes[0], scene, entity, evt));
                 return FunctionReader.getFunctionReader(name, argReaders);
@@ -366,8 +324,7 @@ namespace Kinectitude.Core.Loaders
         public IEnumerable<Tuple<string, string>> GetDefines(object from)
         {
             ParseTreeNode node = from as ParseTreeNode;
-            List<ParseTreeNode> defines = new List<ParseTreeNode>();
-            getOfTypeHelper(node, grammar.Definitions, defines);
+            IEnumerable<ParseTreeNode> defines = grammar.GetOfType(node, grammar.Definitions);
 
             foreach (ParseTreeNode define in defines)
             {
@@ -380,22 +337,6 @@ namespace Kinectitude.Core.Loaders
         {
             ParseTreeNode node = from as ParseTreeNode;
             return node.ChildNodes.FirstOrDefault(child => child.Term == grammar.Expr);
-        }
-
-        private void getOfTypeHelper(ParseTreeNode node, NonTerminal type, List<ParseTreeNode> nodes)
-        {
-            IEnumerable<ParseTreeNode> correctTypedNodes = node.ChildNodes.Where(child => child.Term == type);
-
-            nodes.AddRange(correctTypedNodes);
-            foreach (ParseTreeNode child in correctTypedNodes) getOfTypeHelper(child, type, nodes);
-        }
-
-        private void getOfTypeHelper(ParseTreeNode node, HashSet<NonTerminal> type, List<ParseTreeNode> nodes)
-        {
-            IEnumerable<ParseTreeNode> correctTypedNodes = node.ChildNodes.Where(child => type.Contains(child.Term));
-
-            nodes.AddRange(correctTypedNodes);
-            foreach (ParseTreeNode child in correctTypedNodes) getOfTypeHelper(child, type, nodes);
         }
     }
 }

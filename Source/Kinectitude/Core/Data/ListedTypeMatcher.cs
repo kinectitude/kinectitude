@@ -12,12 +12,15 @@ namespace Kinectitude.Core.Data
 
         public override bool MatchAndSet(IEntity entity)
         {
+            Entity who = entity as Entity;
+            if (null == who) return false;
             foreach (TypeMatcher r in Readables)
             {
+                
                 if (r.MatchAndSet(entity))
                 {
                     OldEntity = Entity;
-                    Entity = entity as Entity;
+                    Entity = who;
                     foreach (Action<DataContainer> toNotify in notify) toNotify(this.Entity);
                     return true;
                 }

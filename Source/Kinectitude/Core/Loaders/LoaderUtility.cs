@@ -16,7 +16,6 @@ namespace Kinectitude.Core.Loaders
         object EventType { get; }
         object ComponentType { get; }
         object UsingType { get; }
-        object DefineType { get; }
         object PrototypeType { get; }
         object SceneType { get; }
         object Else { get; }

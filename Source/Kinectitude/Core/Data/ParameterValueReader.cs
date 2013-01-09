@@ -10,11 +10,11 @@ namespace Kinectitude.Core.Data
     {
         internal readonly object Obj;
         internal readonly string Param;
-        internal readonly DataContainer Owner;
+        internal readonly IDataContainer Owner;
 
-        internal static ParameterValueReader GetParameterValueReader(object obj, string param, Scene scene)
+        internal static ParameterValueReader GetParameterValueReader(object obj, string param, IDataContainer owner)
         {
-            Func<ParameterValueReader> create = new Func<ParameterValueReader>(() => new ParameterValueReader(obj, param, scene));
+            Func<ParameterValueReader> create = new Func<ParameterValueReader>(() => new ParameterValueReader(obj, param, owner));
             return DoubleDictionary<object, string, ParameterValueReader>.GetItem(obj, param, create);
         }
 
@@ -23,15 +23,11 @@ namespace Kinectitude.Core.Data
             DoubleDictionary<object, string, ParameterValueReader>.DeleteDict(obj);
         }
 
-        private ParameterValueReader(object obj, string param, Scene scene)
+        private ParameterValueReader(object obj, string param, IDataContainer owner)
         {
             Obj = obj;
             Param = param;
-            Type objType = obj.GetType();
-            if (typeof(Component).IsAssignableFrom(objType)) Owner = ((Component)obj).Entity;
-            else if (typeof(IManager).IsAssignableFrom(objType)) Owner = scene;
-            else if (typeof(Service).IsAssignableFrom(objType)) Owner = scene.Game;
-            else Owner = null;
+            Owner = owner;
         }
 
         internal override void SetupNotifications()

@@ -6,9 +6,9 @@ using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Data
 {
-    internal sealed class DataContainerReader : RepeatReader
+    public sealed class DataContainerReader : RepeatReader
     {
-        internal readonly DataContainer DataContainer;
+        internal readonly IDataContainer DataContainer;
         internal readonly string Param;
 
         protected override ValueReader Reader

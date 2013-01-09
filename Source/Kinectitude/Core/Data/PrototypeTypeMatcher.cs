@@ -16,10 +16,11 @@ namespace Kinectitude.Core.Data
         public override bool MatchAndSet(IEntity entity)
         {
             Entity who = entity as Entity;
+            if (null == who) return false;
             if (prototype.Contains(who.Id))
             {
                 OldEntity = this.Entity;
-                Entity = entity as Entity;
+                Entity = who;
                 foreach (Action<DataContainer> toNotify in notify)
                 {
                     toNotify(Entity);

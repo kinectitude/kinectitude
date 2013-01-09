@@ -5,7 +5,6 @@ using Kinectitude.Editor.Commands;
 using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Statements.Assignments;
 using Kinectitude.Editor.Storage;
-using Kinectitude.Editor.Storage.Xml;
 using Kinectitude.Editor.Views;
 using Kinectitude.Render;
 using System;
@@ -292,14 +291,7 @@ namespace Kinectitude.Editor.Models
 
         public Plugin GetPlugin(string name)
         {
-            Plugin plugin = Plugins.FirstOrDefault(x => x.ClassName == name);
-            
-            if (null == plugin)
-            {
-                plugin = Plugins.FirstOrDefault(x => x.File == typeof(Kinectitude.Core.Base.Component).Module.Name && x.ShortName == name);
-            }
-            
-            return plugin;
+            return Plugins.FirstOrDefault(x => x.ClassName == name);
         }
 
         public Plugin GetPlugin(Type type)

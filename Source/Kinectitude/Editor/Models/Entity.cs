@@ -610,7 +610,7 @@ namespace Kinectitude.Editor.Models
                 Attribute attribute = prototype.GetAttribute(key);
                 if (null != attribute)
                 {
-                    return attribute.Value;
+                    return attribute.Value.ToString();
                 }
             }
 

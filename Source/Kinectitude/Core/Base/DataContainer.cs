@@ -4,7 +4,7 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Base
 {
-    public abstract class DataContainer
+    public abstract class DataContainer : IDataContainer
     {
         private readonly Dictionary<string, ValueReader> attributes = new Dictionary<string, ValueReader>();
         private readonly Dictionary<string, List<IChangeable>> callbacks = new Dictionary<string, List<IChangeable>>();
@@ -12,11 +12,11 @@ namespace Kinectitude.Core.Base
         internal readonly Dictionary<string, List<IChangeable>> CheckProperties = new Dictionary<string, List<IChangeable>>();
         internal readonly List<Tuple<DataContainer, string, IChangeable>> PropertyChanges = new List<Tuple<DataContainer, string, IChangeable>>();
 
-        public bool Deleted { get; protected set; }
+        internal bool Deleted { get; set; }
 
-        public int Id { get; private set; }
+        internal int Id { get; private set; }
 
-        public string Name { get; set; }
+        internal string Name { get; set; }
 
         public ValueReader this[string key]
         {
@@ -48,7 +48,7 @@ namespace Kinectitude.Core.Base
             Deleted = false;
         }
 
-        internal void NotifyOfChange(string key, IChangeable callback)
+        public void NotifyOfChange(string key, IChangeable callback)
         {
             List<IChangeable> addTo = null;
             callbacks.TryGetValue(key, out addTo);
@@ -71,7 +71,7 @@ namespace Kinectitude.Core.Base
         }
 
 
-        internal void NotifyOfComponentChange(string what, IChangeable callback)
+        public void NotifyOfComponentChange(string what, IChangeable callback)
         {
             List<IChangeable> callbacks;
             if (CheckProperties.TryGetValue(what, out callbacks))

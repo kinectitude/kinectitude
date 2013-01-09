@@ -20,7 +20,7 @@ namespace Kinectitude.Core.Loaders
 
         internal Game Game { get; private set; }
 
-        public Game CreateGame()
+        internal Game CreateGame()
         {
             object root = loaderUtility.GetGame();
             PropertyHolder gameProperties = loaderUtility.GetProperties(root);
