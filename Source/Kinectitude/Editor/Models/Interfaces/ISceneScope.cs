@@ -1,5 +1,4 @@
-﻿using Kinectitude.Core.Data;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Kinectitude.Editor.Models.Interfaces
 {

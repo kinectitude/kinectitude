@@ -18,11 +18,10 @@ using System.Windows.Input;
 
 namespace Kinectitude.Editor.Models
 {
-    internal sealed class Scene : GameModel<ISceneScope>, IAttributeScope, IEntityScope, IManagerScope, IDataContainer, IScene
+    internal sealed class Scene : GameModel<ISceneScope>, IAttributeScope, IEntityScope, IManagerScope
     {
         private string name;
         private int nextAttribute;
-        private CallbackCollection changeCallbacks;
 
         public string Name
         {
@@ -167,24 +166,6 @@ namespace Kinectitude.Editor.Models
                     }
                 }
             });
-
-            changeCallbacks = new CallbackCollection();
-
-            AddHandler<DefineAdded>(n =>
-            {
-                changeCallbacks.PublishComponentChange(n.Define.Name);
-            });
-
-            AddHandler<DefineRemoved>(n =>
-            {
-                changeCallbacks.PublishComponentChange(n.Define.Name);
-            });
-
-            AddHandler<DefinedNameChanged>(n =>
-            {
-                changeCallbacks.PublishComponentChange(n.OldName);
-                changeCallbacks.PublishComponentChange(GetDefinedName(n.Plugin));
-            });
         }
 
         public override void Accept(IGameVisitor visitor)
@@ -219,34 +200,19 @@ namespace Kinectitude.Editor.Models
         public void AddAttribute(Attribute attribute)
         {
             attribute.Scope = this;
-            attribute.PropertyChanged += OnAttributePropertyChanged;
             Attributes.Add(attribute);
-
-            changeCallbacks.PublishAttributeChange(attribute.Name);
         }
 
         public void RemoveAttribute(Attribute attribute)
         {
             attribute.Scope = null;
-            attribute.PropertyChanged -= OnAttributePropertyChanged;
             Attributes.Remove(attribute);
-
-            changeCallbacks.PublishAttributeChange(attribute.Name);
 
             Workspace.Instance.CommandHistory.Log(
                 "remove attribute '" + attribute.Name + "'",
                 () => RemoveAttribute(attribute),
                 () => AddAttribute(attribute)
             );
-        }
-
-        private void OnAttributePropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "Value")
-            {
-                var attribute = (Attribute)sender;
-                changeCallbacks.PublishAttributeChange(attribute.Name);
-            }
         }
 
         public void CreateAttribute()
@@ -308,10 +274,6 @@ namespace Kinectitude.Editor.Models
                 () => RemoveEntity(entity),
                 () => AddEntity(entity)
             );
-
-            DataContainerReader.DeleteDataContainer(entity);
-            ParameterValueReader.DeleteObject(entity);
-        }
 
         private string GetNextAttributeKey()
         {

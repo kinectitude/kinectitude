@@ -790,7 +790,6 @@ namespace Kinectitude.Editor.Models
         }
 
         #region IDataContainer implementation
-
         ValueReader IDataContainer.this[string key]
         {
             get
@@ -801,8 +800,6 @@ namespace Kinectitude.Editor.Models
             {
                 throw new NotSupportedException();
             }
-        }
-
         void IDataContainer.NotifyOfChange(string key, IChanges callback)
         {
             //changeCallbacks.SubscribeToAttributeChange(key, callback);
