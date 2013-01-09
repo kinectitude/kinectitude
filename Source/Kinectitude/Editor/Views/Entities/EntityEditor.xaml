@@ -1,0 +1,315 @@
+﻿<UserControl x:Class="Kinectitude.Editor.Views.Entities.EntityEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:m="clr-namespace:Kinectitude.Editor.Models"
+             xmlns:b="clr-namespace:Kinectitude.Editor.Views.Behaviors"
+             xmlns:s="clr-namespace:System;assembly=mscorlib"
+             xmlns:Statements.Base="clr-namespace:Kinectitude.Editor.Models.Statements.Base"
+             xmlns:Properties="clr-namespace:Kinectitude.Editor.Models.Properties"
+             xmlns:Views.Properties="clr-namespace:Kinectitude.Editor.Views.Properties"
+             xmlns:Actions="clr-namespace:Kinectitude.Editor.Models.Statements.Actions"
+             xmlns:Assignments="clr-namespace:Kinectitude.Editor.Models.Statements.Assignments"
+             xmlns:Conditions="clr-namespace:Kinectitude.Editor.Models.Statements.Conditions"
+             xmlns:Loops="clr-namespace:Kinectitude.Editor.Models.Statements.Loops"
+             xmlns:Events="clr-namespace:Kinectitude.Editor.Models.Statements.Events"
+             mc:Ignorable="d"
+             x:Name="self">
+
+    <UserControl.Resources>
+
+        <ObjectDataProvider x:Key="Operators" MethodName="GetValues" ObjectType="{x:Type s:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="Assignments:AssignmentOperator" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+
+        <Style x:Key="PluginIconStyle" TargetType="{x:Type Image}">
+            <Setter Property="Source" Value="{StaticResource icoStatement}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Type}" Value="{x:Static Statements.Base:StatementType.Event}">
+                    <Setter Property="Source" Value="{StaticResource icoEvent}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Type}" Value="{x:Static Statements.Base:StatementType.Action}">
+                    <Setter Property="Source" Value="{StaticResource icoAction}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
+        <DataTemplate DataType="{x:Type Statements.Base:StatementFactory}">
+            <Border Padding="16" Background="Transparent">
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="16" Height="16" Style="{StaticResource PluginIconStyle}" Margin="0,0,16,0" />
+                    <TextBlock Text="{Binding Name}" />
+                </StackPanel>
+                <i:Interaction.Behaviors>
+                    <b:DragBehavior DragParameter="{Binding}" DragScope="{Binding ElementName=gridEntity}" />
+                </i:Interaction.Behaviors>
+            </Border>
+        </DataTemplate>
+
+        <Style x:Key="DropTarget" TargetType="{x:Type Border}">
+            <Setter Property="AllowDrop" Value="True" />
+            <Setter Property="Background" Value="#ECECEC" />
+            <Setter Property="Padding" Value="16" />
+            <!--Setter Property="Margin" Value="8,0,0,0" /-->
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsInherited}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="StatementsListControl" TargetType="{x:Type ItemsControl}">
+            <Setter Property="ItemsControl.ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="StatementContainer" TargetType="{x:Type Border}">
+            <!--Setter Property="Margin" Value="8,8,0,0" /-->
+            <!--Style.Triggers>
+                <DataTrigger Binding="{Binding ElementName=chkShowInherited, Path=IsChecked}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers-->
+        </Style>
+
+        <CollectionViewSource x:Key="Events" Source="{Binding ElementName=self, Path=DataContext.Events}">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="IsInherited" />
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
+
+        <DataTemplate DataType="{x:Type Statements.Base:Header}">
+            <DockPanel Background="White" LastChildFill="True">
+                <Image DockPanel.Dock="Left" Source="{StaticResource icoLock}" Width="16" Height="16" Margin="8,0,0,0" Visibility="{Binding IsInherited, Converter={StaticResource BoolToVis}}" />
+                <ItemsControl ItemsSource="{Binding Tokens}">
+                    <ItemsControl.Resources>
+                        <DataTemplate DataType="{x:Type Properties:AbstractProperty}">
+                            <Views.Properties:PropertyView MinWidth="125" Margin="0,8,8,8" Background="#ECECEC" Padding="2" />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type Statements.Base:HeaderToken}">
+                            <TextBlock Text="{Binding Text}" FontWeight="Bold" Margin="0,8,8,8" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </ItemsControl.Resources>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="8,0,0,0" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </DockPanel>
+        </DataTemplate>
+        
+        <DataTemplate DataType="{x:Type Assignments:AbstractAssignment}">
+            <Border Background="#FF7373" Margin="0">
+                <DockPanel LastChildFill="True" Background="White">
+                    <Rectangle DockPanel.Dock="Left" Width="16" VerticalAlignment="Stretch" Fill="#FF7373" />
+                    <TextBlock DockPanel.Dock="Left" FontWeight="Bold" Margin="8">Set value</TextBlock>
+                    <TextBox DockPanel.Dock="Left" Text="{Binding Key}" MinWidth="125" Margin="0,8,8,8" />
+                    <ComboBox DockPanel.Dock="Left" SelectedItem="{Binding Operator}" ItemsSource="{Binding Source={StaticResource Operators}}" Height="Auto" />
+                    <TextBlock DockPanel.Dock="Left" FontWeight="Bold" Margin="8"></TextBlock>
+                    <TextBox Text="{Binding Value}" MinWidth="125" Margin="0,8,8,8" />
+                    <i:Interaction.Behaviors>
+                        <b:DragBehavior DragParameter="{Binding}" />
+                        <b:DropTargetBehavior DropCommand="{Binding InsertBeforeCommand}" />
+                    </i:Interaction.Behaviors>
+                </DockPanel>
+                <i:Interaction.Behaviors>
+                    <b:DragBehavior DragParameter="{Binding}" />
+                    <b:DropTargetBehavior DropCommand="{Binding InsertBeforeCommand}" />
+                </i:Interaction.Behaviors>
+            </Border>
+        </DataTemplate>
+        
+        <DataTemplate DataType="{x:Type Actions:AbstractAction}">
+            <Border Margin="0,0,8,0">
+                <DockPanel LastChildFill="True" Background="White">
+                    <Rectangle DockPanel.Dock="Left" Width="16" VerticalAlignment="Stretch" Fill="#FF7373" />
+                    <ContentPresenter Content="{Binding Header}" />
+                    <i:Interaction.Behaviors>
+                        <b:DragBehavior DragParameter="{Binding}" />
+                        <b:DropTargetBehavior DropCommand="{Binding InsertBeforeCommand}" />
+                    </i:Interaction.Behaviors>
+                </DockPanel>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type Conditions:AbstractCondition}">
+            <Border Style="{StaticResource StatementContainer}">
+                <StackPanel Orientation="Vertical">
+                    <DockPanel LastChildFill="True" Background="White">
+                        <Rectangle DockPanel.Dock="Left" Width="16" VerticalAlignment="Stretch" Fill="#C9F76F" />
+                        <TextBlock DockPanel.Dock="Left" FontWeight="Bold" Margin="8">If</TextBlock>
+                        <TextBox Text="{Binding If}" MinWidth="125" Margin="0,8,8,8" />
+                        <i:Interaction.Behaviors>
+                            <b:DragBehavior DragParameter="{Binding}" />
+                            <b:DropTargetBehavior DropCommand="{Binding InsertBeforeCommand}" />
+                        </i:Interaction.Behaviors>
+                    </DockPanel>
+                    <ItemsControl ItemsSource="{Binding Statements}" Style="{StaticResource StatementsListControl}" Margin="8,0,0,0" />
+                    <Border Style="{StaticResource DropTarget}" Margin="8,0,0,0">
+                        <i:Interaction.Behaviors>
+                            <b:DropTargetBehavior DropCommand="{Binding AddActionCommand}" />
+                        </i:Interaction.Behaviors>
+                        <TextBlock>Drop here to add actions</TextBlock>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type Loops:AbstractWhileLoop}">
+            <Border Style="{StaticResource StatementContainer}">
+                <StackPanel Orientation="Vertical">
+                    <DockPanel LastChildFill="True" Background="White">
+                        <Rectangle DockPanel.Dock="Left" Width="16" VerticalAlignment="Stretch" Fill="#C9F76F" />
+                        <TextBlock DockPanel.Dock="Left" FontWeight="Bold" Margin="8">While</TextBlock>
+                        <TextBox Text="{Binding Expression}" MinWidth="125" Margin="0,8,8,8" />
+                        <i:Interaction.Behaviors>
+                            <b:DragBehavior DragParameter="{Binding}" />
+                            <b:DropTargetBehavior DropCommand="{Binding InsertBeforeCommand}" />
+                        </i:Interaction.Behaviors>
+                    </DockPanel>
+                    <ItemsControl ItemsSource="{Binding Statements}" Style="{StaticResource StatementsListControl}" Margin="8,0,0,0" />
+                    <Border Style="{StaticResource DropTarget}" Margin="8,0,0,0">
+                        <i:Interaction.Behaviors>
+                            <b:DropTargetBehavior DropCommand="{Binding AddActionCommand}" />
+                        </i:Interaction.Behaviors>
+                        <TextBlock>Drop here to add actions</TextBlock>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type Loops:AbstractForLoop}">
+            <Border Style="{StaticResource StatementContainer}">
+                <StackPanel Orientation="Vertical">
+                    <DockPanel LastChildFill="True" Background="White">
+                        <Rectangle DockPanel.Dock="Left" Width="16" VerticalAlignment="Stretch" Fill="#C9F76F" />
+                        <TextBlock DockPanel.Dock="Left" FontWeight="Bold" Margin="8">For</TextBlock>
+                        <TextBox DockPanel.Dock="Left" Text="{Binding PreExpression}" MinWidth="125" Margin="0,8,8,8" />
+                        <TextBlock DockPanel.Dock="Left" FontWeight="Bold" Margin="0,8,8,8">;</TextBlock>
+                        <TextBox DockPanel.Dock="Left" Text="{Binding Expression}" MinWidth="125" Margin="0,8,8,8" />
+                        <TextBlock DockPanel.Dock="Left" FontWeight="Bold" Margin="0,8,8,8">;</TextBlock>
+                        <TextBox Text="{Binding PostExpression}" MinWidth="125" Margin="0,8,8,8" />
+                        <i:Interaction.Behaviors>
+                            <b:DragBehavior DragParameter="{Binding}" />
+                            <b:DropTargetBehavior DropCommand="{Binding InsertBeforeCommand}" />
+                        </i:Interaction.Behaviors>
+                    </DockPanel>
+                    <ItemsControl ItemsSource="{Binding Statements}" Style="{StaticResource StatementsListControl}" Margin="8,0,0,0" />
+                    <Border Style="{StaticResource DropTarget}" Margin="8,0,0,0">
+                        <i:Interaction.Behaviors>
+                            <b:DropTargetBehavior DropCommand="{Binding AddActionCommand}" />
+                        </i:Interaction.Behaviors>
+                        <TextBlock>Drop here to add actions</TextBlock>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type Events:AbstractEvent}">
+            <Border Style="{StaticResource StatementContainer}">
+                <StackPanel Orientation="Vertical">
+                    <DockPanel LastChildFill="True" Background="White">
+                        <Rectangle DockPanel.Dock="Left" Width="16" VerticalAlignment="Stretch" Fill="#5CCCCC" />
+                        <ContentPresenter Content="{Binding Header}" />
+                        <i:Interaction.Behaviors>
+                            <b:DragBehavior DragParameter="{Binding}" />
+                            <b:DropTargetBehavior DropCommand="{Binding InsertBeforeCommand}" />
+                        </i:Interaction.Behaviors>
+                    </DockPanel>
+                    <ItemsControl ItemsSource="{Binding Statements}" Style="{StaticResource StatementsListControl}" Margin="8,0,0,0" />
+                    <Border Style="{StaticResource DropTarget}" Margin="8,0,0,0">
+                        <i:Interaction.Behaviors>
+                            <b:DropTargetBehavior DropCommand="{Binding AddActionCommand}" />
+                        </i:Interaction.Behaviors>
+                        <TextBlock>Drop here to add actions</TextBlock>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+    </UserControl.Resources>
+
+    <Grid x:Name="gridEntity">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <DockPanel>
+            <Border DockPanel.Dock="Bottom" Height="200" AllowDrop="True">
+                <TextBlock>Drop here to delete statements</TextBlock>
+                <i:Interaction.Behaviors>
+                    <b:DropTargetBehavior DropCommand="{Binding DeleteStatementCommand}" />
+                </i:Interaction.Behaviors>
+            </Border>
+            <ScrollViewer>
+                <StackPanel Orientation="Vertical">
+                    <Expander IsExpanded="True">
+                        <Expander.Header>
+                            <Border Padding="8">
+                                <TextBlock FontWeight="Bold">Special Actions</TextBlock>
+                            </Border>
+                        </Expander.Header>
+                        <Expander.Content>
+                            <ListBox ItemsSource="{Binding Source={x:Static m:Workspace.Instance}, Path=Statements}" />
+                        </Expander.Content>
+                    </Expander>
+                    <Expander IsExpanded="True">
+                        <Expander.Header>
+                            <Border Padding="8">
+                                <TextBlock FontWeight="Bold">Events</TextBlock>
+                            </Border>
+                        </Expander.Header>
+                        <Expander.Content>
+                            <ListBox ItemsSource="{Binding Source={x:Static m:Workspace.Instance}, Path=Events}" />
+                        </Expander.Content>
+                    </Expander>
+                    <Expander IsExpanded="True">
+                        <Expander.Header>
+                            <Border Padding="8">
+                                <TextBlock FontWeight="Bold">Actions</TextBlock>
+                            </Border>
+                        </Expander.Header>
+                        <Expander.Content>
+                            <ListBox ItemsSource="{Binding Source={x:Static m:Workspace.Instance}, Path=Actions}" />
+                        </Expander.Content>
+                    </Expander>
+                </StackPanel>
+            </ScrollViewer>
+        </DockPanel>
+
+        <GridSplitter Width="4" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Style="{StaticResource gridSplitter}" />
+
+        <DockPanel Grid.Column="2">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0,0,0,4">
+                <Border Padding="8">
+                    <CheckBox x:Name="chkShowInherited" Content="Show Inherited Events" />
+                </Border>
+            </StackPanel>
+            <ScrollViewer HorizontalScrollBarVisibility="Visible" Background="LightGray">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="8">
+                    <ItemsControl ItemsSource="{Binding Source={StaticResource Events}}" />
+                    <Border Style="{StaticResource DropTarget}">
+                        <i:Interaction.Behaviors>
+                            <b:DropTargetBehavior DropCommand="{Binding AddEventCommand}" />
+                        </i:Interaction.Behaviors>
+                        <TextBlock>Drop here to add events</TextBlock>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </DockPanel>
+
+    </Grid>
+
+</UserControl>

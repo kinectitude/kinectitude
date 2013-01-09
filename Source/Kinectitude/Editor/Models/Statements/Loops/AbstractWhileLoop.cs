@@ -1,10 +1,6 @@
-﻿using Kinectitude.Editor.Models.Statements;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Kinectitude.Editor.Models.Statements.Base;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Statements.Loops
 {
     internal abstract class AbstractWhileLoop : CompositeStatement
     {

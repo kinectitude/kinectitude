@@ -1,6 +1,8 @@
-﻿
-using Kinectitude.Editor.Storage;
-namespace Kinectitude.Editor.Models
+﻿using Kinectitude.Editor.Storage;
+using System.Collections.Generic;
+using System.Windows.Input;
+
+namespace Kinectitude.Editor.Models.Properties
 {
     internal sealed class InheritedProperty : AbstractProperty
     {
@@ -11,42 +13,27 @@ namespace Kinectitude.Editor.Models
             get { return inheritedProperty.PluginProperty; }
         }
 
-        public override string Name
-        {
-            get { return inheritedProperty.Name; }
-        }
-
-        public override bool IsInherited
-        {
-            get { return inheritedProperty.IsInherited; }
-            set { }
-        }
-
-        public override bool IsLocal
-        {
-            get { return inheritedProperty.IsLocal; }
-        }
-
-        public override bool CanInherit
-        {
-            get { return inheritedProperty.CanInherit; }
-        }
-
-        public override bool IsRoot
-        {
-            get { return inheritedProperty.IsRoot; }
-        }
-
         public override object Value
         {
             get { return inheritedProperty.Value; }
             set { }
         }
 
-        public InheritedProperty(AbstractProperty inheritedProperty)
+        public override bool HasOwnValue
+        {
+            get { return inheritedProperty.HasOwnValue; }
+        }
+
+        public override IEnumerable<object> AvailableValues
+        {
+            get { return inheritedProperty.AvailableValues; }
+        }
+
+        public override ICommand ClearValueCommand { get; protected set; }
+
+        public InheritedProperty(AbstractProperty inheritedProperty) : base(inheritedProperty)
         {
             this.inheritedProperty = inheritedProperty;
-            inheritedProperty.PropertyChanged += (sender, args) => NotifyPropertyChanged(args.PropertyName);
         }
 
         public override void Accept(IGameVisitor visitor)

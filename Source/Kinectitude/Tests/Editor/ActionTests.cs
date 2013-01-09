@@ -2,8 +2,12 @@
 using Kinectitude.Editor.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using Action = Kinectitude.Editor.Models.Action;
+using Action = Kinectitude.Editor.Models.Statements.Actions.Action;
 using Kinectitude.Editor.Models.Statements;
+using Kinectitude.Editor.Models.Statements.Events;
+using Kinectitude.Editor.Models.Statements.Actions;
+using Kinectitude.Editor.Models.Properties;
+using Kinectitude.Editor.Models.Statements.Base;
 
 namespace Kinectitude.Editor.Tests
 {
@@ -70,7 +74,7 @@ namespace Kinectitude.Editor.Tests
 
             Action action = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
 
-            action.GetProperty("Name").PropertyChanged += (sender, e) => propertyFiredValueChange = (e.PropertyName == "Value");
+            action.GetProperty("Name").PropertyChanged += (sender, e) => propertyFiredValueChange |= (e.PropertyName == "Value");
 
             action.SetProperty("Name", "test");
 
@@ -137,7 +141,7 @@ namespace Kinectitude.Editor.Tests
 
             Action parentAction = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
 
-            parentAction.GetProperty("Name").PropertyChanged += (sender, e) => parentPropertyChanged = (e.PropertyName == "Value");
+            parentAction.GetProperty("Name").PropertyChanged += (sender, e) => parentPropertyChanged |= (e.PropertyName == "Value");
 
             parentAction.SetProperty("Name", "test");
             parentEvent.AddStatement(parentAction);
@@ -145,7 +149,7 @@ namespace Kinectitude.Editor.Tests
             InheritedEvent childEvent = new InheritedEvent(parentEvent);
 
             AbstractProperty childProperty = ((AbstractAction)childEvent.Statements.Single()).GetProperty("Name");
-            childProperty.PropertyChanged += (sender, e) => childPropertyChanged = (e.PropertyName == "Value");
+            childProperty.PropertyChanged += (sender, e) => childPropertyChanged |= (e.PropertyName == "Value");
 
             childProperty.Value = "test2";
 
@@ -169,7 +173,7 @@ namespace Kinectitude.Editor.Tests
             InheritedEvent childEvent = new InheritedEvent(parentEvent);
 
             AbstractProperty childProperty = ((AbstractAction)childEvent.Statements.Single()).GetProperty("Name");
-            childProperty.PropertyChanged += (sender, e) => childPropertyChanged = (e.PropertyName == "Value");
+            childProperty.PropertyChanged += (sender, e) => childPropertyChanged |= (e.PropertyName == "Value");
             
             parentAction.SetProperty("Name", "test2");
 

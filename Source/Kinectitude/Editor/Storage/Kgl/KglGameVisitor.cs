@@ -1,12 +1,16 @@
-﻿using Kinectitude.Core.Language;
-using Kinectitude.Editor.Models;
-using Kinectitude.Editor.Models.Statements;
+﻿using Kinectitude.Editor.Models;
+using Kinectitude.Editor.Models.Properties;
+using Kinectitude.Editor.Models.Statements.Actions;
 using Kinectitude.Editor.Models.Statements.Assignments;
+using Kinectitude.Editor.Models.Statements.Base;
+using Kinectitude.Editor.Models.Statements.Conditions;
+using Kinectitude.Editor.Models.Statements.Events;
+using Kinectitude.Editor.Models.Statements.Loops;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Action = Kinectitude.Editor.Models.Action;
+using Action = Kinectitude.Editor.Models.Statements.Actions.Action;
 using Attribute = Kinectitude.Editor.Models.Attribute;
 
 namespace Kinectitude.Editor.Storage.Kgl
@@ -18,7 +22,7 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         private static readonly Func<AbstractProperty, bool> validProperties = (property => property.IsLocal);
         private static readonly Func<GameModel, bool> allValid = (model => true);
-        private static readonly Func<Component, bool> validComponent = (component => component.IsRoot || component.HasLocalProperties);
+        private static readonly Func<Component, bool> validComponent = (component => component.IsRoot || component.HasOwnValues);
         private static readonly Func<AbstractEvent, bool> validEvt = (evt => evt.IsLocal);
 
         private int numTabs = 0;
@@ -78,7 +82,7 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         public void Visit(Attribute attribute)
         {
-            result = attribute.Key + " = " + attribute.Value;
+            result = attribute.Name + " = " + attribute.Value;
         }
 
         public void Visit(Component component)

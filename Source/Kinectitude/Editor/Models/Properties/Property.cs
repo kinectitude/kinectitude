@@ -1,92 +1,53 @@
-﻿using Kinectitude.Editor.Models.Notifications;
-using Kinectitude.Editor.Models.Values;
+﻿using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Storage;
+using System;
+using System.Collections.Generic;
+using System.Windows.Input;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Properties
 {
     internal sealed class Property : AbstractProperty
     {
         private readonly PluginProperty pluginProperty;
-        //private object value;
-        private bool inherited;
+        private object val;
 
         public override PluginProperty PluginProperty
         {
             get { return pluginProperty; }
         }
 
-        public override string Name
-        {
-            get { return PluginProperty.Name; }
-        }
-
-        public override bool IsInherited
-        {
-            get { return inherited; }
-            set
-            {
-                if (inherited != value)
-                {
-                    inherited = value;
-                    NotifyPropertyChanged("IsInherited");
-                }
-            }
-        }
-
-        [DependsOn("IsInherited")]
-        public override bool IsLocal
-        {
-            get { return !IsInherited; }
-        }
-
-        public override bool CanInherit
-        {
-            get { return null != Scope ? Scope.HasInheritedProperty(Name) : false; }
-        }
-
-        [DependsOn("CanInherit")]
-        public override bool IsRoot
-        {
-            get { return !CanInherit; }
-        }
-
-        [DependsOn("IsInherited")]
         public override object Value
         {
-            get
-            {
-                if (IsInherited && !IsRoot)
-                {
-                    return null != Scope ? Scope.GetInheritedValue(Name) : 0;   // TODO: Get actual default
-                }
-
-                return TypedValue.CurrentValue;
-            }
+            get { return val ?? GetInheritedValue(); }
             set
             {
-                if (TypedValue.CurrentValue != value)
+                if (val != value)
                 {
-                    if (IsRoot || IsLocal)
-                    {
-                        TypedValue.CurrentValue = value;  // TODO: Serialize anything
-                        IsInherited = false;
-                        NotifyPropertyChanged("Value");
-                    }
+                    val = value;
+                    NotifyPropertyChanged("Value");
                 }
             }
         }
 
-        public Value TypedValue { get; private set; }
+        [DependsOn("Value")]
+        public override bool HasOwnValue
+        {
+            get { return null != val; }
+        }
+
+        public override IEnumerable<object> AvailableValues
+        {
+            get { return PluginProperty.AvailableValues; }
+        }
+
+        public override ICommand ClearValueCommand { get; protected set; }
 
         public Property(PluginProperty pluginProperty)
         {
             this.pluginProperty = pluginProperty;
-            this.inherited = true;
 
-            TypedValue = pluginProperty.CreateValue();
-
-            AddDependency<ScopeChanged>("CanInherit");
-            AddDependency<ScopeChanged>("Value");
+            ClearValueCommand = new DelegateCommand(parameter => HasOwnValue, parameter => Value = null);
         }
 
         public override void Accept(IGameVisitor visitor)

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Kinectitude.Editor.Models
+﻿
+namespace Kinectitude.Editor.Models.Statements.Loops
 {
     internal sealed class InheritedWhileLoop : AbstractWhileLoop
     {

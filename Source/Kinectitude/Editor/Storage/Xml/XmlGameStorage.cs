@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Kinectitude.Editor.Models;
+using Kinectitude.Editor.Models.Statements.Base;
+using Kinectitude.Editor.Models.Statements.Conditions;
+using Kinectitude.Editor.Models.Statements.Events;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,10 +10,8 @@ using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Kinectitude.Editor.Models;
-using Action = Kinectitude.Editor.Models.Action;
+using Action = Kinectitude.Editor.Models.Statements.Actions.Action;
 using Attribute = Kinectitude.Editor.Models.Attribute;
-using Kinectitude.Editor.Models.Statements;
 
 namespace Kinectitude.Editor.Storage.Xml
 {

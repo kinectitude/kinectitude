@@ -87,15 +87,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Behaviors\DragAndDropAdorner.cs" />
+    <Compile Include="Models\Statements\Base\Statement.cs" />
+    <Compile Include="Views\Behaviors\DragAdorner.cs" />
     <Compile Include="Base\DelegateCommand.cs" />
     <Compile Include="Base\FilteredObservableCollection.cs" />
-    <Compile Include="Behaviors\DragBehavior.cs" />
-    <Compile Include="Behaviors\DropTargetBehavior.cs" />
+    <Compile Include="Views\Behaviors\DragBehavior.cs" />
+    <Compile Include="Views\Behaviors\DropTargetBehavior.cs" />
     <Compile Include="Commands\CommandHistory.cs" />
     <Compile Include="Commands\DelegateUndoableCommand.cs" />
     <Compile Include="Commands\ICommandHistory.cs" />
     <Compile Include="Commands\IUndoableCommand.cs" />
+    <Compile Include="Models\Interfaces\INameValue.cs" />
+    <Compile Include="Models\Interfaces\INotify.cs" />
     <Compile Include="Models\Project.cs" />
     <Compile Include="Models\Statements\Base\AbstractStatement.cs" />
     <Compile Include="Models\Statements\Assignments\AbstractAssignment.cs" />
@@ -120,10 +123,6 @@
     <Compile Include="Models\Transactions\PluginSelection.cs" />
     <Compile Include="Models\Transactions\SceneTransaction.cs" />
     <Compile Include="Models\Statements\Base\StatementFactory.cs" />
-    <Compile Include="Models\Values\BooleanValue.cs" />
-    <Compile Include="Models\Values\EnumerationValue.cs" />
-    <Compile Include="Models\Values\StringValue.cs" />
-    <Compile Include="Models\Values\Value.cs" />
     <Compile Include="Models\Statements\Loops\WhileLoop.cs" />
     <Compile Include="Storage\IGameStorage.cs" />
     <Compile Include="Storage\IGameVisitor.cs" />
@@ -144,7 +143,11 @@
     <Compile Include="Models\Component.cs" />
     <Compile Include="Models\Statements\Conditions\Condition.cs" />
     <Compile Include="Models\Define.cs" />
-    <Compile Include="Presenters\BasicEntityPresenter.cs" />
+    <Compile Include="Views\Main\Inspector.xaml.cs">
+      <DependentUpon>Inspector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Scenes\Presenters\DefaultEntityVisual.cs" />
+    <Compile Include="Views\Scenes\Presenters\ShapeEntityVisual.cs" />
     <Compile Include="Models\Entity.cs" />
     <Compile Include="Models\Statements\Events\Event.cs" />
     <Compile Include="Models\Game.cs" />
@@ -168,61 +171,51 @@
     <Compile Include="Models\Scene.cs" />
     <Compile Include="Models\Using.cs" />
     <Compile Include="Models\Workspace.cs" />
-    <Compile Include="Presenters\EntityPresenter.cs" />
-    <Compile Include="Presenters\SpriteEntityPresenter.cs" />
-    <Compile Include="Presenters\TextEntityPresenter.cs" />
-    <Compile Include="Views\ComponentDialog.xaml.cs">
-      <DependentUpon>ComponentDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\EntityEditor\EntityEditor.xaml.cs">
+    <Compile Include="Views\Scenes\Presenters\EntityBase.cs" />
+    <Compile Include="Views\Scenes\Presenters\EntityPresenter.cs" />
+    <Compile Include="Views\Scenes\Presenters\EntityVisual.cs" />
+    <Compile Include="Views\Scenes\Presenters\SpriteEntityVisual.cs" />
+    <Compile Include="Views\Scenes\Presenters\TextEntityVisual.cs" />
+    <Compile Include="Views\Entities\EntityEditor.xaml.cs">
       <DependentUpon>EntityEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\MainWindow\SceneDialog.xaml.cs">
+    <Compile Include="Views\Dialogs\SceneDialog.xaml.cs">
       <DependentUpon>SceneDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\PropertyView.xaml.cs">
+    <Compile Include="Views\Properties\PropertyView.xaml.cs">
       <DependentUpon>PropertyView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\MainWindow\NameDialog.xaml.cs">
+    <Compile Include="Views\Dialogs\NameDialog.xaml.cs">
       <DependentUpon>NameDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SceneEditor\ControlAdorner.cs" />
-    <Compile Include="Views\SceneEditor\EntityItemEventArgs.cs" />
-    <Compile Include="Views\SceneEditor\SceneCanvasModes\AbstractMode.cs" />
-    <Compile Include="Views\SceneEditor\AddEntityDialog.xaml.cs">
+    <Compile Include="Views\Scenes\AddEntityDialog.xaml.cs">
       <DependentUpon>AddEntityDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SceneEditor\DragThumb.cs" />
-    <Compile Include="Views\MainWindow\FolderConverter.cs" />
-    <Compile Include="Views\MainWindow\EntityDialog.xaml.cs">
+    <Compile Include="Views\Utils\FolderConverter.cs" />
+    <Compile Include="Views\Dialogs\EntityDialog.xaml.cs">
       <DependentUpon>EntityDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\GameEditor\GameEditor.xaml.cs">
+    <Compile Include="Views\Games\GameEditor.xaml.cs">
       <DependentUpon>GameEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\DialogService.cs" />
-    <Compile Include="Views\MainWindow\MainWindow.xaml.cs">
+    <Compile Include="Views\Utils\DialogService.cs" />
+    <Compile Include="Views\Main\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SceneEditor\EntityItem.cs" />
-    <Compile Include="Views\SceneEditor\SceneCanvasModes\EntityPreviewAdorner.cs" />
-    <Compile Include="Views\SceneEditor\SceneCanvasModes\ManipulationMode.cs" />
-    <Compile Include="Views\SceneEditor\SceneCanvasModes\PanningMode.cs" />
-    <Compile Include="Views\SceneEditor\ResizeThumb.cs" />
-    <Compile Include="Views\SceneEditor\RubberBandAdorner.cs" />
-    <Compile Include="Views\SceneEditor\SceneCanvas.cs" />
-    <Compile Include="Views\SceneEditor\SceneCanvasModes\PlacementMode.cs" />
-    <Compile Include="Views\SceneEditor\SceneCanvasModes\SelectionMode.cs" />
-    <Compile Include="Views\SceneEditor\SceneEditor.xaml.cs">
+    <Compile Include="Views\Controls\Designer\ElasticBandAdorner.cs" />
+    <Compile Include="Views\Controls\Designer\ScaleRotateAdorner.cs" />
+    <Compile Include="Views\Controls\Designer\DesignerCanvas.cs" />
+    <Compile Include="Views\Controls\Designer\DesignerItem.cs" />
+    <Compile Include="Views\Utils\EntityConverter.cs" />
+    <Compile Include="Views\Scenes\SceneEditor.xaml.cs">
       <DependentUpon>SceneEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\GameEditor\SceneThumbnail.xaml.cs">
-      <DependentUpon>SceneThumbnail.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\SceneEditor\Selection.xaml.cs">
-      <DependentUpon>Selection.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Views\Controls\Designer\TranslateAdorner.cs" />
     <Page Include="Resources\Icons.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\Resources.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -230,35 +223,31 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Resources\Simple Styles.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ComponentDialog.xaml">
+    <Page Include="Views\Entities\EntityEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\EntityEditor\EntityEditor.xaml">
+    <Page Include="Views\Dialogs\SceneDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\MainWindow\SceneDialog.xaml">
+    <Page Include="Views\Main\Inspector.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\PropertyView.xaml">
+    <Page Include="Views\Properties\PropertyView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\MainWindow\NameDialog.xaml">
+    <Page Include="Views\Dialogs\NameDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\SceneEditor\AddEntityDialog.xaml">
+    <Page Include="Views\Scenes\AddEntityDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\MainWindow\EntityDialog.xaml">
+    <Page Include="Views\Dialogs\EntityDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -266,23 +255,15 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\GameEditor\GameEditor.xaml">
+    <Page Include="Views\Games\GameEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\MainWindow\MainWindow.xaml">
+    <Page Include="Views\Main\MainWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\SceneEditor\SceneEditor.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\GameEditor\SceneThumbnail.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\SceneEditor\Selection.xaml">
+    <Page Include="Views\Scenes\SceneEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

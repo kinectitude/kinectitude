@@ -1,16 +1,14 @@
 ﻿using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Windows.Input;
 
-namespace Kinectitude.Editor.Models.Statements
+namespace Kinectitude.Editor.Models.Statements.Base
 {
     internal abstract class CompositeStatement : AbstractStatement, IStatementScope
     {
@@ -41,19 +39,28 @@ namespace Kinectitude.Editor.Models.Statements
                 }
             }
 
-            AddActionCommand = new DelegateCommand(
-                (parameter) => IsLocal,
-                (parameter) =>
+            AddActionCommand = new DelegateCommand((parameter) => IsLocal,
+            (parameter) =>
+            {
+                if (IsLocal)
                 {
-                    if (IsLocal)
+                    AbstractStatement statement = parameter as AbstractStatement;
+                    if (null == statement)
                     {
                         StatementFactory factory = parameter as StatementFactory;
                         if (null != factory)
                         {
-                            AddStatement(factory.CreateStatement());
+                            statement = factory.CreateStatement();
                         }
                     }
-                });
+
+                    if (null != statement)
+                    {
+                        statement.RemoveFromParent();
+                        AddStatement(statement);
+                    }
+                }
+            });
         }
 
         public void AddStatement(AbstractStatement statement)
@@ -144,11 +151,7 @@ namespace Kinectitude.Editor.Models.Statements
                 int idx = Statements.IndexOf(statement);
                 if (idx != -1)
                 {
-                    if (Statements.Contains(toInsert))
-                    {
-                        RemoveStatement(toInsert);
-                    }
-
+                    toInsert.RemoveFromParent();
                     PrivateAddStatement(idx, toInsert);
                 }
             }

@@ -1,11 +1,21 @@
-﻿using System;
+﻿using Kinectitude.Editor.Models.Properties;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Statements.Base
 {
+    internal sealed class HeaderToken
+    {
+        public string Text { get; private set; }
+
+        public HeaderToken(string text)
+        {
+            Text = text;
+        }
+    }
+
     internal sealed class Header
     {
         public bool IsInherited { get; private set; }
@@ -28,11 +38,11 @@ namespace Kinectitude.Editor.Models
                 }
                 else if (!string.IsNullOrEmpty(token))
                 {
-                    tokens.Add(token);
+                    tokens.Add(new HeaderToken(token));
                 }
             }
 
-            Tokens = tokens;
+            Tokens = tokens.ToArray();
         }
     }
 }

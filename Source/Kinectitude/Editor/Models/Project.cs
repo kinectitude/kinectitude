@@ -1,10 +1,6 @@
 ﻿using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Views;
-using System;
-using System.Collections.Generic;
+using Kinectitude.Editor.Views.Utils;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using System.Windows.Input;
 
 namespace Kinectitude.Editor.Models

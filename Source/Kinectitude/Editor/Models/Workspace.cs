@@ -2,20 +2,22 @@
 using Kinectitude.Core.Components;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Commands;
-using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Statements.Assignments;
+using Kinectitude.Editor.Models.Statements.Base;
+using Kinectitude.Editor.Models.Statements.Conditions;
+using Kinectitude.Editor.Models.Statements.Events;
+using Kinectitude.Editor.Models.Statements.Loops;
 using Kinectitude.Editor.Storage;
-using Kinectitude.Editor.Storage.Xml;
-using Kinectitude.Editor.Views;
+using Kinectitude.Editor.Views.Utils;
 using Kinectitude.Render;
 using System;
-using Kinectitude.Editor.Storage.Kgl;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
+using Action = Kinectitude.Editor.Models.Statements.Actions.Action;
 
 namespace Kinectitude.Editor.Models
 {
@@ -33,6 +35,8 @@ namespace Kinectitude.Editor.Models
         private readonly Lazy<CommandHistory> commandHistory;
         private readonly List<Entity> entityPresets;
         private BaseModel activeItem;
+        private BaseModel inspectorItem;
+        private object clippedItem;
         private Project project;
 
         public Project Project
@@ -61,6 +65,37 @@ namespace Kinectitude.Editor.Models
             }
         }
 
+        public BaseModel InspectorItem
+        {
+            get { return inspectorItem; }
+            set
+            {
+                if (null == value)
+                {
+                    value = ActiveItem;
+                }
+
+                if (inspectorItem != value)
+                {
+                    inspectorItem = value;
+                    NotifyPropertyChanged("InspectorItem");
+                }
+            }
+        }
+
+        public object ClippedItem
+        {
+            get { return clippedItem; }
+            set
+            {
+                if (clippedItem != value)
+                {
+                    clippedItem = value;
+                    NotifyPropertyChanged("ClippedItem");
+                }
+            }
+        }
+
         public ICommandHistory CommandHistory
         {
             get { return commandHistory.Value; }
@@ -84,6 +119,7 @@ namespace Kinectitude.Editor.Models
         public ICommand SaveProjectCommand { get; private set; }
         public ICommand SaveProjectAsCommand { get; private set; }
         public ICommand OpenItemCommand { get; private set; }
+        public ICommand InspectItemCommand { get; private set; }
         public ICommand CloseItemCommand { get; private set; }
         
         public Workspace()
@@ -150,6 +186,8 @@ namespace Kinectitude.Editor.Models
             });
 
             OpenItemCommand = new DelegateCommand(null, (parameter) => OpenItem(parameter as BaseModel));
+
+            InspectItemCommand = new DelegateCommand(null, (parameter) => InspectorItem = parameter as BaseModel);
 
             CloseItemCommand = new DelegateCommand(null, (parameter) => CloseItem(parameter as BaseModel));
 
@@ -240,6 +278,7 @@ namespace Kinectitude.Editor.Models
                 OpenItems.Add(item);
             }
 
+            InspectorItem = item;
             ActiveItem = item;
         }
 
@@ -305,11 +344,6 @@ namespace Kinectitude.Editor.Models
         public Plugin GetPlugin(Type type)
         {
             return GetPlugin(type.FullName);
-        }
-
-        public void Broadcast<T>(T notification) where T : Notification
-        {
-            Project.Game.Notify(notification);
         }
     }
 }

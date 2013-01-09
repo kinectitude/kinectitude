@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Kinectitude.Core.Attributes;
+﻿using Kinectitude.Core.Attributes;
 using Kinectitude.Editor.Base;
+using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace Kinectitude.Editor.Models

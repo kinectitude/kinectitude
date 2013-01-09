@@ -1,10 +1,6 @@
-﻿using Kinectitude.Editor.Models.Statements;
-using Kinectitude.Editor.Storage;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
+﻿using Kinectitude.Editor.Storage;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Statements.Conditions
 {
     internal sealed class InheritedCondition : AbstractCondition
     {

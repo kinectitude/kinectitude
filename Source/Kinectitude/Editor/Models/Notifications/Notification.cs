@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace Kinectitude.Editor.Models.Notifications
 {
     internal class Notification
@@ -10,6 +6,8 @@ namespace Kinectitude.Editor.Models.Notifications
         public enum NotificationMode { Children, Parent };
 
         public NotificationMode Mode { get; private set; }
+
+        public bool Handled { get; set; }
 
         protected Notification(NotificationMode mode)
         {

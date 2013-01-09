@@ -1,14 +1,15 @@
-﻿using Kinectitude.Editor.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Linq;
-using Kinectitude.Editor.Models;
-using Action = Kinectitude.Editor.Models.Action;
-using Attribute = Kinectitude.Editor.Models.Attribute;
+﻿using Kinectitude.Editor.Models;
+using Kinectitude.Editor.Models.Properties;
+using Kinectitude.Editor.Models.Statements.Actions;
 using Kinectitude.Editor.Models.Statements.Assignments;
-using Kinectitude.Editor.Models.Statements;
+using Kinectitude.Editor.Models.Statements.Base;
+using Kinectitude.Editor.Models.Statements.Conditions;
+using Kinectitude.Editor.Models.Statements.Events;
+using Kinectitude.Editor.Models.Statements.Loops;
+using System.Linq;
+using System.Xml.Linq;
+using Action = Kinectitude.Editor.Models.Statements.Actions.Action;
+using Attribute = Kinectitude.Editor.Models.Attribute;
 
 namespace Kinectitude.Editor.Storage.Xml
 {
@@ -46,7 +47,7 @@ namespace Kinectitude.Editor.Storage.Xml
 
         public void Visit(Attribute attribute)
         {
-            result = new XAttribute(attribute.Key, attribute.Value);
+            result = new XAttribute(attribute.Name, attribute.Value);
         }
 
         public void Visit(Component component)
@@ -99,7 +100,7 @@ namespace Kinectitude.Editor.Storage.Xml
 
             foreach (Attribute attribute in entity.Attributes)
             {
-                if (attribute.IsLocal)
+                if (attribute.HasOwnValue)
                 {
                     element.Add(Apply(attribute));
                 }
@@ -107,7 +108,7 @@ namespace Kinectitude.Editor.Storage.Xml
 
             foreach (Component component in entity.Components)
             {
-                if (component.IsRoot || component.HasLocalProperties)
+                if (component.IsRoot || component.HasOwnValues)
                 {
                     element.Add(Apply(component));
                 }

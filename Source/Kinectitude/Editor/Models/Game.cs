@@ -1,18 +1,18 @@
-﻿using System.Collections.ObjectModel;
+﻿using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models.Interfaces;
+using Kinectitude.Editor.Models.Notifications;
+using Kinectitude.Editor.Models.Transactions;
+using Kinectitude.Editor.Storage;
+using Kinectitude.Editor.Views.Utils;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
-using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Models.Interfaces;
-using Kinectitude.Editor.Views;
-using Kinectitude.Editor.Storage;
-using Kinectitude.Editor.Models.Notifications;
-using System.Collections.Generic;
 
 namespace Kinectitude.Editor.Models
 {
     internal sealed class Game : GameModel<IScope>, IAttributeScope, IEntityScope, ISceneScope
     {
-        private string fileName;
         private string name;
         private int width;
         private int height;
@@ -21,19 +21,6 @@ namespace Kinectitude.Editor.Models
         private int nextAttribute;
         private int nextScene;
         private int nextPrototype;
-
-        public string FileName
-        {
-            get { return fileName; }
-            set
-            {
-                if (fileName != value)
-                {
-                    fileName = value;
-                    NotifyPropertyChanged("FileName");
-                }
-            }
-        }
 
         public string Name
         {
@@ -356,7 +343,7 @@ namespace Kinectitude.Editor.Models
             Attributes.Add(attribute);
 
             Workspace.Instance.CommandHistory.Log(
-                "add attribute '" + attribute.Key + "'",
+                "add attribute '" + attribute.Name + "'",
                 () => AddAttribute(attribute),
                 () => RemoveAttribute(attribute)
             );
@@ -368,7 +355,7 @@ namespace Kinectitude.Editor.Models
             Attributes.Remove(attribute);
 
             Workspace.Instance.CommandHistory.Log(
-                "remove attribute '" + attribute.Key + "'",
+                "remove attribute '" + attribute.Name + "'",
                 () => RemoveAttribute(attribute),
                 () => AddAttribute(attribute)
             );
@@ -384,7 +371,7 @@ namespace Kinectitude.Editor.Models
         {
             string ret = "attribute" + nextAttribute;
 
-            while (Attributes.Any(x => x.Key == ret))
+            while (Attributes.Any(x => x.Name == ret))
             {
                 nextAttribute++;
                 ret = "attribute" + nextAttribute;
@@ -495,9 +482,9 @@ namespace Kinectitude.Editor.Models
         public event AttributeEventHandler InheritedAttributeRemoved { add { } remove { } }
         public event AttributeEventHandler InheritedAttributeChanged { add { } remove { } }
 
-        public string GetInheritedValue(string key)
+        public object GetInheritedValue(string key)
         {
-            return null;
+            return Attribute.DefaultValue;
         }
 
         public bool HasInheritedAttribute(string key)
@@ -507,7 +494,7 @@ namespace Kinectitude.Editor.Models
 
         public bool HasLocalAttribute(string key)
         {
-            return Attributes.Any(x => x.Key == key);
+            return Attributes.Any(x => x.Name == key);
         }
 
         #endregion

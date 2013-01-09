@@ -4,8 +4,6 @@ using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Storage;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Kinectitude.Editor.Models
 {
@@ -15,12 +13,12 @@ namespace Kinectitude.Editor.Models
         private readonly Dictionary<Type, List<Delegate>> allHandlers;
         private readonly Dictionary<Type, List<Tuple<Delegate, string>>> allDependencies;
 
+        public abstract IScope Parent { get; }
+
         public IList<GameModel> Children
         {
             get { return children; }
         }
-
-        public abstract IScope Parent { get; }
 
         protected GameModel()
         {
@@ -67,63 +65,91 @@ namespace Kinectitude.Editor.Models
             dependencies.Add(Tuple.Create<Delegate, string>(predicate, property));
         }
 
-        public void Notify<T>(T notification) where T : Notification
+        protected void Notify<T>(T e) where T : Notification
         {
-            HandleNotification(notification);
+            Notify(this, e);
+        }
 
-            if (notification.Mode == Notification.NotificationMode.Children)
+        protected void Broadcast<T>(T e) where T : Notification
+        {
+            Broadcast(this, e);
+        }
+
+        public void Notify<T>(GameModel source, T e) where T : Notification
+        {
+            HandleNotification(source, e);
+
+            if (!e.Handled)
             {
-                foreach (GameModel child in Children)
+                if (e.Mode == Notification.NotificationMode.Parent && null != Parent)
                 {
-                    child.Notify(notification);
+                    Parent.Notify(source, e);
                 }
-            }
-            else if (notification.Mode == Notification.NotificationMode.Parent && null != Parent)
-            {
-                Parent.Notify(notification);
-            }
-        }
-
-        public void Broadcast<T>(T notification) where T : Notification
-        {
-            IScope root = this;
-
-            while (root.Parent != null)
-            {
-                root = root.Parent;
-            }
-
-            root.Notify(notification);
-        }
-
-        private void HandleNotification<T>(T notification)
-        {
-            List<Delegate> handlers;
-
-            if (allHandlers.TryGetValue(typeof(T), out handlers))
-            {
-                foreach (Delegate handler in handlers)
+                else if (e.Mode == Notification.NotificationMode.Children)
                 {
-                    var typedHandler = handler as Action<T>;
-
-                    if (null != typedHandler)
+                    foreach (GameModel child in Children)
                     {
-                        typedHandler(notification);
+                        child.Notify(source, e);
                     }
                 }
             }
+        }
 
-            List<Tuple<Delegate, string>> dependencies;
+        private T GetAncestor<T>(GameModel model) where T : class, IScope
+        {
+            IScope current = model;
+            T ancestor = current as T;
 
-            if (allDependencies.TryGetValue(typeof(T), out dependencies))
+            while (null == ancestor && current.Parent != null)
             {
-                foreach (var pair in dependencies)
-                {
-                    var typedPredicate = pair.Item1 as Predicate<T>;
+                current = current.Parent;
+                ancestor = current as T;
+            }
 
-                    if (null == typedPredicate || typedPredicate(notification))
+            return ancestor;
+        }
+
+        public void Broadcast<T>(GameModel source, T e) where T : Notification
+        {
+            Game game = GetAncestor<Game>(source);
+
+            if (null != game)
+            {
+                game.Notify(source, e);
+            }
+        }
+
+        private void HandleNotification<T>(GameModel source, T e)
+        {
+            if (this != source)
+            {
+                List<Delegate> handlers;
+
+                if (allHandlers.TryGetValue(typeof(T), out handlers))
+                {
+                    foreach (Delegate handler in handlers)
                     {
-                        NotifyPropertyChanged(pair.Item2);
+                        var typedHandler = handler as Action<T>;
+
+                        if (null != typedHandler)
+                        {
+                            typedHandler(e);
+                        }
+                    }
+                }
+
+                List<Tuple<Delegate, string>> dependencies;
+
+                if (allDependencies.TryGetValue(typeof(T), out dependencies))
+                {
+                    foreach (var pair in dependencies)
+                    {
+                        var typedPredicate = pair.Item1 as Predicate<T>;
+
+                        if (null == typedPredicate || typedPredicate(e))
+                        {
+                            NotifyPropertyChanged(pair.Item2);
+                        }
                     }
                 }
             }

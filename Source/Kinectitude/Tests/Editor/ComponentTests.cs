@@ -4,6 +4,7 @@ using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Components;
 using Kinectitude.Editor.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Kinectitude.Editor.Models.Properties;
 
 namespace Kinectitude.Editor.Tests
 {
@@ -86,7 +87,7 @@ namespace Kinectitude.Editor.Tests
 
             Component childComponent = child.GetComponentByType(TransformComponentType);
             Property childProperty = childComponent.GetProperty("X");
-            childProperty.IsInherited = false;
+            //childProperty.IsInherited = false;
             childProperty.Value = 500;
 
             parent.RemoveComponent(component);
@@ -177,10 +178,7 @@ namespace Kinectitude.Editor.Tests
             Component parentComponent = new Component(game.GetPlugin(typeof(TransformComponent).FullName));
             
             Property x = parentComponent.GetProperty("X");
-            x.IsInherited = false;
             x.Value = 400;
-
-            string loc = Environment.CurrentDirectory;
 
             parent.AddComponent(parentComponent);
             
@@ -194,7 +192,6 @@ namespace Kinectitude.Editor.Tests
             Component childComponent = child.Components[0];
             
             Property y = childComponent.GetProperty("Y");
-            y.IsInherited = false;
             y.Value = 300;
             
             scene.AddEntity(child);

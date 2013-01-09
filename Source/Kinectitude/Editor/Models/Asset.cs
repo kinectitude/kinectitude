@@ -1,6 +1,4 @@
 ﻿using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Models.Interfaces;
-using Kinectitude.Editor.Storage;
 
 namespace Kinectitude.Editor.Models
 {

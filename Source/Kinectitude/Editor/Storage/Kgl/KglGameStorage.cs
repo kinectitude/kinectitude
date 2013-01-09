@@ -1,11 +1,6 @@
 ﻿using Kinectitude.Editor.Models;
-using Kinectitude.Editor.Storage.Xml;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Xml.Linq;
 
 namespace Kinectitude.Editor.Storage.Kgl
 {

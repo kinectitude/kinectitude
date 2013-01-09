@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Models.Interfaces;
+﻿using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
-using Kinectitude.Editor.Models.Statements;
+using Kinectitude.Editor.Models.Properties;
+using Kinectitude.Editor.Models.Statements.Base;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Statements.Events
 {
     internal abstract class AbstractEvent : CompositeStatement, IPropertyScope
     {
@@ -68,14 +67,14 @@ namespace Kinectitude.Editor.Models
 
         #region IPropertyScope implementation
 
-        public bool HasInheritedProperty(string name)
+        public bool HasInheritedProperty(PluginProperty property)
         {
             return false;
         }
 
-        public object GetInheritedValue(string name)
+        public object GetInheritedValue(PluginProperty property)
         {
-            return null;
+            return property.DefaultValue;
         }
 
         #endregion

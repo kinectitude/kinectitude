@@ -2,6 +2,10 @@
 using Kinectitude.Editor.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Kinectitude.Editor.Models.Statements;
+using Kinectitude.Editor.Models.Statements.Events;
+using Kinectitude.Editor.Models.Statements.Conditions;
+using Kinectitude.Editor.Models.Statements.Actions;
+using Kinectitude.Editor.Models.Statements.Base;
 
 namespace Kinectitude.Editor.Tests
 {

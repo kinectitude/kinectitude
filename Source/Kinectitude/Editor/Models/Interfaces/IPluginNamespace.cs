@@ -1,5 +1,4 @@
-﻿
-namespace Kinectitude.Editor.Models.Interfaces
+﻿namespace Kinectitude.Editor.Models.Interfaces
 {
     internal interface IPluginNamespace
     {
