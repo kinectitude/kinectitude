@@ -5,7 +5,7 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Base
 {
-    public sealed class Entity : DataContainer
+    public sealed class Entity : DataContainer, IEntity
     {
         //used to get a specific component
         private readonly Dictionary<Type, Component> componentDictionary = new Dictionary<Type, Component>();
