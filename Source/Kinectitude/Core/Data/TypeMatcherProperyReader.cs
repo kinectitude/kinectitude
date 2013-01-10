@@ -9,15 +9,15 @@ namespace Kinectitude.Core.Data
     internal sealed class TypeMatcherProperyReader : RepeatReader
     {
         internal readonly TypeMatcherWatcher Watcher;
-        internal readonly string What;
-        internal readonly string Component;
+        internal readonly string ComponentName;
         internal readonly string Param;
 
+        private Component component = null; 
         private Entity lastEntity = null;
 
         protected override ValueReader Reader
         {
-            get { return Watcher.GetTypeMatcher().GetComponentValue(Component, Param); }
+            get { return Watcher.GetTypeMatcher().GetComponentValue(ComponentName, Param); }
         }
 
         internal static TypeMatcherProperyReader GetTypeMatcherProperyReader
@@ -32,21 +32,25 @@ namespace Kinectitude.Core.Data
 
         private TypeMatcherProperyReader(TypeMatcherWatcher watcher, string component, string param)
         {
-            Component = component;
+            ComponentName = component;
             Param = param;
-            What = component + "." + param;
             Watcher = watcher;
             TypeMatcher matcher = Watcher.GetTypeMatcher();
+            if(matcher.Entity != null) this.component = matcher.Entity.GetComponent(component);
             Watcher.NotifyOfChange(this);
         }
 
         private void typeMatcherChange()
         {
-            if (lastEntity != null) lastEntity.UnnotifyOfComponentChange(What, this);
+            if (lastEntity != null) lastEntity.UnnotifyOfComponentChange(new Tuple<IChangeable,string>(component, Param), this);
             Entity entity = Watcher.GetTypeMatcher().Entity;
-            lastEntity = entity;
-            entity.NotifyOfComponentChange(What, this);
-            ((IChangeable)this).Change();
+            if (entity != null)
+            {
+                component = entity.GetComponent(ComponentName);
+                lastEntity = entity;
+                ((IDataContainer)entity).NotifyOfComponentChange(new Tuple<IChangeable, string>(component, Param), this);
+            }
+            ((IChanges)this).Change();
         }
 
         internal override ValueWriter ConvertToWriter() { return new TypeMatcherProperyWriter(this); }

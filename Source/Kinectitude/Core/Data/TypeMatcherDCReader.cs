@@ -37,7 +37,7 @@ namespace Kinectitude.Core.Data
             Entity entity = Watcher.GetTypeMatcher().Entity;
             lastEntity = entity;
             entity.StopNotifications(Param, this);
-            ((IChangeable)this).Change();
+            ((IChanges)this).Change();
         }
         internal override ValueWriter ConvertToWriter() { return new TypeMatcherDCWriter(this); }
     }

@@ -7,10 +7,13 @@ namespace Kinectitude.Core.Base
     public abstract class DataContainer : IDataContainer
     {
         private readonly Dictionary<string, ValueReader> attributes = new Dictionary<string, ValueReader>();
-        private readonly Dictionary<string, List<IChangeable>> callbacks = new Dictionary<string, List<IChangeable>>();
+        private readonly Dictionary<string, List<IChanges>> callbacks = new Dictionary<string, List<IChanges>>();
 
-        internal readonly Dictionary<string, List<IChangeable>> CheckProperties = new Dictionary<string, List<IChangeable>>();
-        internal readonly List<Tuple<DataContainer, string, IChangeable>> PropertyChanges = new List<Tuple<DataContainer, string, IChangeable>>();
+        internal readonly Dictionary<Tuple<IChangeable, string>, List<IChanges>> CheckProperties =
+            new Dictionary<Tuple<IChangeable, string>, List<IChanges>>();
+
+        internal readonly List<Tuple<DataContainer, Tuple<IChangeable, string>, IChanges>> PropertyChanges =
+            new List<Tuple<DataContainer, Tuple<IChangeable, string>, IChanges>>();
 
         internal bool Deleted { get; set; }
 
@@ -36,8 +39,8 @@ namespace Kinectitude.Core.Base
                 attributes[key] = reader;
                 if (callbacks.ContainsKey(key))
                 {
-                    foreach (IChangeable callable in callbacks[key]) callable.Prepare();
-                    foreach (IChangeable callable in callbacks[key]) callable.Change();
+                    foreach (IChanges callable in callbacks[key]) callable.Prepare();
+                    foreach (IChanges callable in callbacks[key]) callable.Change();
                 }
             }
         }
@@ -48,13 +51,13 @@ namespace Kinectitude.Core.Base
             Deleted = false;
         }
 
-        public void NotifyOfChange(string key, IChangeable callback)
+        public void NotifyOfChange(string key, IChanges callback)
         {
-            List<IChangeable> addTo = null;
+            List<IChanges> addTo = null;
             callbacks.TryGetValue(key, out addTo);
             if (null == addTo)
             {
-                addTo = new List<IChangeable>();
+                addTo = new List<IChanges>();
                 callbacks[key] = addTo;
                 addTo.Add(callback);
             }
@@ -64,52 +67,48 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        internal void StopNotifications(string key, IChangeable callback)
+        internal void StopNotifications(string key, IChanges callback)
         {
-            List<IChangeable> removeFrom = callbacks[key];
+            List<IChanges> removeFrom = callbacks[key];
             removeFrom.Remove(callback);
         }
 
-
-        public void NotifyOfComponentChange(string what, IChangeable callback)
+        void IDataContainer.NotifyOfComponentChange(Tuple<IChangeable, string> what, IChanges callback)
         {
-            List<IChangeable> callbacks;
+            List<IChanges> callbacks;
             if (CheckProperties.TryGetValue(what, out callbacks))
             {
                 callbacks.Add(callback);
             }
             else
             {
-                callbacks = new List<IChangeable>();
+                callbacks = new List<IChanges>();
                 callbacks.Add(callback);
                 CheckProperties[what] = callbacks;
-                string[] parts = what.Split('.');
-                Changeable ch = GetChangeable(parts[0]);
-                if(null != ch) ch.ShouldCheck = true;
+
+                if(null != what.Item1) what.Item1.ShouldCheck = true;
             }
         }
 
-        internal void UnnotifyOfComponentChange(string what, IChangeable callback)
+        object IDataContainer.GetParam(IChangeable what, string property) { return ClassFactory.GetParam(what, property); }
+
+        internal void UnnotifyOfComponentChange(Tuple<IChangeable, string> what, IChanges callback)
         {
-            List<IChangeable> callbacks;
+            List<IChanges> callbacks;
             if (CheckProperties.TryGetValue(what, out callbacks))
             {
                 callbacks.Remove(callback);
-                if (callbacks.Count == 0)
-                {
-                    Changeable ch = GetChangeable(what.Split('.')[0]);
-                    if(null != ch) ch.ShouldCheck = false;
-                }
+                if (callbacks.Count == 0 && null != what.Item1) what.Item1.ShouldCheck = false;
             }
         }
 
-        internal void ChangedProperty(string what)
+        internal void ChangedProperty(Tuple<IChangeable, string> what)
         {
-            List<IChangeable> callbacks;
+            List<IChanges> callbacks;
             if (CheckProperties.TryGetValue(what, out callbacks))
             {
-                foreach (IChangeable callback in callbacks) callback.Prepare();
-                foreach (IChangeable callback in callbacks) callback.Change();
+                foreach (IChanges callback in callbacks) callback.Prepare();
+                foreach (IChanges callback in callbacks) callback.Change();
             }
         }
 

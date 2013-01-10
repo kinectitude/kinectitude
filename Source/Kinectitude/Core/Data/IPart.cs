@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Kinectitude.Core.Data
 {
-    public interface IChangeable
+    public interface IChanges
     {
         void Prepare();
         void Change();

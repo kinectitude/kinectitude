@@ -191,7 +191,7 @@ namespace Kinectitude.Core.Loaders
         private ValueReader makeParameterReader(Scene scene, Entity entity, string name, string component, string param)
         {
             DataContainer who = getDataContainer(scene, entity, name);
-            object obj = who.GetChangeable(component);
+            Changeable obj = who.GetChangeable(component);
             return ParameterValueReader.GetParameterValueReader(obj, param, who);
         }
 

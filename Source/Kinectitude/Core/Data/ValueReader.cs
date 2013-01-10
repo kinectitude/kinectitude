@@ -7,9 +7,9 @@ namespace Kinectitude.Core.Data
 {
     internal enum PreferedType { String, Number, Boolean, Null }
 
-    public abstract class ValueReader : IChangeable
+    public abstract class ValueReader : IChanges
     {
-        internal readonly List<IChangeable> Callbacks = new List<IChangeable>();
+        internal readonly List<IChanges> Callbacks = new List<IChanges>();
         //TODO change to a null reader when I make one
         private readonly Queue<ConstantReader> Values = new Queue<ConstantReader>();
 
@@ -94,7 +94,7 @@ namespace Kinectitude.Core.Data
 
         internal virtual void SetupNotifications() { }
 
-        internal void NotifyOfChange(IChangeable change)
+        internal void NotifyOfChange(IChanges change)
         {
             if (Values.Count == 0)
             {
@@ -125,15 +125,15 @@ namespace Kinectitude.Core.Data
         internal static ValueWriter GetValueWriter(ValueReader reader) { return reader.GetValueWriter(); }
 
 
-        void IChangeable.Prepare() { Values.Enqueue(new ConstantReader(GetPreferedValue())); }
+        void IChanges.Prepare() { Values.Enqueue(new ConstantReader(GetPreferedValue())); }
 
-        void IChangeable.Change()
+        void IChanges.Change()
         {
             ConstantReader curVal = Values.Dequeue();
             if (!Values.Peek().HasSameVal(curVal))
             {
-                foreach (IChangeable callback in Callbacks) callback.Prepare();
-                foreach (IChangeable callback in Callbacks) callback.Change();
+                foreach (IChanges callback in Callbacks) callback.Prepare();
+                foreach (IChanges callback in Callbacks) callback.Change();
             }
         }
     }

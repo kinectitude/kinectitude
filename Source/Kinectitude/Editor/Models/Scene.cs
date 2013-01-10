@@ -439,12 +439,12 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        void IDataContainer.NotifyOfChange(string key, IChangeable callback)
+        void IDataContainer.NotifyOfChange(string key, IChanges callback)
         {
             changeCallbacks.SubscribeToAttributeChange(key, callback);
         }
 
-        void IDataContainer.NotifyOfComponentChange(string what, IChangeable callback)
+        void IDataContainer.NotifyOfComponentChange(string what, IChanges callback)
         {
             var tokens = what.Split('.');
             changeCallbacks.SubscribeToComponentChange(tokens[0], tokens[1], callback);

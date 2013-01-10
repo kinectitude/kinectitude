@@ -15,7 +15,7 @@ namespace Kinectitude.Core.Data
 
         public override void SetValue(ValueReader value)
         {
-            reader.Watcher.GetTypeMatcher().setComponentValue(reader.Component, reader.Param, value);
+            reader.Watcher.GetTypeMatcher().setComponentValue(reader.ComponentName, reader.Param, value);
         }
     }
 }

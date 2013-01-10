@@ -8,7 +8,7 @@ namespace Kinectitude.Editor.Models
 {
     internal sealed class CallbackCollection
     {
-        private static void PrivatePublish(IEnumerable<IChangeable> callbacks)
+        private static void PrivatePublish(IEnumerable<IChanges> callbacks)
         {
             foreach (var callback in callbacks)
             {
@@ -21,75 +21,75 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        private readonly Dictionary<string, List<IChangeable>> allCallbacks;
-        private readonly Dictionary<string, Dictionary<string, List<IChangeable>>> allComponentCallbacks;
+        private readonly Dictionary<string, List<IChanges>> allCallbacks;
+        private readonly Dictionary<string, Dictionary<string, List<IChanges>>> allComponentCallbacks;
 
         public CallbackCollection()
         {
-            allCallbacks = new Dictionary<string, List<IChangeable>>();
-            allComponentCallbacks = new Dictionary<string, Dictionary<string, List<IChangeable>>>();
+            allCallbacks = new Dictionary<string, List<IChanges>>();
+            allComponentCallbacks = new Dictionary<string, Dictionary<string, List<IChanges>>>();
         }
 
-        private List<IChangeable> GetCallbacks(string key)
+        private List<IChanges> GetCallbacks(string key)
         {
-            List<IChangeable> callbacks;
+            List<IChanges> callbacks;
             allCallbacks.TryGetValue(key, out callbacks);
 
             if (null == callbacks)
             {
-                callbacks = new List<IChangeable>();
+                callbacks = new List<IChanges>();
                 allCallbacks[key] = callbacks;
             }
 
             return callbacks;
         }
 
-        private List<IChangeable> GetPropertyCallbacks(string component, string property)
+        private List<IChanges> GetPropertyCallbacks(string component, string property)
         {
             var componentCallbacks = GetComponentCallbacks(component);
 
-            List<IChangeable> callbacks;
+            List<IChanges> callbacks;
             componentCallbacks.TryGetValue(property, out callbacks);
 
             if (null == callbacks)
             {
-                callbacks = new List<IChangeable>();
+                callbacks = new List<IChanges>();
                 componentCallbacks[property] = callbacks;
             }
 
             return callbacks;
         }
 
-        private Dictionary<string, List<IChangeable>> GetComponentCallbacks(string component)
+        private Dictionary<string, List<IChanges>> GetComponentCallbacks(string component)
         {
-            Dictionary<string, List<IChangeable>> callbacks;
+            Dictionary<string, List<IChanges>> callbacks;
             allComponentCallbacks.TryGetValue(component, out callbacks);
 
             if (null == callbacks)
             {
-                callbacks = new Dictionary<string, List<IChangeable>>();
+                callbacks = new Dictionary<string, List<IChanges>>();
                 allComponentCallbacks[component] = callbacks;
             }
 
             return callbacks;
         }
 
-        public void SubscribeToAttributeChange(string key, IChangeable callback)
+        public void SubscribeToAttributeChange(string key, IChanges callback)
         {
             GetCallbacks(key).Add(callback);
         }
 
-        public void SubscribeToComponentChange(string component, string property, IChangeable callback)
+        public void SubscribeToComponentChange(string component, string property, IChanges callback)
         {
             GetPropertyCallbacks(component, property).Add(callback);
         }
 
-        public void Unsubscribe(string key, IChangeable callback)
+        public void Unsubscribe(string key, IChanges callback)
         {
             GetCallbacks(key).Remove(callback);
         }
 
-        public void Unsubscribe(string component, string property, IChangeable callback)
+        public void Unsubscribe(string component, string property, IChanges callback)
         {
             GetPropertyCallbacks(component, property).Remove(callback);
         }
