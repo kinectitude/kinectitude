@@ -1,14 +1,16 @@
-﻿using System;
+﻿using Kinectitude.Editor.Models.Interfaces;
+using Kinectitude.Editor.Models.Notifications;
+using Kinectitude.Editor.Models.Properties;
+using Kinectitude.Editor.Storage;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Models.Interfaces;
-using Kinectitude.Editor.Storage;
-using Kinectitude.Editor.Models.Notifications;
 
 namespace Kinectitude.Editor.Models
 {
+    internal delegate void ComponentPropertyEventHandler(Component component, PluginProperty property);
+
     internal sealed class Component : GameModel<IComponentScope>, IPropertyScope
     {
         private readonly Plugin plugin;
@@ -17,7 +19,7 @@ namespace Kinectitude.Editor.Models
         public event PropertyEventHandler InheritedPropertyAdded;
         public event PropertyEventHandler InheritedPropertyRemoved;
         public event PropertyEventHandler InheritedPropertyChanged;
-        public event PropertyEventHandler LocalPropertyChanged;
+        public event ComponentPropertyEventHandler LocalPropertyChanged;
 
         public Plugin Plugin
         {
@@ -44,9 +46,9 @@ namespace Kinectitude.Editor.Models
             get { return plugin.Requires; }
         }
 
-        public bool HasLocalProperties
+        public bool HasOwnValues
         {
-            get { return Properties.Any(x => !x.IsInherited); }
+            get { return Properties.Any(x => x.HasOwnValue); }
         }
 
         [DependsOn("IsRoot")]
@@ -82,8 +84,11 @@ namespace Kinectitude.Editor.Models
 
             AddDependency<ScopeChanged>("Type");
             AddDependency<ScopeChanged>("IsRoot");
-            AddDependency<DefineAdded>("Type", (n) => n.Define.Class == Plugin.ClassName);
-            AddDependency<DefinedNameChanged>("Type", (n) => n.Plugin == Plugin);
+            AddDependency<DefineAdded>("Type", n => n.Define.Class == Plugin.ClassName);
+            AddDependency<DefinedNameChanged>("Type", n => n.Plugin == Plugin);
+
+            //AddDependency<ComponentAdded>("IsRoot", OnComponentAdded);
+            //AddDependency<ComponentRemoved>("IsRoot", OnComponentRemoved);
         }
 
         public override void Accept(IGameVisitor visitor)
@@ -102,12 +107,14 @@ namespace Kinectitude.Editor.Models
         {
             scope.InheritedComponentAdded -= OnInheritedComponentAdded;
             scope.InheritedComponentRemoved -= OnInheritedComponentRemoved;
+            scope.InheritedPropertyChanged -= OnInheritedPropertyChanged;
         }
 
         protected override void OnScopeAttaching(IComponentScope scope)
         {
             scope.InheritedComponentAdded += OnInheritedComponentAdded;
             scope.InheritedComponentRemoved += OnInheritedComponentRemoved;
+            scope.InheritedPropertyChanged += OnInheritedPropertyChanged;
         }
 
         public bool DependsOn(Component requiredComponent)
@@ -129,14 +136,14 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        public bool HasInheritedProperty(string name)
+        public bool HasInheritedProperty(PluginProperty property)
         {
             return null != Scope ? Scope.HasInheritedComponent(plugin) : false;
         }
 
-        public object GetInheritedValue(string name)
+        public object GetInheritedValue(PluginProperty property)
         {
-            return null != Scope ? Scope.GetInheritedValue(plugin, name) : null;
+            return null != Scope ? Scope.GetInheritedValue(plugin, property) : property.DefaultValue;
         }
 
         private void OnInheritedComponentAdded(Plugin plugin)
@@ -159,7 +166,7 @@ namespace Kinectitude.Editor.Models
         {
             if (this.plugin == plugin)
             {
-                if (null != InheritedPropertyAdded)
+                if (null != InheritedPropertyRemoved)
                 {
                     foreach (PluginProperty property in plugin.Properties)
                     {
@@ -171,12 +178,20 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        private void OnPropertyValueChanged(object sender, PropertyChangedEventArgs args)
+        private void OnInheritedPropertyChanged(PluginProperty property)
         {
-            if (null != LocalPropertyChanged && args.PropertyName == "Value")
+            if (null != InheritedPropertyChanged)
+            {
+                InheritedPropertyChanged(property);
+            }
+        }
+
+        private void OnPropertyValueChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (null != LocalPropertyChanged && e.PropertyName == "Value")
             {
                 AbstractProperty property = sender as AbstractProperty;
-                LocalPropertyChanged(property.PluginProperty);
+                LocalPropertyChanged(this, property.PluginProperty);
             }
         }
 
@@ -191,7 +206,10 @@ namespace Kinectitude.Editor.Models
 
             foreach (AbstractProperty property in this.Properties)
             {
-                copy.SetProperty(property.Name, property.Value);
+                if (property.HasOwnValue)
+                {
+                    copy.SetProperty(property.Name, property.Value);
+                }
             }
 
             return copy;

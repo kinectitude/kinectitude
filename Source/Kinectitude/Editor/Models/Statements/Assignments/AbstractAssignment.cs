@@ -1,9 +1,7 @@
 ﻿using Kinectitude.Core.Language;
-using Kinectitude.Editor.Storage;
-using System;
+
+using Kinectitude.Editor.Models.Statements.Base;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Kinectitude.Editor.Models.Statements.Assignments
 {

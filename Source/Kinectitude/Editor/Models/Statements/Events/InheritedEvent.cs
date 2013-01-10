@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using Kinectitude.Editor.Models.Interfaces;
-using System.Text.RegularExpressions;
+﻿using Kinectitude.Editor.Models.Properties;
+using Kinectitude.Editor.Models.Statements.Base;
 using Kinectitude.Editor.Storage;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Statements.Events
 {
     internal sealed class InheritedEvent : AbstractEvent
     {

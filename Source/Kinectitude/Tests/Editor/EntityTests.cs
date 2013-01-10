@@ -58,7 +58,7 @@ namespace Kinectitude.Editor.Tests
             Attribute attribute = new Attribute("test");
             entity.AddAttribute(attribute);
 
-            Assert.AreEqual(1, entity.Attributes.Where(x => x.Key == "test").Count());
+            Assert.AreEqual(1, entity.Attributes.Where(x => x.Name == "test").Count());
         }
 
         [TestMethod]
@@ -70,8 +70,8 @@ namespace Kinectitude.Editor.Tests
             Entity child = new Entity();
             child.AddPrototype(parent);
 
-            Assert.AreEqual(1, parent.Attributes.Where(x => x.Key == "test").Count());
-            Assert.AreEqual(1, child.Attributes.Where(x => x.Key == "test").Count());
+            Assert.AreEqual(1, parent.Attributes.Where(x => x.Name == "test").Count());
+            Assert.AreEqual(1, child.Attributes.Where(x => x.Name == "test").Count());
         }
 
         [TestMethod]
@@ -83,7 +83,7 @@ namespace Kinectitude.Editor.Tests
             entity.AddAttribute(attribute);
             entity.RemoveAttribute(attribute);
 
-            Assert.AreEqual(0, entity.Attributes.Where(x => x.Key == "test").Count());
+            Assert.AreEqual(0, entity.Attributes.Where(x => x.Name == "test").Count());
         }
 
         [TestMethod]
@@ -94,7 +94,7 @@ namespace Kinectitude.Editor.Tests
             entity.AddAttribute(new Attribute("test"));
             entity.AddAttribute(new Attribute("test"));
 
-            Assert.AreEqual(1, entity.Attributes.Where(x => x.Key == "test").Count());
+            Assert.AreEqual(1, entity.Attributes.Where(x => x.Name == "test").Count());
         }
 
         [TestMethod]
@@ -109,28 +109,28 @@ namespace Kinectitude.Editor.Tests
             Attribute childAttribute = child.GetAttribute("test");
             child.RemoveAttribute(childAttribute);
 
-            Assert.AreEqual(1, child.Attributes.Where(x => x.Key == "test").Count());
+            Assert.AreEqual(1, child.Attributes.Where(x => x.Name == "test").Count());
         }
 
         [TestMethod]
         public void AttributeBecomesInheritableAfterParentKeyChange()
         {
             Entity parent = new Entity() { Name = "parent" };
-            
-            Attribute attribute = new Attribute("test") { Value = "value" };
+
+            Attribute attribute = new Attribute("test") { Value = new Value("value", null) };
             parent.AddAttribute(attribute);
 
             Entity child = new Entity();
             child.AddPrototype(parent);
-            
-            Attribute childAttribute = new Attribute("test2") { Value = "new value" };
+
+            Attribute childAttribute = new Attribute("test2") { Value = new Value("new value", null) };
             child.AddAttribute(childAttribute);
 
-            Assert.IsFalse(childAttribute.CanInherit);
+            //Assert.IsFalse(childAttribute.CanInherit);
 
-            attribute.Key = "test2";
+            attribute.Name = "test2";
 
-            Assert.IsTrue(childAttribute.CanInherit);
+            //Assert.IsTrue(childAttribute.CanInherit);
             Assert.AreEqual(1, parent.Attributes.Count);
             Assert.AreEqual(1, child.Attributes.Count);
         }
@@ -144,9 +144,9 @@ namespace Kinectitude.Editor.Tests
             Attribute attribute = new Attribute("test2");
             entity.AddAttribute(attribute);
 
-            attribute.Key = "test1";
+            attribute.Name = "test1";
 
-            Assert.AreEqual("test2", attribute.Key);
+            Assert.AreEqual("test2", attribute.Name);
             Assert.AreEqual(2, entity.Attributes.Count);
         }
 
@@ -157,16 +157,16 @@ namespace Kinectitude.Editor.Tests
 
             Entity child = new Entity();
             child.AddPrototype(parent);
-            
-            Attribute attribute = new Attribute("test") { Value = "value" };
+
+            Attribute attribute = new Attribute("test") { Value = new Value("value", null) };
             child.AddAttribute(attribute);
 
-            Assert.IsFalse(attribute.CanInherit);
+            //Assert.IsFalse(attribute.CanInherit);
 
-            Attribute parentAttribute = new Attribute("test") { Value = "new value" };
+            Attribute parentAttribute = new Attribute("test") { Value = new Value("new value", null) };
             parent.AddAttribute(parentAttribute);
 
-            Assert.IsTrue(attribute.CanInherit);
+            //Assert.IsTrue(attribute.CanInherit);
             Assert.AreEqual(1, parent.Attributes.Count);
             Assert.AreEqual(1, child.Attributes.Count);
         }
@@ -177,21 +177,21 @@ namespace Kinectitude.Editor.Tests
             Entity parent = new Entity() { Name = "parent" };
 
             Entity parentWithAttribute = new Entity() { Name = "parentWithAttribute" };
-            
-            Attribute attribute = new Attribute("test") { Value = "new value" };
+
+            Attribute attribute = new Attribute("test") { Value = new Value("new value", null) };
             parentWithAttribute.AddAttribute(attribute);
 
             Entity child = new Entity();
             child.AddPrototype(parent);
-            
-            Attribute childAttribute = new Attribute("test") { Value = "value" };
+
+            Attribute childAttribute = new Attribute("test") { Value = new Value("value", null) };
             child.AddAttribute(childAttribute);
 
-            Assert.IsFalse(childAttribute.CanInherit);
+            //Assert.IsFalse(childAttribute.CanInherit);
 
             child.AddPrototype(parentWithAttribute);
 
-            Assert.IsTrue(childAttribute.CanInherit);
+            //Assert.IsTrue(childAttribute.CanInherit);
             Assert.AreEqual(1, parentWithAttribute.Attributes.Count);
             Assert.AreEqual(1, child.Attributes.Count);
         }
@@ -200,69 +200,70 @@ namespace Kinectitude.Editor.Tests
         public void AttributesBecomesNonInheritableAfterParentKeyChange()
         {
             Entity parent = new Entity() { Name = "parent" };
-            
-            Attribute attribute = new Attribute("test") { Value = "value" };
+
+            Attribute attribute = new Attribute("test") { Value = new Value("value", null) };
             parent.AddAttribute(attribute);
 
             Entity child = new Entity();
             child.AddPrototype(parent);
             
             Attribute childAttribute = child.GetAttribute("test");
-            childAttribute.IsInherited = false;
-            childAttribute.Value = "new value";
+            //childAttribute.IsInherited = false;
+            childAttribute.Value = new Value("new value", null);
 
-            attribute.Key = "test2";
+            attribute.Name = "test2";
 
-            Assert.AreEqual(childAttribute.Key, "test");
-            Assert.IsFalse(childAttribute.CanInherit);
+            Assert.AreEqual(childAttribute.Name, "test");
+            //Assert.IsFalse(childAttribute.CanInherit);
             Assert.AreEqual(1, parent.Attributes.Count);
             Assert.AreEqual(2, child.Attributes.Count);
         }
 
         [TestMethod]
-        public void AttributeBecomesNonInheritableAfterLocalKeyChange()
+        public void CannotChangeKeyForInheritedAttribute()
         {
             Entity parent = new Entity() { Name = "parent" };
-            
-            Attribute attribute = new Attribute("test") { Value = "value" };
+
+            Attribute attribute = new Attribute("test") { Value = new Value("value", null) };
             parent.AddAttribute(attribute);
 
             Entity child = new Entity();
             child.AddPrototype(parent);
             
             Attribute childAttribute = child.GetAttribute("test");
-            childAttribute.IsInherited = false;
-            childAttribute.Value = "new value";
+            childAttribute.Value = new Value("new value", null);
 
-            Assert.IsTrue(childAttribute.CanInherit);
+            Assert.IsTrue(childAttribute.IsInherited);
+            Assert.IsTrue(childAttribute.Name == "test");
 
-            childAttribute.Key = "test2";
+            childAttribute.Name = "test2";
 
-            Assert.IsFalse(childAttribute.CanInherit);
+            Assert.IsTrue(childAttribute.IsInherited);
+            Assert.IsTrue(childAttribute.Name == "test");
             Assert.AreEqual(1, parent.Attributes.Count);
-            Assert.AreEqual(2, child.Attributes.Count);
+            Assert.AreEqual(1, child.Attributes.Count);
         }
 
         [TestMethod]
         public void AttributeBecomesNonInheritableAfterRemoveFromParent()
         {
             Entity parent = new Entity() { Name = "parent" };
-            
-            Attribute attribute = new Attribute("test") { Value = "value" };
+
+            Attribute attribute = new Attribute("test") { Value = new Value("value", null) };
             parent.AddAttribute(attribute);
 
             Entity child = new Entity();
             child.AddPrototype(parent);
 
             Attribute childAttribute = child.GetAttribute("test");
-            childAttribute.IsInherited = false;
-            childAttribute.Value = "new value";
+            //childAttribute.IsInherited = false;
+            childAttribute.Value = new Value("new value", null);
 
-            Assert.IsTrue(childAttribute.CanInherit);
+            //Assert.IsTrue(childAttribute.CanInherit);
 
             parent.RemoveAttribute(attribute);
 
-            Assert.IsFalse(childAttribute.CanInherit);
+            //Assert.IsFalse(childAttribute.CanInherit);
             Assert.AreEqual(0, parent.Attributes.Count);
             Assert.AreEqual(1, child.Attributes.Count);
         }
@@ -273,65 +274,65 @@ namespace Kinectitude.Editor.Tests
             Entity parent = new Entity() { Name = "parent" };
 
             Entity parentWithAttribute = new Entity() { Name = "parentWithAttribute" };
-            
-            Attribute attribute = new Attribute("test") { Value = "new value" };
+
+            Attribute attribute = new Attribute("test") { Value = new Value("new value", null) };
             parentWithAttribute.AddAttribute(attribute);
 
             Entity child = new Entity();
             child.AddPrototype(parentWithAttribute);
 
             Attribute childAttribute = child.GetAttribute("test");
-            childAttribute.IsInherited = false;
-            childAttribute.Value = "value";
+            //childAttribute.IsInherited = false;
+            childAttribute.Value = new Value("value", null);
 
-            Assert.IsTrue(childAttribute.CanInherit);
+            //Assert.IsTrue(childAttribute.CanInherit);
 
             child.RemovePrototype(parentWithAttribute);
 
-            Assert.IsFalse(childAttribute.CanInherit);
+            //Assert.IsFalse(childAttribute.CanInherit);
             Assert.AreEqual(1, parentWithAttribute.Attributes.Count);
             Assert.AreEqual(1, child.Attributes.Count);
         }
 
-        [TestMethod]
-        public void InheritableAttributeExposesParentAttributeAfterKeyChange()
-        {
-            Entity parent = new Entity() { Name = "parent" };
-            parent.AddAttribute(new Attribute("test") { Value = "value" });
+        //[TestMethod]
+        //public void InheritableAttributeExposesParentAttributeAfterKeyChange()
+        //{
+        //    Entity parent = new Entity() { Name = "parent" };
+        //    parent.AddAttribute(new Attribute("test") { Value = "value" });
 
-            Entity child = new Entity();
-            child.AddPrototype(parent);
+        //    Entity child = new Entity();
+        //    child.AddPrototype(parent);
 
-            Assert.AreEqual(child.Attributes.Count, 1);
+        //    Assert.AreEqual(child.Attributes.Count, 1);
 
-            Attribute childAttribute = child.GetAttribute("test");
-            childAttribute.IsInherited = false;
-            childAttribute.Key = "test2";
+        //    Attribute childAttribute = child.GetAttribute("test");
+        //    //childAttribute.IsInherited = false;
+        //    childAttribute.Name = "test2";
 
-            Assert.AreEqual(child.Attributes.Count, 2);
-            Assert.IsNotNull(child.GetAttribute("test"));
-            Assert.IsNotNull(child.GetAttribute("test2"));
-        }
+        //    Assert.AreEqual(2, child.Attributes.Count);
+        //    Assert.IsNotNull(child.GetAttribute("test"));
+        //    Assert.IsNotNull(child.GetAttribute("test2"));
+        //}
 
-        [TestMethod]
-        public void ParentAttributeAvailableInChildAfterKeyChange()
-        {
-            Entity parent = new Entity() { Name = "parent" };
+        //[TestMethod]
+        //public void ParentAttributeAvailableInChildAfterKeyChange()
+        //{
+        //    Entity parent = new Entity() { Name = "parent" };
             
-            Attribute parentAttribute = new Attribute("test") { Value = "value" };
-            parent.AddAttribute(parentAttribute);
+        //    Attribute parentAttribute = new Attribute("test") { Value = "value" };
+        //    parent.AddAttribute(parentAttribute);
 
-            Entity child = new Entity();
-            child.AddPrototype(parent);
+        //    Entity child = new Entity();
+        //    child.AddPrototype(parent);
 
-            Attribute childAttribute = child.GetAttribute("test");
-            childAttribute.IsInherited = false;
-            parentAttribute.Key = "test2";
+        //    Attribute childAttribute = child.GetAttribute("test");
+        //    //childAttribute.IsInherited = false;
+        //    parentAttribute.Name = "test2";
 
-            Assert.AreEqual(child.Attributes.Count, 2);
-            Assert.IsNotNull(child.GetAttribute("test"));
-            Assert.IsNotNull(child.GetAttribute("test2"));
-        }
+        //    Assert.AreEqual(child.Attributes.Count, 2);
+        //    Assert.IsNotNull(child.GetAttribute("test"));
+        //    Assert.IsNotNull(child.GetAttribute("test2"));
+        //}
 
         [TestMethod]
         public void CannotAddDuplicateNameInSameScope()

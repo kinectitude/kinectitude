@@ -1,20 +1,27 @@
-﻿using Kinectitude.Editor.Base;
+﻿using Kinectitude.Core.Data;
+using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
+using Kinectitude.Editor.Models.Transactions;
 using Kinectitude.Editor.Storage;
-using Kinectitude.Editor.Views;
+using Kinectitude.Editor.Views.Scenes.Presenters;
+using Kinectitude.Editor.Views.Utils;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 
 namespace Kinectitude.Editor.Models
 {
-    internal sealed class Scene : GameModel<ISceneScope>, IAttributeScope, IEntityScope, IManagerScope
+    internal sealed class Scene : GameModel<ISceneScope>, IAttributeScope, IEntityScope, IManagerScope, IDataContainer
     {
         private string name;
         private int nextAttribute;
+        private CallbackCollection changeCallbacks;
 
         public string Name
         {
@@ -45,16 +52,20 @@ namespace Kinectitude.Editor.Models
         public ObservableCollection<Attribute> Attributes { get; private set; }
         public ObservableCollection<Manager> Managers { get; private set; }
         public ObservableCollection<Entity> Entities { get; private set; }
-        public ObservableCollection<Entity> SelectedEntities { get; private set; }
+        public ObservableCollection<EntityPresenter> EntityPresenters { get; private set; }
 
         public ICommand RenameCommand { get; private set; }
-        public ICommand SelectCommand { get; private set; }
         public ICommand AddAttributeCommand { get; private set; }
         public ICommand RemoveAttributeCommand { get; private set; }
         public ICommand PromptAddEntityCommand { get; private set; }
         public ICommand AddEntityCommand { get; private set; }
         public ICommand RemoveEntityCommand { get; private set; }
         public ICommand PropertiesCommand { get; private set; }
+
+        public ICommand CutCommand { get; private set; }
+        public ICommand CopyCommand { get; private set; }
+        public ICommand PasteCommand { get; private set; }
+        public ICommand DeleteCommand { get; private set; }
 
         public Scene(string name)
         {
@@ -63,7 +74,9 @@ namespace Kinectitude.Editor.Models
             Attributes = new ObservableCollection<Attribute>();
             Managers = new ObservableCollection<Manager>();
             Entities = new ObservableCollection<Entity>();
-            SelectedEntities = new ObservableCollection<Entity>();
+            EntityPresenters = new ObservableCollection<EntityPresenter>();
+
+            Entities.CollectionChanged += OnEntitiesChanged;
 
             RenameCommand = new DelegateCommand(null, (parameter) =>
             {
@@ -89,7 +102,6 @@ namespace Kinectitude.Editor.Models
                 {
                     Entity entity = preset.DeepCopy();
                     AddEntity(entity);
-                    SelectEntity(entity);
                 }
             });
 
@@ -103,6 +115,75 @@ namespace Kinectitude.Editor.Models
             {
                 DialogService.ShowDialog(DialogService.Constants.SceneDialog, new SceneTransaction(this));
             });
+
+            CutCommand = new DelegateCommand(null, (parameter) =>
+            {
+                var selected = (IEnumerable)parameter;
+                if (null != selected)
+                {
+                    var clip = selected.Cast<EntityPresenter>().Select(x => x.Entity).ToArray();
+
+                    foreach (var entity in clip)
+                    {
+                        RemoveEntity(entity);
+                    }
+
+                    Workspace.Instance.ClippedItem = clip;
+                }
+            });
+
+            CopyCommand = new DelegateCommand(null, (parameter) =>
+            {
+                var selected = (IEnumerable)parameter;
+                if (null != selected)
+                {
+                    var clip = selected.Cast<EntityPresenter>().Select(x => x.Entity.DeepCopy()).ToArray();
+                    Workspace.Instance.ClippedItem = clip;
+                }
+            });
+
+            PasteCommand = new DelegateCommand(null, (parameter) =>
+            {
+                var clippedEntities = Workspace.Instance.ClippedItem as IEnumerable<Entity>;
+                if (null != clippedEntities)
+                {
+                    foreach (var entity in clippedEntities)
+                    {
+                        AddEntity(entity.DeepCopy());
+                    }
+                }
+            });
+
+            DeleteCommand = new DelegateCommand(null, (parameter) =>
+            {
+                var selected = (IEnumerable)parameter;
+                if (null != selected)
+                {
+                    var entities = selected.Cast<EntityPresenter>().Select(x => x.Entity).ToArray();
+                    foreach (var entity in entities)
+                    {
+                        RemoveEntity(entity);
+                    }
+                }
+            });
+
+            changeCallbacks = new CallbackCollection();
+
+            AddHandler<DefineAdded>(n =>
+            {
+                changeCallbacks.PublishComponentChange(n.Define.Name);
+            });
+
+            AddHandler<DefineRemoved>(n =>
+            {
+                changeCallbacks.PublishComponentChange(n.Define.Name);
+            });
+
+            AddHandler<DefinedNameChanged>(n =>
+            {
+                changeCallbacks.PublishComponentChange(n.OldName);
+                changeCallbacks.PublishComponentChange(GetDefinedName(n.Plugin));
+            });
         }
 
         public override void Accept(IGameVisitor visitor)
@@ -110,22 +191,61 @@ namespace Kinectitude.Editor.Models
             visitor.Visit(this);
         }
 
+        private void OnEntitiesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (Entity entity in e.NewItems)
+                {
+                    EntityPresenters.Add(new EntityPresenter(entity));
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (Entity entity in e.OldItems)
+                {
+                    var presenter = EntityPresenters.First(x => x.Entity == entity);
+                    EntityPresenters.Remove(presenter);
+                }
+            }
+        }
+
+        public Attribute GetAttribute(string name)
+        {
+            return Attributes.FirstOrDefault(x => x.Name == name);
+        }
+
         public void AddAttribute(Attribute attribute)
         {
             attribute.Scope = this;
+            attribute.PropertyChanged += OnAttributePropertyChanged;
             Attributes.Add(attribute);
+
+            changeCallbacks.PublishAttributeChange(attribute.Name);
         }
 
         public void RemoveAttribute(Attribute attribute)
         {
             attribute.Scope = null;
+            attribute.PropertyChanged -= OnAttributePropertyChanged;
             Attributes.Remove(attribute);
 
+            changeCallbacks.PublishAttributeChange(attribute.Name);
+
             Workspace.Instance.CommandHistory.Log(
-                "remove attribute '" + attribute.Key + "'",
+                "remove attribute '" + attribute.Name + "'",
                 () => RemoveAttribute(attribute),
                 () => AddAttribute(attribute)
             );
+        }
+
+        private void OnAttributePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Value")
+            {
+                var attribute = (Attribute)sender;
+                changeCallbacks.PublishAttributeChange(attribute.Name);
+            }
         }
 
         public void CreateAttribute()
@@ -189,22 +309,11 @@ namespace Kinectitude.Editor.Models
             );
         }
 
-        public void SelectEntity(Entity entity)
-        {
-            DeselectAll();
-            SelectedEntities.Add(entity);
-        }
-
-        public void DeselectAll()
-        {
-            SelectedEntities.Clear();
-        }
-
         private string GetNextAttributeKey()
         {
             string ret = "attribute" + nextAttribute;
 
-            while (Attributes.Any(x => x.Key == ret))
+            while (Attributes.Any(x => x.Name == ret))
             {
                 nextAttribute++;
                 ret = "attribute" + nextAttribute;
@@ -284,14 +393,14 @@ namespace Kinectitude.Editor.Models
             return false;
         }
 
-        public string GetInheritedValue(string key)
+        public Value GetInheritedValue(string key)
         {
-            return null;
+            return Attribute.DefaultValue;
         }
 
         public bool HasLocalAttribute(string key)
         {
-            return Attributes.Any(x => x.Key == key);
+            return Attributes.Any(x => x.Name == key);
         }
 
         #endregion
@@ -312,6 +421,33 @@ namespace Kinectitude.Editor.Models
             }
 
             return false;
+        }
+
+        #endregion
+
+        #region IDataContainer implementation
+
+        ValueReader IDataContainer.this[string key]
+        {
+            get
+            {
+                return GetAttribute(key).Value.Reader ?? ConstantReader.NullValue;
+            }
+            set
+            {
+                throw new NotSupportedException();
+            }
+        }
+
+        void IDataContainer.NotifyOfChange(string key, IChangeable callback)
+        {
+            changeCallbacks.SubscribeToAttributeChange(key, callback);
+        }
+
+        void IDataContainer.NotifyOfComponentChange(string what, IChangeable callback)
+        {
+            var tokens = what.Split('.');
+            changeCallbacks.SubscribeToComponentChange(tokens[0], tokens[1], callback);
         }
 
         #endregion

@@ -77,6 +77,7 @@
     <Compile Include="Editor\GameTests.cs" />
     <Compile Include="Editor\PropertyTests.cs" />
     <Compile Include="Editor\SceneTests.cs" />
+    <Compile Include="Editor\DataTests.cs" />
     <Compile Include="Editor\WorkspaceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

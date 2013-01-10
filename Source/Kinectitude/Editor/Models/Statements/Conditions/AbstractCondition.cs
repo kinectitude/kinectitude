@@ -1,9 +1,7 @@
-﻿using System.Collections.ObjectModel;
-using Kinectitude.Editor.Models.Interfaces;
-using Kinectitude.Editor.Models.Notifications;
-using Kinectitude.Editor.Models.Statements;
+﻿using Kinectitude.Editor.Models.Interfaces;
+using Kinectitude.Editor.Models.Statements.Base;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Statements.Conditions
 {
     internal abstract class AbstractCondition : CompositeStatement, IStatementScope
     {

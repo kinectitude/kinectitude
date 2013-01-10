@@ -1,0 +1,128 @@
+﻿<UserControl x:Class="Kinectitude.Editor.Views.Scenes.SceneEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:v="clr-namespace:Kinectitude.Editor.Views"
+             xmlns:m="clr-namespace:Kinectitude.Editor.Models"
+             xmlns:Utils="clr-namespace:Kinectitude.Editor.Views.Utils"
+             xmlns:Presenters="clr-namespace:Kinectitude.Editor.Views.Scenes.Presenters"
+             xmlns:Designer="clr-namespace:Kinectitude.Editor.Views.Controls.Designer"
+             mc:Ignorable="d"
+             x:Name="self">
+
+    <UserControl.Resources>
+
+        <Utils:EntityConverter x:Key="EntityConverter" />
+
+        <DataTemplate DataType="{x:Type Presenters:EntityPresenter}">
+            <ContentControl Content="{Binding Visual}" Opacity="{Binding Opacity}">
+                <ContentControl.ContextMenu>
+                    <ContextMenu DataContext="{Binding Entity}">
+                        <MenuItem Header="Rename..." Command="{Binding RenameCommand}" />
+                        <MenuItem Header="Delete" Command="{Binding ElementName=self, Path=DataContext.RemoveEntityCommand, Mode=OneWay}" CommandParameter="{Binding}" />
+                        <Separator />
+                        <MenuItem Header="Properties..." Command="{Binding PropertiesCommand}" />
+                    </ContextMenu>
+                </ContentControl.ContextMenu>
+            </ContentControl>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type Presenters:EntityVisual}">
+            <Grid>
+                <Rectangle Opacity="0.7" Fill="Black" Width="48" Height="48" />
+                <Line Stroke="White" X1="0" Y1="0" X2="48" Y2="48" />
+                <Line Stroke="White" X1="48" Y1="0" X2="0" Y2="48" />
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type Presenters:ShapeEntityVisual}">
+            <Grid>
+                <Rectangle Visibility="{Binding IsRectangular, Converter={StaticResource BoolToVis}}"
+                           Width="{Binding Presenter.Width}"
+                           Height="{Binding Presenter.Height}"
+                           Fill="{Binding FillColor}"
+                           Stroke="{Binding LineColor}"
+                           StrokeThickness="{Binding LineThickness}" />
+                <Ellipse Visibility="{Binding IsElliptical, Converter={StaticResource BoolToVis}}"
+                         Width="{Binding Presenter.Width}"
+                         Height="{Binding Presenter.Height}"
+                         Fill="{Binding FillColor}"
+                         Stroke="{Binding LineColor}"
+                         StrokeThickness="{Binding LineThickness}" />
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type Presenters:SpriteEntityVisual}" />
+
+        <DataTemplate DataType="{x:Type Presenters:TextEntityVisual}">
+            <TextBlock Text="{Binding Value}" FontSize="{Binding FontSize}" Foreground="{Binding FontColor}" />
+        </DataTemplate>
+        
+    </UserControl.Resources>
+
+    <DockPanel>
+
+        <ToolBarTray DockPanel.Dock="Left" Margin="0,0,4,0" Orientation="Vertical" IsLocked="True">
+            <ToolBar Band="1" BandIndex="1">
+                <Button Margin="0,0,0,4" ToolTip="Select Tool">
+                    <Image Source="{StaticResource icoCursor}" Stretch="None" />
+                </Button>
+                <!--Button Content="Hand Tool" /-->
+                <Button Click="AddEntity_Click" Margin="0,0,0,4" ToolTip="Add Entity">
+                    <Image Source="{StaticResource icoEntity}" Stretch="None" />
+                </Button>
+            </ToolBar>
+            <ToolBar Band="1" BandIndex="2">
+                <Button ToolTip="Send Forward" Margin="0,0,0,4">
+                    <Image Source="{StaticResource icoSendForward}" Stretch="None" />
+                </Button>
+                <Button ToolTip="Send Backward" Margin="0,0,0,4">
+                    <Image Source="{StaticResource icoSendBackward}" Stretch="None" />
+                </Button>
+                <Button ToolTip="Send To Front" Margin="0,0,0,4">
+                    <Image Source="{StaticResource icoSendToFront}" Stretch="None" />
+                </Button>
+                <Button ToolTip="Send To Back" Margin="0,0,0,4">
+                    <Image Source="{StaticResource icoSendToBack}" Stretch="None" />
+                </Button>
+            </ToolBar>
+            <ToolBar Band="1" BandIndex="3">
+                <Button ToolTip="Align Left" Margin="0,0,0,4">
+                    <Image Source="{StaticResource icoAlignLeft}" Stretch="None" />
+                </Button>
+                <Button ToolTip="Align Center" Margin="0,0,0,4">
+                    <Image Source="{StaticResource icoAlignCenter}" Stretch="None" />
+                </Button>
+                <Button ToolTip="Align Right" Margin="0,0,0,4">
+                    <Image Source="{StaticResource icoAlignRight}" Stretch="None" />
+                </Button>
+                <Button ToolTip="Align Top" Margin="0,0,0,4">
+                    <Image Source="{StaticResource icoAlignTop}" Stretch="None" />
+                </Button>
+                <Button ToolTip="Align Middle" Margin="0,0,0,4">
+                    <Image Source="{StaticResource icoAlignMiddle}" Stretch="None" />
+                </Button>
+                <Button ToolTip="Align Bottom">
+                    <Image Source="{StaticResource icoAlignBottom}" Stretch="None" />
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+        
+        <!--ScrollViewer Background="Gray" HorizontalScrollBarVisibility="Visible">
+        </ScrollViewer-->
+
+        <Designer:DesignerCanvas Margin="16"
+                          Width="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.Game.Width}"
+                          Height="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.Game.Height}"
+                          ItemsSource="{Binding EntityPresenters, Mode=OneWay}"
+                          SelectedItem="{Binding Source={x:Static m:Workspace.Instance}, Path=InspectorItem, Mode=OneWayToSource, Converter={StaticResource EntityConverter}}"
+                          CutCommand="{Binding CutCommand, Mode=OneWay}"
+                          PasteCommand="{Binding PasteCommand, Mode=OneWay}"
+                          CopyCommand="{Binding CopyCommand, Mode=OneWay}"
+                          DeleteCommand="{Binding DeleteCommand, Mode=OneWay}">
+
+        </Designer:DesignerCanvas>
+    </DockPanel>
+    
+</UserControl>

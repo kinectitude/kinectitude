@@ -5,7 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Windows.Input;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Transactions
 {
     internal sealed class EntityTransaction : BaseModel
     {

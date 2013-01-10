@@ -1,13 +1,12 @@
 ﻿using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
-using System;
+using Kinectitude.Editor.Models.Statements.Actions;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Windows.Input;
 
-namespace Kinectitude.Editor.Models.Statements
+namespace Kinectitude.Editor.Models.Statements.Base
 {
     internal abstract class AbstractStatement : GameModel<IStatementScope>
     {
@@ -45,7 +44,7 @@ namespace Kinectitude.Editor.Models.Statements
                 {
                     if (IsLocal)
                     {
-                        Action toInsert = parameter as Action;
+                        var toInsert = parameter as AbstractStatement;
                         if (null != toInsert)
                         {
                             if (null != Scope)
@@ -65,6 +64,14 @@ namespace Kinectitude.Editor.Models.Statements
         private void OnInheritedPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             NotifyPropertyChanged(e.PropertyName);
+        }
+
+        public void RemoveFromParent()
+        {
+            if (null != Scope)
+            {
+                Scope.RemoveStatement(this);
+            }
         }
 
         public abstract AbstractStatement DeepCopyStatement();

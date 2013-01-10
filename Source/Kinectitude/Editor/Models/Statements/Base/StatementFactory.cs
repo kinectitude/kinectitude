@@ -1,10 +1,6 @@
-﻿using Kinectitude.Editor.Models.Statements;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Statements.Base
 {
     internal enum StatementType
     {

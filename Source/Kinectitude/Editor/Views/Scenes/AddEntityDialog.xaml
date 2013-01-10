@@ -1,0 +1,24 @@
+﻿<Window x:Class="Kinectitude.Editor.Views.Scenes.AddEntityDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:m="clr-namespace:Kinectitude.Editor.Models"
+        Title="Add Entity"
+        Width="400">
+    
+    <Window.Resources>
+        
+        <DataTemplate DataType="{x:Type m:Entity}">
+            <TextBlock Text="{Binding Name}" />
+        </DataTemplate>
+        
+    </Window.Resources>
+    
+    <StackPanel Orientation="Vertical">
+        <ListBox Name="lstPresets" ItemsSource="{Binding Source={x:Static m:Workspace.Instance}, Path=EntityPresets}" />
+        <Separator />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Name="btnCancel" IsCancel="True" Width="100" Margin="4">Cancel</Button>
+            <Button Name="btnOK" IsDefault="True" Click="btnOK_Click" Width="100" Margin="0,4,4,4" Command="{Binding AddEntityCommand}" CommandParameter="{Binding ElementName=lstPresets, Path=SelectedItem}">OK</Button>
+        </StackPanel>
+    </StackPanel>
+</Window>

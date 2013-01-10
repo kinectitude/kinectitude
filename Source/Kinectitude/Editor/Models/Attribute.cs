@@ -1,47 +1,55 @@
-﻿using Kinectitude.Editor.Base;
+﻿using Kinectitude.Core.Data;
+using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Storage;
+using System.Windows.Input;
 
 namespace Kinectitude.Editor.Models
 {
-    internal delegate void KeyChangedEventHandler(string oldKey, string newKey);
+    internal delegate void NameChangedEventHandler(string oldName, string newName);
     
     internal sealed class Attribute : GameModel<IAttributeScope>
     {
-        private const string DefaultValue = "";
+        public static readonly Value DefaultValue = new Value("", ConstantReader.NullValue);
 
-        private string key;
-        private string value;
+        private string name;
+        private Value val;
         private bool inherited;
 
-        public event KeyChangedEventHandler KeyChanged;
+        public event NameChangedEventHandler NameChanged;
 
-        public string Key
+        public string Name
         {
-            get { return key; }
+            get { return name; }
             set
             {
-                if (IsLocal && key != value && !KeyExists(value))
+                if (IsLocal && name != value && !KeyExists(value))
                 {
-                    string oldKey = key;
+                    string oldKey = name;
                     
                     Workspace.Instance.CommandHistory.Log(
                         "rename attribute to '" + value + "'",
-                        () => Key = value,
-                        () => Key = oldKey
+                        () => Name = value,
+                        () => Name = oldKey
                     );
 
-                    key = value;
+                    name = value;
 
-                    if (null != KeyChanged)
+                    if (null != NameChanged)
                     {
-                        KeyChanged(oldKey, key);
+                        NameChanged(oldKey, name);
                     }
 
                     NotifyPropertyChanged("Key");
                 }
             }
+        }
+
+        [DependsOn("Value")]
+        public bool HasOwnValue
+        {
+            get { return null != val; }
         }
 
         public bool IsInherited
@@ -51,14 +59,6 @@ namespace Kinectitude.Editor.Models
             {
                 if (inherited != value)
                 {
-                    bool oldInherited = inherited;
-
-                    Workspace.Instance.CommandHistory.Log(
-                        "toggle attribute inheritance",
-                        () => IsInherited = value,
-                        () => IsInherited = oldInherited
-                    );
-
                     inherited = value;
                     NotifyPropertyChanged("IsInherited");
                 }
@@ -71,28 +71,22 @@ namespace Kinectitude.Editor.Models
             get { return !IsInherited; }
         }
 
-        public bool CanInherit
+        public bool IsEditable
         {
-            get { return null != Scope ? Scope.HasInheritedAttribute(Key) : false; }
+            get { return true; }
         }
 
-        [DependsOn("IsLocal")]
-        public object Value
+        public Value Value
         {
             get
             {
-                if (IsLocal)
-                {
-                    return value;
-                }
-
-                return null != Scope ? Scope.GetInheritedValue(Key) : DefaultValue;
+                return val ?? GetInheritedValue();
             }
             set
             {
-                if (IsLocal && this.value != value)
+                if (val != value)
                 {
-                    string oldValue = this.value;
+                    var oldValue = val;
 
                     Workspace.Instance.CommandHistory.Log(
                         "change attribute value",
@@ -100,18 +94,21 @@ namespace Kinectitude.Editor.Models
                         () => Value = oldValue
                     );
 
-                    this.value = value.ToString();
+                    val = value;
                     NotifyPropertyChanged("Value");
                 }
             }
         }
 
-        public Attribute(string key)
-        {
-            this.key = key;
-            this.value = DefaultValue;
+        public ICommand ClearValueCommand { get; private set; }
 
-            AddDependency<ScopeChanged>("CanInherit");
+        public Attribute(string name)
+        {
+            this.name = name;
+            this.inherited = false;
+
+            ClearValueCommand = new DelegateCommand(parameter => HasOwnValue, parameter => Value = null);
+
             AddDependency<ScopeChanged>("Value");
         }
 
@@ -146,15 +143,20 @@ namespace Kinectitude.Editor.Models
 
         private void OnInheritedAttributeChanged(string key)
         {
-            if (key == Key)
+            if (key == Name)
             {
-                NotifyPropertyChanged("Scope");
+                NotifyPropertyChanged("Value");
             }
         }
 
         public Attribute DeepCopy()
         {
-            return new Attribute(this.Key) { Value = this.Value };
+            return new Attribute(this.Name) { Value = this.Value };
+        }
+
+        private Value GetInheritedValue()
+        {
+            return null != Scope ? Scope.GetInheritedValue(Name) : DefaultValue;
         }
     }
 }

@@ -1,11 +1,6 @@
-﻿using Kinectitude.Editor.Models.Statements;
-using Kinectitude.Editor.Storage;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Kinectitude.Editor.Storage;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Statements.Loops
 {
     internal sealed class WhileLoop : AbstractWhileLoop
     {

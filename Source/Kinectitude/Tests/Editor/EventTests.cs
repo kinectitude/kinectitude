@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using Kinectitude.Editor.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Kinectitude.Editor.Models.Statements.Events;
+using Kinectitude.Editor.Models.Properties;
 
 namespace Kinectitude.Editor.Tests
 {
@@ -64,7 +66,7 @@ namespace Kinectitude.Editor.Tests
             Event evt = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
 
             AbstractProperty property = evt.GetProperty("Trigger");
-            property.PropertyChanged += (o, e) => propertyChanged = (e.PropertyName == "Value");
+            property.PropertyChanged += (o, e) => propertyChanged |= (e.PropertyName == "Value");
 
             evt.SetProperty("Trigger", "test");
 

@@ -1,26 +1,29 @@
-﻿using System;
+﻿using Kinectitude.Core.Data;
+using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models.Interfaces;
+using Kinectitude.Editor.Models.Notifications;
+using Kinectitude.Editor.Models.Properties;
+using Kinectitude.Editor.Models.Statements.Base;
+using Kinectitude.Editor.Models.Statements.Events;
+using Kinectitude.Editor.Models.Transactions;
+using Kinectitude.Editor.Storage;
+using Kinectitude.Editor.Views.Utils;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
-using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Models.Interfaces;
-using Kinectitude.Editor.Views;
-using Kinectitude.Editor.Storage;
-using Kinectitude.Editor.Models.Notifications;
-using Kinectitude.Editor.Models.Statements;
 
 namespace Kinectitude.Editor.Models
 {
-    internal delegate void NameChangedEventHandler(Entity entity, string oldName, string newName);
-
-    internal sealed class Entity : GameModel<IEntityScope>, IAttributeScope, IComponentScope, IStatementScope
+    internal sealed class Entity : GameModel<IEntityScope>, IAttributeScope, IComponentScope, IStatementScope, IDataContainer
     {
         private string name;
         private bool prototype;
         private int nextAttribute;
+        private CallbackCollection changeCallbacks;
         
         public string Name
         {
@@ -56,8 +59,7 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        [DependsOn("Name")]
-        [DependsOn("Prototypes")]
+        [DependsOn("Name"), DependsOn("Prototypes")]
         public string DisplayName
         {
             get
@@ -76,17 +78,15 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        public ObservableCollection<Entity> Prototypes { get; private set; }
-        public ObservableCollection<Attribute> Attributes { get; private set; }
-        public ObservableCollection<Component> Components { get; private set; }
-        public ObservableCollection<AbstractEvent> Events { get; private set; }
-
-        //public EventCollection LocalEvents { get; private set; }
-
         public IEnumerable<Plugin> Plugins
         {
             get { return Components.Select(x => x.Plugin).Union(Events.SelectMany(x => x.Plugins)).Distinct(); }
         }
+
+        public ObservableCollection<Entity> Prototypes { get; private set; }
+        public ObservableCollection<Attribute> Attributes { get; private set; }
+        public ObservableCollection<Component> Components { get; private set; }
+        public ObservableCollection<AbstractEvent> Events { get; private set; }
 
         public ICommand RenameCommand { get; private set; }
         public ICommand PropertiesCommand { get; private set; }
@@ -94,6 +94,7 @@ namespace Kinectitude.Editor.Models
         public ICommand RemoveAttributeCommand { get; private set; }
         public ICommand AddEventCommand { get; private set; }
         public ICommand RemoveEventCommand { get; private set; }
+        public ICommand DeleteStatementCommand { get; private set; }
 
         public Entity()
         {
@@ -101,8 +102,6 @@ namespace Kinectitude.Editor.Models
             Attributes = new ObservableCollection<Attribute>();
             Components = new ObservableCollection<Component>();
             Events = new ObservableCollection<AbstractEvent>();
-
-            //LocalEvents = new EventCollection(this);
 
             RenameCommand = new DelegateCommand(null, (parameter) =>
             {
@@ -145,6 +144,30 @@ namespace Kinectitude.Editor.Models
                 {
                     RemoveEvent(evt);
                 }
+            });
+
+            DeleteStatementCommand = new DelegateCommand(null, (parameter) =>
+            {
+                var statement = (AbstractStatement)parameter;
+                statement.RemoveFromParent();
+            });
+
+            changeCallbacks = new CallbackCollection();
+
+            AddHandler<DefineAdded>(n =>
+            {
+                changeCallbacks.PublishComponentChange(n.Define.Name);
+            });
+
+            AddHandler<DefineRemoved>(n =>
+            {
+                changeCallbacks.PublishComponentChange(n.Define.Name);
+            });
+
+            AddHandler<DefinedNameChanged>(n =>
+            {
+                changeCallbacks.PublishComponentChange(n.OldName);
+                changeCallbacks.PublishComponentChange(GetDefinedName(n.Plugin));
             });
         }
 
@@ -226,37 +249,68 @@ namespace Kinectitude.Editor.Models
 
         private void InheritAttribute(Attribute inheritedAttribute)
         {
-            inheritedAttribute.KeyChanged += OnPrototypeAttributeKeyChanged;
+            inheritedAttribute.NameChanged += OnPrototypeAttributeNameChanged;
             inheritedAttribute.PropertyChanged += OnPrototypeAttributePropertyChanged;
 
-            Attribute localAttribute = GetAttribute(inheritedAttribute.Key);
-            if (null == localAttribute)
-            {
-                localAttribute = new Attribute(inheritedAttribute.Key) { IsInherited = true };
-                AddAttribute(localAttribute);
-            }
+            EnsureAttributeExists(inheritedAttribute.Name);
 
             if (null != InheritedAttributeAdded)
             {
-                InheritedAttributeAdded(inheritedAttribute.Key);
+                InheritedAttributeAdded(inheritedAttribute.Name);
             }
         }
 
         private void DisinheritAttribute(Attribute inheritedAttribute)
         {
-            inheritedAttribute.KeyChanged -= OnPrototypeAttributeKeyChanged;
+            inheritedAttribute.NameChanged -= OnPrototypeAttributeNameChanged;
             inheritedAttribute.PropertyChanged -= OnPrototypeAttributePropertyChanged;
 
-            Attribute localAttribute = GetAttribute(inheritedAttribute.Key);
-            if (null != localAttribute && localAttribute.IsInherited)
-            {
-                RemoveAttribute(localAttribute);
-            }
+            CheckAttributeInheritance(inheritedAttribute.Name);
 
             if (null != InheritedAttributeRemoved)
             {
-                InheritedAttributeRemoved(inheritedAttribute.Key);
-            }   
+                InheritedAttributeRemoved(inheritedAttribute.Name);
+            }
+        }
+
+        private void EnsureAttributeExists(string key)
+        {
+            var localAttribute = GetAttribute(key);
+            if (null == localAttribute)
+            {
+                localAttribute = new Attribute(key) { IsInherited = true };
+                PrivateAddAttribute(localAttribute);
+            }
+            else if (!localAttribute.IsInherited)
+            {
+                localAttribute.IsInherited = true;
+            }
+        }
+
+        private void CheckAttributeInheritance(string key)
+        {
+            var localAttribute = GetAttribute(key);
+            if (null != localAttribute)
+            {
+                if (HasInheritedAttribute(key))
+                {
+                    if (!localAttribute.IsInherited)
+                    {
+                        localAttribute.IsInherited = true;
+                    }
+                }
+                else if (localAttribute.HasOwnValue)
+                {
+                    if (localAttribute.IsInherited)
+                    {
+                        localAttribute.IsInherited = false;
+                    }
+                }
+                else
+                {
+                    PrivateRemoveAttribute(localAttribute);
+                }
+            }
         }
 
         private void OnPrototypeAttributesChanged(object sender, NotifyCollectionChangedEventArgs args)
@@ -277,102 +331,67 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        private void OnPrototypeAttributeKeyChanged(string oldKey, string newKey)
+        private void OnPrototypeAttributeNameChanged(string oldKey, string newKey)
         {
-            Attribute inheritedAttributeWithOldKey = null;
-
-            foreach (Entity prototype in Prototypes)
-            {
-                inheritedAttributeWithOldKey = prototype.GetAttribute(oldKey);
-                if (null != inheritedAttributeWithOldKey)
-                {
-                    break;
-                }
-            }
-
-            if (null == inheritedAttributeWithOldKey)
-            {
-                Attribute localAttribute = GetAttribute(oldKey);
-                if (null != localAttribute && localAttribute.IsInherited)
-                {
-                    RemoveAttribute(localAttribute);
-
-                    if (null != InheritedAttributeRemoved)
-                    {
-                        InheritedAttributeRemoved(oldKey);
-                    }
-                }
-            }
-            else if (null != InheritedAttributeChanged)
-            {
-                InheritedAttributeChanged(oldKey);
-            }
-
-            Attribute localAttributeWithNewKey = GetAttribute(newKey);
-            if (null == localAttributeWithNewKey)
-            {
-                localAttributeWithNewKey = new Attribute(newKey) { IsInherited = true };
-                AddAttribute(localAttributeWithNewKey);
-
-                if (null != InheritedAttributeAdded)
-                {
-                    InheritedAttributeAdded(newKey);
-                }
-            }
-            else if (null != InheritedAttributeChanged)
-            {
-                InheritedAttributeChanged(newKey);
-            }
-        }
-
-        private void OnLocalAttributeKeyChanged(string oldKey, string newKey)
-        {
-            Attribute inheritedAttributeWithOldKey = null;
-
-            foreach (Entity prototype in Prototypes)
-            {
-                inheritedAttributeWithOldKey = prototype.GetAttribute(oldKey);
-                if (null != inheritedAttributeWithOldKey)
-                {
-                    InheritAttribute(inheritedAttributeWithOldKey);
-                }
-            }
+            CheckAttributeInheritance(oldKey);
+            EnsureAttributeExists(newKey);
         }
 
         public Attribute GetAttribute(string key)
         {
-            return Attributes.FirstOrDefault(x => x.Key == key);
+            return Attributes.FirstOrDefault(x => x.Name == key);
+        }
+
+        private void PrivateAddAttribute(Attribute attribute)
+        {
+            attribute.Scope = this;
+            attribute.PropertyChanged += OnLocalAttributePropertyChanged;
+            Attributes.Add(attribute);
+            changeCallbacks.PublishAttributeChange(attribute.Name);
         }
 
         public void AddAttribute(Attribute attribute)
         {
-            if (!HasLocalAttribute(attribute.Key))
+            if (!HasLocalAttribute(attribute.Name))
             {
-                attribute.Scope = this;
-                attribute.KeyChanged += OnLocalAttributeKeyChanged;
-                Attributes.Add(attribute);
+                PrivateAddAttribute(attribute);
 
                 Workspace.Instance.CommandHistory.Log(
-                    "add attribute '" + attribute.Key + "'",
+                    "add attribute '" + attribute.Name + "'",
                     () => AddAttribute(attribute),
                     () => RemoveAttribute(attribute)
                 );
             }
         }
 
+        private void PrivateRemoveAttribute(Attribute attribute)
+        {
+            attribute.Scope = null;
+            attribute.PropertyChanged -= OnLocalAttributePropertyChanged;
+            Attributes.Remove(attribute);
+            changeCallbacks.PublishAttributeChange(attribute.Name);
+        }
+
         public void RemoveAttribute(Attribute attribute)
         {
-            if (attribute.IsLocal || attribute.IsInherited && !attribute.CanInherit)
+            if (!attribute.IsInherited)
             {
-                attribute.Scope = null;
-                attribute.KeyChanged -= OnLocalAttributeKeyChanged;
-                Attributes.Remove(attribute);
+                PrivateRemoveAttribute(attribute);
 
                 Workspace.Instance.CommandHistory.Log(
-                    "remove attribute '" + attribute.Key + "'",
+                    "remove attribute '" + attribute.Name + "'",
                     () => RemoveAttribute(attribute),
                     () => AddAttribute(attribute)
                 );
+            }
+        }
+
+        private void OnLocalAttributePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Value")
+            {
+                var attribute = (Attribute)sender;
+                changeCallbacks.PublishAttributeChange(attribute.Name);
             }
         }
 
@@ -404,7 +423,7 @@ namespace Kinectitude.Editor.Models
             inheritedComponent.LocalPropertyChanged -= OnPrototypeComponentLocalPropertyChanged;
 
             Component localComponent = GetComponentByRole(inheritedComponent.Provides);
-            if (null != localComponent && !localComponent.HasLocalProperties)
+            if (null != localComponent && !localComponent.HasOwnValues)
             {
                 RemoveComponent(localComponent);
             }
@@ -449,10 +468,12 @@ namespace Kinectitude.Editor.Models
                 }
 
                 component.Scope = this;
+                component.LocalPropertyChanged += OnComponentLocalPropertyChanged;
                 Components.Add(component);
 
                 Notify(new PluginUsed(component.Plugin));
-
+                changeCallbacks.PublishComponentChange(component.Type);
+                
                 Workspace.Instance.CommandHistory.Log(
                     "add component '" + component.DisplayName + "'",
                     () => AddComponent(component),
@@ -467,8 +488,13 @@ namespace Kinectitude.Editor.Models
             {
                 if (!Components.Any(x => x.DependsOn(component)))
                 {
+                    var definedType = component.Type;
+
                     component.Scope = null;
+                    component.LocalPropertyChanged -= OnComponentLocalPropertyChanged;
                     Components.Remove(component);
+
+                    changeCallbacks.PublishComponentChange(definedType);
 
                     Workspace.Instance.CommandHistory.Log(
                         "remove component '" + component.DisplayName + "'",
@@ -477,6 +503,11 @@ namespace Kinectitude.Editor.Models
                     );
                 }
             }
+        }
+
+        private void OnComponentLocalPropertyChanged(Component component, PluginProperty property)
+        {
+            changeCallbacks.PublishComponentChange(component.Type, property.Name);
         }
 
         public Component GetComponentByRole(string provides)
@@ -521,19 +552,24 @@ namespace Kinectitude.Editor.Models
 
         public void AddEvent(AbstractEvent evt)
         {
-            evt.Scope = this;
-            Events.Add(evt);
-
-            foreach (Plugin plugin in evt.Plugins)
-            {
-                Notify(new PluginUsed(plugin));
-            }
+            PrivateAddEvent(Events.Count, evt);
 
             Workspace.Instance.CommandHistory.Log(
                 "add event '" + evt.Header + "'",
                 () => AddEvent(evt),
                 () => RemoveEvent(evt)
             );
+        }
+
+        private void PrivateAddEvent(int idx, AbstractEvent evt)
+        {
+            evt.Scope = this;
+            Events.Insert(idx, evt);
+
+            foreach (Plugin plugin in evt.Plugins)
+            {
+                Notify(new PluginUsed(plugin));
+            }
         }
 
         public void RemoveEvent(AbstractEvent evt)
@@ -554,6 +590,11 @@ namespace Kinectitude.Editor.Models
         {
             evt.Scope = null;
             Events.Remove(evt);
+        }
+
+        void IStatementScope.RemoveStatement(AbstractStatement statement)
+        {
+            RemoveEvent((AbstractEvent)statement);
         }
 
         private string GetNextAttributeKey()
@@ -579,7 +620,7 @@ namespace Kinectitude.Editor.Models
             if (null != InheritedAttributeChanged && e.PropertyName == "Value")
             {
                 Attribute attribute = sender as Attribute;
-                InheritedAttributeChanged(attribute.Key);
+                InheritedAttributeChanged(attribute.Name);
             }
         }
 
@@ -603,14 +644,14 @@ namespace Kinectitude.Editor.Models
         public event AttributeEventHandler InheritedAttributeRemoved;
         public event AttributeEventHandler InheritedAttributeChanged;
 
-        public string GetInheritedValue(string key)
+        public Value GetInheritedValue(string key)
         {
             foreach (Entity prototype in Prototypes)
             {
-                Attribute attribute = prototype.GetAttribute(key);
+                var attribute = prototype.GetAttribute(key);
                 if (null != attribute)
                 {
-                    return attribute.Value.ToString();
+                    return attribute.Value;
                 }
             }
 
@@ -624,7 +665,7 @@ namespace Kinectitude.Editor.Models
 
         public bool HasLocalAttribute(string key)
         {
-            return Attributes.Any(x => x.Key == key);
+            return Attributes.Any(x => x.Name == key);
         }
 
         #endregion
@@ -645,26 +686,27 @@ namespace Kinectitude.Editor.Models
             return Prototypes.SelectMany(x => x.Components).Any(x => x.Plugin == plugin);
         }
 
-        public object GetInheritedValue(Plugin plugin, string name)
+        public object GetInheritedValue(Plugin plugin, PluginProperty pluginProperty)
         {
             foreach (Entity prototype in Prototypes)
             {
                 Component component = prototype.Components.FirstOrDefault(x => x.Plugin == plugin);
                 if (null != component)
                 {
-                    Property property = component.GetProperty(name);
-                    if (null != property)
+                    Property property = component.GetProperty(pluginProperty.Name);
+                    if (property.HasOwnValue)
                     {
                         return property.Value;
                     }
                 }
             }
-            return null;
+
+            return pluginProperty.DefaultValue;
         }
 
         #endregion
 
-        private void OnPrototypeComponentLocalPropertyChanged(PluginProperty property)
+        private void OnPrototypeComponentLocalPropertyChanged(Component component, PluginProperty property)
         {
             if (null != InheritedPropertyChanged)
             {
@@ -731,14 +773,45 @@ namespace Kinectitude.Editor.Models
             return copy;
         }
 
-        public void InsertBefore(AbstractStatement statement, AbstractStatement toInsert)
+        void IStatementScope.InsertBefore(AbstractStatement statement, AbstractStatement toInsert)
         {
-
+            int idx = Events.IndexOf((AbstractEvent)statement);
+            if (idx != -1)
+            {
+                var evt = toInsert as AbstractEvent;
+                if (null != evt)
+                {
+                    evt.RemoveFromParent();
+                    PrivateAddEvent(idx, evt);
+                }
+            }
         }
 
-        public void InsertPrototypeBefore(Entity prototype, Entity toInsert)
-        {
+        #region IDataContainer implementation
 
+        ValueReader IDataContainer.this[string key]
+        {
+            get
+            {
+                return GetAttribute(key).Value.Reader ?? ConstantReader.NullValue;
+            }
+            set
+            {
+                throw new NotSupportedException();
+            }
         }
+
+        void IDataContainer.NotifyOfChange(string key, IChangeable callback)
+        {
+            changeCallbacks.SubscribeToAttributeChange(key, callback);
+        }
+
+        void IDataContainer.NotifyOfComponentChange(string what, IChangeable callback)
+        {
+            var tokens = what.Split('.');
+            changeCallbacks.SubscribeToComponentChange(tokens[0], tokens[1], callback);
+        }
+
+        #endregion
     }
 }

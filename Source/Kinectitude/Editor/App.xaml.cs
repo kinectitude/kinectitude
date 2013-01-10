@@ -1,5 +1,7 @@
-﻿using System.Windows;
-using Kinectitude.Editor.Views;
+﻿using Kinectitude.Editor.Views.Dialogs;
+using Kinectitude.Editor.Views.Scenes;
+using Kinectitude.Editor.Views.Utils;
+using System.Windows;
 
 namespace Kinectitude.Editor
 {
@@ -11,7 +13,6 @@ namespace Kinectitude.Editor
         public App()
         {
             DialogService.RegisterWindow<EntityDialog>(DialogService.Constants.EntityDialog);
-            DialogService.RegisterWindow<ComponentDialog>(DialogService.Constants.ComponentDialog);
             DialogService.RegisterWindow<AddEntityDialog>(DialogService.Constants.AddEntityDialog);
             DialogService.RegisterWindow<NameDialog>(DialogService.Constants.NameDialog);
             DialogService.RegisterWindow<SceneDialog>(DialogService.Constants.SceneDialog);

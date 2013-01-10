@@ -15,9 +15,10 @@ namespace Kinectitude.Editor.Models
             {
                 if (name != value)
                 {
+                    var oldName = name;
                     name = value;
 
-                    Notify(new DefinedNameChanged(Workspace.Instance.GetPlugin(Class)));
+                    Broadcast(new DefinedNameChanged(oldName, Workspace.Instance.GetPlugin(Class)));
                     NotifyPropertyChanged("Name");
                 }
             }

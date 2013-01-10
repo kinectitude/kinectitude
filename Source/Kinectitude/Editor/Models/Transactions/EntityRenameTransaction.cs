@@ -1,11 +1,7 @@
 ﻿using Kinectitude.Editor.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Input;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Transactions
 {
     internal sealed class EntityRenameTransaction : BaseModel
     {

@@ -9,7 +9,7 @@ namespace Kinectitude.Editor.Models.Interfaces
         event AttributeEventHandler InheritedAttributeRemoved;
         event AttributeEventHandler InheritedAttributeChanged;
 
-        string GetInheritedValue(string key);
+        Value GetInheritedValue(string key);
         bool HasInheritedAttribute(string key);
         bool HasLocalAttribute(string key);
     }

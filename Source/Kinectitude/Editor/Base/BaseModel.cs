@@ -1,5 +1,4 @@
-﻿using Kinectitude.Editor.Storage;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -13,11 +12,7 @@ namespace Kinectitude.Editor.Base
         [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
         protected sealed class DependsOnAttribute : System.Attribute
         {
-            public string Property
-            {
-                get;
-                private set;
-            }
+            public string Property { get; private set; }
 
             public DependsOnAttribute(string property)
             {

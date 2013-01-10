@@ -15,10 +15,10 @@ namespace Kinectitude.Editor.Tests
             Attribute attribute = new Attribute("test");
             attribute.PropertyChanged += (o, e) => propertyChanged = (e.PropertyName == "Key");
 
-            attribute.Key = "test2";
+            attribute.Name = "test2";
 
             Assert.IsTrue(propertyChanged);
-            Assert.AreEqual("test2", attribute.Key);
+            Assert.AreEqual("test2", attribute.Name);
         }
 
         [TestMethod]
@@ -27,12 +27,12 @@ namespace Kinectitude.Editor.Tests
             bool propertyChanged = false;
 
             Attribute attribute = new Attribute("test");
-            attribute.PropertyChanged += (o, e) => propertyChanged = (e.PropertyName == "Value");
+            attribute.PropertyChanged += (o, e) => propertyChanged |= (e.PropertyName == "Value");
             
-            attribute.Value = "value";
+            attribute.Value = new Value("value", null);
 
             Assert.IsTrue(propertyChanged);
-            Assert.AreEqual("value", attribute.Value);
+            Assert.AreEqual("value", attribute.Value.Initializer);
         }
 
         [TestMethod]
@@ -48,11 +48,11 @@ namespace Kinectitude.Editor.Tests
 
             Attribute childAttribute = child.GetAttribute("test");
 
-            parentAttribute.Key = "test2";
+            parentAttribute.Name = "test2";
 
-            Assert.IsTrue(childAttribute.IsInherited);
-            Assert.AreEqual(0, child.Attributes.Count(x => x.Key == "test"));
-            Assert.AreEqual(1, child.Attributes.Count(x => x.Key == "test2"));
+            Assert.IsFalse(childAttribute.HasOwnValue);
+            Assert.AreEqual(0, child.Attributes.Count(x => x.Name == "test"));
+            Assert.AreEqual(1, child.Attributes.Count(x => x.Name == "test2"));
         }
 
         [TestMethod]
@@ -71,14 +71,14 @@ namespace Kinectitude.Editor.Tests
             Attribute childAttribute = child.GetAttribute("test");
             //childAttribute.PropertyChanged += (o, e) => propertyChanged = (e.PropertyName == "Value");
 
-            parentAttribute.Value = "value";
+            parentAttribute.Value = new Value("value", null);
 
             //Assert.IsTrue(propertyChanged);
-            Assert.AreEqual("value", childAttribute.Value);
+            Assert.AreEqual("value", childAttribute.Value.Initializer);
         }
 
         [TestMethod]
-        public void SetInheritedAttributeToLocal()
+        public void GiveInheritedAttributeLocalValue()
         {
             bool propertyChanged = false;
 
@@ -90,26 +90,23 @@ namespace Kinectitude.Editor.Tests
             Entity child = new Entity();
             child.AddPrototype(parent);
 
-            Assert.AreEqual(1, child.Attributes.Count(x => x.IsInherited));
+            Assert.AreEqual(1, child.Attributes.Count(x => x.IsInherited && !x.HasOwnValue));
 
             Attribute childAttribute = child.GetAttribute("test");
-            childAttribute.PropertyChanged += (o, e) => propertyChanged |= (e.PropertyName == "IsInherited");
+            childAttribute.PropertyChanged += (o, e) => propertyChanged |= (e.PropertyName == "HasOwnValue");
 
-            Assert.IsTrue(childAttribute.CanInherit);
-
-            childAttribute.IsInherited = false;
-            childAttribute.Value = "value";
+            childAttribute.Value = new Value("value", null);
 
             Assert.IsTrue(propertyChanged);
-            Assert.AreEqual(0, child.Attributes.Count(x => x.IsInherited));
+            Assert.AreEqual(1, child.Attributes.Count(x => x.HasOwnValue));
         }
 
         [TestMethod]
-        public void SetLocalAttributeToInherited()
+        public void ClearAttributeValue()
         {
             Entity parent = new Entity() { Name = "parent" };
-            
-            Attribute parentAttribute = new Attribute("test");
+
+            Attribute parentAttribute = new Attribute("test") { Value = new Value("originalValue", null) };
             parent.AddAttribute(parentAttribute);
 
             Entity child = new Entity();
@@ -117,16 +114,15 @@ namespace Kinectitude.Editor.Tests
 
             Attribute childAttribute = child.GetAttribute("test");
 
-            Assert.IsTrue(childAttribute.CanInherit);
-            
-            childAttribute.IsInherited = false;
-            childAttribute.Value = "value";
+            childAttribute.Value = new Value("value", null);
 
-            Assert.AreEqual(0, child.Attributes.Count(x => x.IsInherited));
+            Assert.AreEqual(childAttribute.Value.Initializer, "value");
+            Assert.AreEqual(1, child.Attributes.Count(x => x.HasOwnValue));
 
-            childAttribute.IsInherited = true;
+            childAttribute.Value = null;
 
-            Assert.AreEqual(1, child.Attributes.Count(x => x.IsInherited));
+            Assert.AreEqual(childAttribute.Value.Initializer, "originalValue");
+            Assert.AreEqual(0, child.Attributes.Count(x => x.HasOwnValue));
         }
     }
 }

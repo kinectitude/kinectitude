@@ -4,6 +4,7 @@ using Kinectitude.Core.Components;
 using Kinectitude.Editor.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Component = Kinectitude.Editor.Models.Component;
+using Kinectitude.Editor.Models.Properties;
 
 namespace Kinectitude.Editor.Tests
 {
@@ -36,13 +37,13 @@ namespace Kinectitude.Editor.Tests
             Component component = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             
             Property property = component.GetProperty("X");
-            property.PropertyChanged += (o, e) => eventFired = (e.PropertyName == "Value");
+            property.PropertyChanged += (o, e) => eventFired |= (e.PropertyName == "Value");
 
             property.Value = 500;
 
             Assert.IsTrue(eventFired);
             Assert.AreEqual(500, component.Properties.Single(x => x.Name == "X").Value);
-            Assert.IsTrue(property.IsRoot);
+            //Assert.IsTrue(property.IsRoot);
             Assert.IsFalse(property.IsInherited);
         }
 
@@ -50,12 +51,9 @@ namespace Kinectitude.Editor.Tests
         public void DefaultPropertyOnRootComponent()
         {
             Component component = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
-
             Property property = component.GetProperty("X");
 
-            Assert.AreEqual(0, component.Properties.Count(x => x.IsLocal));
-            Assert.IsTrue(property.IsRoot);
-            Assert.IsTrue(property.IsInherited);
+            Assert.IsFalse(property.HasOwnValue);
         }
 
         [TestMethod]
@@ -63,16 +61,19 @@ namespace Kinectitude.Editor.Tests
         {
             Entity child = new Entity();
             
-            Component childComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
+            Plugin plugin = Workspace.Instance.GetPlugin(TransformComponentType);
+
+            Component childComponent = new Component(plugin);
             child.AddComponent(childComponent);
 
             Property childProperty = childComponent.GetProperty("X");
 
-            Assert.IsFalse(childProperty.CanInherit);
+            Assert.IsFalse(childProperty.HasOwnValue);
+            Assert.AreEqual(childProperty.PluginProperty.DefaultValue, childProperty.Value);
 
             Entity parent = new Entity() { Name = "parent" };
 
-            Component parentComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
+            Component parentComponent = new Component(plugin);
 
             Property parentProperty = parentComponent.GetProperty("X");
             parentProperty.Value = 500;
@@ -81,36 +82,34 @@ namespace Kinectitude.Editor.Tests
 
             child.AddPrototype(parent);
 
-            Assert.IsTrue(childProperty.CanInherit);
+            Assert.IsFalse(childProperty.HasOwnValue);
             Assert.AreEqual(500, childProperty.Value);
-            Assert.AreEqual(1, childComponent.Properties.Count(x => x.Name == "X" && x.IsInherited));
-            Assert.AreEqual(1, parentComponent.Properties.Count(x => x.Name == "X" && x.IsRoot));
         }
 
-        [TestMethod]
-        public void CannotSetValueForInheritedProperty()
-        {
-            Entity parent = new Entity() { Name = "parent" };
+        //[TestMethod]
+        //public void CannotSetValueForInheritedProperty()
+        //{
+        //    Entity parent = new Entity() { Name = "parent" };
             
-            Component parentComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
+        //    Component parentComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             
-            Property parentProperty = parentComponent.GetProperty("X");
-            parentProperty.Value = 500;
-            parent.AddComponent(parentComponent);
+        //    Property parentProperty = parentComponent.GetProperty("X");
+        //    parentProperty.Value = 500;
+        //    parent.AddComponent(parentComponent);
 
-            Entity child = new Entity();
-            child.AddPrototype(parent);
+        //    Entity child = new Entity();
+        //    child.AddPrototype(parent);
 
-            Component childComponent = child.GetComponentByType(TransformComponentType);
+        //    Component childComponent = child.GetComponentByType(TransformComponentType);
             
-            Property childProperty = childComponent.GetProperty("X");
-            childProperty.Value = 250;
+        //    Property childProperty = childComponent.GetProperty("X");
+        //    childProperty.Value = 250;
 
-            Assert.IsTrue(childProperty.IsInherited);
-            Assert.IsTrue(childProperty.CanInherit);
-            Assert.AreEqual(500, childProperty.Value);
-            Assert.AreEqual(0, childComponent.Properties.Count(x => x.IsLocal));
-        }
+        //    Assert.IsTrue(childProperty.IsInherited);
+        //    //Assert.IsTrue(childProperty.CanInherit);
+        //    Assert.AreEqual(500, childProperty.Value);
+        //    Assert.AreEqual(0, childComponent.Properties.Count(x => x.IsLocal));
+        //}
 
         [TestMethod]
         public void ValueFollowsInheritedProperty()
@@ -174,21 +173,21 @@ namespace Kinectitude.Editor.Tests
         }
 
         [TestMethod]
-        public void SetInheritedPropertyToLocal()
+        public void GiveDefaultPropertyLocalValue()
         {
             Component component = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
-            
+
             Property property = component.GetProperty("X");
 
-            Assert.IsTrue(property.IsInherited);
+            Assert.IsFalse(property.HasOwnValue);
 
-            property.IsInherited = false;
+            property.Value = 5;
 
-            Assert.IsFalse(property.IsInherited);
+            Assert.IsTrue(property.HasOwnValue);
         }
 
         [TestMethod]
-        public void SetLocalPropertyToInherited()
+        public void ClearLocalValueFromProperty()
         {
             Entity parent = new Entity() { Name = "parent" };
 
@@ -205,19 +204,17 @@ namespace Kinectitude.Editor.Tests
 
             child.AddComponent(childComponent);
 
-            Assert.IsTrue(childProperty.IsLocal);
-            Assert.IsFalse(childProperty.CanInherit);
+            Assert.IsTrue(childProperty.HasOwnValue);
             Assert.AreEqual(250, childProperty.Value);
 
             child.AddPrototype(parent);
 
-            Assert.IsTrue(childProperty.CanInherit);
-            Assert.IsTrue(childProperty.IsLocal);
+            Assert.IsTrue(childProperty.HasOwnValue);
             Assert.AreEqual(250, childProperty.Value);
 
-            childProperty.IsInherited = true;
+            childProperty.Value = null;
 
-            Assert.IsTrue(childProperty.IsInherited);
+            Assert.IsFalse(childProperty.HasOwnValue);
             Assert.AreEqual(500, childProperty.Value);
         }
 

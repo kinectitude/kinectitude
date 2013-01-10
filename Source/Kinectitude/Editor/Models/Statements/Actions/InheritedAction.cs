@@ -1,9 +1,8 @@
-﻿using Kinectitude.Editor.Models.Statements;
+﻿using Kinectitude.Editor.Models.Properties;
+using Kinectitude.Editor.Models.Statements.Base;
 using Kinectitude.Editor.Storage;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Statements.Actions
 {
     internal sealed class InheritedAction : AbstractAction
     {

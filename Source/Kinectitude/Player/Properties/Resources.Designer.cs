@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Kinectitude.Core.Properties {
+namespace Kinectitude.Player.Properties {
     using System;
     
     

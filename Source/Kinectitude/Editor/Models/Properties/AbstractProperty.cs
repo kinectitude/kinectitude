@@ -1,32 +1,60 @@
-﻿using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Models.Interfaces;
+﻿using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Input;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Properties
 {
-    internal abstract class AbstractProperty : GameModel<IPropertyScope>
+    internal abstract class AbstractProperty : GameModel<IPropertyScope>, INameValue
     {
+        private readonly AbstractProperty inheritedProperty;
+
         public abstract PluginProperty PluginProperty { get; }
 
-        public abstract string Name { get; }
+        public string Name
+        {
+            get { return PluginProperty.Name; }
+        }
 
-        public abstract bool IsInherited { get; set; }
+        public bool IsInherited
+        {
+            get { return null != inheritedProperty; }
+        }
 
-        [DependsOn("IsInherited")]
-        public abstract bool IsLocal { get; }
+        public bool IsLocal
+        {
+            get { return !IsInherited; }
+        }
 
-        public abstract bool CanInherit { get; }
+        public bool IsEditable
+        {
+            get { return IsLocal; }
+        }
 
-        [DependsOn("CanInherit")]
-        public abstract bool IsRoot { get; }
-
-        [DependsOn("IsInherited")]
         public abstract object Value { get; set; }
 
-        protected AbstractProperty()
+        public abstract bool HasOwnValue { get; }
+
+        public abstract IEnumerable<object> AvailableValues { get; }
+
+        public abstract ICommand ClearValueCommand { get; protected set; }
+
+        protected AbstractProperty(AbstractProperty inheritedProperty = null)
         {
-            AddDependency<ScopeChanged>("CanInherit");
+            this.inheritedProperty = inheritedProperty;
+
+            if (null != inheritedProperty)
+            {
+                inheritedProperty.PropertyChanged += OnInheritedPropertyChanged;
+            }
+
             AddDependency<ScopeChanged>("Value");
+        }
+
+        private void OnInheritedPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            NotifyPropertyChanged(e.PropertyName);
         }
 
         protected override void OnScopeDetaching(IPropertyScope scope)
@@ -47,7 +75,7 @@ namespace Kinectitude.Editor.Models
         {
             if (property.Name == Name)
             {
-                NotifyPropertyChanged("Scope");
+                NotifyPropertyChanged("Value");
             }
         }
 
@@ -55,7 +83,7 @@ namespace Kinectitude.Editor.Models
         {
             if (property.Name == Name)
             {
-                NotifyPropertyChanged("Scope");
+                NotifyPropertyChanged("Value");
             }
         }
 
@@ -63,13 +91,25 @@ namespace Kinectitude.Editor.Models
         {
             if (property.Name == Name)
             {
-                NotifyPropertyChanged("Scope");
+                NotifyPropertyChanged("Value");
             }
         }
 
         public Property DeepCopy()
         {
-            return new Property(this.PluginProperty) { Value = this.Value };
+            var property = new Property(PluginProperty);
+
+            if (HasOwnValue)
+            {
+                property.Value = Value;
+            }
+
+            return property;
+        }
+
+        public object GetInheritedValue()
+        {
+            return null != Scope ? Scope.GetInheritedValue(PluginProperty) : PluginProperty.DefaultValue;
         }
     }
 }

@@ -1,9 +1,9 @@
-﻿using System.Collections.ObjectModel;
-using System.Linq;
-using Kinectitude.Editor.Base;
-using System.Windows.Input;
+﻿using Kinectitude.Editor.Base;
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
+using System.Windows.Input;
 
 namespace Kinectitude.Editor.Commands
 {

@@ -3,11 +3,15 @@ using Kinectitude.Core.Language;
 using Kinectitude.Editor.Models;
 using Kinectitude.Editor.Models.Statements;
 using Kinectitude.Editor.Models.Statements.Assignments;
+using Kinectitude.Editor.Models.Statements.Base;
+using Kinectitude.Editor.Models.Statements.Conditions;
+using Kinectitude.Editor.Models.Statements.Events;
+using Kinectitude.Editor.Models.Statements.Loops;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Action = Kinectitude.Editor.Models.Action;
+using Action = Kinectitude.Editor.Models.Statements.Actions.Action;
 using Attribute = Kinectitude.Editor.Models.Attribute;
 
 namespace Kinectitude.Editor.Storage.Kgl
@@ -101,7 +105,7 @@ namespace Kinectitude.Editor.Storage.Kgl
 
             foreach (Tuple<string, object> attribute in getAttributes(root))
             {
-                game.AddAttribute(new Attribute(attribute.Item1) { Value = attribute.Item2 });
+                game.AddAttribute(new Attribute(attribute.Item1) { Value = new Value(attribute.Item2.ToString(), null) });  // TODO pass a ValueReader to the Value
                 //TODO set width, height and is full screen here.  All values should be value readers
             }
 
@@ -118,7 +122,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             }
 
             //TODO won't need explicit cast when using value reader (or similar for editor) also may be an expression?
-            game.FirstScene = game.GetScene(((string)game.Attributes.First(attribute => attribute.Key == "FirstScene").Value).Replace("\"", ""));
+            game.FirstScene = game.GetScene(game.GetAttribute("FirstScene").Value.ToString().Replace("\"", ""));
 
             return game;
         }
@@ -151,7 +155,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             foreach (string name in grammar.GetPrototypes(node)) entity.AddPrototype(game.GetPrototype(name));
 
             foreach (Tuple<string, object> attribute in getAttributes(node)) 
-                entity.AddAttribute(new Attribute(attribute.Item1) { Value = attribute.Item2 });
+                entity.AddAttribute(new Attribute(attribute.Item1) { Value = new Value(attribute.Item2.ToString(), null) }); // TODO pass a ValueReader to the Value
 
             foreach (ParseTreeNode componentNode in grammar.GetOfType(node, grammar.Component))
             {
@@ -259,7 +263,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             Scene scene = new Scene(grammar.GetName(node));
 
             foreach (Tuple<string, object> attribute in getAttributes(node))
-                scene.AddAttribute(new Attribute(attribute.Item1) { Value = attribute.Item2 });
+                scene.AddAttribute(new Attribute(attribute.Item1) { Value = new Value(attribute.Item2.ToString(), null) }); // TODO pass a ValueReader to the Value
 
             foreach (ParseTreeNode managerNode in grammar.GetOfType(node, grammar.Manager))
             {

@@ -8,7 +8,7 @@ using Kinectitude.Editor.Models.Notifications;
 namespace Kinectitude.Editor.Tests
 {
     [TestClass]
-    public class GameViewModelTests
+    public class GameTests
     {
         private static readonly string TransformComponentType = typeof(TransformComponent).FullName;
         private static readonly string TransformComponentShort = typeof(TransformComponent).Name;
@@ -182,7 +182,7 @@ namespace Kinectitude.Editor.Tests
             game.AddAttribute(attribute);
 
             Assert.IsTrue(collectionChanged);
-            Assert.AreEqual(game.Attributes.Count(x => x.Key == "test"), 1);
+            Assert.AreEqual(game.Attributes.Count(x => x.Name == "test"), 1);
         }
 
         [TestMethod]
@@ -198,7 +198,7 @@ namespace Kinectitude.Editor.Tests
             game.RemoveAttribute(attribute);
 
             Assert.AreEqual(2, eventsFired);
-            Assert.AreEqual(game.Attributes.Count(x => x.Key == "test"), 0);
+            Assert.AreEqual(game.Attributes.Count(x => x.Name == "test"), 0);
         }
 
         [TestMethod]
@@ -256,16 +256,16 @@ namespace Kinectitude.Editor.Tests
         //    Assert.AreEqual(game.Assets.Count(x => x.FileName == "Test Asset"), 0);
         //}
 
-        [TestMethod]
-        public void GameAttributeCannotInherit()
-        {
-            Game game = new Game("Test Game");
+        //[TestMethod]
+        //public void GameAttributeCannotInherit()
+        //{
+        //    Game game = new Game("Test Game");
             
-            Attribute attribute = new Attribute("test");
-            game.AddAttribute(attribute);
+        //    Attribute attribute = new Attribute("test");
+        //    game.AddAttribute(attribute);
 
-            Assert.IsFalse(attribute.CanInherit);
-        }
+        //    Assert.IsFalse(attribute.CanInherit);
+        //}
 
         [TestMethod]
         public void GetDefinedPlugin()

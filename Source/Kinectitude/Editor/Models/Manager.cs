@@ -1,20 +1,16 @@
-﻿using System;
+﻿using Kinectitude.Editor.Models.Interfaces;
+using Kinectitude.Editor.Models.Notifications;
+using Kinectitude.Editor.Models.Properties;
+using Kinectitude.Editor.Storage;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Models.Interfaces;
-using Kinectitude.Editor.Storage;
-using Kinectitude.Editor.Models.Notifications;
 
 namespace Kinectitude.Editor.Models
 {
     internal sealed class Manager : GameModel<IManagerScope>, IPropertyScope
     {
         private readonly Plugin plugin;
-
-        public event PropertyEventHandler InheritedPropertyAdded { add { } remove { } }
-        public event PropertyEventHandler InheritedPropertyRemoved { add { } remove { } }
-        public event PropertyEventHandler InheritedPropertyChanged { add { } remove { } }
 
         public string Type
         {
@@ -42,7 +38,7 @@ namespace Kinectitude.Editor.Models
         {
             if (plugin.Type != PluginType.Manager)
             {
-                throw new ArgumentException("Plugin is not an manager");
+                throw new ArgumentException("Plugin is not a manager");
             }
 
             this.plugin = plugin;
@@ -50,6 +46,7 @@ namespace Kinectitude.Editor.Models
             Properties = new ObservableCollection<Property>();
 
             AddDependency<ScopeChanged>("Type");
+            AddDependency<ScopeChanged>("IsRequired");
         }
 
         public override void Accept(IGameVisitor visitor)
@@ -71,14 +68,22 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        bool IPropertyScope.HasInheritedProperty(string name)
+        #region IPropertyScope implementation
+
+        public event PropertyEventHandler InheritedPropertyAdded { add { } remove { } }
+        public event PropertyEventHandler InheritedPropertyRemoved { add { } remove { } }
+        public event PropertyEventHandler InheritedPropertyChanged { add { } remove { } }
+
+        public bool HasInheritedProperty(PluginProperty property)
         {
             return false;
         }
 
-        object IPropertyScope.GetInheritedValue(string name)
+        public object GetInheritedValue(PluginProperty property)
         {
-            return null;
+            return property.DefaultValue;
         }
+
+        #endregion
     }
 }

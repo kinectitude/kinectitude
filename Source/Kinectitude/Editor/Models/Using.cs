@@ -47,6 +47,8 @@ namespace Kinectitude.Editor.Models
         {
             define.Scope = null;
             Defines.Remove(define);
+
+            Broadcast(new DefineRemoved(define));
         }
 
         public Define GetDefineByName(string name)

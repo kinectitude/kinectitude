@@ -1,11 +1,6 @@
-﻿using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Models.Statements;
-using Kinectitude.Editor.Storage;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Input;
+﻿using Kinectitude.Editor.Storage;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Statements.Conditions
 {
     internal class Condition : AbstractCondition
     {

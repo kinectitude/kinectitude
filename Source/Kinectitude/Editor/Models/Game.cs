@@ -1,18 +1,21 @@
-﻿using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows.Input;
+﻿using Kinectitude.Core.Data;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
-using Kinectitude.Editor.Views;
-using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.Models.Notifications;
+using Kinectitude.Editor.Models.Transactions;
+using Kinectitude.Editor.Storage;
+using Kinectitude.Editor.Views.Utils;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Windows.Input;
 
 namespace Kinectitude.Editor.Models
 {
-    internal sealed class Game : GameModel<IScope>, IAttributeScope, IEntityScope, ISceneScope
+    internal sealed class Game : GameModel<IScope>, IAttributeScope, IEntityScope, ISceneScope, IDataContainer
     {
-        private string fileName;
         private string name;
         private int width;
         private int height;
@@ -21,19 +24,7 @@ namespace Kinectitude.Editor.Models
         private int nextAttribute;
         private int nextScene;
         private int nextPrototype;
-
-        public string FileName
-        {
-            get { return fileName; }
-            set
-            {
-                if (fileName != value)
-                {
-                    fileName = value;
-                    NotifyPropertyChanged("FileName");
-                }
-            }
-        }
+        private CallbackCollection changeCallbacks;
 
         public string Name
         {
@@ -236,6 +227,24 @@ namespace Kinectitude.Editor.Models
                     }
                 }
             });
+
+            changeCallbacks = new CallbackCollection();
+
+            AddHandler<DefineAdded>(n =>
+            {
+                changeCallbacks.PublishComponentChange(n.Define.Name);
+            });
+
+            AddHandler<DefineRemoved>(n =>
+            {
+                changeCallbacks.PublishComponentChange(n.Define.Name);
+            });
+
+            AddHandler<DefinedNameChanged>(n =>
+            {
+                changeCallbacks.PublishComponentChange(n.OldName);
+                changeCallbacks.PublishComponentChange(GetDefinedName(n.Plugin));
+            });
         }
 
         public override void Accept(IGameVisitor visitor)
@@ -247,12 +256,22 @@ namespace Kinectitude.Editor.Models
         {
             use.Scope = this;
             Usings.Add(use);
+
+            foreach (var define in use.Defines)
+            {
+                Notify(new DefineAdded(define));
+            }
         }
 
         public void RemoveUsing(Using use)
         {
             use.Scope = null;
             Usings.Remove(use);
+
+            foreach (var define in use.Defines)
+            {
+                Notify(new DefineRemoved(define));
+            }
         }
 
         private bool HasPrototypeWithName(string name)
@@ -350,13 +369,20 @@ namespace Kinectitude.Editor.Models
             return Scenes.FirstOrDefault(x => x.Name == name);
         }
 
+        public Attribute GetAttribute(string name)
+        {
+            return Attributes.FirstOrDefault(x => x.Name == name);
+        }
+
         public void AddAttribute(Attribute attribute)
         {
             attribute.Scope = this;
+            attribute.PropertyChanged += OnAttributePropertyChanged;
             Attributes.Add(attribute);
+            changeCallbacks.PublishAttributeChange(attribute.Name);
 
             Workspace.Instance.CommandHistory.Log(
-                "add attribute '" + attribute.Key + "'",
+                "add attribute '" + attribute.Name + "'",
                 () => AddAttribute(attribute),
                 () => RemoveAttribute(attribute)
             );
@@ -365,13 +391,24 @@ namespace Kinectitude.Editor.Models
         public void RemoveAttribute(Attribute attribute)
         {
             attribute.Scope = null;
+            attribute.PropertyChanged -= OnAttributePropertyChanged;
             Attributes.Remove(attribute);
+            changeCallbacks.PublishAttributeChange(attribute.Name);
 
             Workspace.Instance.CommandHistory.Log(
-                "remove attribute '" + attribute.Key + "'",
+                "remove attribute '" + attribute.Name + "'",
                 () => RemoveAttribute(attribute),
                 () => AddAttribute(attribute)
             );
+        }
+
+        private void OnAttributePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Value")
+            {
+                var attribute = (Attribute)sender;
+                changeCallbacks.PublishAttributeChange(attribute.Name);
+            }
         }
 
         public void CreateAttribute()
@@ -384,7 +421,7 @@ namespace Kinectitude.Editor.Models
         {
             string ret = "attribute" + nextAttribute;
 
-            while (Attributes.Any(x => x.Key == ret))
+            while (Attributes.Any(x => x.Name == ret))
             {
                 nextAttribute++;
                 ret = "attribute" + nextAttribute;
@@ -495,9 +532,9 @@ namespace Kinectitude.Editor.Models
         public event AttributeEventHandler InheritedAttributeRemoved { add { } remove { } }
         public event AttributeEventHandler InheritedAttributeChanged { add { } remove { } }
 
-        public string GetInheritedValue(string key)
+        public Value GetInheritedValue(string key)
         {
-            return null;
+            return Attribute.DefaultValue;
         }
 
         public bool HasInheritedAttribute(string key)
@@ -507,7 +544,7 @@ namespace Kinectitude.Editor.Models
 
         public bool HasLocalAttribute(string key)
         {
-            return Attributes.Any(x => x.Key == key);
+            return Attributes.Any(x => x.Name == key);
         }
 
         #endregion
@@ -541,6 +578,33 @@ namespace Kinectitude.Editor.Models
             }
 
             return Workspace.Instance.GetPlugin(name);
+        }
+
+        #endregion
+
+        #region IDataContainer implementation
+
+        ValueReader IDataContainer.this[string key]
+        {
+            get
+            {
+                return GetAttribute(key).Value.Reader ?? ConstantReader.NullValue;
+            }
+            set
+            {
+                throw new NotSupportedException();
+            }
+        }
+
+        void IDataContainer.NotifyOfChange(string key, IChangeable callback)
+        {
+            changeCallbacks.SubscribeToAttributeChange(key, callback);
+        }
+
+        void IDataContainer.NotifyOfComponentChange(string what, IChangeable callback)
+        {
+            var tokens = what.Split('.');
+            changeCallbacks.SubscribeToComponentChange(tokens[0], tokens[1], callback);
         }
 
         #endregion

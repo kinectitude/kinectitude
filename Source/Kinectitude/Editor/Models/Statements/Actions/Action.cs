@@ -1,13 +1,10 @@
-﻿using Kinectitude.Editor.Base;
-using Kinectitude.Editor.Models.Notifications;
+﻿using Kinectitude.Editor.Models.Notifications;
+using Kinectitude.Editor.Models.Properties;
+using Kinectitude.Editor.Models.Statements.Base;
 using Kinectitude.Editor.Storage;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Windows.Input;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Statements.Actions
 {
     internal class Action : AbstractAction
     {
