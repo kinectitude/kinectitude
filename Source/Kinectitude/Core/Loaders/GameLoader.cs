@@ -6,6 +6,7 @@ using System.Reflection;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Data;
 using Kinectitude.Core.Attributes;
+using Kinectitude.Core.Loaders.Kgl;
 
 namespace Kinectitude.Core.Loaders
 {

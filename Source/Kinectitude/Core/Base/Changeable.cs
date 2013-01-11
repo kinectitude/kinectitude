@@ -31,10 +31,9 @@ namespace Kinectitude.Core.Base
             if (((IChangeable) this).ShouldCheck) DataContainer.ChangedProperty(new Tuple<IChangeable, string>((IChangeable)this, str));
         }
 
-        // TODO loading
         public object this[string parameter]
         {
-            get { throw new NotImplementedException(); }
+            get { return ClassFactory.GetParam(this, parameter); }
         }
     }
 }

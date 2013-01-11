@@ -163,7 +163,8 @@
     <Compile Include="Loaders\GameLoader.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Loaders\KGLLoaderUtility.cs" />
+    <Compile Include="Loaders\Kgl\KGLBaseLoader.cs" />
+    <Compile Include="Loaders\Kgl\KGLLoaderUtility.cs" />
     <Compile Include="Loaders\LoadedAction.cs" />
     <Compile Include="Loaders\LoadedActionable.cs" />
     <Compile Include="Loaders\LoadedAssignment.cs" />

@@ -21,7 +21,7 @@ namespace Kinectitude.Core.Data
         }
 
         internal static TypeMatcherProperyReader GetTypeMatcherProperyReader
-            (object obj, string objParam, string component, string param,  Entity owner)
+            (object obj, string objParam, string component, string param, IDataContainer owner)
         {
             TypeMatcherWatcher watcher = TypeMatcherWatcher.GetTypeMatcherWatcher(obj, objParam, owner);
             Func<TypeMatcherProperyReader> create = 

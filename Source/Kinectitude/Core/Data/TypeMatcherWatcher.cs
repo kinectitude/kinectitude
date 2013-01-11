@@ -15,14 +15,14 @@ namespace Kinectitude.Core.Data
 
         private readonly List<IChanges> Callbacks = new List<IChanges>();
 
-        internal static TypeMatcherWatcher GetTypeMatcherWatcher(object obj, string param, Entity owner)
+        internal static TypeMatcherWatcher GetTypeMatcherWatcher(object obj, string param, IDataContainer owner)
         {
             Func<TypeMatcherWatcher> create = new Func<TypeMatcherWatcher>(() => new TypeMatcherWatcher(obj, param, owner));
             return DoubleDictionary<object, string, TypeMatcherWatcher>.GetItem(obj, param, create);
 
         }
 
-        private TypeMatcherWatcher(object obj, string param, Entity owner)
+        private TypeMatcherWatcher(object obj, string param, IDataContainer owner)
         {
             Obj = obj;
             Param = param;

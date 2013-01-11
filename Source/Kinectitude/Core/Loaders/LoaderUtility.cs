@@ -32,7 +32,7 @@ namespace Kinectitude.Core.Loaders
         IEnumerable<string> GetPrototypes(object from);
         string GetType(object from);
         object GetCondition(object from);
-        object MakeAssignable(object obj, Scene scene = null, Entity entity = null, Event evt = null);
+        object MakeAssignable(object obj, IScene scene = null, IDataContainer entity = null, Event evt = null);
         /// <summary>
         /// Tuple is Target, type (*=, /= etc) or null for =, then Value
         /// </summary>

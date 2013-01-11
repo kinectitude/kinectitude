@@ -6,10 +6,10 @@ using System.Text;
 
 namespace Kinectitude.Core.Base
 {
-    internal interface IScene
+    internal interface IScene : IDataContainer
     {
         IDataContainer Game { get; }
-
         IDataContainer GetEntity(string name);
+        HashSet<int> GetOfPrototype(string prototype, bool exact);
     }
 }

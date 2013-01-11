@@ -249,7 +249,7 @@ namespace Kinectitude.Core.Base
             return manager as Changeable;
         }
 
-        internal HashSet<int> GetOfPrototype(string prototype, bool exact)
+        public HashSet<int> GetOfPrototype(string prototype, bool exact)
         {
             Dictionary<string, HashSet<int>> dict = exact ? IsExactType : IsType;
             HashSet<int> ids;

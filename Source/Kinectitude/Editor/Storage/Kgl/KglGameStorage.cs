@@ -1,5 +1,6 @@
 ﻿using Irony.Parsing;
 using Kinectitude.Core.Language;
+using Kinectitude.Core.Loaders.Kgl;
 using Kinectitude.Editor.Models;
 using Kinectitude.Editor.Models.Statements;
 using Kinectitude.Editor.Models.Statements.Assignments;
@@ -16,11 +17,10 @@ using Attribute = Kinectitude.Editor.Models.Attribute;
 
 namespace Kinectitude.Editor.Storage.Kgl
 {
-    internal sealed class KglGameStorage : IGameStorage
+    internal sealed class KglGameStorage : KGLBaseLoader, IGameStorage
     {
         private readonly FileInfo FileName;
         private readonly KglGameVisitor Visitor = new KglGameVisitor();
-        private readonly KinectitudeGrammar grammar = new KinectitudeGrammar();
 
         private Game game;
         private ParseTreeNode root;
