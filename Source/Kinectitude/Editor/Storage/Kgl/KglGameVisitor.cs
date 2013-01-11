@@ -214,6 +214,11 @@ namespace Kinectitude.Editor.Storage.Kgl
             result = sceneBuilder.ToString();
         }
 
+        public void Visit(Service service)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Visit(Using use)
         {
             result = new StringBuilder("using ").Append(use.File).Append(openDef())

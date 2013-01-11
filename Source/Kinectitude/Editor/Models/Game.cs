@@ -358,6 +358,9 @@ namespace Kinectitude.Editor.Models
                 () => RemoveScene(scene),
                 () => AddScene(scene)
             );
+
+            DataContainerReader.DeleteDataContainer(scene);
+            ParameterValueReader.DeleteObject(scene);
         }
 
         public Scene CreateScene()
@@ -504,6 +507,11 @@ namespace Kinectitude.Editor.Models
             }
         }
 
+        public Service GetServiceByType(Plugin type)
+        {
+            return null;
+        }
+
         #region IEntityScope implementation
 
         IEnumerable<Entity> IEntityScope.Prototypes
@@ -610,7 +618,18 @@ namespace Kinectitude.Editor.Models
 
         IChangeable IDataContainer.GetChangeable(string name)
         {
-            return null;
+            var plugin = GetPlugin(name);
+
+            return new DelegateChangeable((parameter) =>
+            {
+                var service = GetServiceByType(plugin);
+                if (null != service)
+                {
+                    return service.GetProperty(parameter).Value;
+                }
+
+                return null;
+            });   
         }
 
         #endregion

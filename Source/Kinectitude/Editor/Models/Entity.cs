@@ -816,7 +816,18 @@ namespace Kinectitude.Editor.Models
 
         IChangeable IDataContainer.GetChangeable(string name)
         {
-            throw new NotImplementedException();
+            var plugin = GetPlugin(name);
+
+            return new DelegateChangeable((parameter) =>
+            {
+                var component = GetComponentByType(plugin.ClassName);
+                if (null != component)
+                {
+                    return component.GetProperty(parameter).Value;
+                }
+
+                return null;
+            });
         }
 
         #endregion

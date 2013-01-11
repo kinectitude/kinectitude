@@ -94,8 +94,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Models\CallbackCollection.cs" />
-    <Compile Include="Models\ComponentChangeable.cs" />
+    <Compile Include="Models\DelegateChangeable.cs" />
     <Compile Include="Models\Notifications\DefineRemoved.cs" />
+    <Compile Include="Models\Service.cs" />
     <Compile Include="Models\Statements\Base\Statement.cs" />
     <Compile Include="Models\Value.cs" />
     <Compile Include="Views\Behaviors\DragAdorner.cs" />

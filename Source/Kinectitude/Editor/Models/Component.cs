@@ -1,4 +1,5 @@
-﻿using Kinectitude.Editor.Models.Interfaces;
+﻿using Kinectitude.Core.Base;
+using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Properties;
 using Kinectitude.Editor.Storage;
@@ -11,7 +12,7 @@ namespace Kinectitude.Editor.Models
 {
     internal delegate void ComponentPropertyEventHandler(Component component, PluginProperty property);
 
-    internal sealed class Component : GameModel<IComponentScope>, IPropertyScope
+    internal sealed class Component : GameModel<IComponentScope>, IPropertyScope, IChangeable
     {
         private readonly Plugin plugin;
         private readonly List<Property> properties;
@@ -86,9 +87,6 @@ namespace Kinectitude.Editor.Models
             AddDependency<ScopeChanged>("IsRoot");
             AddDependency<DefineAdded>("Type", n => n.Define.Class == Plugin.ClassName);
             AddDependency<DefinedNameChanged>("Type", n => n.Plugin == Plugin);
-
-            //AddDependency<ComponentAdded>("IsRoot", OnComponentAdded);
-            //AddDependency<ComponentRemoved>("IsRoot", OnComponentRemoved);
         }
 
         public override void Accept(IGameVisitor visitor)
@@ -214,5 +212,16 @@ namespace Kinectitude.Editor.Models
 
             return copy;
         }
+
+        #region IChangeable implementation
+
+        object IChangeable.this[string parameter]
+        {
+            get { return GetProperty(parameter).Value; }
+        }
+
+        bool IChangeable.ShouldCheck { get; set; }
+
+        #endregion
     }
 }

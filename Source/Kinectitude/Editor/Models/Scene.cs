@@ -308,6 +308,9 @@ namespace Kinectitude.Editor.Models
                 () => RemoveEntity(entity),
                 () => AddEntity(entity)
             );
+
+            DataContainerReader.DeleteDataContainer(entity);
+            ParameterValueReader.DeleteObject(entity);
         }
 
         private string GetNextAttributeKey()
@@ -348,6 +351,11 @@ namespace Kinectitude.Editor.Models
                     ResolveComponentDependencies(component);
                 }
             }
+        }
+
+        public Manager GetManagerByType(Plugin type)
+        {
+            return Managers.FirstOrDefault(x => x.Plugin == type);
         }
 
         public bool HasManagerOfType(Plugin type)
@@ -453,7 +461,18 @@ namespace Kinectitude.Editor.Models
 
         IChangeable IDataContainer.GetChangeable(string name)
         {
-            throw new NotImplementedException();
+            var plugin = GetPlugin(name);
+
+            return new DelegateChangeable((parameter) =>
+            {
+                var manager = GetManagerByType(plugin);
+                if (null != manager)
+                {
+                    return manager.GetProperty(parameter).Value;
+                }
+
+                return null;
+            });
         }
 
         #endregion
