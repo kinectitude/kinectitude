@@ -1,4 +1,5 @@
-﻿using Kinectitude.Core.Data;
+﻿using Kinectitude.Core.Base;
+using Kinectitude.Core.Data;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
@@ -15,6 +16,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
+using Event = Kinectitude.Editor.Models.Statements.Events.Event;
 
 namespace Kinectitude.Editor.Models
 {
@@ -803,13 +805,18 @@ namespace Kinectitude.Editor.Models
 
         void IDataContainer.NotifyOfChange(string key, IChanges callback)
         {
-            changeCallbacks.SubscribeToAttributeChange(key, callback);
+            //changeCallbacks.SubscribeToAttributeChange(key, callback);
         }
 
-        void IDataContainer.NotifyOfComponentChange(string what, IChanges callback)
+        void IDataContainer.NotifyOfComponentChange(Tuple<IChangeable, string> what, IChanges callback)
         {
-            var tokens = what.Split('.');
-            changeCallbacks.SubscribeToComponentChange(tokens[0], tokens[1], callback);
+            //var tokens = what.Split('.');
+            //changeCallbacks.SubscribeToComponentChange(tokens[0], tokens[1], callback);
+        }
+
+        IChangeable IDataContainer.GetChangeable(string name)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

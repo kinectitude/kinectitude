@@ -6,7 +6,7 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Base
 {    
-    internal sealed class Scene : DataContainer
+    internal sealed class Scene : DataContainer, IScene
     {
         private readonly Dictionary<string, List<TriggerOccursEvent>> triggers;
         private readonly SceneLoader seceneLoader;
@@ -167,6 +167,16 @@ namespace Kinectitude.Core.Base
         internal Entity GetEntity(string name)
         {
             return EntityByName[name];
+        }
+
+        IDataContainer IScene.Game
+        {
+            get { return Game; }
+        }
+
+        IDataContainer IScene.GetEntity(string name)
+        {
+            return GetEntity(name);
         }
 
         internal void CreateEntity(string prototype)

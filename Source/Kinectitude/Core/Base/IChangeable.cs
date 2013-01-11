@@ -7,6 +7,8 @@ namespace Kinectitude.Core.Base
 {
     internal interface IChangeable
     {
+        object this[string parameter] { get; }
+
         bool ShouldCheck { get; set; }
     }
 }

@@ -90,8 +90,6 @@ namespace Kinectitude.Core.Base
             }
         }
 
-        object IDataContainer.GetParam(IChangeable what, string property) { return ClassFactory.GetParam(what, property); }
-
         internal void UnnotifyOfComponentChange(Tuple<IChangeable, string> what, IChanges callback)
         {
             List<IChanges> callbacks;
@@ -113,5 +111,10 @@ namespace Kinectitude.Core.Base
         }
 
         internal abstract Changeable GetChangeable(string name);
+
+        IChangeable IDataContainer.GetChangeable(string name)
+        {
+            return GetChangeable(name);
+        }
     }
 }
