@@ -23,6 +23,8 @@ namespace Kinectitude.Editor.Models
 {
     internal sealed class Workspace : BaseModel
     {
+        public static IValueMaker ValueMaker;
+
         private const string PluginDirectory = "Plugins";
 
         private static readonly Lazy<Workspace> instance = new Lazy<Workspace>();

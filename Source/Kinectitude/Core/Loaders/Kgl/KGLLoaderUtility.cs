@@ -10,7 +10,7 @@ using System.IO;
 
 namespace Kinectitude.Core.Loaders.Kgl
 {
-    internal sealed class KGLLoaderUtility : KGLBaseLoader, LoaderUtility
+    internal sealed class KGLLoaderUtility : KGLBase, LoaderUtility
     {
         private readonly ParseTreeNode Root;
 
@@ -36,20 +36,7 @@ namespace Kinectitude.Core.Loaders.Kgl
             Root = parseTree.Root;
         }
 
-        public PropertyHolder GetProperties(object from)
-        {
-            ParseTreeNode node = from as ParseTreeNode;
-
-            PropertyHolder propertyHolder = new PropertyHolder();
-
-            if (grammar.Prototype == node.Term || grammar.Entity == node.Term)
-                node = node.ChildNodes.First(child => child.Term == grammar.EntityDefinition);
-
-            foreach (ParseTreeNode property in GetOfType(node, grammar.Properties))
-                propertyHolder.AddValue(property.ChildNodes[0].Token.ValueString, property.ChildNodes[1]);
-
-            return propertyHolder;
-        }
+        public PropertyHolder GetProperties(object from) { return base.GetProperties(from as ParseTreeNode); }
 
         public IEnumerable<object> GetOfType(object from, object type)
         { 
@@ -147,5 +134,9 @@ namespace Kinectitude.Core.Loaders.Kgl
             ParseTreeNode node = from as ParseTreeNode;
             return node.ChildNodes.FirstOrDefault(child => child.Term == grammar.Expr);
         }
+
+        public string GetName(object from) { return grammar.GetName(from as ParseTreeNode); }
+        public ValueReader MakeAssignmentValue(ValueReader ls, object type, ValueReader rs) { return base.MakeAssignmentValue(ls, type as ParseTreeNode, rs); }
+        public object MakeAssignable(object obj, IScene scene, IDataContainer entity, Event evt) { return base.MakeAssignable(obj as ParseTreeNode, scene, entity, evt); }
     }
 }

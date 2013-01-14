@@ -99,6 +99,8 @@
     <Compile Include="Models\Service.cs" />
     <Compile Include="Models\Statements\Base\Statement.cs" />
     <Compile Include="Models\Value.cs" />
+    <Compile Include="Storage\IValueMaker.cs" />
+    <Compile Include="Storage\Kgl\KGLValueMaker.cs" />
     <Compile Include="Views\Behaviors\DragAdorner.cs" />
     <Compile Include="Base\DelegateCommand.cs" />
     <Compile Include="Base\FilteredObservableCollection.cs" />

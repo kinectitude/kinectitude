@@ -1,5 +1,7 @@
 ﻿using Irony.Parsing;
+using Kinectitude.Core.Data;
 using Kinectitude.Core.Language;
+using Kinectitude.Core.Loaders;
 using Kinectitude.Core.Loaders.Kgl;
 using Kinectitude.Editor.Models;
 using Kinectitude.Editor.Models.Statements;
@@ -17,7 +19,7 @@ using Attribute = Kinectitude.Editor.Models.Attribute;
 
 namespace Kinectitude.Editor.Storage.Kgl
 {
-    internal sealed class KglGameStorage : KGLBaseLoader, IGameStorage
+    internal sealed class KglGameStorage : KGLBase, IGameStorage
     {
         private readonly FileInfo FileName;
         private readonly KglGameVisitor Visitor = new KglGameVisitor();
@@ -97,21 +99,22 @@ namespace Kinectitude.Editor.Storage.Kgl
                 game.AddUsing(use);
             }
 
-
             //TODO this could be an expression set it later
             game.Width = 800;
             game.Height = 600;
             game.IsFullScreen = false;
 
-            foreach (Tuple<string, object> attribute in getAttributes(root))
+            foreach (Tuple<string, object> attribute in GetProperties(root))
             {
-                game.AddAttribute(new Attribute(attribute.Item1) { Value = new Value(attribute.Item2.ToString(), null) });  // TODO pass a ValueReader to the Value
+                ParseTreeNode attributeNode = (ParseTreeNode)attribute.Item2;
+                ValueReader reader = MakeAssignable(attributeNode, null, null, null) as ValueReader;
+                game.AddAttribute(new Attribute(attribute.Item1) { Value = new Value(getStrVal(attributeNode), reader) });
                 //TODO set width, height and is full screen here.  All values should be value readers
             }
 
             foreach (ParseTreeNode prototype in grammar.GetOfType(root, grammar.Prototype))
             {
-                Entity entity = CreateEntity(prototype);
+                Entity entity = CreateEntity(prototype, null);
                 game.AddPrototype(entity);
             }
 
@@ -122,7 +125,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             }
 
             //TODO won't need explicit cast when using value reader (or similar for editor) also may be an expression?
-            game.FirstScene = game.GetScene(game.GetAttribute("FirstScene").Value.ToString().Replace("\"", ""));
+            game.FirstScene = game.GetScene(game.GetAttribute("FirstScene").Value.Reader);
 
             return game;
         }
@@ -148,14 +151,18 @@ namespace Kinectitude.Editor.Storage.Kgl
             return use;
         }
 
-        private Entity CreateEntity(ParseTreeNode node)
+        private Entity CreateEntity(ParseTreeNode node, Scene scene)
         {
             Entity entity = new Entity() { Name = grammar.GetName(node) };
 
             foreach (string name in grammar.GetPrototypes(node)) entity.AddPrototype(game.GetPrototype(name));
 
-            foreach (Tuple<string, object> attribute in getAttributes(node)) 
-                entity.AddAttribute(new Attribute(attribute.Item1) { Value = new Value(attribute.Item2.ToString(), null) }); // TODO pass a ValueReader to the Value
+            foreach (Tuple<string, object> attribute in GetProperties(node))
+            {
+                ParseTreeNode attributeNode = (ParseTreeNode)attribute.Item2;
+                ValueReader reader = MakeAssignable(attributeNode, scene, entity, null) as ValueReader;
+                entity.AddAttribute(new Attribute(attribute.Item1) { Value = new Value(getStrVal(attributeNode), reader) });
+            }
 
             foreach (ParseTreeNode componentNode in grammar.GetOfType(node, grammar.Component))
             {
@@ -172,7 +179,12 @@ namespace Kinectitude.Editor.Storage.Kgl
                     entity.AddComponent(component);
                 }
 
-                foreach (Tuple<string, object> property in getAttributes(componentNode)) component.SetProperty(property.Item1, property.Item2);
+                foreach (Tuple<string, object> property in GetProperties(componentNode))
+                {
+                    //TODO make this have a value reader when it is ready
+                    ParseTreeNode propertyNode = (ParseTreeNode)property.Item2;
+                    component.SetProperty(property.Item1, getStrVal(propertyNode));
+                }
             }
 
             foreach (ParseTreeNode eventNode in grammar.GetOfType(node, grammar.Evt))
@@ -187,8 +199,12 @@ namespace Kinectitude.Editor.Storage.Kgl
         private Action createAction(ParseTreeNode node)
         {
             Action action = new Action(game.GetPlugin(grammar.GetName(node)));
-            foreach(Tuple<string, object> property in getAttributes(node)) 
-            action.SetProperty(property.Item1, property.Item2);
+            foreach (Tuple<string, object> property in GetProperties(node))
+            {
+                ParseTreeNode propertyNode = (ParseTreeNode)property.Item2;
+                //TODO value reader when ready
+                action.SetProperty(property.Item1, getStrVal(propertyNode));
+            }
             return action;
         }
 
@@ -201,7 +217,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             }
             else if (statementNode.Term == grammar.Condition)
             {
-                Condition cond = new Condition() { If = statementNode.Token.ValueString/*TODO check if this works*/};
+                Condition cond = new Condition() { If = getStrVal(statementNode)};
                 foreach (ParseTreeNode child in grammar.GetOfType(statementNode, grammar.Actions)) createStatement(child, evt, cond);
                 statement = cond;
                 //TODO else
@@ -253,7 +269,12 @@ namespace Kinectitude.Editor.Storage.Kgl
         private Event CreateEvent(ParseTreeNode node)
         {
             Event evt = new Event(game.GetPlugin(grammar.GetName(node)));
-            foreach (Tuple<string, object> property in getAttributes(node)) evt.SetProperty(property.Item1, property.Item2);
+            foreach (Tuple<string, object> property in GetProperties(node))
+            {
+                ParseTreeNode propertyNode = (ParseTreeNode)property.Item2;
+                //TODO value reader when ready
+                evt.SetProperty(property.Item1, getStrVal(propertyNode));
+            }
             foreach (ParseTreeNode actionNode in grammar.GetOfType(node, grammar.Actions)) createStatement(node.ChildNodes[2].ChildNodes[0], evt, null);
             return evt;
         }
@@ -262,8 +283,12 @@ namespace Kinectitude.Editor.Storage.Kgl
         {
             Scene scene = new Scene(grammar.GetName(node));
 
-            foreach (Tuple<string, object> attribute in getAttributes(node))
-                scene.AddAttribute(new Attribute(attribute.Item1) { Value = new Value(attribute.Item2.ToString(), null) }); // TODO pass a ValueReader to the Value
+            foreach (Tuple<string, object> attribute in GetProperties(node))
+            {
+                ParseTreeNode attributeNode = (ParseTreeNode)attribute.Item2;
+                ValueReader reader = MakeAssignable(attributeNode, scene, null, null) as ValueReader;
+                scene.AddAttribute(new Attribute(attribute.Item1) { Value = new Value(getStrVal(attributeNode), reader) });
+            }
 
             foreach (ParseTreeNode managerNode in grammar.GetOfType(node, grammar.Manager))
             {
@@ -273,7 +298,7 @@ namespace Kinectitude.Editor.Storage.Kgl
 
             foreach (ParseTreeNode entityNode in grammar.GetOfType(node, grammar.Entity))
             {
-                Entity entity = CreateEntity(entityNode);
+                Entity entity = CreateEntity(entityNode, scene);
                 scene.AddEntity(entity);
             }
 
@@ -283,7 +308,12 @@ namespace Kinectitude.Editor.Storage.Kgl
         private Manager CreateManager(ParseTreeNode node)
         {
             Manager manager = new Manager(game.GetPlugin(grammar.GetName(node)));
-            foreach (Tuple<string, object> property in getAttributes(node)) manager.SetProperty(property.Item1, property.Item2);
+            foreach (Tuple<string, object> property in GetProperties(node))
+            {
+                ParseTreeNode propertyNode = (ParseTreeNode)property.Item2;
+                //TODO value reader when ready
+                manager.SetProperty(property.Item1, getStrVal(propertyNode));
+            }
             return manager;
         }
 
@@ -294,13 +324,9 @@ namespace Kinectitude.Editor.Storage.Kgl
             return src.Substring(pos, length);
         }
 
-        private IEnumerable<Tuple<string, object>> getAttributes(ParseTreeNode node)
+        private Tuple<string, object> getAttribute(ParseTreeNode node)
         {
-            if (grammar.Prototype == node.Term || grammar.Entity == node.Term)
-                node = node.ChildNodes.First(child => child.Term == grammar.EntityDefinition);
-
-            foreach (ParseTreeNode property in grammar.GetOfType(node, grammar.Properties))
-                yield return new Tuple<string, object>(property.ChildNodes[0].Token.ValueString, getStrVal(property.ChildNodes[1]));
+            return new Tuple<string, object>(node.ChildNodes[0].Token.ValueString, getStrVal(node.ChildNodes[1]));
         }
     }
 }

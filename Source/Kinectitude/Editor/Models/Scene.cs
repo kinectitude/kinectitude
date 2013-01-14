@@ -18,7 +18,7 @@ using System.Windows.Input;
 
 namespace Kinectitude.Editor.Models
 {
-    internal sealed class Scene : GameModel<ISceneScope>, IAttributeScope, IEntityScope, IManagerScope, IDataContainer
+    internal sealed class Scene : GameModel<ISceneScope>, IAttributeScope, IEntityScope, IManagerScope, IDataContainer, IScene
     {
         private string name;
         private int nextAttribute;
@@ -475,6 +475,20 @@ namespace Kinectitude.Editor.Models
             });
         }
 
+        #endregion
+
+        #region IScene implementation
+        IDataContainer IScene.Game
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        IDataContainer IScene.GetEntity(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        HashSet<int> IScene.GetOfPrototype(string prototype, bool exact) { return new HashSet<int>(); }
         #endregion
     }
 }

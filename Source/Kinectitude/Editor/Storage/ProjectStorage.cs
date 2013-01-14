@@ -23,6 +23,7 @@ namespace Kinectitude.Editor.Storage
             if (file.Extension == ".kgl")
             {
                 storage = new KglGameStorage(file);
+                Workspace.ValueMaker = new KGLValueMaker();
             }
 
             return storage;

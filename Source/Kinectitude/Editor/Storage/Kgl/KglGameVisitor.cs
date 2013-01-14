@@ -80,7 +80,7 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         public void Visit(Attribute attribute)
         {
-            result = attribute.Name + " = " + attribute.Value;
+            result = attribute.Name + " = " + attribute.Value.Initializer;
         }
 
         public void Visit(Component component)
@@ -199,7 +199,8 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         public void Visit(Property property)
         {
-            result = property.Name + '=' + property.Value;
+            //TODO change this when it is a value
+            result = property.Name + '=' + (string)property.Value;
         }
 
         public void Visit(Scene scene)
@@ -216,11 +217,13 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         public void Visit(Service service)
         {
+            //TODO implement when service has everything I need
             throw new NotImplementedException();
         }
 
         public void Visit(Using use)
         {
+            if (use.File == null) return;
             result = new StringBuilder("using ").Append(use.File).Append(openDef())
                 .Append(visitMembers<Define>(use.Defines, "\n", allValid)).Append(closeDef()).ToString();
         }
@@ -265,14 +268,13 @@ namespace Kinectitude.Editor.Storage.Kgl
         private string openDef()
         {
             numTabs++;
-            return "{\n";
+            return "\n" + tabs() + "{\n";
         }
 
         private string closeDef()
         {
-            string retVal = "\n" + tabs() + "}\n" ;
             numTabs--;
-            return retVal;
+            return "\n" + tabs() + "}\n" ;
         }
 
     }

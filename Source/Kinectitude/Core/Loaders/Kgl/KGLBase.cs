@@ -9,14 +9,13 @@ using System.Text;
 
 namespace Kinectitude.Core.Loaders.Kgl
 {
-    internal abstract class KGLBaseLoader
+    internal abstract class KGLBase
     {
         protected readonly KinectitudeGrammar grammar = new KinectitudeGrammar();
 
-        public object MakeAssignable(object obj, IScene scene, IDataContainer entity, Event evt)
+        public object MakeAssignable(ParseTreeNode node, IScene scene, IDataContainer entity, Event evt)
         {
-            if (obj == null) return ConstantReader.TrueValue;
-            ParseTreeNode node = obj as ParseTreeNode;
+            if (node == null) return ConstantReader.TrueValue;
             if (node.Term == grammar.TypeMatcher) return makeTypeMatcher(node, scene);
             return makeValueReader(node, scene, entity, evt);
         }
@@ -48,10 +47,9 @@ namespace Kinectitude.Core.Loaders.Kgl
             }
         }
 
-        public ValueReader MakeAssignmentValue(ValueReader ls, object type, ValueReader rs)
+        public ValueReader MakeAssignmentValue(ValueReader ls, ParseTreeNode binOpNode, ValueReader rs)
         {
-            if (type == null) return rs;
-            ParseTreeNode binOpNode = type as ParseTreeNode;
+            if (binOpNode == null) return rs;
             KinectitudeGrammar.OpCode opCode = grammar.OpLookup[binOpNode.Term];
             return binOpCreate(opCode, ls, rs);
         }
@@ -129,7 +127,7 @@ namespace Kinectitude.Core.Loaders.Kgl
             }
             else if (type0 == grammar.Function)
             {
-                string name = GetName(from);
+                string name = grammar.GetName(from);
                 IEnumerable<ParseTreeNode> arguments = grammar.GetOfType(from, grammar.Argument);
                 List<ValueReader> argReaders = new List<ValueReader>();
                 foreach (ParseTreeNode argument in arguments) argReaders.Add(makeValueReader(argument.ChildNodes[0], scene, entity, evt));
@@ -168,8 +166,6 @@ namespace Kinectitude.Core.Loaders.Kgl
             }
         }
 
-        public string GetName(object from) { return grammar.GetName(from as ParseTreeNode); }
-
         private ValueReader uniOpCreate(BnfTerm op, ValueReader value)
         {
             if (grammar.Not == op) return new NotOpReader(value);
@@ -204,6 +200,19 @@ namespace Kinectitude.Core.Loaders.Kgl
                     return null;
 
             }
+        }
+
+        public PropertyHolder GetProperties(ParseTreeNode node)
+        {
+            PropertyHolder propertyHolder = new PropertyHolder();
+
+            if (grammar.Prototype == node.Term || grammar.Entity == node.Term)
+                node = node.ChildNodes.First(child => child.Term == grammar.EntityDefinition);
+
+            foreach (ParseTreeNode property in grammar.GetOfType(node, grammar.Properties))
+                propertyHolder.AddValue(property.ChildNodes[0].Token.ValueString, property.ChildNodes[1]);
+
+            return propertyHolder;
         }
     }
 }

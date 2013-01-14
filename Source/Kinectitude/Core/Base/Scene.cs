@@ -166,7 +166,9 @@ namespace Kinectitude.Core.Base
 
         internal Entity GetEntity(string name)
         {
-            return EntityByName[name];
+            Entity entity = null;
+            EntityByName.TryGetValue(name, out entity);
+            return entity;
         }
 
         IDataContainer IScene.Game
