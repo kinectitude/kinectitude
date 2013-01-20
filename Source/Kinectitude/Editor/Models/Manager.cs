@@ -3,6 +3,7 @@ using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Properties;
 using Kinectitude.Editor.Storage;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -11,6 +12,7 @@ namespace Kinectitude.Editor.Models
     internal sealed class Manager : GameModel<IManagerScope>, IPropertyScope
     {
         private readonly Plugin plugin;
+        private readonly List<Property> properties;
 
         public string Type
         {
@@ -32,7 +34,10 @@ namespace Kinectitude.Editor.Models
             get { return null != Scope ? Scope.RequiresManager(this) : false; }
         }
 
-        public ObservableCollection<Property> Properties { get; private set; }
+        public IEnumerable<Property> Properties
+        {
+            get { return properties; }
+        }
 
         public Manager(Plugin plugin)
         {
@@ -43,7 +48,11 @@ namespace Kinectitude.Editor.Models
 
             this.plugin = plugin;
 
-            Properties = new ObservableCollection<Property>();
+            properties = new List<Property>();
+            foreach (PluginProperty property in plugin.Properties)
+            {
+                AddProperty(new Property(property));
+            }
 
             AddDependency<ScopeChanged>("Type");
             AddDependency<ScopeChanged>("IsRequired");
@@ -52,6 +61,12 @@ namespace Kinectitude.Editor.Models
         public override void Accept(IGameVisitor visitor)
         {
             visitor.Visit(this);
+        }
+
+        private void AddProperty(Property property)
+        {
+            property.Scope = this;
+            properties.Add(property);
         }
 
         public Property GetProperty(string name)
