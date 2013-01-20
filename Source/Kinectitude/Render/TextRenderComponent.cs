@@ -31,7 +31,7 @@ namespace Kinectitude.Render
         }
 
         private string fontFamily;
-        [PluginProperty("Font Family", "")]
+        [PluginProperty("Font Family", "", "Arial")]
         public string FontFamily
         {
             get { return fontFamily; }
@@ -46,7 +46,7 @@ namespace Kinectitude.Render
         }
 
         private FontWeight fontWeight;
-        [PluginProperty("Font Weight", "")]
+        [PluginProperty("Font Weight", "", FontWeight.Normal)]
         public FontWeight FontWeight
         {
             get { return fontWeight; }
@@ -61,7 +61,7 @@ namespace Kinectitude.Render
         }
 
         public FontStyle fontStyle;
-        [PluginProperty("Font Style", "")]
+        [PluginProperty("Font Style", "", FontStyle.Normal)]
         public FontStyle FontStyle
         {
             get { return fontStyle; }
@@ -76,7 +76,7 @@ namespace Kinectitude.Render
         }
 
         private FontStretch fontStretch;
-        [PluginProperty("Font Stretch", "")]
+        [PluginProperty("Font Stretch", "", FontStretch.Normal)]
         public FontStretch FontStretch
         {
             get { return fontStretch; }
@@ -106,7 +106,7 @@ namespace Kinectitude.Render
         }
 
         private string fontColor;
-        [PluginProperty("Font Color", "", "black")]
+        [PluginProperty("Font Color", "", "Black")]
         public string FontColor
         {
             get { return fontColor; }
@@ -136,7 +136,7 @@ namespace Kinectitude.Render
         }
 
         private FlowDirection flowDirection;
-        [PluginProperty("Flow Direction", "")]
+        [PluginProperty("Flow Direction", "", FlowDirection.TopToBottom)]
         public FlowDirection FlowDirection
         {
             get { return flowDirection; }
@@ -166,7 +166,7 @@ namespace Kinectitude.Render
         }
 
         private ParagraphAlignment paragraphAlignment;
-        [PluginProperty("Paragraph Alignment", "")]
+        [PluginProperty("Paragraph Alignment", "", ParagraphAlignment.Near)]
         public ParagraphAlignment ParagraphAlignment
         {
             get { return paragraphAlignment; }
@@ -181,7 +181,7 @@ namespace Kinectitude.Render
         }
 
         private ReadingDirection readingDirection;
-        [PluginProperty("Reading Direction", "")]
+        [PluginProperty("Reading Direction", "", ReadingDirection.LeftToRight)]
         public ReadingDirection ReadingDirection
         {
             get { return readingDirection; }
@@ -196,7 +196,7 @@ namespace Kinectitude.Render
         }
 
         private TextAlignment textAlignment;
-        [PluginProperty("Text Alignment", "")]
+        [PluginProperty("Text Alignment", "", TextAlignment.Leading)]
         public TextAlignment TextAlignment
         {
             get { return textAlignment; }
@@ -211,7 +211,7 @@ namespace Kinectitude.Render
         }
 
         private WordWrapping wordWrapping;
-        [PluginProperty("Word Wrapping", "")]
+        [PluginProperty("Word Wrapping", "", WordWrapping.NoWrap)]
         public WordWrapping WordWrapping
         {
             get { return wordWrapping; }
