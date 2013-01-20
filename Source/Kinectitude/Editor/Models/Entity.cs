@@ -654,6 +654,14 @@ namespace Kinectitude.Editor.Models
             }
         }
 
+        public void RemoveFromScope()
+        {
+            if (null != Scope)
+            {
+                Scope.RemoveEntity(this);
+            }
+        }
+
         #region IPluginNamespace implementation
 
         public string GetDefinedName(Plugin plugin)
