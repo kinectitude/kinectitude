@@ -175,7 +175,7 @@
                                         <StackPanel.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem Header="Rename..." Command="{Binding RenameCommand}" />
-                                                <MenuItem Header="Delete" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=Game.RemoveItemCommand}" CommandParameter="{Binding}" />
+                                                <MenuItem Header="Delete" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.Game.RemoveItemCommand}" CommandParameter="{Binding}" />
                                                 <Separator />
                                                 <MenuItem Header="Properties..." Command="{Binding PropertiesCommand}" />
                                             </ContextMenu>
@@ -193,7 +193,7 @@
                                         <StackPanel.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem Header="Rename..." Command="{Binding RenameCommand}" />
-                                                <MenuItem Header="Delete" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=Game.RemoveItemCommand}" CommandParameter="{Binding}" />
+                                                <MenuItem Header="Delete" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.Game.RemoveItemCommand}" CommandParameter="{Binding}" />
                                                 <Separator />
                                                 <MenuItem Header="Properties..." Command="{Binding PropertiesCommand}" />
                                             </ContextMenu>

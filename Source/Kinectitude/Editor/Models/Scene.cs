@@ -337,6 +337,11 @@ namespace Kinectitude.Editor.Models
             return Entities.Any(x => x.Name != null && x.Name == name) || null != Scope && Scope.EntityNameExists(name);
         }
 
+        void IEntityScope.RemoveEntity(Entity entity)
+        {
+            RemoveEntity(entity);
+        }
+
         #endregion
 
         #region IPluginNamespace implementation

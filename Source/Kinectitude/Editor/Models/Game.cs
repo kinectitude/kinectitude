@@ -139,11 +139,9 @@ namespace Kinectitude.Editor.Models
 
         public ICommand RenameCommand { get; private set; }
         public ICommand AddPrototypeCommand { get; private set; }
-        public ICommand RemovePrototypeCommand { get; private set; }
         public ICommand AddAttributeCommand { get; private set; }
         public ICommand RemoveAttributeCommand { get; private set; }
         public ICommand AddSceneCommand { get; private set; }
-        public ICommand RemoveSceneCommand { get; private set; }
         public ICommand RemoveItemCommand { get; private set; }
 
         public Game(string name)
@@ -176,12 +174,6 @@ namespace Kinectitude.Editor.Models
                 });
             });
 
-            RemovePrototypeCommand = new DelegateCommand(null, (parameter) =>
-            {
-                Entity prototype = parameter as Entity;
-                RemovePrototype(prototype);
-            });
-
             AddSceneCommand = new DelegateCommand(null, (parameter) =>
             {
                 Scene scene = CreateScene();
@@ -193,12 +185,6 @@ namespace Kinectitude.Editor.Models
                         AddScene(scene);
                     }
                 });
-            });
-
-            RemoveSceneCommand = new DelegateCommand(null, (parameter) =>
-            {
-                Scene scene = parameter as Scene;
-                RemoveScene(scene);
             });
 
             AddAttributeCommand = new DelegateCommand(null, (parameter) =>
@@ -214,10 +200,10 @@ namespace Kinectitude.Editor.Models
 
             RemoveItemCommand = new DelegateCommand(null, (parameter) =>
             {
-                Entity prototype = parameter as Entity;
-                if (null != prototype)
+                Entity entity = parameter as Entity;
+                if (null != entity)
                 {
-                    RemovePrototype(prototype);
+                    entity.RemoveFromScope();
                 }
                 else
                 {
@@ -522,6 +508,11 @@ namespace Kinectitude.Editor.Models
         public bool EntityNameExists(string name)
         {
             return HasPrototypeWithName(name);
+        }
+
+        void IEntityScope.RemoveEntity(Entity entity)
+        {
+            RemovePrototype(entity);
         }
 
         #endregion
