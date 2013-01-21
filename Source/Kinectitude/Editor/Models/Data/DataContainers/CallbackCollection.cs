@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Data.DataContainers
 {
     internal sealed class CallbackCollection
     {
@@ -110,6 +110,19 @@ namespace Kinectitude.Editor.Models
         public void PublishComponentChange(string component, string property)
         {
             PrivatePublish(GetPropertyCallbacks(component, property));
+        }
+
+        public void PublishAll()
+        {
+            foreach (var entry in allCallbacks)
+            {
+                PrivatePublish(entry.Value);
+            }
+
+            foreach (var key in allComponentCallbacks.Keys)
+            {
+                PublishComponentChange(key);
+            }
         }
     }
 }

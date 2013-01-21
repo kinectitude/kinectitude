@@ -1,6 +1,7 @@
 ﻿using Kinectitude.Core.Base;
 using Kinectitude.Core.Data;
 using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models.Data.DataContainers;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Transactions;
@@ -15,7 +16,7 @@ using System.Windows.Input;
 
 namespace Kinectitude.Editor.Models
 {
-    internal sealed class Game : GameModel<IScope>, IAttributeScope, IEntityScope, ISceneScope, IDataContainer
+    internal sealed class Game : GameModel<IScope>, IAttributeScope, IEntityScope, ISceneScope
     {
         private string name;
         private int width;
@@ -25,7 +26,6 @@ namespace Kinectitude.Editor.Models
         private int nextAttribute;
         private int nextScene;
         private int nextPrototype;
-        private CallbackCollection changeCallbacks;
 
         public string Name
         {
@@ -214,24 +214,6 @@ namespace Kinectitude.Editor.Models
                     }
                 }
             });
-
-            changeCallbacks = new CallbackCollection();
-
-            AddHandler<DefineAdded>(n =>
-            {
-                changeCallbacks.PublishComponentChange(n.Define.Name);
-            });
-
-            AddHandler<DefineRemoved>(n =>
-            {
-                changeCallbacks.PublishComponentChange(n.Define.Name);
-            });
-
-            AddHandler<DefinedNameChanged>(n =>
-            {
-                changeCallbacks.PublishComponentChange(n.OldName);
-                changeCallbacks.PublishComponentChange(GetDefinedName(n.Plugin));
-            });
         }
 
         public override void Accept(IGameVisitor visitor)
@@ -344,9 +326,6 @@ namespace Kinectitude.Editor.Models
                 () => RemoveScene(scene),
                 () => AddScene(scene)
             );
-
-            DataContainerReader.DeleteDataContainer(scene);
-            ParameterValueReader.DeleteObject(scene);
         }
 
         public Scene CreateScene()
@@ -367,9 +346,7 @@ namespace Kinectitude.Editor.Models
         public void AddAttribute(Attribute attribute)
         {
             attribute.Scope = this;
-            attribute.PropertyChanged += OnAttributePropertyChanged;
             Attributes.Add(attribute);
-            changeCallbacks.PublishAttributeChange(attribute.Name);
 
             Workspace.Instance.CommandHistory.Log(
                 "add attribute '" + attribute.Name + "'",
@@ -381,24 +358,13 @@ namespace Kinectitude.Editor.Models
         public void RemoveAttribute(Attribute attribute)
         {
             attribute.Scope = null;
-            attribute.PropertyChanged -= OnAttributePropertyChanged;
             Attributes.Remove(attribute);
-            changeCallbacks.PublishAttributeChange(attribute.Name);
 
             Workspace.Instance.CommandHistory.Log(
                 "remove attribute '" + attribute.Name + "'",
                 () => RemoveAttribute(attribute),
                 () => AddAttribute(attribute)
             );
-        }
-
-        private void OnAttributePropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "Value")
-            {
-                var attribute = (Attribute)sender;
-                changeCallbacks.PublishAttributeChange(attribute.Name);
-            }
         }
 
         public void CreateAttribute()
@@ -528,6 +494,21 @@ namespace Kinectitude.Editor.Models
 
         #region IAttributeScope implementation
 
+        Entity IAttributeScope.Entity
+        {
+            get { return null; }
+        }
+
+        Scene IAttributeScope.Scene
+        {
+            get { return null; }
+        }
+
+        Game IAttributeScope.Game
+        {
+            get { return this; }
+        }
+
         public event AttributeEventHandler InheritedAttributeAdded { add { } remove { } }
         public event AttributeEventHandler InheritedAttributeRemoved { add { } remove { } }
         public event AttributeEventHandler InheritedAttributeChanged { add { } remove { } }
@@ -578,49 +559,6 @@ namespace Kinectitude.Editor.Models
             }
 
             return Workspace.Instance.GetPlugin(name);
-        }
-
-        #endregion
-
-        #region IDataContainer implementation
-
-        ValueReader IDataContainer.this[string key]
-        {
-            get
-            {
-                return GetAttribute(key).Value.Reader ?? ConstantReader.NullValue;
-            }
-            set
-            {
-                throw new NotSupportedException();
-            }
-        }
-
-        void IDataContainer.NotifyOfChange(string key, IChanges callback)
-        {
-            //changeCallbacks.SubscribeToAttributeChange(key, callback);
-        }
-
-        void IDataContainer.NotifyOfComponentChange(Tuple<IChangeable, string> what, IChanges callback)
-        {
-            //var tokens = what.Split('.');
-            //changeCallbacks.SubscribeToComponentChange(tokens[0], tokens[1], callback);
-        }
-
-        IChangeable IDataContainer.GetChangeable(string name)
-        {
-            var plugin = GetPlugin(name);
-
-            return new DelegateChangeable((parameter) =>
-            {
-                var service = GetServiceByType(plugin);
-                if (null != service)
-                {
-                    return service.GetProperty(parameter).Value;
-                }
-
-                return null;
-            });   
         }
 
         #endregion

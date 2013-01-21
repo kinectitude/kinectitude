@@ -20,12 +20,11 @@ using Event = Kinectitude.Editor.Models.Statements.Events.Event;
 
 namespace Kinectitude.Editor.Models
 {
-    internal sealed class Entity : GameModel<IEntityScope>, IAttributeScope, IComponentScope, IStatementScope, IDataContainer
+    internal sealed class Entity : GameModel<IEntityScope>, IAttributeScope, IComponentScope, IStatementScope
     {
         private string name;
         private bool prototype;
         private int nextAttribute;
-        private CallbackCollection changeCallbacks;
         
         public string Name
         {
@@ -154,23 +153,23 @@ namespace Kinectitude.Editor.Models
                 statement.RemoveFromParent();
             });
 
-            changeCallbacks = new CallbackCollection();
+            //changeCallbacks = new CallbackCollection();
 
-            AddHandler<DefineAdded>(n =>
-            {
-                changeCallbacks.PublishComponentChange(n.Define.Name);
-            });
+            //AddHandler<DefineAdded>(n =>
+            //{
+            //    changeCallbacks.PublishComponentChange(n.Define.Name);
+            //});
 
-            AddHandler<DefineRemoved>(n =>
-            {
-                changeCallbacks.PublishComponentChange(n.Define.Name);
-            });
+            //AddHandler<DefineRemoved>(n =>
+            //{
+            //    changeCallbacks.PublishComponentChange(n.Define.Name);
+            //});
 
-            AddHandler<DefinedNameChanged>(n =>
-            {
-                changeCallbacks.PublishComponentChange(n.OldName);
-                changeCallbacks.PublishComponentChange(GetDefinedName(n.Plugin));
-            });
+            //AddHandler<DefinedNameChanged>(n =>
+            //{
+            //    changeCallbacks.PublishComponentChange(n.OldName);
+            //    changeCallbacks.PublishComponentChange(GetDefinedName(n.Plugin));
+            //});
         }
 
         public override void Accept(IGameVisitor visitor)
@@ -349,7 +348,7 @@ namespace Kinectitude.Editor.Models
             attribute.Scope = this;
             attribute.PropertyChanged += OnLocalAttributePropertyChanged;
             Attributes.Add(attribute);
-            changeCallbacks.PublishAttributeChange(attribute.Name);
+            //changeCallbacks.PublishAttributeChange(attribute.Name);
         }
 
         public void AddAttribute(Attribute attribute)
@@ -371,7 +370,7 @@ namespace Kinectitude.Editor.Models
             attribute.Scope = null;
             attribute.PropertyChanged -= OnLocalAttributePropertyChanged;
             Attributes.Remove(attribute);
-            changeCallbacks.PublishAttributeChange(attribute.Name);
+            //changeCallbacks.PublishAttributeChange(attribute.Name);
         }
 
         public void RemoveAttribute(Attribute attribute)
@@ -393,7 +392,7 @@ namespace Kinectitude.Editor.Models
             if (e.PropertyName == "Value")
             {
                 var attribute = (Attribute)sender;
-                changeCallbacks.PublishAttributeChange(attribute.Name);
+                //changeCallbacks.PublishAttributeChange(attribute.Name);
             }
         }
 
@@ -474,7 +473,7 @@ namespace Kinectitude.Editor.Models
                 Components.Add(component);
 
                 Notify(new PluginUsed(component.Plugin));
-                changeCallbacks.PublishComponentChange(component.Type);
+                //changeCallbacks.PublishComponentChange(component.Type);
                 
                 Workspace.Instance.CommandHistory.Log(
                     "add component '" + component.DisplayName + "'",
@@ -496,7 +495,7 @@ namespace Kinectitude.Editor.Models
                     component.LocalPropertyChanged -= OnComponentLocalPropertyChanged;
                     Components.Remove(component);
 
-                    changeCallbacks.PublishComponentChange(definedType);
+                    //changeCallbacks.PublishComponentChange(definedType);
 
                     Workspace.Instance.CommandHistory.Log(
                         "remove component '" + component.DisplayName + "'",
@@ -509,7 +508,7 @@ namespace Kinectitude.Editor.Models
 
         private void OnComponentLocalPropertyChanged(Component component, PluginProperty property)
         {
-            changeCallbacks.PublishComponentChange(component.Type, property.Name);
+            //changeCallbacks.PublishComponentChange(component.Type, property.Name);
         }
 
         public Component GetComponentByRole(string provides)
@@ -650,6 +649,21 @@ namespace Kinectitude.Editor.Models
 
         #region IAttributeScope implementation
 
+        Entity IAttributeScope.Entity
+        {
+            get { return this; }
+        }
+
+        Scene IAttributeScope.Scene
+        {
+            get { return null; }
+        }
+
+        Game IAttributeScope.Game
+        {
+            get { return null; }
+        }
+
         public event AttributeEventHandler InheritedAttributeAdded;
         public event AttributeEventHandler InheritedAttributeRemoved;
         public event AttributeEventHandler InheritedAttributeChanged;
@@ -704,10 +718,10 @@ namespace Kinectitude.Editor.Models
                 if (null != component)
                 {
                     Property property = component.GetProperty(pluginProperty.Name);
-                    if (property.HasOwnValue)
-                    {
+                    //if (property.HasOwnValue)
+                    //{
                         return property.Value;
-                    }
+                    //}
                 }
             }
 
@@ -797,44 +811,45 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        #region IDataContainer implementation
-        ValueReader IDataContainer.this[string key]
-        {
-            get
-            {
-                return GetAttribute(key).Value.Reader ?? ConstantReader.NullValue;
-            }
-            set
-            {
-                throw new NotSupportedException();
-            }
-        void IDataContainer.NotifyOfChange(string key, IChanges callback)
-        {
-            //changeCallbacks.SubscribeToAttributeChange(key, callback);
-        }
+        //#region IDataContainer implementation
+        //ValueReader IDataContainer.this[string key]
+        //{
+        //    get
+        //    {
+        //        return GetAttribute(key).Value.Reader ?? ConstantReader.NullValue;
+        //    }
+        //    set
+        //    {
+        //        throw new NotSupportedException();
+        //    }
+        //}
+        //void IDataContainer.NotifyOfChange(string key, IChanges callback)
+        //{
+        //    //changeCallbacks.SubscribeToAttributeChange(key, callback);
+        //}
 
-        void IDataContainer.NotifyOfComponentChange(Tuple<IChangeable, string> what, IChanges callback)
-        {
-            //var tokens = what.Split('.');
-            //changeCallbacks.SubscribeToComponentChange(tokens[0], tokens[1], callback);
-        }
+        //void IDataContainer.NotifyOfComponentChange(Tuple<IChangeable, string> what, IChanges callback)
+        //{
+        //    //var tokens = what.Split('.');
+        //    //changeCallbacks.SubscribeToComponentChange(tokens[0], tokens[1], callback);
+        //}
 
-        IChangeable IDataContainer.GetChangeable(string name)
-        {
-            var plugin = GetPlugin(name);
+        //IChangeable IDataContainer.GetChangeable(string name)
+        //{
+        //    var plugin = GetPlugin(name);
 
-            return new DelegateChangeable((parameter) =>
-            {
-                var component = GetComponentByType(plugin.ClassName);
-                if (null != component)
-                {
-                    return component.GetProperty(parameter).Value;
-                }
+        //    return new DelegateChangeable((parameter) =>
+        //    {
+        //        var component = GetComponentByType(plugin.ClassName);
+        //        if (null != component)
+        //        {
+        //            return component.GetProperty(parameter).Value;
+        //        }
 
-                return null;
-            });
-        }
+        //        return null;
+        //    });
+        //}
 
-        #endregion
+        //#endregion
     }
 }

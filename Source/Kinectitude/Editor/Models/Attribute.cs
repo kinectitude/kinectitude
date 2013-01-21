@@ -9,9 +9,9 @@ namespace Kinectitude.Editor.Models
 {
     internal delegate void NameChangedEventHandler(string oldName, string newName);
     
-    internal sealed class Attribute : GameModel<IAttributeScope>
+    internal sealed class Attribute : GameModel<IAttributeScope>, IValueScope
     {
-        public static readonly Value DefaultValue = new Value("", ConstantReader.NullValue);
+        public static readonly Value DefaultValue = new Value("");
 
         private string name;
         private Value val;
@@ -158,5 +158,24 @@ namespace Kinectitude.Editor.Models
         {
             return null != Scope ? Scope.GetInheritedValue(Name) : DefaultValue;
         }
+
+        #region IValueScope implementation
+
+        Entity IValueScope.Entity
+        {
+            get { return null != Scope ? Scope.Entity : null; }
+        }
+
+        Scene IValueScope.Scene
+        {
+            get { return null != Scope ? Scope.Scene : null; }
+        }
+
+        Game IValueScope.Game
+        {
+            get { return null != Scope ? Scope.Game : null; }
+        }
+
+        #endregion
     }
 }

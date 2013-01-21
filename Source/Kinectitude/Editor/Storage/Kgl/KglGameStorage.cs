@@ -106,8 +106,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             foreach (Tuple<string, object> attribute in GetProperties(root))
             {
                 ParseTreeNode attributeNode = (ParseTreeNode)attribute.Item2;
-                ValueReader reader = MakeAssignable(attributeNode, null, null, null) as ValueReader;
-                game.AddAttribute(new Attribute(attribute.Item1) { Value = new Value(getStrVal(attributeNode), reader) });
+                game.AddAttribute(new Attribute(attribute.Item1) { Value = new Value(getStrVal(attributeNode)) });
                 //TODO set width, height and is full screen here.  All values should be value readers
             }
 
@@ -159,8 +158,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             foreach (Tuple<string, object> attribute in GetProperties(node))
             {
                 ParseTreeNode attributeNode = (ParseTreeNode)attribute.Item2;
-                ValueReader reader = MakeAssignable(attributeNode, scene, entity, null) as ValueReader;
-                entity.AddAttribute(new Attribute(attribute.Item1) { Value = new Value(getStrVal(attributeNode), reader) });
+                entity.AddAttribute(new Attribute(attribute.Item1) { Value = new Value(getStrVal(attributeNode)) });
             }
 
             foreach (ParseTreeNode componentNode in grammar.GetOfType(node, grammar.Component))
@@ -285,8 +283,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             foreach (Tuple<string, object> attribute in GetProperties(node))
             {
                 ParseTreeNode attributeNode = (ParseTreeNode)attribute.Item2;
-                ValueReader reader = MakeAssignable(attributeNode, scene, null, null) as ValueReader;
-                scene.AddAttribute(new Attribute(attribute.Item1) { Value = new Value(getStrVal(attributeNode), reader) });
+                scene.AddAttribute(new Attribute(attribute.Item1) { Value = new Value(getStrVal(attributeNode)) });
             }
 
             foreach (ParseTreeNode managerNode in grammar.GetOfType(node, grammar.Manager))

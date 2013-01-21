@@ -228,6 +228,11 @@ namespace Kinectitude.Editor.Storage.Kgl
                 .Append(visitMembers<Define>(use.Defines, "\n", allValid)).Append(closeDef()).ToString();
         }
 
+        public void Visit(Value val)
+        {
+            throw new NotImplementedException(); // TODO: set result = the string representation of the given Value.
+        }
+
         public void Visit(WhileLoop loop)
         {
             StringBuilder sb = new StringBuilder(tabs()).Append("while(").Append(loop.Expression).Append(")")

@@ -1,6 +1,7 @@
 ﻿using Kinectitude.Core.Base;
 using Kinectitude.Core.Data;
 using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models.Data.DataContainers;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Transactions;
@@ -66,6 +67,9 @@ namespace Kinectitude.Editor.Models
         public ICommand CopyCommand { get; private set; }
         public ICommand PasteCommand { get; private set; }
         public ICommand DeleteCommand { get; private set; }
+
+        private readonly CallbackCollection changeCallbacks;
+        private readonly Dictionary<string, EntityDataContainer> dataContainers;
 
         public Scene(string name)
         {
@@ -166,6 +170,8 @@ namespace Kinectitude.Editor.Models
                     }
                 }
             });
+
+            dataContainers = new Dictionary<string, EntityDataContainer>();
         }
 
         public override void Accept(IGameVisitor visitor)
@@ -274,6 +280,12 @@ namespace Kinectitude.Editor.Models
                 () => RemoveEntity(entity),
                 () => AddEntity(entity)
             );
+        }
+
+        public Entity GetEntityByName(string name)
+        {
+            return Entities.FirstOrDefault(x => x.Name == name);
+        }
 
         private string GetNextAttributeKey()
         {
@@ -360,6 +372,21 @@ namespace Kinectitude.Editor.Models
 
         #region IAttributeScope implementation
 
+        Entity IAttributeScope.Entity
+        {
+            get { return null; }
+        }
+
+        Scene IAttributeScope.Scene
+        {
+            get { return this; }
+        }
+
+        Game IAttributeScope.Game
+        {
+            get { return null; }
+        }
+
         public event AttributeEventHandler InheritedAttributeAdded { add { } remove { } }
         public event AttributeEventHandler InheritedAttributeRemoved { add { } remove { } }
         public event AttributeEventHandler InheritedAttributeChanged { add { } remove { } }
@@ -399,63 +426,6 @@ namespace Kinectitude.Editor.Models
             return false;
         }
 
-        #endregion
-
-        #region IDataContainer implementation
-
-        ValueReader IDataContainer.this[string key]
-        {
-            get
-            {
-                return GetAttribute(key).Value.Reader ?? ConstantReader.NullValue;
-            }
-            set
-            {
-                throw new NotSupportedException();
-            }
-        }
-
-        void IDataContainer.NotifyOfChange(string key, IChanges callback)
-        {
-            //changeCallbacks.SubscribeToAttributeChange(key, callback);
-        }
-
-        void IDataContainer.NotifyOfComponentChange(Tuple<IChangeable, string> what, IChanges callback)
-        {
-            //var tokens = what.Split('.');
-            //changeCallbacks.SubscribeToComponentChange(tokens[0], tokens[1], callback);
-        }
-
-        IChangeable IDataContainer.GetChangeable(string name)
-        {
-            var plugin = GetPlugin(name);
-
-            return new DelegateChangeable((parameter) =>
-            {
-                var manager = GetManagerByType(plugin);
-                if (null != manager)
-                {
-                    return manager.GetProperty(parameter).Value;
-                }
-
-                return null;
-            });
-        }
-
-        #endregion
-
-        #region IScene implementation
-        IDataContainer IScene.Game
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        IDataContainer IScene.GetEntity(string name)
-        {
-            throw new NotImplementedException();
-        }
-
-        HashSet<int> IScene.GetOfPrototype(string prototype, bool exact) { return new HashSet<int>(); }
         #endregion
     }
 }

@@ -34,6 +34,7 @@ namespace Kinectitude.Editor.Storage
         void Visit(Scene scene);
         void Visit(Service service);
         void Visit(Using use);
+        void Visit(Value val);
         void Visit(WhileLoop loop);
     }
 }
