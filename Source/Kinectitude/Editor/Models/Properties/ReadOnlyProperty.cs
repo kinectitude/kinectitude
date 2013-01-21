@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace Kinectitude.Editor.Models.Properties
 {
-    internal sealed class InheritedProperty : AbstractProperty
+    internal sealed class ReadOnlyProperty : AbstractProperty
     {
         private readonly AbstractProperty inheritedProperty;
 
@@ -32,7 +32,7 @@ namespace Kinectitude.Editor.Models.Properties
 
         public override ICommand ClearValueCommand { get; protected set; }
 
-        public InheritedProperty(AbstractProperty inheritedProperty) : base(inheritedProperty)
+        public ReadOnlyProperty(AbstractProperty inheritedProperty) : base(inheritedProperty)
         {
             this.inheritedProperty = inheritedProperty;
         }

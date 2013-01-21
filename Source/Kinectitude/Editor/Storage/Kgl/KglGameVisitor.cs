@@ -181,7 +181,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             result = "";
         }
 
-        public void Visit(InheritedProperty property)
+        public void Visit(ReadOnlyProperty property)
         {
             result = "";
         }

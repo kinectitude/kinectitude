@@ -174,7 +174,7 @@
     <Compile Include="Models\Statements\Actions\ReadOnlyAction.cs" />
     <Compile Include="Models\Statements\Conditions\ReadOnlyCondition.cs" />
     <Compile Include="Models\Statements\Events\ReadOnlyEvent.cs" />
-    <Compile Include="Models\Properties\InheritedProperty.cs" />
+    <Compile Include="Models\Properties\ReadOnlyProperty.cs" />
     <Compile Include="Models\Interfaces\IStatementScope.cs" />
     <Compile Include="Models\Interfaces\IAttributeScope.cs" />
     <Compile Include="Models\Interfaces\IComponentScope.cs" />

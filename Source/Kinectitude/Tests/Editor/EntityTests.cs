@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Kinectitude.Editor.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Kinectitude.Editor.Models.Values;
 
 namespace Kinectitude.Editor.Tests
 {
@@ -117,13 +118,13 @@ namespace Kinectitude.Editor.Tests
         {
             Entity parent = new Entity() { Name = "parent" };
 
-            Attribute attribute = new Attribute("test") { Value = new Value("value", null) };
+            Attribute attribute = new Attribute("test") { Value = new Value("value") };
             parent.AddAttribute(attribute);
 
             Entity child = new Entity();
             child.AddPrototype(parent);
 
-            Attribute childAttribute = new Attribute("test2") { Value = new Value("new value", null) };
+            Attribute childAttribute = new Attribute("test2") { Value = new Value("new value") };
             child.AddAttribute(childAttribute);
 
             //Assert.IsFalse(childAttribute.CanInherit);
@@ -158,12 +159,12 @@ namespace Kinectitude.Editor.Tests
             Entity child = new Entity();
             child.AddPrototype(parent);
 
-            Attribute attribute = new Attribute("test") { Value = new Value("value", null) };
+            Attribute attribute = new Attribute("test") { Value = new Value("value") };
             child.AddAttribute(attribute);
 
             //Assert.IsFalse(attribute.CanInherit);
 
-            Attribute parentAttribute = new Attribute("test") { Value = new Value("new value", null) };
+            Attribute parentAttribute = new Attribute("test") { Value = new Value("new value") };
             parent.AddAttribute(parentAttribute);
 
             //Assert.IsTrue(attribute.CanInherit);
@@ -178,13 +179,13 @@ namespace Kinectitude.Editor.Tests
 
             Entity parentWithAttribute = new Entity() { Name = "parentWithAttribute" };
 
-            Attribute attribute = new Attribute("test") { Value = new Value("new value", null) };
+            Attribute attribute = new Attribute("test") { Value = new Value("new value") };
             parentWithAttribute.AddAttribute(attribute);
 
             Entity child = new Entity();
             child.AddPrototype(parent);
 
-            Attribute childAttribute = new Attribute("test") { Value = new Value("value", null) };
+            Attribute childAttribute = new Attribute("test") { Value = new Value("value") };
             child.AddAttribute(childAttribute);
 
             //Assert.IsFalse(childAttribute.CanInherit);
@@ -201,7 +202,7 @@ namespace Kinectitude.Editor.Tests
         {
             Entity parent = new Entity() { Name = "parent" };
 
-            Attribute attribute = new Attribute("test") { Value = new Value("value", null) };
+            Attribute attribute = new Attribute("test") { Value = new Value("value") };
             parent.AddAttribute(attribute);
 
             Entity child = new Entity();
@@ -209,7 +210,7 @@ namespace Kinectitude.Editor.Tests
             
             Attribute childAttribute = child.GetAttribute("test");
             //childAttribute.IsInherited = false;
-            childAttribute.Value = new Value("new value", null);
+            childAttribute.Value = new Value("new value");
 
             attribute.Name = "test2";
 
@@ -224,14 +225,14 @@ namespace Kinectitude.Editor.Tests
         {
             Entity parent = new Entity() { Name = "parent" };
 
-            Attribute attribute = new Attribute("test") { Value = new Value("value", null) };
+            Attribute attribute = new Attribute("test") { Value = new Value("value") };
             parent.AddAttribute(attribute);
 
             Entity child = new Entity();
             child.AddPrototype(parent);
             
             Attribute childAttribute = child.GetAttribute("test");
-            childAttribute.Value = new Value("new value", null);
+            childAttribute.Value = new Value("new value");
 
             Assert.IsTrue(childAttribute.IsInherited);
             Assert.IsTrue(childAttribute.Name == "test");
@@ -249,7 +250,7 @@ namespace Kinectitude.Editor.Tests
         {
             Entity parent = new Entity() { Name = "parent" };
 
-            Attribute attribute = new Attribute("test") { Value = new Value("value", null) };
+            Attribute attribute = new Attribute("test") { Value = new Value("value") };
             parent.AddAttribute(attribute);
 
             Entity child = new Entity();
@@ -257,7 +258,7 @@ namespace Kinectitude.Editor.Tests
 
             Attribute childAttribute = child.GetAttribute("test");
             //childAttribute.IsInherited = false;
-            childAttribute.Value = new Value("new value", null);
+            childAttribute.Value = new Value("new value");
 
             //Assert.IsTrue(childAttribute.CanInherit);
 
@@ -275,7 +276,7 @@ namespace Kinectitude.Editor.Tests
 
             Entity parentWithAttribute = new Entity() { Name = "parentWithAttribute" };
 
-            Attribute attribute = new Attribute("test") { Value = new Value("new value", null) };
+            Attribute attribute = new Attribute("test") { Value = new Value("new value") };
             parentWithAttribute.AddAttribute(attribute);
 
             Entity child = new Entity();
@@ -283,7 +284,7 @@ namespace Kinectitude.Editor.Tests
 
             Attribute childAttribute = child.GetAttribute("test");
             //childAttribute.IsInherited = false;
-            childAttribute.Value = new Value("value", null);
+            childAttribute.Value = new Value("value");
 
             //Assert.IsTrue(childAttribute.CanInherit);
 

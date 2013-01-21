@@ -79,16 +79,16 @@ namespace Kinectitude.Editor.Tests
         }
 
         [TestMethod]
-        public void AddInheritedCondition()
+        public void AddReadOnlyCondition()
         {
             Event parentEvent = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
-            InheritedEvent childEvent = new InheritedEvent(parentEvent);
+            ReadOnlyEvent childEvent = new ReadOnlyEvent(parentEvent);
 
             parentEvent.AddStatement(new Condition() { If = "test > 1" });
 
             Assert.AreEqual(1, childEvent.Statements.Count);
 
-            InheritedCondition childCondition = childEvent.Statements.OfType<InheritedCondition>().Single();
+            ReadOnlyCondition childCondition = childEvent.Statements.OfType<ReadOnlyCondition>().Single();
 
             Assert.IsNotNull(childCondition);
             Assert.AreEqual("test > 1", childCondition.If);
@@ -98,7 +98,7 @@ namespace Kinectitude.Editor.Tests
         public void AddInheritedAction()
         {
             Condition parentCondition = new Condition() { If = "test > 1" };
-            InheritedCondition childCondition = new InheritedCondition(parentCondition);
+            ReadOnlyCondition childCondition = new ReadOnlyCondition(parentCondition);
 
             parentCondition.AddStatement(new Action(Workspace.Instance.GetPlugin(FireTriggerActionType)));
 
@@ -109,7 +109,7 @@ namespace Kinectitude.Editor.Tests
         public void RemoveInheritedAction()
         {
             Condition parentCondition = new Condition() { If = "test > 1" };
-            InheritedCondition childCondition = new InheritedCondition(parentCondition);
+            ReadOnlyCondition childCondition = new ReadOnlyCondition(parentCondition);
 
             Action parentAction = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
             parentCondition.AddStatement(parentAction);
@@ -122,7 +122,7 @@ namespace Kinectitude.Editor.Tests
         public void CannotRemoveInheritedActionFromInheritingCondition()
         {
             Condition parentCondition = new Condition() { If = "test > 1" };
-            InheritedCondition childCondition = new InheritedCondition(parentCondition);
+            ReadOnlyCondition childCondition = new ReadOnlyCondition(parentCondition);
 
             Action parentAction = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
             parentCondition.AddStatement(parentAction);
@@ -134,13 +134,13 @@ namespace Kinectitude.Editor.Tests
         }
 
         [TestMethod]
-        public void InheritedConditionFollowsRuleChange()
+        public void ReadOnlyConditionFollowsRuleChange()
         {
             bool propertyChanged = false;
 
             Condition parentCondition = new Condition() { If = "test > 1" };
             
-            InheritedCondition childCondition = new InheritedCondition(parentCondition);
+            ReadOnlyCondition childCondition = new ReadOnlyCondition(parentCondition);
             childCondition.PropertyChanged += (o, e) => propertyChanged = (e.PropertyName == "If");
 
             Assert.AreEqual("test > 1", childCondition.If);

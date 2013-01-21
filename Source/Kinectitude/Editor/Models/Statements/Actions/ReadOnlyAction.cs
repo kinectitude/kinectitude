@@ -25,7 +25,7 @@ namespace Kinectitude.Editor.Models.Statements.Actions
 
             foreach (AbstractProperty inheritedProperty in inheritedAction.Properties)
             {
-                InheritedProperty localProperty = new InheritedProperty(inheritedProperty);
+                ReadOnlyProperty localProperty = new ReadOnlyProperty(inheritedProperty);
                 AddProperty(localProperty);
             }
 

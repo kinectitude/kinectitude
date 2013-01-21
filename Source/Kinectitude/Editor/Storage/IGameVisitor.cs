@@ -28,7 +28,7 @@ namespace Kinectitude.Editor.Storage
         void Visit(ReadOnlyCondition condition);
         void Visit(ReadOnlyEvent evt);
         void Visit(ReadOnlyForLoop loop);
-        void Visit(InheritedProperty property);
+        void Visit(ReadOnlyProperty property);
         void Visit(ReadOnlyWhileLoop loop);
         void Visit(Manager manager);
         void Visit(Property property);

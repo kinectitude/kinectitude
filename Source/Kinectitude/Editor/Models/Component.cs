@@ -13,7 +13,7 @@ namespace Kinectitude.Editor.Models
 {
     internal delegate void ComponentPropertyEventHandler(Component component, PluginProperty property);
 
-    internal sealed class Component : GameModel<IComponentScope>, IPropertyScope, IChangeable
+    internal sealed class Component : GameModel<IComponentScope>, IPropertyScope
     {
         private readonly Plugin plugin;
         private readonly List<Property> properties;
@@ -213,16 +213,5 @@ namespace Kinectitude.Editor.Models
 
             return copy;
         }
-
-        #region IChangeable implementation
-
-        object IChangeable.this[string parameter]
-        {
-            get { return GetProperty(parameter).Value; }
-        }
-
-        bool IChangeable.ShouldCheck { get; set; }
-
-        #endregion
     }
 }

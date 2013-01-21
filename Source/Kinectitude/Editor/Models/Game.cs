@@ -17,7 +17,7 @@ using System.Windows.Input;
 
 namespace Kinectitude.Editor.Models
 {
-    internal sealed class Game : GameModel<IScope>, IAttributeScope, IEntityScope, ISceneScope
+    internal sealed class Game : GameModel<IScope>, IAttributeScope, IEntityScope, ISceneScope, IServiceScope
     {
         private string name;
         private int width;
@@ -134,6 +134,7 @@ namespace Kinectitude.Editor.Models
         }
 
         public ObservableCollection<Using> Usings { get; private set; }
+        public ObservableCollection<Service> Services { get; private set; }
         public ObservableCollection<Entity> Prototypes { get; private set; }
         public ObservableCollection<Scene> Scenes { get; private set; }
         public ObservableCollection<Attribute> Attributes { get; private set; }
@@ -150,6 +151,7 @@ namespace Kinectitude.Editor.Models
             this.name = name;
             
             Usings = new ObservableCollection<Using>();
+            Services = new ObservableCollection<Service>();
             Prototypes = new ObservableCollection<Entity>();
             Scenes = new ObservableCollection<Scene>();
             Attributes = new ObservableCollection<Attribute>();
@@ -462,7 +464,19 @@ namespace Kinectitude.Editor.Models
 
         public Service GetServiceByType(Plugin type)
         {
-            return null;
+            return Services.FirstOrDefault(x => x.Plugin == type);
+        }
+
+        public void AddService(Service service)
+        {
+            service.Scope = this;
+            Services.Add(service);
+        }
+
+        public void RemoveService(Service service)
+        {
+            service.Scope = null;
+            Services.Remove(service);
         }
 
         #region IEntityScope implementation

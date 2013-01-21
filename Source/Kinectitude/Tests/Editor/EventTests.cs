@@ -3,6 +3,7 @@ using Kinectitude.Editor.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Kinectitude.Editor.Models.Statements.Events;
 using Kinectitude.Editor.Models.Properties;
+using Kinectitude.Editor.Models.Values;
 
 namespace Kinectitude.Editor.Tests
 {
@@ -68,7 +69,7 @@ namespace Kinectitude.Editor.Tests
             AbstractProperty property = evt.GetProperty("Trigger");
             property.PropertyChanged += (o, e) => propertyChanged |= (e.PropertyName == "Value");
 
-            evt.SetProperty("Trigger", "test");
+            evt.SetProperty("Trigger", new Value("test"));
 
             Assert.IsTrue(propertyChanged);
             Assert.AreEqual("test", property.Value);
@@ -118,7 +119,7 @@ namespace Kinectitude.Editor.Tests
         }
 
         [TestMethod]
-        public void RemoveInheritedEvent()
+        public void RemoveReadOnlyEvent()
         {
             int eventsFired = 0;
 
@@ -181,32 +182,32 @@ namespace Kinectitude.Editor.Tests
         }
 
         [TestMethod]
-        public void CannotSetInheritedEventProperty()
+        public void CannotSetReadOnlyEventProperty()
         {
             Entity parent = new Entity() { Name = "parent" };
 
             Event parentEvent = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
-            parentEvent.SetProperty("Trigger", "test");
+            parentEvent.SetProperty("Trigger", new Value("test"));
             parent.AddEvent(parentEvent);
 
             Entity child = new Entity();
             child.AddPrototype(parent);
 
             AbstractProperty childProperty = child.Events.Single().GetProperty("Trigger");
-            childProperty.Value = "test2";
+            childProperty.Value = new Value("test2");
 
             Assert.AreEqual("test", childProperty.Value);
         }
 
         [TestMethod]
-        public void CannotRemoveInheritedEventFromInheritingEntity()
+        public void CannotRemoveReadOnlyEventFromInheritingEntity()
         {
             bool collectionChanged = false;
 
             Entity parent = new Entity() { Name = "parent" };
 
             Event parentEvent = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
-            parentEvent.SetProperty("Trigger", "test");
+            parentEvent.SetProperty("Trigger", new Value("test"));
             parent.AddEvent(parentEvent);
 
             Entity child = new Entity();

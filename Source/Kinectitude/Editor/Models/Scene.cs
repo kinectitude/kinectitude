@@ -69,9 +69,6 @@ namespace Kinectitude.Editor.Models
         public ICommand PasteCommand { get; private set; }
         public ICommand DeleteCommand { get; private set; }
 
-        private readonly CallbackCollection changeCallbacks;
-        private readonly Dictionary<string, EntityDataContainer> dataContainers;
-
         public Scene(string name)
         {
             this.name = name;
@@ -171,8 +168,6 @@ namespace Kinectitude.Editor.Models
                     }
                 }
             });
-
-            dataContainers = new Dictionary<string, EntityDataContainer>();
         }
 
         public override void Accept(IGameVisitor visitor)

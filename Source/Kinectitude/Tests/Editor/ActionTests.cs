@@ -8,6 +8,7 @@ using Kinectitude.Editor.Models.Statements.Events;
 using Kinectitude.Editor.Models.Statements.Actions;
 using Kinectitude.Editor.Models.Properties;
 using Kinectitude.Editor.Models.Statements.Base;
+using Kinectitude.Editor.Models.Values;
 
 namespace Kinectitude.Editor.Tests
 {
@@ -76,7 +77,7 @@ namespace Kinectitude.Editor.Tests
 
             action.GetProperty("Name").PropertyChanged += (sender, e) => propertyFiredValueChange |= (e.PropertyName == "Value");
 
-            action.SetProperty("Name", "test");
+            action.SetProperty("Name", new Value("test"));
 
             Assert.IsTrue(propertyFiredValueChange);
             Assert.AreEqual("test", action.GetProperty("Name").Value);
@@ -93,7 +94,7 @@ namespace Kinectitude.Editor.Tests
 
             parentEvent.AddStatement(new Action(Workspace.Instance.GetPlugin(FireTriggerActionType)));
 
-            InheritedEvent childEvent = new InheritedEvent(parentEvent);
+            ReadOnlyEvent childEvent = new ReadOnlyEvent(parentEvent);
             childEvent.Statements.CollectionChanged += (sender, e) => childEventsRaised++;
 
             Assert.AreEqual(1, childEvent.Statements.Count);
@@ -117,7 +118,7 @@ namespace Kinectitude.Editor.Tests
             Action parentAction = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
             parentEvent.AddStatement(parentAction);
 
-            InheritedEvent childEvent = new InheritedEvent(parentEvent);
+            ReadOnlyEvent childEvent = new ReadOnlyEvent(parentEvent);
             childEvent.Statements.CollectionChanged += (sender, e) => childEventsRaised++;
 
             Assert.AreEqual(1, childEvent.Statements.Count);
@@ -143,15 +144,15 @@ namespace Kinectitude.Editor.Tests
 
             parentAction.GetProperty("Name").PropertyChanged += (sender, e) => parentPropertyChanged |= (e.PropertyName == "Value");
 
-            parentAction.SetProperty("Name", "test");
+            parentAction.SetProperty("Name", new Value("test"));
             parentEvent.AddStatement(parentAction);
 
-            InheritedEvent childEvent = new InheritedEvent(parentEvent);
+            ReadOnlyEvent childEvent = new ReadOnlyEvent(parentEvent);
 
             AbstractProperty childProperty = ((AbstractAction)childEvent.Statements.Single()).GetProperty("Name");
             childProperty.PropertyChanged += (sender, e) => childPropertyChanged |= (e.PropertyName == "Value");
 
-            childProperty.Value = "test2";
+            childProperty.Value = new Value("test2");
 
             Assert.AreEqual("test", childProperty.Value);
             Assert.AreEqual(1, parentEventsRaised);
@@ -167,15 +168,15 @@ namespace Kinectitude.Editor.Tests
             Event parentEvent = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
 
             Action parentAction = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
-            parentAction.SetProperty("Name", "test");
+            parentAction.SetProperty("Name", new Value("test"));
             parentEvent.AddStatement(parentAction);
 
-            InheritedEvent childEvent = new InheritedEvent(parentEvent);
+            ReadOnlyEvent childEvent = new ReadOnlyEvent(parentEvent);
 
             AbstractProperty childProperty = ((AbstractAction)childEvent.Statements.Single()).GetProperty("Name");
             childProperty.PropertyChanged += (sender, e) => childPropertyChanged |= (e.PropertyName == "Value");
             
-            parentAction.SetProperty("Name", "test2");
+            parentAction.SetProperty("Name", new Value("test2"));
 
             Assert.AreEqual("test2", childProperty.Value);
             Assert.IsTrue(childPropertyChanged);
@@ -189,7 +190,7 @@ namespace Kinectitude.Editor.Tests
             Action parentAction = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
             parentEvent.AddStatement(parentAction);
 
-            InheritedEvent childEvent = new InheritedEvent(parentEvent);
+            ReadOnlyEvent childEvent = new ReadOnlyEvent(parentEvent);
 
             Assert.AreEqual(1, childEvent.Statements.Count);
 
