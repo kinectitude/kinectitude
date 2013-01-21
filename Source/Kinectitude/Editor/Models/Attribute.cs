@@ -89,13 +89,24 @@ namespace Kinectitude.Editor.Models
                 {
                     var oldValue = val;
 
+                    if (null != val)
+                    {
+                        val.Scope = null;
+                    }
+
+                    val = value;
+
+                    if (null != val)
+                    {
+                        val.Scope = this;
+                    }
+
                     Workspace.Instance.CommandHistory.Log(
                         "change attribute value",
                         () => Value = value,
                         () => Value = oldValue
                     );
 
-                    val = value;
                     NotifyPropertyChanged("Value");
                 }
             }
@@ -159,24 +170,5 @@ namespace Kinectitude.Editor.Models
         {
             return null != Scope ? Scope.GetInheritedValue(Name) : DefaultValue;
         }
-
-        #region IValueScope implementation
-
-        Entity IValueScope.Entity
-        {
-            get { return null != Scope ? Scope.Entity : null; }
-        }
-
-        Scene IValueScope.Scene
-        {
-            get { return null != Scope ? Scope.Scene : null; }
-        }
-
-        Game IValueScope.Game
-        {
-            get { return null != Scope ? Scope.Game : null; }
-        }
-
-        #endregion
     }
 }

@@ -83,7 +83,7 @@ namespace Kinectitude.Editor.Models.Data.DataContainers
 
             if (null == container)
             {
-                container = new EntityDataContainer(null, null);
+                container = new EntityDataContainer(value, name);
                 namedEntities[name] = container;
             }
 

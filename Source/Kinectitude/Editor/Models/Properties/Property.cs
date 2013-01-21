@@ -1,4 +1,5 @@
 ﻿using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Values;
 using Kinectitude.Editor.Storage;
@@ -8,7 +9,7 @@ using System.Windows.Input;
 
 namespace Kinectitude.Editor.Models.Properties
 {
-    internal sealed class Property : AbstractProperty
+    internal sealed class Property : AbstractProperty, IValueScope
     {
         private readonly PluginProperty pluginProperty;
         private Value val;
@@ -25,7 +26,18 @@ namespace Kinectitude.Editor.Models.Properties
             {
                 if (val != value)
                 {
+                    if (null != val)
+                    {
+                        val.Scope = null;
+                    }
+
                     val = value;
+
+                    if (null != val)
+                    {
+                        val.Scope = this;
+                    }
+
                     NotifyPropertyChanged("Value");
                 }
             }

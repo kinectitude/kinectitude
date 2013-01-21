@@ -5,10 +5,5 @@ using System.Text;
 
 namespace Kinectitude.Editor.Models.Interfaces
 {
-    internal interface IValueScope : IScope
-    {
-        Entity Entity { get; }
-        Scene Scene { get; }
-        Game Game { get; }
-    }
+    internal interface IValueScope : IScope { }
 }

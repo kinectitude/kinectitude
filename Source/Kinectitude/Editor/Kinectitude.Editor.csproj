@@ -100,6 +100,7 @@
     <Compile Include="Models\Data\DataContainers\GameDataContainer.cs" />
     <Compile Include="Models\Data\DataContainers\SceneDataContainer.cs" />
     <Compile Include="Models\Data\DataContainers\ThisDataContainer.cs" />
+    <Compile Include="Models\Data\ValueReaders\EntityValueReader.cs" />
     <Compile Include="Models\Interfaces\IServiceScope.cs" />
     <Compile Include="Models\Interfaces\IValueScope.cs" />
     <Compile Include="Models\Notifications\DefineRemoved.cs" />

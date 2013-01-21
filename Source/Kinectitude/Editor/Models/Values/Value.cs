@@ -30,17 +30,17 @@ namespace Kinectitude.Editor.Models.Values
 
         public Entity Entity
         {
-            get { return null != Scope ? Scope.Entity : null; }
+            get { return GetAncestor<Entity>(); }
         }
 
         public Scene Scene
         {
-            get { return null != Scope ? Scope.Scene : null; }
+            get { return GetAncestor<Scene>(); }
         }
 
         public Game Game
         {
-            get { return null != Scope ? Scope.Game : null; }
+            get { return GetAncestor<Game>(); }
         }
 
         public Value(string initializer)
