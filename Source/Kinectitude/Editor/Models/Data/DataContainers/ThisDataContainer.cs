@@ -1,5 +1,6 @@
 ﻿using Kinectitude.Core.Base;
 using Kinectitude.Core.Data;
+using Kinectitude.Editor.Models.Data.Changeables;
 using Kinectitude.Editor.Models.Data.ValueReaders;
 using Kinectitude.Editor.Models.Values;
 using System;
@@ -24,6 +25,7 @@ namespace Kinectitude.Editor.Models.Data.DataContainers
     {
         private readonly Value value;
         private readonly Dictionary<string, ThisValueReader> attributes;
+        private readonly Dictionary<string, ThisChangeable> changeables;
 
         public Entity Entity
         {
