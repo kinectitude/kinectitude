@@ -761,7 +761,7 @@ namespace Kinectitude.Editor.Models
             AbstractEvent localEvent = Events.FirstOrDefault(x => x.InheritsFrom(evt));
             if (null == localEvent)
             {
-                localEvent = new InheritedEvent(evt);
+                localEvent = new ReadOnlyEvent(evt);
                 AddEvent(localEvent);
             }
         }

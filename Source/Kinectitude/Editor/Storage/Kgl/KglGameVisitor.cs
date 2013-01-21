@@ -155,27 +155,27 @@ namespace Kinectitude.Editor.Storage.Kgl
                 .Append(visitMembers<Scene>(game.Scenes, "", allValid)).Append(closeDef()).ToString();
         }
 
-        public void Visit(InheritedAction action)
+        public void Visit(ReadOnlyAction action)
         {
             result = "";
         }
 
-        public void Visit(InheritedAssignment assignment)
+        public void Visit(ReadOnlyAssignment assignment)
         {
             result = "";
         }
 
-        public void Visit(InheritedCondition condition)
+        public void Visit(ReadOnlyCondition condition)
         {
             result = "";
         }
 
-        public void Visit(InheritedEvent evt)
+        public void Visit(ReadOnlyEvent evt)
         {
             result = "";
         }
 
-        public void Visit(InheritedForLoop loop)
+        public void Visit(ReadOnlyForLoop loop)
         {
             result = "";
         }
@@ -185,7 +185,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             result = "";
         }
 
-        public void Visit(InheritedWhileLoop loop)
+        public void Visit(ReadOnlyWhileLoop loop)
         {
             result = "";
         }

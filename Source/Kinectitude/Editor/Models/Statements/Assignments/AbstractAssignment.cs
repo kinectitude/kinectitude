@@ -49,7 +49,7 @@ namespace Kinectitude.Editor.Models.Statements.Assignments
 
         public sealed override AbstractStatement CreateInheritor()
         {
-            return new InheritedAssignment(this);
+            return new ReadOnlyAssignment(this);
         }
     }
 }

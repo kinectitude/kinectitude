@@ -103,7 +103,7 @@ namespace Kinectitude.Editor.Models.Statements.Events
 
         public sealed override AbstractStatement CreateInheritor()
         {
-            return new InheritedEvent(this);
+            return new ReadOnlyEvent(this);
         }
     }
 }

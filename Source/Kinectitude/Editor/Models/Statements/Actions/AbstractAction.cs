@@ -93,7 +93,7 @@ namespace Kinectitude.Editor.Models.Statements.Actions
 
         public sealed override AbstractStatement CreateInheritor()
         {
-            return new InheritedAction(this);
+            return new ReadOnlyAction(this);
         }
     }
 }

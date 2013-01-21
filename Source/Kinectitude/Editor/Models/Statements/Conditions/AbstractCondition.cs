@@ -23,7 +23,7 @@ namespace Kinectitude.Editor.Models.Statements.Conditions
 
         public sealed override AbstractStatement CreateInheritor()
         {
-            return new InheritedCondition(this);
+            return new ReadOnlyCondition(this);
         }
     }
 }

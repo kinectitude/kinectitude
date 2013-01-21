@@ -1,7 +1,7 @@
 ﻿
 namespace Kinectitude.Editor.Models.Statements.Loops
 {
-    internal sealed class InheritedForLoop : AbstractForLoop
+    internal sealed class ReadOnlyForLoop : AbstractForLoop
     {
         private readonly AbstractForLoop inheritedLoop;
 
@@ -23,7 +23,7 @@ namespace Kinectitude.Editor.Models.Statements.Loops
             set { }
         }
 
-        public InheritedForLoop(AbstractForLoop inheritedLoop) : base(inheritedLoop)
+        public ReadOnlyForLoop(AbstractForLoop inheritedLoop) : base(inheritedLoop)
         {
             this.inheritedLoop = inheritedLoop;
         }

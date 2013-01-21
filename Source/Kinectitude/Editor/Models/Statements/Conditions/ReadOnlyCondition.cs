@@ -2,7 +2,7 @@
 
 namespace Kinectitude.Editor.Models.Statements.Conditions
 {
-    internal sealed class InheritedCondition : AbstractCondition
+    internal sealed class ReadOnlyCondition : AbstractCondition
     {
         private readonly AbstractCondition inheritedCondition;
 
@@ -12,7 +12,7 @@ namespace Kinectitude.Editor.Models.Statements.Conditions
             set { }
         }
 
-        public InheritedCondition(AbstractCondition inheritedCondition) : base(inheritedCondition)
+        public ReadOnlyCondition(AbstractCondition inheritedCondition) : base(inheritedCondition)
         {
             this.inheritedCondition = inheritedCondition;
         }

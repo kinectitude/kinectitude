@@ -1,7 +1,7 @@
 ﻿
 namespace Kinectitude.Editor.Models.Statements.Loops
 {
-    internal sealed class InheritedWhileLoop : AbstractWhileLoop
+    internal sealed class ReadOnlyWhileLoop : AbstractWhileLoop
     {
         private readonly AbstractWhileLoop inheritedLoop;
 
@@ -11,7 +11,7 @@ namespace Kinectitude.Editor.Models.Statements.Loops
             set { }
         }
 
-        public InheritedWhileLoop(AbstractWhileLoop inheritedLoop) : base(inheritedLoop)
+        public ReadOnlyWhileLoop(AbstractWhileLoop inheritedLoop) : base(inheritedLoop)
         {
             this.inheritedLoop = inheritedLoop;
         }

@@ -2,16 +2,16 @@
 using Kinectitude.Editor.Models.Statements.Base;
 using Kinectitude.Editor.Storage;
 
-namespace Kinectitude.Editor.Models.Statements.Actions
+namespace Kinectitude.Editor.Models.Statements.Events
 {
-    internal sealed class InheritedAction : AbstractAction
+    internal sealed class ReadOnlyEvent : AbstractEvent
     {
-        private readonly AbstractAction inheritedAction;
+        private readonly AbstractEvent inheritedEvent;
         private readonly Header header;
 
         public override Plugin Plugin
         {
-            get { return inheritedAction.Plugin; }
+            get { return inheritedEvent.Plugin; }
         }
 
         public override Header Header
@@ -19,11 +19,11 @@ namespace Kinectitude.Editor.Models.Statements.Actions
             get { return header; }
         }
 
-        public InheritedAction(AbstractAction inheritedAction) : base(inheritedAction)
+        public ReadOnlyEvent(AbstractEvent inheritedEvent) : base(inheritedEvent)
         {
-            this.inheritedAction = inheritedAction;
+            this.inheritedEvent = inheritedEvent;
 
-            foreach (AbstractProperty inheritedProperty in inheritedAction.Properties)
+            foreach (AbstractProperty inheritedProperty in inheritedEvent.Properties)
             {
                 InheritedProperty localProperty = new InheritedProperty(inheritedProperty);
                 AddProperty(localProperty);

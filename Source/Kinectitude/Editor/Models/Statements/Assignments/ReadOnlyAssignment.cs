@@ -2,7 +2,7 @@
 
 namespace Kinectitude.Editor.Models.Statements.Assignments
 {
-    internal sealed class InheritedAssignment : AbstractAssignment
+    internal sealed class ReadOnlyAssignment : AbstractAssignment
     {
         private readonly AbstractAssignment inheritedAssignment;
 
@@ -24,7 +24,7 @@ namespace Kinectitude.Editor.Models.Statements.Assignments
             set { }
         }
 
-        public InheritedAssignment(AbstractAssignment inheritedAssignment) : base(inheritedAssignment)
+        public ReadOnlyAssignment(AbstractAssignment inheritedAssignment) : base(inheritedAssignment)
         {
             this.inheritedAssignment = inheritedAssignment;
         }
