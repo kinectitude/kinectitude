@@ -1,5 +1,6 @@
 ﻿using Kinectitude.Core.Base;
 using Kinectitude.Core.Data;
+using Kinectitude.Editor.Models.Data.Changeables;
 using Kinectitude.Editor.Models.Data.ValueReaders;
 using Kinectitude.Editor.Models.Values;
 using System;
@@ -15,6 +16,7 @@ namespace Kinectitude.Editor.Models.Data.DataContainers
         private readonly Value value;
         private readonly string name;
         private readonly Dictionary<string, EntityValueReader> attributes;
+        private readonly Dictionary<string, ComponentChangeable> changeables;
 
         private Scene Scene
         {
@@ -42,6 +44,7 @@ namespace Kinectitude.Editor.Models.Data.DataContainers
             this.value = value;
             this.name = name;
             attributes = new Dictionary<string, EntityValueReader>();
+            changeables = new Dictionary<string, ComponentChangeable>();
         }
 
         ValueReader IDataContainer.this[string key]
@@ -67,7 +70,16 @@ namespace Kinectitude.Editor.Models.Data.DataContainers
 
         IChangeable IDataContainer.GetChangeable(string name)
         {
-            throw new NotImplementedException();
+            ComponentChangeable changeable;
+            changeables.TryGetValue(name, out changeable);
+
+            if (null == changeable)
+            {
+                changeable = new ComponentChangeable(this, name);
+                changeables[name] = changeable;
+            }
+
+            return changeable;
         }
 
         void IDataContainer.NotifyOfChange(string key, IChanges callback)

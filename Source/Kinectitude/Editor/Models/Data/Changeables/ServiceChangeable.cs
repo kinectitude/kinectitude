@@ -8,33 +8,33 @@ using System.Text;
 
 namespace Kinectitude.Editor.Models.Data.Changeables
 {
-    internal sealed class ThisChangeable : IChangeable
+    internal sealed class ServiceChangeable : IChangeable
     {
-        private readonly ThisDataContainer container;
+        private readonly GameDataContainer container;
         private readonly string type;
-        private readonly Dictionary<string, ThisComponentValueReader> properties;
+        private readonly Dictionary<string, ServiceValueReader> properties;
 
-        public Component Component
+        public Service Service
         {
             get
             {
-                Component component = null;
+                Service service = null;
 
-                var entity = container.Entity;
-                if (null != entity)
+                var game = container.Game;
+                if (null != game)
                 {
-                    component = entity.GetComponentByType(type);
+                    service = game.GetServiceByDefinedName(type);
                 }
 
-                return component;
+                return service;
             }
         }
 
-        public ThisChangeable(ThisDataContainer container, string type)
+        public ServiceChangeable(GameDataContainer container, string type)
         {
             this.container = container;
             this.type = type;
-            properties = new Dictionary<string, ThisComponentValueReader>();
+            properties = new Dictionary<string, ServiceValueReader>();
         }
 
         #region IChangeable implementation
@@ -43,12 +43,12 @@ namespace Kinectitude.Editor.Models.Data.Changeables
         {
             get
             {
-                ThisComponentValueReader reader;
+                ServiceValueReader reader;
                 properties.TryGetValue(parameter, out reader);
 
                 if (null == reader)
                 {
-                    reader = new ThisComponentValueReader(this, parameter);
+                    reader = new ServiceValueReader(this, parameter);
                     properties[parameter] = reader;
                 }
 
@@ -58,7 +58,7 @@ namespace Kinectitude.Editor.Models.Data.Changeables
 
         bool IChangeable.ShouldCheck
         {
-            get { return true; }    // TODO: What should I return here? Should it be settable?
+            get { return true; }
             set { throw new NotSupportedException(); }
         }
 

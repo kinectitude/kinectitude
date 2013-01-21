@@ -8,11 +8,11 @@ using System.Text;
 
 namespace Kinectitude.Editor.Models.Data.Changeables
 {
-    internal sealed class ThisChangeable : IChangeable
+    internal sealed class ComponentChangeable : IChangeable
     {
-        private readonly ThisDataContainer container;
+        private readonly EntityDataContainer container;
         private readonly string type;
-        private readonly Dictionary<string, ThisComponentValueReader> properties;
+        private readonly Dictionary<string, ComponentValueReader> properties;
 
         public Component Component
         {
@@ -30,11 +30,11 @@ namespace Kinectitude.Editor.Models.Data.Changeables
             }
         }
 
-        public ThisChangeable(ThisDataContainer container, string type)
+        public ComponentChangeable(EntityDataContainer container, string type)
         {
             this.container = container;
             this.type = type;
-            properties = new Dictionary<string, ThisComponentValueReader>();
+            properties = new Dictionary<string, ComponentValueReader>();
         }
 
         #region IChangeable implementation
@@ -43,12 +43,12 @@ namespace Kinectitude.Editor.Models.Data.Changeables
         {
             get
             {
-                ThisComponentValueReader reader;
+                ComponentValueReader reader;
                 properties.TryGetValue(parameter, out reader);
 
                 if (null == reader)
                 {
-                    reader = new ThisComponentValueReader(this, parameter);
+                    reader = new ComponentValueReader(this, parameter);
                     properties[parameter] = reader;
                 }
 
@@ -58,7 +58,7 @@ namespace Kinectitude.Editor.Models.Data.Changeables
 
         bool IChangeable.ShouldCheck
         {
-            get { return true; }    // TODO: What should I return here? Should it be settable?
+            get { return true; }
             set { throw new NotSupportedException(); }
         }
 

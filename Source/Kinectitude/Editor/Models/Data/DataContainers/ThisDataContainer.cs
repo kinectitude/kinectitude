@@ -24,7 +24,7 @@ namespace Kinectitude.Editor.Models.Data.DataContainers
     internal sealed class ThisDataContainer : IDataContainer
     {
         private readonly Value value;
-        private readonly Dictionary<string, ThisValueReader> attributes;
+        private readonly Dictionary<string, ThisEntityValueReader> attributes;
         private readonly Dictionary<string, ThisChangeable> changeables;
 
         public Entity Entity
@@ -35,7 +35,9 @@ namespace Kinectitude.Editor.Models.Data.DataContainers
         public ThisDataContainer(Value value)
         {
             this.value = value;
-            attributes = new Dictionary<string, ThisValueReader>();
+
+            attributes = new Dictionary<string, ThisEntityValueReader>();
+            changeables = new Dictionary<string, ThisChangeable>();
         }
 
         #region IDataContainer implementation
@@ -44,12 +46,12 @@ namespace Kinectitude.Editor.Models.Data.DataContainers
         {
             get
             {
-                ThisValueReader reader;
+                ThisEntityValueReader reader;
                 attributes.TryGetValue(key, out reader);
 
                 if (null == reader)
                 {
-                    reader = new ThisValueReader(this, key);
+                    reader = new ThisEntityValueReader(this, key);
                     attributes[key] = reader;
                 }
 
@@ -63,7 +65,16 @@ namespace Kinectitude.Editor.Models.Data.DataContainers
 
         IChangeable IDataContainer.GetChangeable(string name)
         {
-            throw new NotImplementedException();
+            ThisChangeable changeable;
+            changeables.TryGetValue(name, out changeable);
+
+            if (null == changeable)
+            {
+                changeable = new ThisChangeable(this, name);
+                changeables[name] = changeable;
+            }
+
+            return changeable;
         }
 
         void IDataContainer.NotifyOfChange(string key, IChanges callback)

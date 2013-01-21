@@ -8,33 +8,33 @@ using System.Text;
 
 namespace Kinectitude.Editor.Models.Data.Changeables
 {
-    internal sealed class ThisChangeable : IChangeable
+    internal sealed class ManagerChangeable : IChangeable
     {
-        private readonly ThisDataContainer container;
+        private readonly SceneDataContainer container;
         private readonly string type;
-        private readonly Dictionary<string, ThisComponentValueReader> properties;
+        private readonly Dictionary<string, ManagerValueReader> properties;
 
-        public Component Component
+        public Manager Manager
         {
             get
             {
-                Component component = null;
+                Manager manager = null;
 
-                var entity = container.Entity;
-                if (null != entity)
+                var scene = container.Scene;
+                if (null != scene)
                 {
-                    component = entity.GetComponentByType(type);
+                    manager = scene.GetManagerByDefinedName(type);
                 }
 
-                return component;
+                return manager;
             }
         }
 
-        public ThisChangeable(ThisDataContainer container, string type)
+        public ManagerChangeable(SceneDataContainer container, string type)
         {
             this.container = container;
             this.type = type;
-            properties = new Dictionary<string, ThisComponentValueReader>();
+            properties = new Dictionary<string, ManagerValueReader>();
         }
 
         #region IChangeable implementation
@@ -43,12 +43,12 @@ namespace Kinectitude.Editor.Models.Data.Changeables
         {
             get
             {
-                ThisComponentValueReader reader;
+                ManagerValueReader reader;
                 properties.TryGetValue(parameter, out reader);
 
                 if (null == reader)
                 {
-                    reader = new ThisComponentValueReader(this, parameter);
+                    reader = new ManagerValueReader(this, parameter);
                     properties[parameter] = reader;
                 }
 

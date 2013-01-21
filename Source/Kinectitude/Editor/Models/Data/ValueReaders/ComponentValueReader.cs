@@ -7,9 +7,9 @@ using System.Text;
 
 namespace Kinectitude.Editor.Models.Data.ValueReaders
 {
-    internal sealed class ThisChangeableValueReader : RepeatReader
+    internal sealed class ComponentValueReader : RepeatReader
     {
-        private readonly ThisChangeable changeable;
+        private readonly ComponentChangeable changeable;
         private readonly string parameter;
 
         protected override ValueReader Reader
@@ -30,7 +30,7 @@ namespace Kinectitude.Editor.Models.Data.ValueReaders
             }
         }
 
-        public ThisChangeableValueReader(ThisChangeable changeable, string parameter)
+        public ComponentValueReader(ComponentChangeable changeable, string parameter)
         {
             this.changeable = changeable;
             this.parameter = parameter;

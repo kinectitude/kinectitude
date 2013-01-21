@@ -328,6 +328,11 @@ namespace Kinectitude.Editor.Models
             return Managers.FirstOrDefault(x => x.Plugin == type);
         }
 
+        public Manager GetManagerByDefinedName(string name)
+        {
+            return Managers.FirstOrDefault(x => x.Type == name);
+        }
+
         public bool HasManagerOfType(Plugin type)
         {
             return Managers.Any(x => x.Plugin == type);

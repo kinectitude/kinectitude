@@ -1,5 +1,6 @@
 ﻿using Kinectitude.Core.Base;
 using Kinectitude.Core.Data;
+using Kinectitude.Editor.Models.Data.Changeables;
 using Kinectitude.Editor.Models.Data.ValueReaders;
 using Kinectitude.Editor.Models.Values;
 using System;
@@ -13,6 +14,7 @@ namespace Kinectitude.Editor.Models.Data.DataContainers
     {
         private readonly Value value;
         private readonly Dictionary<string, GameValueReader> attributes;
+        private readonly Dictionary<string, ServiceChangeable> changeables;
 
         public Game Game
         {
@@ -22,7 +24,9 @@ namespace Kinectitude.Editor.Models.Data.DataContainers
         public GameDataContainer(Value value)
         {
             this.value = value;
-            this.attributes = new Dictionary<string, GameValueReader>();
+            
+            attributes = new Dictionary<string, GameValueReader>();
+            changeables = new Dictionary<string, ServiceChangeable>();
         }
 
         #region IDataContainer implementation
@@ -50,7 +54,16 @@ namespace Kinectitude.Editor.Models.Data.DataContainers
 
         IChangeable IDataContainer.GetChangeable(string name)
         {
-            throw new NotImplementedException();
+            ServiceChangeable changeable;
+            changeables.TryGetValue(name, out changeable);
+
+            if (null == changeable)
+            {
+                changeable = new ServiceChangeable(this, name);
+                changeables[name] = changeable;
+            }
+
+            return changeable;
         }
 
         void IDataContainer.NotifyOfChange(string key, IChanges callback)

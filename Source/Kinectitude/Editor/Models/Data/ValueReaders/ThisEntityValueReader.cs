@@ -12,7 +12,7 @@ namespace Kinectitude.Editor.Models.Data.ValueReaders
     /// tied to any entity at one time. It gets whatever Entity owns the associated Value object
     /// at the time it is used.
     /// </summary>
-    internal sealed class ThisValueReader : RepeatReader
+    internal sealed class ThisEntityValueReader : RepeatReader
     {
         private readonly ThisDataContainer container;
         private readonly string key;
@@ -35,7 +35,7 @@ namespace Kinectitude.Editor.Models.Data.ValueReaders
             }
         }
 
-        public ThisValueReader(ThisDataContainer container, string key)
+        public ThisEntityValueReader(ThisDataContainer container, string key)
         {
             this.container = container;
             this.key = key;

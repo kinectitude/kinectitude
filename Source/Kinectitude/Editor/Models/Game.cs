@@ -467,6 +467,11 @@ namespace Kinectitude.Editor.Models
             return Services.FirstOrDefault(x => x.Plugin == type);
         }
 
+        public Service GetServiceByDefinedName(string name)
+        {
+            return Services.FirstOrDefault(x => x.Type == name);
+        }
+
         public void AddService(Service service)
         {
             service.Scope = this;
