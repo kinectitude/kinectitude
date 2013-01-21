@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Kinectitude.Editor.Models
+namespace Kinectitude.Editor.Models.Values
 {
     internal sealed class Value : GameModel<IValueScope>
     {

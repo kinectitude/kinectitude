@@ -2,6 +2,7 @@
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
+using Kinectitude.Editor.Models.Values;
 using Kinectitude.Editor.Storage;
 using System.Windows.Input;
 

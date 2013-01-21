@@ -1,4 +1,5 @@
-﻿namespace Kinectitude.Editor.Models.Interfaces
+﻿using Kinectitude.Editor.Models.Values;
+namespace Kinectitude.Editor.Models.Interfaces
 {
     internal delegate void PropertyEventHandler(PluginProperty property);
 
@@ -9,6 +10,6 @@
         event PropertyEventHandler InheritedPropertyChanged;
 
         bool HasInheritedProperty(PluginProperty property);
-        object GetInheritedValue(PluginProperty property);
+        Value GetInheritedValue(PluginProperty property);
     }
 }

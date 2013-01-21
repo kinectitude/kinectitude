@@ -10,6 +10,7 @@ using Kinectitude.Editor.Models.Statements.Base;
 using Kinectitude.Editor.Models.Statements.Conditions;
 using Kinectitude.Editor.Models.Statements.Events;
 using Kinectitude.Editor.Models.Statements.Loops;
+using Kinectitude.Editor.Models.Values;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -180,7 +181,7 @@ namespace Kinectitude.Editor.Storage.Kgl
                 {
                     //TODO make this have a value reader when it is ready
                     ParseTreeNode propertyNode = (ParseTreeNode)property.Item2;
-                    component.SetProperty(property.Item1, getStrVal(propertyNode));
+                    component.SetProperty(property.Item1, new Value(getStrVal(propertyNode)));
                 }
             }
 
@@ -200,7 +201,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             {
                 ParseTreeNode propertyNode = (ParseTreeNode)property.Item2;
                 //TODO value reader when ready
-                action.SetProperty(property.Item1, getStrVal(propertyNode));
+                action.SetProperty(property.Item1, new Value(getStrVal(propertyNode)));
             }
             return action;
         }
@@ -270,7 +271,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             {
                 ParseTreeNode propertyNode = (ParseTreeNode)property.Item2;
                 //TODO value reader when ready
-                evt.SetProperty(property.Item1, getStrVal(propertyNode));
+                evt.SetProperty(property.Item1, new Value(getStrVal(propertyNode)));
             }
             foreach (ParseTreeNode actionNode in grammar.GetOfType(node, grammar.Actions)) createStatement(node.ChildNodes[2].ChildNodes[0], evt, null);
             return evt;
@@ -308,7 +309,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             {
                 ParseTreeNode propertyNode = (ParseTreeNode)property.Item2;
                 //TODO value reader when ready
-                manager.SetProperty(property.Item1, getStrVal(propertyNode));
+                manager.SetProperty(property.Item1, new Value(getStrVal(propertyNode)));
             }
             return manager;
         }

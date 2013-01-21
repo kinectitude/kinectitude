@@ -1,4 +1,5 @@
 ﻿
+using Kinectitude.Editor.Models.Values;
 namespace Kinectitude.Editor.Models.Interfaces
 {
     internal delegate void AttributeEventHandler(string key);

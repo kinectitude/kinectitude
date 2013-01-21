@@ -1,5 +1,6 @@
 ﻿using Kinectitude.Core.Base;
 using Kinectitude.Core.Data;
+using Kinectitude.Editor.Models.Values;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;

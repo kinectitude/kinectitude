@@ -1,4 +1,5 @@
 ﻿
+using Kinectitude.Editor.Models.Values;
 namespace Kinectitude.Editor.Models.Interfaces
 {
     internal delegate void ComponentEventHandler(Plugin plugin);
@@ -11,6 +12,6 @@ namespace Kinectitude.Editor.Models.Interfaces
 
         bool HasInheritedComponent(Plugin plugin);
         bool HasRootComponent(Plugin plugin);
-        object GetInheritedValue(Plugin plugin, PluginProperty pluginProperty);
+        Value GetInheritedValue(Plugin plugin, PluginProperty pluginProperty);
     }
 }

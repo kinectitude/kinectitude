@@ -5,6 +5,7 @@ using Kinectitude.Editor.Models.Data.DataContainers;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Transactions;
+using Kinectitude.Editor.Models.Values;
 using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.Views.Utils;
 using System;

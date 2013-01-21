@@ -5,6 +5,7 @@ using Kinectitude.Editor.Models.Statements.Assignments;
 using Kinectitude.Editor.Models.Statements.Conditions;
 using Kinectitude.Editor.Models.Statements.Events;
 using Kinectitude.Editor.Models.Statements.Loops;
+using Kinectitude.Editor.Models.Values;
 using Action = Kinectitude.Editor.Models.Statements.Actions.Action;
 using Attribute = Kinectitude.Editor.Models.Attribute;
 

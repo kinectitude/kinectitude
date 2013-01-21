@@ -1,4 +1,5 @@
-﻿using Kinectitude.Editor.Storage;
+﻿using Kinectitude.Editor.Models.Values;
+using Kinectitude.Editor.Storage;
 using System.Collections.Generic;
 using System.Windows.Input;
 
@@ -13,7 +14,7 @@ namespace Kinectitude.Editor.Models.Properties
             get { return inheritedProperty.PluginProperty; }
         }
 
-        public override object Value
+        public override Value Value
         {
             get { return inheritedProperty.Value; }
             set { }

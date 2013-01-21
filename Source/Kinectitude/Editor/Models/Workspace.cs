@@ -7,6 +7,7 @@ using Kinectitude.Editor.Models.Statements.Base;
 using Kinectitude.Editor.Models.Statements.Conditions;
 using Kinectitude.Editor.Models.Statements.Events;
 using Kinectitude.Editor.Models.Statements.Loops;
+using Kinectitude.Editor.Models.Values;
 using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.Views.Utils;
 using Kinectitude.Render;
@@ -214,8 +215,8 @@ namespace Kinectitude.Editor.Models
         {
             Entity blankEntity = new Entity() { Name = "Blank Entity" };
             Component blankEntityTransform = new Component(GetPlugin(typeof(TransformComponent)));
-            blankEntityTransform.SetProperty("Width", 48);
-            blankEntityTransform.SetProperty("Height", 48);
+            blankEntityTransform.SetProperty("Width", new Value("48"));
+            blankEntityTransform.SetProperty("Height", new Value("48"));
             blankEntity.AddComponent(blankEntityTransform);
 
             entityPresets.Add(blankEntity);
@@ -227,21 +228,21 @@ namespace Kinectitude.Editor.Models
 
             Entity shapeEntity = new Entity() { Name = "Shape Entity" };
             Component shapeEntityTransform = new Component(GetPlugin(typeof(TransformComponent)));
-            shapeEntityTransform.SetProperty("Width", 48);
-            shapeEntityTransform.SetProperty("Height", 48);
+            shapeEntityTransform.SetProperty("Width", new Value("48"));
+            shapeEntityTransform.SetProperty("Height", new Value("48"));
             shapeEntity.AddComponent(blankEntityTransform);
             Component shapeEntityRender = new Component(GetPlugin(typeof(RenderComponent)));
-            shapeEntityRender.SetProperty("Shape", "Rectangle");
-            shapeEntityRender.SetProperty("FillColor", "Blue");
+            shapeEntityRender.SetProperty("Shape", new Value("Rectangle"));
+            shapeEntityRender.SetProperty("FillColor", new Value("Blue"));
             shapeEntity.AddComponent(shapeEntityRender);
 
             entityPresets.Add(shapeEntity);
 
             Entity textEntity = new Entity() { Name = "Text Entity" };
             Component textEntityText = new Component(GetPlugin(typeof(TextRenderComponent)));
-            textEntityText.SetProperty("FontSize", 36);
-            textEntityText.SetProperty("FontColor", "Black");
-            textEntityText.SetProperty("Value", "Your Text Here");
+            textEntityText.SetProperty("FontSize", new Value("36"));
+            textEntityText.SetProperty("FontColor", new Value("Black"));
+            textEntityText.SetProperty("Value", new Value("Your Text Here"));
             textEntity.AddComponent(textEntityText);
 
             entityPresets.Add(textEntity);

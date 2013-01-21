@@ -1,5 +1,6 @@
 ﻿using Kinectitude.Core.Attributes;
 using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models.Values;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace Kinectitude.Editor.Models
             get { return attribute.Description; }
         }
 
-        public object DefaultValue
+        public Value DefaultValue
         {
             get
             {
@@ -43,7 +44,7 @@ namespace Kinectitude.Editor.Models
                     }
                 }
 
-                return result;
+                return new Value(result.ToString());
             }
         }
 

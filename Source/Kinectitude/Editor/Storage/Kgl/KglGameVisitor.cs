@@ -6,6 +6,7 @@ using Kinectitude.Editor.Models.Statements.Base;
 using Kinectitude.Editor.Models.Statements.Conditions;
 using Kinectitude.Editor.Models.Statements.Events;
 using Kinectitude.Editor.Models.Statements.Loops;
+using Kinectitude.Editor.Models.Values;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -200,7 +201,7 @@ namespace Kinectitude.Editor.Storage.Kgl
         public void Visit(Property property)
         {
             //TODO change this when it is a value
-            result = property.Name + '=' + (string)property.Value;
+            result = property.Name + '=' + Apply(property.Value);
         }
 
         public void Visit(Scene scene)
@@ -230,7 +231,7 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         public void Visit(Value val)
         {
-            throw new NotImplementedException(); // TODO: set result = the string representation of the given Value.
+            result = val.Initializer;
         }
 
         public void Visit(WhileLoop loop)

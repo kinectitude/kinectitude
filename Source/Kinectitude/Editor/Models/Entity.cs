@@ -7,6 +7,7 @@ using Kinectitude.Editor.Models.Properties;
 using Kinectitude.Editor.Models.Statements.Base;
 using Kinectitude.Editor.Models.Statements.Events;
 using Kinectitude.Editor.Models.Transactions;
+using Kinectitude.Editor.Models.Values;
 using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.Views.Utils;
 using System;
@@ -710,7 +711,7 @@ namespace Kinectitude.Editor.Models
             return Prototypes.SelectMany(x => x.Components).Any(x => x.Plugin == plugin);
         }
 
-        public object GetInheritedValue(Plugin plugin, PluginProperty pluginProperty)
+        public Value GetInheritedValue(Plugin plugin, PluginProperty pluginProperty)
         {
             foreach (Entity prototype in Prototypes)
             {

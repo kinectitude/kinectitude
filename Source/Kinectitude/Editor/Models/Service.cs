@@ -1,6 +1,7 @@
 ﻿using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Properties;
+using Kinectitude.Editor.Models.Values;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -84,7 +85,7 @@ namespace Kinectitude.Editor.Models
             return false;
         }
 
-        public object GetInheritedValue(PluginProperty property)
+        public Value GetInheritedValue(PluginProperty property)
         {
             return property.DefaultValue;
         }
