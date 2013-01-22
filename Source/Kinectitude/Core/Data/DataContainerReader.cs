@@ -6,9 +6,9 @@ using Kinectitude.Core.Base;
 
 namespace Kinectitude.Core.Data
 {
-    internal sealed class DataContainerReader : RepeatReader
+    public sealed class DataContainerReader : RepeatReader
     {
-        internal readonly DataContainer DataContainer;
+        internal readonly IDataContainer DataContainer;
         internal readonly string Param;
 
         protected override ValueReader Reader
@@ -16,18 +16,18 @@ namespace Kinectitude.Core.Data
             get { return DataContainer[Param]; }
         }
 
-        internal static DataContainerReader GetDataContainerReader(DataContainer dataContainer, string param)
+        internal static DataContainerReader GetDataContainerReader(IDataContainer dataContainer, string param)
         {
             Func<DataContainerReader> create = new Func<DataContainerReader>(() => new DataContainerReader(dataContainer, param));
-            return DoubleDictionary<DataContainer, string, DataContainerReader>.GetItem(dataContainer, param, create);
+            return DoubleDictionary<IDataContainer, string, DataContainerReader>.GetItem(dataContainer, param, create);
         }
 
-        internal static void DeleteDataContainer(DataContainer dataContainer)
+        internal static void DeleteDataContainer(IDataContainer dataContainer)
         {
-            DoubleDictionary<DataContainer, string, DataContainerReader>.DeleteDict(dataContainer);
+            DoubleDictionary<IDataContainer, string, DataContainerReader>.DeleteDict(dataContainer);
         }
 
-        private DataContainerReader(DataContainer dataContainer, string param)
+        private DataContainerReader(IDataContainer dataContainer, string param)
         {
             DataContainer = dataContainer;
             Param = param;

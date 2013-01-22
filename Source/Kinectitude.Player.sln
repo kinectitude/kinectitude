@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinectitude.Player", "Kinectitude\Player\Kinectitude.Player.csproj", "{753C2E85-FCF6-46E1-939C-D35C0B047E40}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinectitude.Core", "Kinectitude\Core\Kinectitude.Core.csproj", "{AEAB17EC-574C-4177-9204-FE48F4C3F429}"
@@ -14,8 +14,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinectitude.DirectInput", "Kinectitude\DirectInput\Kinectitude.DirectInput.csproj", "{6F23FA79-3A6F-4D54-A099-336F90A719E7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinectitude.Sound", "Kinectitude\Sound\Kinectitude.Sound.csproj", "{499726D9-9224-4D97-983F-C773FD027037}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinectitude.DebugPlayer", "Kinectitude\Kinectitude.DebugPlayer\Kinectitude.DebugPlayer.csproj", "{821E1C4D-7E84-49D3-BD52-DDF23155B401}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -112,18 +110,6 @@ Global
 		{499726D9-9224-4D97-983F-C773FD027037}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{499726D9-9224-4D97-983F-C773FD027037}.Release|Win32.ActiveCfg = Release|Any CPU
 		{499726D9-9224-4D97-983F-C773FD027037}.Release|x86.ActiveCfg = Release|Any CPU
-		{821E1C4D-7E84-49D3-BD52-DDF23155B401}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{821E1C4D-7E84-49D3-BD52-DDF23155B401}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{821E1C4D-7E84-49D3-BD52-DDF23155B401}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{821E1C4D-7E84-49D3-BD52-DDF23155B401}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{821E1C4D-7E84-49D3-BD52-DDF23155B401}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{821E1C4D-7E84-49D3-BD52-DDF23155B401}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{821E1C4D-7E84-49D3-BD52-DDF23155B401}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{821E1C4D-7E84-49D3-BD52-DDF23155B401}.Release|Any CPU.Build.0 = Release|Any CPU
-		{821E1C4D-7E84-49D3-BD52-DDF23155B401}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{821E1C4D-7E84-49D3-BD52-DDF23155B401}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{821E1C4D-7E84-49D3-BD52-DDF23155B401}.Release|Win32.ActiveCfg = Release|Any CPU
-		{821E1C4D-7E84-49D3-BD52-DDF23155B401}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

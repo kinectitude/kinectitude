@@ -5,10 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:m="clr-namespace:Kinectitude.Editor.Models"
              xmlns:v="clr-namespace:Kinectitude.Editor.Views"
+             xmlns:u="clr-namespace:Kinectitude.Editor.Views.Utils"
              mc:Ignorable="d">
 
     <UserControl.Resources>
         <SolidColorBrush x:Key="DefaultValueBrush" Color="#1B67E0" />
+        <u:ValueConverter x:Key="ValueConverter" />
     </UserControl.Resources>
 
     <DockPanel>
@@ -22,7 +24,7 @@
                 IsEnabled="{Binding HasOwnValue}" />
         <ComboBox IsTextSearchEnabled="False"
                   IsEditable="True"
-                  Text="{Binding Value, UpdateSourceTrigger=LostFocus}"
+                  Text="{Binding Value, UpdateSourceTrigger=LostFocus, Converter={StaticResource ValueConverter}}"
                   IsEnabled="{Binding IsEditable}"
                   ItemsSource="{Binding AvailableValues}">
             <ComboBox.Style>

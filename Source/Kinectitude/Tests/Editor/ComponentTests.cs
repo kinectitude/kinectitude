@@ -5,6 +5,7 @@ using Kinectitude.Core.Components;
 using Kinectitude.Editor.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Kinectitude.Editor.Models.Properties;
+using Kinectitude.Editor.Models.Values;
 
 namespace Kinectitude.Editor.Tests
 {
@@ -88,7 +89,7 @@ namespace Kinectitude.Editor.Tests
             Component childComponent = child.GetComponentByType(TransformComponentType);
             Property childProperty = childComponent.GetProperty("X");
             //childProperty.IsInherited = false;
-            childProperty.Value = 500;
+            childProperty.Value = new Value("500");
 
             parent.RemoveComponent(component);
 
@@ -178,7 +179,7 @@ namespace Kinectitude.Editor.Tests
             Component parentComponent = new Component(game.GetPlugin(typeof(TransformComponent).FullName));
             
             Property x = parentComponent.GetProperty("X");
-            x.Value = 400;
+            x.Value = new Value("400");
 
             parent.AddComponent(parentComponent);
             
@@ -192,7 +193,7 @@ namespace Kinectitude.Editor.Tests
             Component childComponent = child.Components[0];
             
             Property y = childComponent.GetProperty("Y");
-            y.Value = 300;
+            y.Value = new Value("300");
             
             scene.AddEntity(child);
 
@@ -272,7 +273,7 @@ namespace Kinectitude.Editor.Tests
             Component childComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             
             Property property = childComponent.GetProperty("X");
-            property.Value = 500;
+            property.Value = new Value("500");
             
             child.AddComponent(childComponent);
             child.AddPrototype(parent);
@@ -295,7 +296,7 @@ namespace Kinectitude.Editor.Tests
             Component component = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             
             Property property = component.GetProperty("X");
-            property.Value = 500;
+            property.Value = new Value("500");
             
             child.AddComponent(component);
             child.AddPrototype(parent);

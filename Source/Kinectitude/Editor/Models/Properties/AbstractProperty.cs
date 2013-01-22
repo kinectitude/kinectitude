@@ -1,5 +1,6 @@
 ﻿using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
+using Kinectitude.Editor.Models.Values;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Input;
@@ -32,7 +33,7 @@ namespace Kinectitude.Editor.Models.Properties
             get { return IsLocal; }
         }
 
-        public abstract object Value { get; set; }
+        public abstract Value Value { get; set; }
 
         public abstract bool HasOwnValue { get; }
 
@@ -107,9 +108,39 @@ namespace Kinectitude.Editor.Models.Properties
             return property;
         }
 
-        public object GetInheritedValue()
+        public Value GetInheritedValue()
         {
             return null != Scope ? Scope.GetInheritedValue(PluginProperty) : PluginProperty.DefaultValue;
+        }
+
+        public double GetDoubleValue()
+        {
+            return Value.Reader.GetDoubleValue();
+        }
+
+        public float GetFloatValue()
+        {
+            return Value.Reader.GetFloatValue();
+        }
+
+        public int GetIntValue()
+        {
+            return Value.Reader.GetIntValue();
+        }
+
+        public long GetLongValue()
+        {
+            return Value.Reader.GetLongValue();
+        }
+
+        public bool GetBoolValue()
+        {
+            return Value.Reader.GetBoolValue();
+        }
+
+        public string GetStringValue()
+        {
+            return Value.Reader.GetStrValue();
         }
     }
 }

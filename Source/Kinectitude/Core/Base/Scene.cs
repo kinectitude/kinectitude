@@ -6,7 +6,7 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Base
 {    
-    internal sealed class Scene : DataContainer
+    internal sealed class Scene : DataContainer, IScene
     {
         private readonly Dictionary<string, List<TriggerOccursEvent>> triggers;
         private readonly SceneLoader seceneLoader;
@@ -166,7 +166,19 @@ namespace Kinectitude.Core.Base
 
         internal Entity GetEntity(string name)
         {
-            return EntityByName[name];
+            Entity entity = null;
+            EntityByName.TryGetValue(name, out entity);
+            return entity;
+        }
+
+        IDataContainer IScene.Game
+        {
+            get { return Game; }
+        }
+
+        IDataContainer IScene.GetEntity(string name)
+        {
+            return GetEntity(name);
         }
 
         internal void CreateEntity(string prototype)
@@ -239,7 +251,7 @@ namespace Kinectitude.Core.Base
             return manager as Changeable;
         }
 
-        internal HashSet<int> GetOfPrototype(string prototype, bool exact)
+        public HashSet<int> GetOfPrototype(string prototype, bool exact)
         {
             Dictionary<string, HashSet<int>> dict = exact ? IsExactType : IsType;
             HashSet<int> ids;

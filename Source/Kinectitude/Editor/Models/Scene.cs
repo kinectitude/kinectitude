@@ -1,14 +1,20 @@
-﻿using Kinectitude.Editor.Base;
+﻿using Kinectitude.Core.Base;
+using Kinectitude.Core.Data;
+using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models.Data.DataContainers;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Transactions;
+using Kinectitude.Editor.Models.Values;
 using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.Views.Scenes.Presenters;
 using Kinectitude.Editor.Views.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 
@@ -188,6 +194,11 @@ namespace Kinectitude.Editor.Models
             }
         }
 
+        public Attribute GetAttribute(string name)
+        {
+            return Attributes.FirstOrDefault(x => x.Name == name);
+        }
+
         public void AddAttribute(Attribute attribute)
         {
             attribute.Scope = this;
@@ -267,6 +278,11 @@ namespace Kinectitude.Editor.Models
             );
         }
 
+        public Entity GetEntityByName(string name)
+        {
+            return Entities.FirstOrDefault(x => x.Name == name);
+        }
+
         private string GetNextAttributeKey()
         {
             string ret = "attribute" + nextAttribute;
@@ -305,6 +321,16 @@ namespace Kinectitude.Editor.Models
                     ResolveComponentDependencies(component);
                 }
             }
+        }
+
+        public Manager GetManagerByType(Plugin type)
+        {
+            return Managers.FirstOrDefault(x => x.Plugin == type);
+        }
+
+        public Manager GetManagerByDefinedName(string name)
+        {
+            return Managers.FirstOrDefault(x => x.Type == name);
         }
 
         public bool HasManagerOfType(Plugin type)
@@ -347,6 +373,21 @@ namespace Kinectitude.Editor.Models
 
         #region IAttributeScope implementation
 
+        Entity IAttributeScope.Entity
+        {
+            get { return null; }
+        }
+
+        Scene IAttributeScope.Scene
+        {
+            get { return this; }
+        }
+
+        Game IAttributeScope.Game
+        {
+            get { return null; }
+        }
+
         public event AttributeEventHandler InheritedAttributeAdded { add { } remove { } }
         public event AttributeEventHandler InheritedAttributeRemoved { add { } remove { } }
         public event AttributeEventHandler InheritedAttributeChanged { add { } remove { } }
@@ -356,7 +397,7 @@ namespace Kinectitude.Editor.Models
             return false;
         }
 
-        public object GetInheritedValue(string key)
+        public Value GetInheritedValue(string key)
         {
             return Attribute.DefaultValue;
         }

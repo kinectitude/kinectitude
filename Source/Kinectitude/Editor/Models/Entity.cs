@@ -1,10 +1,13 @@
-﻿using Kinectitude.Editor.Base;
+﻿using Kinectitude.Core.Base;
+using Kinectitude.Core.Data;
+using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Properties;
 using Kinectitude.Editor.Models.Statements.Base;
 using Kinectitude.Editor.Models.Statements.Events;
 using Kinectitude.Editor.Models.Transactions;
+using Kinectitude.Editor.Models.Values;
 using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.Views.Utils;
 using System;
@@ -14,6 +17,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
+using Event = Kinectitude.Editor.Models.Statements.Events.Event;
 
 namespace Kinectitude.Editor.Models
 {
@@ -229,21 +233,6 @@ namespace Kinectitude.Editor.Models
 
         private void InheritAttribute(Attribute inheritedAttribute)
         {
-            //inheritedAttribute.NameChanged += OnPrototypeAttributeKeyChanged;
-            //inheritedAttribute.PropertyChanged += OnPrototypeAttributePropertyChanged;
-
-            //Attribute localAttribute = GetAttribute(inheritedAttribute.Name);
-            //if (null == localAttribute)
-            //{
-            //    localAttribute = new Attribute(inheritedAttribute.Name) { IsNameEditable = false };
-            //    AddAttribute(localAttribute);
-            //}
-
-            //if (null != InheritedAttributeAdded)
-            //{
-            //    InheritedAttributeAdded(inheritedAttribute.Name);
-            //}
-
             inheritedAttribute.NameChanged += OnPrototypeAttributeNameChanged;
             inheritedAttribute.PropertyChanged += OnPrototypeAttributePropertyChanged;
 
@@ -257,20 +246,6 @@ namespace Kinectitude.Editor.Models
 
         private void DisinheritAttribute(Attribute inheritedAttribute)
         {
-            //inheritedAttribute.NameChanged -= OnPrototypeAttributeKeyChanged;
-            //inheritedAttribute.PropertyChanged -= OnPrototypeAttributePropertyChanged;
-
-            //Attribute localAttribute = GetAttribute(inheritedAttribute.Name);
-            //if (null != localAttribute && !localAttribute.HasOwnValue)
-            //{
-            //    RemoveAttribute(localAttribute);
-            //}
-
-            //if (null != InheritedAttributeRemoved)
-            //{
-            //    InheritedAttributeRemoved(inheritedAttribute.Name);
-            //}
-
             inheritedAttribute.NameChanged -= OnPrototypeAttributeNameChanged;
             inheritedAttribute.PropertyChanged -= OnPrototypeAttributePropertyChanged;
 
@@ -342,51 +317,6 @@ namespace Kinectitude.Editor.Models
 
         private void OnPrototypeAttributeNameChanged(string oldKey, string newKey)
         {
-            //Attribute inheritedAttributeWithOldKey = null;
-
-            //foreach (Entity prototype in Prototypes)
-            //{
-            //    inheritedAttributeWithOldKey = prototype.GetAttribute(oldKey);
-            //    if (null != inheritedAttributeWithOldKey)
-            //    {
-            //        break;
-            //    }
-            //}
-
-            //if (null == inheritedAttributeWithOldKey)
-            //{
-            //    Attribute localAttribute = GetAttribute(oldKey);
-            //    if (null != localAttribute && !localAttribute.HasOwnValue)
-            //    {
-            //        RemoveAttribute(localAttribute);
-
-            //        if (null != InheritedAttributeRemoved)
-            //        {
-            //            InheritedAttributeRemoved(oldKey);
-            //        }
-            //    }
-            //}
-            //else if (null != InheritedAttributeChanged)
-            //{
-            //    InheritedAttributeChanged(oldKey);
-            //}
-
-            //Attribute localAttributeWithNewKey = GetAttribute(newKey);
-            //if (null == localAttributeWithNewKey)
-            //{
-            //    localAttributeWithNewKey = new Attribute(newKey) { IsNameEditable = false };
-            //    AddAttribute(localAttributeWithNewKey);
-
-            //    if (null != InheritedAttributeAdded)
-            //    {
-            //        InheritedAttributeAdded(newKey);
-            //    }
-            //}
-            //else if (null != InheritedAttributeChanged)
-            //{
-            //    InheritedAttributeChanged(newKey);
-            //}
-
             CheckAttributeInheritance(oldKey);
             EnsureAttributeExists(newKey);
         }
@@ -425,7 +355,6 @@ namespace Kinectitude.Editor.Models
         public void RemoveAttribute(Attribute attribute)
         {
             if (!attribute.IsInherited)
-            //if (attribute.IsLocal || attribute.IsInherited && !attribute.CanInherit)
             {
                 PrivateRemoveAttribute(attribute);
 
@@ -513,7 +442,7 @@ namespace Kinectitude.Editor.Models
                 Components.Add(component);
 
                 Notify(new PluginUsed(component.Plugin));
-
+                
                 Workspace.Instance.CommandHistory.Log(
                     "add component '" + component.DisplayName + "'",
                     () => AddComponent(component),
@@ -528,6 +457,8 @@ namespace Kinectitude.Editor.Models
             {
                 if (!Components.Any(x => x.DependsOn(component)))
                 {
+                    var definedType = component.Type;
+
                     component.Scope = null;
                     Components.Remove(component);
 
@@ -678,15 +609,30 @@ namespace Kinectitude.Editor.Models
 
         #region IAttributeScope implementation
 
+        Entity IAttributeScope.Entity
+        {
+            get { return this; }
+        }
+
+        Scene IAttributeScope.Scene
+        {
+            get { return null; }
+        }
+
+        Game IAttributeScope.Game
+        {
+            get { return null; }
+        }
+
         public event AttributeEventHandler InheritedAttributeAdded;
         public event AttributeEventHandler InheritedAttributeRemoved;
         public event AttributeEventHandler InheritedAttributeChanged;
 
-        public object GetInheritedValue(string key)
+        public Value GetInheritedValue(string key)
         {
             foreach (Entity prototype in Prototypes)
             {
-                Attribute attribute = prototype.GetAttribute(key);
+                var attribute = prototype.GetAttribute(key);
                 if (null != attribute)
                 {
                     return attribute.Value;
@@ -724,7 +670,7 @@ namespace Kinectitude.Editor.Models
             return Prototypes.SelectMany(x => x.Components).Any(x => x.Plugin == plugin);
         }
 
-        public object GetInheritedValue(Plugin plugin, PluginProperty pluginProperty)
+        public Value GetInheritedValue(Plugin plugin, PluginProperty pluginProperty)
         {
             foreach (Entity prototype in Prototypes)
             {
@@ -732,10 +678,10 @@ namespace Kinectitude.Editor.Models
                 if (null != component)
                 {
                     Property property = component.GetProperty(pluginProperty.Name);
-                    if (null != property)
-                    {
+                    //if (property.HasOwnValue)
+                    //{
                         return property.Value;
-                    }
+                    //}
                 }
             }
 
@@ -744,7 +690,7 @@ namespace Kinectitude.Editor.Models
 
         #endregion
 
-        private void OnPrototypeComponentLocalPropertyChanged(PluginProperty property)
+        private void OnPrototypeComponentLocalPropertyChanged(Component component, PluginProperty property)
         {
             if (null != InheritedPropertyChanged)
             {
@@ -775,7 +721,7 @@ namespace Kinectitude.Editor.Models
             AbstractEvent localEvent = Events.FirstOrDefault(x => x.InheritsFrom(evt));
             if (null == localEvent)
             {
-                localEvent = new InheritedEvent(evt);
+                localEvent = new ReadOnlyEvent(evt);
                 AddEvent(localEvent);
             }
         }

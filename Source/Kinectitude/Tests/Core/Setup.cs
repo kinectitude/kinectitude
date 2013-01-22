@@ -12,7 +12,7 @@ namespace Kinectitude.Tests.Core
     public class Setup
     {
 
-        public static Game StartGame(string testFile, Action<string> die = null)
+        internal static Game StartGame(string testFile, Action<string> die = null)
         {
             if (die == null) die = new Action<string>(str => Assert.Fail(str));
             GameLoader gameLoader = new GameLoader(testFile, new Assembly[] { typeof(Setup).Assembly }, 1, 1, null, die);

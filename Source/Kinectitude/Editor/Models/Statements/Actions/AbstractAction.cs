@@ -1,6 +1,7 @@
 ﻿using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Properties;
 using Kinectitude.Editor.Models.Statements.Base;
+using Kinectitude.Editor.Models.Values;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -53,7 +54,7 @@ namespace Kinectitude.Editor.Models.Statements.Actions
             return Properties.FirstOrDefault(x => x.Name == name);
         }
 
-        public void SetProperty(string name, object value)
+        public void SetProperty(string name, Value value)
         {
             if (IsLocal)
             {
@@ -72,7 +73,7 @@ namespace Kinectitude.Editor.Models.Statements.Actions
             return false;
         }
 
-        public object GetInheritedValue(PluginProperty property)
+        public Value GetInheritedValue(PluginProperty property)
         {
             return property.DefaultValue;
         }
@@ -93,7 +94,7 @@ namespace Kinectitude.Editor.Models.Statements.Actions
 
         public sealed override AbstractStatement CreateInheritor()
         {
-            return new InheritedAction(this);
+            return new ReadOnlyAction(this);
         }
     }
 }

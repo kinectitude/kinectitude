@@ -7,7 +7,9 @@ using Kinectitude.Editor.Models.Statements.Base;
 using Kinectitude.Editor.Models.Statements.Conditions;
 using Kinectitude.Editor.Models.Statements.Events;
 using Kinectitude.Editor.Models.Statements.Loops;
+using Kinectitude.Editor.Models.Values;
 using Kinectitude.Editor.Storage;
+using Kinectitude.Editor.Storage.Kgl;
 using Kinectitude.Editor.Views.Utils;
 using Kinectitude.Render;
 using System;
@@ -23,6 +25,8 @@ namespace Kinectitude.Editor.Models
 {
     internal sealed class Workspace : BaseModel
     {
+        public static IValueMaker ValueMaker = new KGLValueMaker();
+
         private const string PluginDirectory = "Plugins";
 
         private static readonly Lazy<Workspace> instance = new Lazy<Workspace>();
@@ -212,8 +216,8 @@ namespace Kinectitude.Editor.Models
         {
             Entity blankEntity = new Entity() { Name = "Blank Entity" };
             Component blankEntityTransform = new Component(GetPlugin(typeof(TransformComponent)));
-            blankEntityTransform.SetProperty("Width", 48);
-            blankEntityTransform.SetProperty("Height", 48);
+            blankEntityTransform.SetProperty("Width", new Value(48, true));
+            blankEntityTransform.SetProperty("Height", new Value(48, true));
             blankEntity.AddComponent(blankEntityTransform);
 
             entityPresets.Add(blankEntity);
@@ -225,21 +229,21 @@ namespace Kinectitude.Editor.Models
 
             Entity shapeEntity = new Entity() { Name = "Shape Entity" };
             Component shapeEntityTransform = new Component(GetPlugin(typeof(TransformComponent)));
-            shapeEntityTransform.SetProperty("Width", 48);
-            shapeEntityTransform.SetProperty("Height", 48);
+            shapeEntityTransform.SetProperty("Width", new Value(48, true));
+            shapeEntityTransform.SetProperty("Height", new Value(48, true));
             shapeEntity.AddComponent(blankEntityTransform);
             Component shapeEntityRender = new Component(GetPlugin(typeof(RenderComponent)));
-            shapeEntityRender.SetProperty("Shape", "Rectangle");
-            shapeEntityRender.SetProperty("FillColor", "Blue");
+            shapeEntityRender.SetProperty("Shape", new Value("Rectangle", true));
+            shapeEntityRender.SetProperty("FillColor", new Value("Blue", true));
             shapeEntity.AddComponent(shapeEntityRender);
 
             entityPresets.Add(shapeEntity);
 
             Entity textEntity = new Entity() { Name = "Text Entity" };
             Component textEntityText = new Component(GetPlugin(typeof(TextRenderComponent)));
-            textEntityText.SetProperty("FontSize", 36);
-            textEntityText.SetProperty("FontColor", "Black");
-            textEntityText.SetProperty("Value", "Your Text Here");
+            textEntityText.SetProperty("FontSize", new Value(36, true));
+            textEntityText.SetProperty("FontColor", new Value("Black", true));
+            textEntityText.SetProperty("Value", new Value("Your Text Here", true));
             textEntity.AddComponent(textEntityText);
 
             entityPresets.Add(textEntity);
@@ -331,14 +335,7 @@ namespace Kinectitude.Editor.Models
 
         public Plugin GetPlugin(string name)
         {
-            Plugin plugin = Plugins.FirstOrDefault(x => x.ClassName == name);
-            
-            if (null == plugin)
-            {
-                plugin = Plugins.FirstOrDefault(x => x.File == typeof(Kinectitude.Core.Base.Component).Module.Name && x.ShortName == name);
-            }
-            
-            return plugin;
+            return Plugins.FirstOrDefault(x => x.ClassName == name);
         }
 
         public Plugin GetPlugin(Type type)

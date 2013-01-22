@@ -10,7 +10,7 @@ namespace Kinectitude.Core.Data
     {
         private object Obj;
         private string Param;
-        private DataContainer Owner;
+        private IDataContainer Owner;
 
         public ParameterValueWriter(ParameterValueReader reader) : base(reader)
         {

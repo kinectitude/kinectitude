@@ -29,7 +29,7 @@ namespace Kinectitude.Editor.Models.Statements.Loops
 
         public sealed override AbstractStatement CreateInheritor()
         {
-            return new InheritedForLoop(this);
+            return new ReadOnlyForLoop(this);
         }
     }
 }

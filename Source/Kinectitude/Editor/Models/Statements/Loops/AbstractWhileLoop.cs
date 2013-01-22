@@ -22,7 +22,7 @@ namespace Kinectitude.Editor.Models.Statements.Loops
 
         public sealed override AbstractStatement CreateInheritor()
         {
-            return new InheritedWhileLoop(this);
+            return new ReadOnlyWhileLoop(this);
         }
     }
 }
