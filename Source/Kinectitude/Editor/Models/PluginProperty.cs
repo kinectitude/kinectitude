@@ -44,7 +44,7 @@ namespace Kinectitude.Editor.Models
                     }
                 }
 
-                return new Value(result.ToString());
+                return new Value(result, true);
             }
         }
 

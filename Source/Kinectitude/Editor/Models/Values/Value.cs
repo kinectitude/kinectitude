@@ -54,6 +54,22 @@ namespace Kinectitude.Editor.Models.Values
             AddHandler<ScopeChanged>(OnScopeChanged);
         }
 
+        public Value(object value, bool constant)
+        {
+            if (null != value)
+            {
+                initializer = value.ToString();
+
+                var type = value.GetType();
+                if (type == typeof(string) || type.IsEnum)
+                {
+                    initializer = "\"" + initializer + "\"";
+                }
+            }
+
+            reader = new ConstantReader(value);
+        }
+
         public override void Accept(IGameVisitor visitor)
         {
             visitor.Visit(this);
