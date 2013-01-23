@@ -39,6 +39,7 @@ namespace Kinectitude.Core.Loaders
             foreach (object entity in entities)
             {
                 string name = loaderUtility.GetName(entity);
+                if (ClassFactory.isRegistered(name)) Game.CurrentGame.Die("The name " + name + " can't be both defined and used for an entity");
                 LoadedEntity loadedEntity = gameLoader.entityParse(entity, name, onid++);
                 LoadedScene.addLoadedEntity(loadedEntity);
             }
@@ -48,10 +49,7 @@ namespace Kinectitude.Core.Loaders
         internal void CreateEntity(string name, Scene scene)
         {
             LoadedEntity loadedEntity;
-            if (!LoadedEntity.Prototypes.TryGetValue(name, out loadedEntity))
-            {
-                //TODO throw exception?
-            }
+            if (!LoadedEntity.Prototypes.TryGetValue(name, out loadedEntity)) Game.CurrentGame.Die("The prototype " + name + " does not exist!");
             Entity entity = loadedEntity.Create(onid++, scene, true);
             entity.Scene = scene;
             entity.Ready();

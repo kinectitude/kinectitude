@@ -1,0 +1,68 @@
+﻿using Kinectitude.Tests.dll{
+    define MockComponent as Kinectitude.Tests.Core.MockComponent
+    define wow as Kinectitude.Tests.Core.MockComponent2
+    define Assertion as Kinectitude.Tests.Core.AssertionAction
+}
+
+Game (Width = 800, Height=600, FirstScene="test", IsFullScreen=false, val=0){
+    Prototype prototype(){
+        Event OnCreate(){
+            if(scene.created){
+                scene.created += 1
+            }
+            if(!scene.created){
+                scene.created = 1
+            }
+            Assertion(LS=scene.created, RS=1, Assertion="Created new entity", OnlyRunIf= true)
+        }
+    }
+    
+    Scene test(score = 0, val = 1){
+        Entity runTests(val = 2){
+            Event SceneStarts(){
+                CreateEntity(Prototype="prototype")
+                Assertion(LS=scene.created, RS=1, Assertion="Created new entity", OnlyRunIf= true)
+                game.val += 1
+                PushScene(Target="test" + this.val)
+                Assertion(LS=game.lastScene, RS=2, Assertion="Got back from scene 2", OnlyRunIf= true)
+                runTests.val = this.val + scene.val
+                PushScene(Target="test" + this.val)
+                Assertion(LS=game.lastScene, RS=3, Assertion="Got back from scene 3", OnlyRunIf= true)
+                ChangeScene(Target="test4")
+                game.val += 1
+                Assertion(LS=game.val, RS=4, Assertion="game's val is correct", OnlyRunIf= true)
+            }
+        }
+    }
+    
+    Scene test2(){
+        Entity runTests(val = 2){
+            Event SceneStarts(){
+                game.lastScene = 2
+                runTests.val = this.val + 1
+                scene.val = 10
+                PopScene()
+            }
+        }
+    }
+    
+    Scene test3(){
+        Entity wow(val = 2){
+            Event SceneStarts(){
+                game.lastScene = 3
+                game.val += 2
+                runTests.val = this.val + 100
+                scene.val =220
+                PopScene()
+            }
+        }
+    }
+    
+    Scene test4(){
+        Entity runTests(){
+            Event SceneStarts(){
+                PopScene()
+            }
+        }
+    }
+}

@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <TestSettings name="Local" id="b72a577d-fe44-42f8-8c14-62d9179b77d3" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Description>These are default test settings for a local test run.</Description>
-  <Execution>
+  <Execution hostProcessPlatform="MSIL">
+    <Hosts skipUnhostableTests="false" />
     <TestTypeSpecific>
       <UnitTestRunConfig testTypeId="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b">
         <AssemblyResolution>
