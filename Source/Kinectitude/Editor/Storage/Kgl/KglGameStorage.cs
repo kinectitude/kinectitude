@@ -118,6 +118,12 @@ namespace Kinectitude.Editor.Storage.Kgl
                 game.AddPrototype(entity);
             }
 
+            foreach (ParseTreeNode serviceNode in grammar.GetOfType(root, grammar.Service))
+            {
+                Service service = CreateService(serviceNode);
+                game.AddService(service);
+            }
+
             foreach (ParseTreeNode sceneNode in grammar.GetOfType(root, grammar.Scene))
             {
                 Scene scene = CreateScene(sceneNode);
@@ -313,6 +319,19 @@ namespace Kinectitude.Editor.Storage.Kgl
                 manager.SetProperty(property.Item1, new Value(getStrVal(propertyNode)));
             }
             return manager;
+        }
+
+
+        private Service CreateService(ParseTreeNode node)
+        {
+            Service service = new Service(game.GetPlugin(grammar.GetName(node)));
+            foreach (Tuple<string, object> property in GetProperties(node))
+            {
+                ParseTreeNode propertyNode = (ParseTreeNode)property.Item2;
+                //TODO value reader when ready
+                service.SetProperty(property.Item1, new Value(getStrVal(propertyNode)));
+            }
+            return service;
         }
 
         private string getStrVal(ParseTreeNode node)

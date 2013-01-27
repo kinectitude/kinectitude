@@ -218,8 +218,8 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         public void Visit(Service service)
         {
-            //TODO implement when service has everything I need
-            throw new NotImplementedException();
+            result = new StringBuilder("\t\tService ")
+                .Append(service.Type).Append(properties<Property>(service.Properties)).ToString();
         }
 
         public void Visit(Using use)
