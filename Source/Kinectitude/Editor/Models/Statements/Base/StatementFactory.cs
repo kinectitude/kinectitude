@@ -8,6 +8,7 @@ namespace Kinectitude.Editor.Models.Statements.Base
         Action,
         Assignment,
         ConditionGroup,
+        Condition,
         WhileLoop,
         ForLoop
     }

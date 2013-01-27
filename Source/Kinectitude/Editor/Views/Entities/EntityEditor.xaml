@@ -142,21 +142,7 @@
             </Border>
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type Conditions:AbstractConditionGroup}">
-            <Border Style="{StaticResource StatementContainer}">
-                <DockPanel LastChildFill="True" Background="White" DataContext="{Binding If}">
-                    <Rectangle DockPanel.Dock="Left" Width="16" VerticalAlignment="Stretch" Fill="#C9F76F" />
-                    <TextBlock DockPanel.Dock="Left" FontWeight="Bold" Margin="8">If</TextBlock>
-                    <TextBox Text="{Binding Expression}" MinWidth="125" Margin="0,8,8,8" />
-                    <i:Interaction.Behaviors>
-                        <b:DragBehavior DragParameter="{Binding}" />
-                        <b:DropTargetBehavior DropCommand="{Binding InsertBeforeCommand}" />
-                    </i:Interaction.Behaviors>
-                </DockPanel>
-            </Border>
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type Conditions:AbstractCondition}">
+        <DataTemplate x:Key="IfConditionTemplate" DataType="{x:Type Conditions:AbstractCondition}">
             <Border Style="{StaticResource StatementContainer}">
                 <StackPanel Orientation="Vertical">
                     <DockPanel LastChildFill="True" Background="White">
@@ -179,6 +165,36 @@
             </Border>
         </DataTemplate>
 
+        <DataTemplate DataType="{x:Type Conditions:AbstractConditionGroup}">
+            <StackPanel Orientation="Vertical">
+                <ContentPresenter Content="{Binding If}" ContentTemplate="{StaticResource IfConditionTemplate}" />
+                <ItemsControl ItemsSource="{Binding Statements}" Style="{StaticResource StatementsListControl}" Margin="8,0,0,0" />
+                <Border Style="{StaticResource DropTarget}" Margin="8,0,0,0">
+                    <i:Interaction.Behaviors>
+                        <b:DropTargetBehavior DropCommand="{Binding AddActionCommand}" />
+                    </i:Interaction.Behaviors>
+                    <TextBlock>Drop new else-if condition here</TextBlock>
+                </Border>
+                <ContentPresenter Content="{Binding Else}" ContentTemplate="{StaticResource IfConditionTemplate}">
+                    <ContentPresenter.Style>
+                        <Style TargetType="{x:Type ContentPresenter}">
+                            <Style.Triggers>
+                                <Trigger Property="Content" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentPresenter.Style>
+                </ContentPresenter>
+                <Border Style="{StaticResource DropTarget}" Margin="8,0,0,0">
+                    <i:Interaction.Behaviors>
+                        <b:DropTargetBehavior DropCommand="{Binding SetElseCommand}" />
+                    </i:Interaction.Behaviors>
+                    <TextBlock>Drop else condition here</TextBlock>
+                </Border>
+            </StackPanel>
+        </DataTemplate>
+        
         <DataTemplate DataType="{x:Type Loops:AbstractWhileLoop}">
             <Border Style="{StaticResource StatementContainer}">
                 <StackPanel Orientation="Vertical">

@@ -47,7 +47,7 @@ namespace Kinectitude.Editor.Models.Statements.Conditions
         public AbstractCondition Else
         {
             get { return elseCondition; }
-            protected set
+            set
             {
                 if (elseCondition != value)
                 {
