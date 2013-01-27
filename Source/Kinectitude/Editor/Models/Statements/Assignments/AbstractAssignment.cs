@@ -1,9 +1,7 @@
 ﻿using Kinectitude.Core.Language;
-
-using Kinectitude.Editor.Models.Statements.Base;
-
 using Kinectitude.Editor.Models.Statements.Base;
 using System.Collections.Generic;
+
 namespace Kinectitude.Editor.Models.Statements.Assignments
 {
     internal enum AssignmentOperator
@@ -49,7 +47,7 @@ namespace Kinectitude.Editor.Models.Statements.Assignments
             return new Assignment() { Key = this.Key, Operator = this.Operator, Value = this.Value };
         }
 
-        public sealed override AbstractStatement CreateInheritor()
+        public sealed override AbstractStatement CreateReadOnly()
         {
             return new ReadOnlyAssignment(this);
         }

@@ -6,9 +6,9 @@ namespace Kinectitude.Editor.Models.Statements.Conditions
     {
         private readonly AbstractCondition inheritedCondition;
 
-        public override string If
+        public override string Expression
         {
-            get { return inheritedCondition.If; }
+            get { return inheritedCondition.Expression; }
             set { }
         }
 

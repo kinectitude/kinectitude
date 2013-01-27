@@ -7,7 +7,7 @@ namespace Kinectitude.Editor.Models.Statements.Base
         Event,
         Action,
         Assignment,
-        Condition,
+        ConditionGroup,
         WhileLoop,
         ForLoop
     }

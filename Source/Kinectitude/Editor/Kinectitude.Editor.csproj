@@ -99,8 +99,6 @@
     <Compile Include="Models\Data\Changeables\ThisChangeable.cs" />
     <Compile Include="Models\Data\DataContainers\CallbackCollection.cs" />
     <Compile Include="Models\Data\DataContainers\EntityDataContainer.cs" />
-    <Compile Include="Models\Data\DataContainers\DelegateChangeable.cs" />
-    <Compile Include="Models\Data\DataContainers\DelegateDataContainer.cs" />
     <Compile Include="Models\Data\DataContainers\GameDataContainer.cs" />
     <Compile Include="Models\Data\DataContainers\SceneDataContainer.cs" />
     <Compile Include="Models\Data\DataContainers\ThisDataContainer.cs" />
@@ -114,12 +112,15 @@
     <Compile Include="Models\Notifications\DefineRemoved.cs" />
     <Compile Include="Models\Service.cs" />
     <Compile Include="Models\Statements\Base\Statement.cs" />
+    <Compile Include="Models\Statements\Conditions\AbstractConditionGroup.cs" />
+    <Compile Include="Models\Statements\Conditions\ConditionGroup.cs" />
     <Compile Include="Models\Values\Value.cs" />
     <Compile Include="Models\Data\ValueReaders\GameValueReader.cs" />
     <Compile Include="Models\Data\ValueReaders\SceneValueReader.cs" />
     <Compile Include="Models\Data\ValueReaders\ThisEntityValueReader.cs" />
     <Compile Include="Storage\IValueMaker.cs" />
     <Compile Include="Storage\Kgl\KGLValueMaker.cs" />
+    <Compile Include="Models\Statements\Conditions\ReadOnlyConditionGroup.cs" />
     <Compile Include="Views\Behaviors\DragAdorner.cs" />
     <Compile Include="Base\DelegateCommand.cs" />
     <Compile Include="Base\FilteredObservableCollection.cs" />

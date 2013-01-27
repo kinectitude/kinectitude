@@ -1,6 +1,11 @@
 ﻿using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
+using Kinectitude.Editor.Models.Statements.Actions;
+using Kinectitude.Editor.Models.Statements.Assignments;
+using Kinectitude.Editor.Models.Statements.Conditions;
+using Kinectitude.Editor.Models.Statements.Loops;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -12,7 +17,7 @@ namespace Kinectitude.Editor.Models.Statements.Base
 {
     internal abstract class CompositeStatement : AbstractStatement, IStatementScope
     {
-        private readonly CompositeStatement inheritedStatement;
+        private readonly CompositeStatement sourceStatement;
 
         public override IEnumerable<Plugin> Plugins
         {
@@ -21,28 +26,43 @@ namespace Kinectitude.Editor.Models.Statements.Base
 
         public ObservableCollection<AbstractStatement> Statements { get; private set; }
 
+        public virtual IEnumerable<Type> AllowableStatements
+        {
+            get
+            {
+                return new[]
+                {
+                    typeof(AbstractAction),
+                    typeof(AbstractAssignment),
+                    typeof(AbstractConditionGroup),
+                    typeof(AbstractForLoop),
+                    typeof(AbstractWhileLoop)
+                };
+            }
+        }
+
         public ICommand AddActionCommand { get; private set; }
 
-        protected CompositeStatement(CompositeStatement inheritedStatement = null) : base(inheritedStatement)
+        protected CompositeStatement(CompositeStatement sourceStatement = null) : base(sourceStatement)
         {
-            this.inheritedStatement = inheritedStatement;
+            this.sourceStatement = sourceStatement;
 
             Statements = new ObservableCollection<AbstractStatement>();
 
-            if (null != inheritedStatement)
+            if (null != sourceStatement)
             {
-                inheritedStatement.Statements.CollectionChanged += OnInheritedStatementsChanged;
+                sourceStatement.Statements.CollectionChanged += OnSourceStatementsChanged;
 
-                foreach (AbstractStatement statement in inheritedStatement.Statements)
+                foreach (AbstractStatement statement in sourceStatement.Statements)
                 {
-                    InheritStatement(statement);
+                    FollowStatement(statement);
                 }
             }
 
-            AddActionCommand = new DelegateCommand((parameter) => IsLocal,
+            AddActionCommand = new DelegateCommand((parameter) => IsEditable,
             (parameter) =>
             {
-                if (IsLocal)
+                if (IsEditable)
                 {
                     AbstractStatement statement = parameter as AbstractStatement;
                     if (null == statement)
@@ -70,18 +90,34 @@ namespace Kinectitude.Editor.Models.Statements.Base
 
         private void PrivateAddStatement(int idx, AbstractStatement statement)
         {
-            statement.Scope = this;
-            Statements.Insert(idx, statement);
-
-            foreach (Plugin plugin in statement.Plugins)
+            if (IsAllowed(statement))
             {
-                Notify(new PluginUsed(plugin));
+                statement.Scope = this;
+                Statements.Insert(idx, statement);
+
+                foreach (Plugin plugin in statement.Plugins)
+                {
+                    Notify(new PluginUsed(plugin));
+                }
             }
+        }
+
+        private bool IsAllowed(AbstractStatement statement)
+        {
+            foreach (var type in AllowableStatements)
+            {
+                if (type.IsAssignableFrom(statement.GetType()))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public void RemoveStatement(AbstractStatement statement)
         {
-            if (statement.IsLocal)
+            if (statement.IsEditable)
             {
                 PrivateRemoveStatement(statement);
             }
@@ -93,52 +129,52 @@ namespace Kinectitude.Editor.Models.Statements.Base
             Statements.Remove(statement);
         }
 
-        private void OnInheritedPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void OnSourcePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             NotifyPropertyChanged(e.PropertyName);
         }
 
-        private void OnInheritedStatementsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void OnSourceStatementsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                foreach (AbstractStatement inheritedStatement in e.NewItems)
+                foreach (AbstractStatement sourceStatement in e.NewItems)
                 {
-                    InheritStatement(inheritedStatement);
+                    FollowStatement(sourceStatement);
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                foreach (AbstractStatement inheritedStatement in e.OldItems)
+                foreach (AbstractStatement sourceStatement in e.OldItems)
                 {
-                    DisinheritStatement(inheritedStatement);
+                    UnfollowStatement(sourceStatement);
                 }
             }
 
             // TODO: Handle rearrange/move
         }
 
-        private AbstractStatement FindInheritor(AbstractStatement inheritedStatement)
+        private AbstractStatement FindReadOnly(AbstractStatement sourceStatement)
         {
-            return Statements.FirstOrDefault(x => x.InheritsFrom(inheritedStatement));
+            return Statements.FirstOrDefault(x => x.InheritsFrom(sourceStatement));
         }
 
-        private void InheritStatement(AbstractStatement inheritedStatement)
+        private void FollowStatement(AbstractStatement sourceStatement)
         {
-            AbstractStatement inheritor = FindInheritor(inheritedStatement);
-            if (null == inheritor)
+            AbstractStatement readonlyStatement = FindReadOnly(sourceStatement);
+            if (null == readonlyStatement)
             {
-                inheritor = inheritedStatement.CreateInheritor();
-                AddStatement(inheritor);
+                readonlyStatement = sourceStatement.CreateReadOnly();
+                AddStatement(readonlyStatement);
             }
         }
 
-        private void DisinheritStatement(AbstractStatement inheritedStatement)
+        private void UnfollowStatement(AbstractStatement sourceStatement)
         {
-            AbstractStatement inheritor = FindInheritor(inheritedStatement);
-            if (null != inheritor)
+            AbstractStatement readonlyStatement = FindReadOnly(sourceStatement);
+            if (null != readonlyStatement)
             {
-                PrivateRemoveStatement(inheritor);
+                PrivateRemoveStatement(readonlyStatement);
             }
         }
 
@@ -146,7 +182,7 @@ namespace Kinectitude.Editor.Models.Statements.Base
 
         public void InsertBefore(AbstractStatement statement, AbstractStatement toInsert)
         {
-            if (IsLocal)
+            if (IsEditable)
             {
                 int idx = Statements.IndexOf(statement);
                 if (idx != -1)

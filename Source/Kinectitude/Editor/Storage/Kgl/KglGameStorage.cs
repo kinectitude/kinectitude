@@ -222,7 +222,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             }
             else if (statementNode.Term == grammar.Condition)
             {
-                Condition cond = new Condition() { If = getStrVal(statementNode)};
+                Condition cond = new Condition() { Expression = getStrVal(statementNode)};
                 foreach (ParseTreeNode child in grammar.GetOfType(statementNode, grammar.Actions)) createStatement(child, evt, cond);
                 statement = cond;
                 //TODO else

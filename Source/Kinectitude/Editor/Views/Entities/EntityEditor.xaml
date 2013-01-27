@@ -142,6 +142,20 @@
             </Border>
         </DataTemplate>
 
+        <DataTemplate DataType="{x:Type Conditions:AbstractConditionGroup}">
+            <Border Style="{StaticResource StatementContainer}">
+                <DockPanel LastChildFill="True" Background="White" DataContext="{Binding If}">
+                    <Rectangle DockPanel.Dock="Left" Width="16" VerticalAlignment="Stretch" Fill="#C9F76F" />
+                    <TextBlock DockPanel.Dock="Left" FontWeight="Bold" Margin="8">If</TextBlock>
+                    <TextBox Text="{Binding Expression}" MinWidth="125" Margin="0,8,8,8" />
+                    <i:Interaction.Behaviors>
+                        <b:DragBehavior DragParameter="{Binding}" />
+                        <b:DropTargetBehavior DropCommand="{Binding InsertBeforeCommand}" />
+                    </i:Interaction.Behaviors>
+                </DockPanel>
+            </Border>
+        </DataTemplate>
+
         <DataTemplate DataType="{x:Type Conditions:AbstractCondition}">
             <Border Style="{StaticResource StatementContainer}">
                 <StackPanel Orientation="Vertical">

@@ -102,7 +102,7 @@ namespace Kinectitude.Editor.Models.Statements.Events
             return DeepCopy();
         }
 
-        public sealed override AbstractStatement CreateInheritor()
+        public sealed override AbstractStatement CreateReadOnly()
         {
             return new ReadOnlyEvent(this);
         }

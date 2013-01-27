@@ -535,7 +535,7 @@ namespace Kinectitude.Editor.Models
 
         public void RemoveEvent(AbstractEvent evt)
         {
-            if (evt.IsLocal)
+            if (evt.IsEditable)
             {
                 PrivateRemoveEvent(evt);
 

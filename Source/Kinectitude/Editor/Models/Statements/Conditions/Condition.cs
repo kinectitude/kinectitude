@@ -4,17 +4,17 @@ namespace Kinectitude.Editor.Models.Statements.Conditions
 {
     internal class Condition : AbstractCondition
     {
-        private string rule;
+        private string expression;
 
-        public override string If
+        public override string Expression
         {
-            get { return rule; }
+            get { return expression; }
             set
             {
-                if (rule != value)
+                if (expression != value)
                 {
-                    rule = value;
-                    NotifyPropertyChanged("If");
+                    expression = value;
+                    NotifyPropertyChanged("Expression");
                 }
             }
         }

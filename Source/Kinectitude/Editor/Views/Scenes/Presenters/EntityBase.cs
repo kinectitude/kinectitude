@@ -2,6 +2,7 @@
 using Kinectitude.Editor.Models;
 using Kinectitude.Editor.Models.Properties;
 using Kinectitude.Editor.Models.Values;
+using System;
 
 namespace Kinectitude.Editor.Views.Scenes.Presenters
 {
@@ -122,6 +123,21 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
             if (null != property)
             {
                 result = property.GetStringValue();
+            }
+
+            return result;
+        }
+
+        protected TEnum GetEnumValue<TComponent, TEnum>(string propertyName)
+            where TComponent : Kinectitude.Core.Base.Component
+            where TEnum : struct, IConvertible
+        {
+            TEnum result = default(TEnum);
+
+            var property = GetProperty<TComponent>(propertyName);
+            if (null != property)
+            {
+                result = property.GetEnumValue<TEnum>();
             }
 
             return result;

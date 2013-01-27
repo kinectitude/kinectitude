@@ -56,7 +56,7 @@ namespace Kinectitude.Editor.Models.Statements.Actions
 
         public void SetProperty(string name, Value value)
         {
-            if (IsLocal)
+            if (IsEditable)
             {
                 AbstractProperty property = GetProperty(name);
                 if (null != property)
@@ -92,7 +92,7 @@ namespace Kinectitude.Editor.Models.Statements.Actions
             return copy;
         }
 
-        public sealed override AbstractStatement CreateInheritor()
+        public sealed override AbstractStatement CreateReadOnly()
         {
             return new ReadOnlyAction(this);
         }

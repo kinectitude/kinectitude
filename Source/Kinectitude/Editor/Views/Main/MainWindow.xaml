@@ -243,7 +243,7 @@
                                                             <ColumnDefinition Width="0.5*" />
                                                             <ColumnDefinition Width="*" />
                                                         </Grid.ColumnDefinitions>
-                                                        <TextBox IsEnabled="{Binding IsLocal}" Text="{Binding Name}" Grid.Column="0" Margin="0,0,2,0" />
+                                                        <TextBox IsEnabled="{Binding IsEditable}" Text="{Binding Name}" Grid.Column="0" Margin="0,0,2,0" />
                                                         <Properties:PropertyView DataContext="{Binding}" Grid.Column="1" />
                                                     </Grid>
                                                 </Border>
@@ -300,7 +300,7 @@
                                                             <ColumnDefinition Width="*" />
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Text="{Binding Name}" Grid.Column="0" />
-                                                        <Properties:PropertyView IsEnabled="{Binding IsLocal}" DataContext="{Binding TypedValue}" Grid.Column="1" />
+                                                        <Properties:PropertyView DataContext="{Binding}" Grid.Column="1" />
                                                     </Grid>
                                                 </Border>
                                             </DataTemplate>

@@ -5,10 +5,10 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
 {
     internal sealed class ShapeEntityVisual : EntityVisual
     {
-        public string Shape
+        public RenderComponent.ShapeType Shape
         {
-            get { return GetStringValue<RenderComponent>("Shape"); }
-            set { SetValue<RenderComponent, string>("Shape", value); }
+            get { return GetEnumValue<RenderComponent, RenderComponent.ShapeType>("Shape"); }
+            set { SetValue<RenderComponent, RenderComponent.ShapeType>("Shape", value); }
         }
 
         public string FillColor
@@ -32,7 +32,11 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
         [DependsOn("Shape")]
         public bool IsElliptical
         {
-            get { return GetStringValue<RenderComponent>("Shape") == "Ellipse"; }
+            get
+            {
+                return GetEnumValue<RenderComponent, RenderComponent.ShapeType>("Shape") ==
+                    Kinectitude.Render.RenderComponent.ShapeType.Ellipse;
+            }
         }
 
         [DependsOn("IsElliptical")]

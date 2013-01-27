@@ -18,11 +18,10 @@ namespace Kinectitude.Editor.Storage.Kgl
 {
     internal sealed class KglGameVisitor : IGameVisitor
     {
-        
         private static readonly Func<AbstractProperty, bool> validProperties = (property => property.HasOwnValue);
         private static readonly Func<GameModel, bool> allValid = (model => true);
         private static readonly Func<Component, bool> validComponent = (component => component.IsRoot || component.HasOwnValues);
-        private static readonly Func<AbstractEvent, bool> validEvt = (evt => evt.IsLocal);
+        private static readonly Func<AbstractEvent, bool> validEvt = (evt => evt.IsEditable);
 
         private int numTabs = 0;
         private string result;
@@ -95,10 +94,15 @@ namespace Kinectitude.Editor.Storage.Kgl
         {
             string tabStr = tabs();
             StringBuilder conditionBuilder = new StringBuilder(tabStr)
-                .Append("if(").Append(condition.If).Append(')').Append(openDef());
+                .Append("if(").Append(condition.Expression).Append(')').Append(openDef());
             conditionBuilder.Append(visitMembers<AbstractStatement>(condition.Statements, "\n", allValid));
             conditionBuilder.Append(closeDef());
             result = conditionBuilder.ToString();
+        }
+
+        public void Visit(ConditionGroup group)
+        {
+            // TODO: implement this
         }
 
         public void Visit(Define define)
@@ -167,6 +171,11 @@ namespace Kinectitude.Editor.Storage.Kgl
         }
 
         public void Visit(ReadOnlyCondition condition)
+        {
+            result = "";
+        }
+
+        public void Visit(ReadOnlyConditionGroup group)
         {
             result = "";
         }

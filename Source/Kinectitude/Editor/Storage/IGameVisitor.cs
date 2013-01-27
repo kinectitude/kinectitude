@@ -18,6 +18,7 @@ namespace Kinectitude.Editor.Storage
         void Visit(Attribute attribute);
         void Visit(Component component);
         void Visit(Condition condition);
+        void Visit(ConditionGroup group);
         void Visit(Define define);
         void Visit(Entity entity);
         void Visit(Event evt);
@@ -26,6 +27,7 @@ namespace Kinectitude.Editor.Storage
         void Visit(ReadOnlyAction action);
         void Visit(ReadOnlyAssignment assignment);
         void Visit(ReadOnlyCondition condition);
+        void Visit(ReadOnlyConditionGroup group);
         void Visit(ReadOnlyEvent evt);
         void Visit(ReadOnlyForLoop loop);
         void Visit(ReadOnlyProperty property);

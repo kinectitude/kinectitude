@@ -79,5 +79,48 @@ namespace Kinectitude.Editor.Models.Values
         {
             // TODO: Tell ThisDataContainer to update if needed
         }
+
+        public double GetDoubleValue()
+        {
+            return Reader.GetDoubleValue();
+        }
+
+        public float GetFloatValue()
+        {
+            return Reader.GetFloatValue();
+        }
+
+        public int GetIntValue()
+        {
+            return Reader.GetIntValue();
+        }
+
+        public long GetLongValue()
+        {
+            return Reader.GetLongValue();
+        }
+
+        public bool GetBoolValue()
+        {
+            return Reader.GetBoolValue();
+        }
+
+        public string GetStringValue()
+        {
+            return Reader.GetStrValue();
+        }
+
+        public T GetEnumValue<T>() where T : struct, IConvertible
+        {
+            var result = default(T);
+
+            var str = GetStringValue();
+            if (!string.IsNullOrEmpty(str))
+            {
+                Enum.TryParse<T>(str, out result);
+            }
+
+            return result;
+        }
     }
 }

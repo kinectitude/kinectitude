@@ -248,7 +248,7 @@ namespace Kinectitude.Editor.Models
 
             entityPresets.Add(textEntity);
 
-            Statements.Add(new StatementFactory("Condition", StatementType.Condition, () => new Condition()));
+            Statements.Add(new StatementFactory("If", StatementType.ConditionGroup, () => new ConditionGroup()));
             Statements.Add(new StatementFactory("While Loop", StatementType.WhileLoop, () => new WhileLoop()));
             Statements.Add(new StatementFactory("For Loop", StatementType.ForLoop, () => new ForLoop()));
             Statements.Add(new StatementFactory("Assign a Value", StatementType.Assignment, () => new Assignment()));
