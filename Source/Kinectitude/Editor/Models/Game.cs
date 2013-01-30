@@ -7,6 +7,7 @@ using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Transactions;
 using Kinectitude.Editor.Models.Values;
 using Kinectitude.Editor.Storage;
+using Kinectitude.Editor.Views.Dialogs;
 using Kinectitude.Editor.Views.Utils;
 using System;
 using System.Collections.Generic;
@@ -160,7 +161,7 @@ namespace Kinectitude.Editor.Models
 
             RenameCommand = new DelegateCommand(null, (parameter) =>
             {
-                DialogService.ShowDialog(DialogService.Constants.NameDialog, this);
+                DialogService.ShowDialog<NameDialog>(this);
             });
 
             AddPrototypeCommand = new DelegateCommand(null, (parameter) =>
@@ -168,7 +169,7 @@ namespace Kinectitude.Editor.Models
                 Entity prototype = CreatePrototype();
                 EntityTransaction transaction = new EntityTransaction(Prototypes, prototype);
                     
-                DialogService.ShowDialog(DialogService.Constants.EntityDialog, transaction, (result) =>
+                DialogService.ShowDialog<EntityDialog>(transaction, (result) =>
                 {
                     if (result == true)
                     {
@@ -181,7 +182,7 @@ namespace Kinectitude.Editor.Models
             {
                 Scene scene = CreateScene();
 
-                DialogService.ShowDialog(DialogService.Constants.NameDialog, new SceneTransaction(scene), (result) =>
+                DialogService.ShowDialog<NameDialog>(new SceneTransaction(scene), (result) =>
                 {
                     if (result == true)
                     {

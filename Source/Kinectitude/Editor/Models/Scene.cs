@@ -7,6 +7,7 @@ using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Transactions;
 using Kinectitude.Editor.Models.Values;
 using Kinectitude.Editor.Storage;
+using Kinectitude.Editor.Views.Dialogs;
 using Kinectitude.Editor.Views.Scenes.Presenters;
 using Kinectitude.Editor.Views.Utils;
 using System;
@@ -82,7 +83,7 @@ namespace Kinectitude.Editor.Models
 
             RenameCommand = new DelegateCommand(null, (parameter) =>
             {
-                DialogService.ShowDialog(DialogService.Constants.NameDialog, new SceneTransaction(this));
+                DialogService.ShowDialog<NameDialog>(new SceneTransaction(this));
             });
 
             AddAttributeCommand = new DelegateCommand(null, (parameter) =>
@@ -115,7 +116,7 @@ namespace Kinectitude.Editor.Models
 
             PropertiesCommand = new DelegateCommand(null, (parameter) =>
             {
-                DialogService.ShowDialog(DialogService.Constants.SceneDialog, new SceneTransaction(this));
+                DialogService.ShowDialog<SceneDialog>(new SceneTransaction(this));
             });
 
             CutCommand = new DelegateCommand(null, (parameter) =>

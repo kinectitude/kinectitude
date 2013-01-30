@@ -10,6 +10,7 @@ using Kinectitude.Editor.Models.Statements.Loops;
 using Kinectitude.Editor.Models.Values;
 using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.Storage.Kgl;
+using Kinectitude.Editor.Views.Main;
 using Kinectitude.Editor.Views.Utils;
 using Kinectitude.Render;
 using System;
@@ -18,14 +19,16 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Windows;
 using System.Windows.Input;
 using Action = Kinectitude.Editor.Models.Statements.Actions.Action;
+using Condition = Kinectitude.Editor.Models.Statements.Conditions.Condition;
 
 namespace Kinectitude.Editor.Models
 {
     internal sealed class Workspace : BaseModel
     {
-        public static IValueMaker ValueMaker = new KGLValueMaker();
+        public static IValueMaker ValueMaker = new KglValueMaker();
 
         private const string PluginDirectory = "Plugins";
 
@@ -38,8 +41,6 @@ namespace Kinectitude.Editor.Models
 
         private readonly Lazy<CommandHistory> commandHistory;
         private readonly List<Entity> entityPresets;
-        private BaseModel activeItem;
-        private BaseModel inspectorItem;
         private object clippedItem;
         private Project project;
 
@@ -52,37 +53,6 @@ namespace Kinectitude.Editor.Models
                 {
                     project = value;
                     NotifyPropertyChanged("Project");
-                }
-            }
-        }
-
-        public BaseModel ActiveItem
-        {
-            get { return activeItem; }
-            set
-            {
-                if (activeItem != value)
-                {
-                    activeItem = value;
-                    NotifyPropertyChanged("ActiveItem");
-                }
-            }
-        }
-
-        public BaseModel InspectorItem
-        {
-            get { return inspectorItem; }
-            set
-            {
-                if (null == value)
-                {
-                    value = ActiveItem;
-                }
-
-                if (inspectorItem != value)
-                {
-                    inspectorItem = value;
-                    NotifyPropertyChanged("InspectorItem");
                 }
             }
         }
@@ -110,7 +80,6 @@ namespace Kinectitude.Editor.Models
             get { return entityPresets; }
         }
 
-        public ObservableCollection<BaseModel> OpenItems { get; private set; }
         public ObservableCollection<Plugin> Plugins { get; private set; }
         public ObservableCollection<Plugin> Managers { get; private set; }
         public ObservableCollection<Plugin> Components { get; private set; }
@@ -122,13 +91,10 @@ namespace Kinectitude.Editor.Models
         public ICommand LoadProjectCommand { get; private set; }
         public ICommand SaveProjectCommand { get; private set; }
         public ICommand SaveProjectAsCommand { get; private set; }
-        public ICommand OpenItemCommand { get; private set; }
-        public ICommand InspectItemCommand { get; private set; }
-        public ICommand CloseItemCommand { get; private set; }
-        
+        public ICommand ExitCommand { get; private set; }
+
         public Workspace()
         {
-            OpenItems = new ObservableCollection<BaseModel>();
             Plugins = new ObservableCollection<Plugin>();
 
             Managers = new FilteredObservableCollection<Plugin>(Plugins, (plugin) => plugin.Type == PluginType.Manager);
@@ -141,7 +107,24 @@ namespace Kinectitude.Editor.Models
 
             commandHistory = new Lazy<CommandHistory>();
 
-            NewProjectCommand = new DelegateCommand(null, (parameter) => NewProject());
+            NewProjectCommand = new DelegateCommand(null, (parameter) =>
+            {
+                Game game = new Game("Untitled Game") { Width = 800, Height = 600 };
+                game.AddScene(new Scene("Scene 1"));
+
+                //Project project = new Project() { GameRoot = "Data/" };
+                Project project = new Project();
+                project.Game = game;
+
+                DialogService.ShowDialog<ProjectDialog>(project, (result) =>
+                {
+                    if (result == true)
+                    {
+                        ProjectStorage.CreateProject(project);
+                        Project = project;
+                    }
+                });
+            });
 
             LoadProjectCommand = new DelegateCommand(null, (parameter) =>
             {
@@ -156,20 +139,20 @@ namespace Kinectitude.Editor.Models
 
             SaveProjectCommand = new DelegateCommand(null, (parameter) =>
             {
-                if (null == Project.File)
+                if (null == Project.Title)
                 {
                     DialogService.ShowSaveDialog(
                         (result, fileName) =>
                         {
                             if (result == true)
                             {
-                                Project.File = fileName;
+                                Project.Title = fileName;
                             }
                         }
                     );
                 }
 
-                if (null != Project.File)
+                if (null != Project.Title)
                 {
                     SaveProject();
                 }
@@ -182,18 +165,14 @@ namespace Kinectitude.Editor.Models
                     {
                         if (result == true)
                         {
-                            Project.File = fileName;
+                            Project.Title = fileName;
                             SaveProject();
                         }
                     }
                 );
             });
 
-            OpenItemCommand = new DelegateCommand(null, (parameter) => OpenItem(parameter as BaseModel));
-
-            InspectItemCommand = new DelegateCommand(null, (parameter) => InspectorItem = parameter as BaseModel);
-
-            CloseItemCommand = new DelegateCommand(null, (parameter) => CloseItem(parameter as BaseModel));
+            ExitCommand = new DelegateCommand(null, (parameter) => Exit());
 
             Assembly core = typeof(Kinectitude.Core.Base.Component).Assembly;
             RegisterPlugins(core);
@@ -255,15 +234,9 @@ namespace Kinectitude.Editor.Models
             Statements.Add(new StatementFactory("Assign a Value", StatementType.Assignment, () => new Assignment()));
         }
 
-        public void NewProject()
+        public void Exit()
         {
-            Game game = new Game("Untitled Game") { Width = 800, Height = 600 };
-            game.AddScene(new Scene("Scene 1"));
-
-            Project project = new Project() { GameRoot = "Data/" };
-            project.Game = game;
-
-            Project = project;
+            Application.Current.Shutdown();
         }
 
         public void LoadProject(string fileName)
@@ -274,27 +247,6 @@ namespace Kinectitude.Editor.Models
         public void SaveProject()
         {
             ProjectStorage.SaveProject(Project);
-        }
-
-        public void OpenItem(BaseModel item)
-        {
-            if (!OpenItems.Contains(item))
-            {
-                OpenItems.Add(item);
-            }
-
-            InspectorItem = item;
-            ActiveItem = item;
-        }
-
-        public void CloseItem(BaseModel item)
-        {
-            OpenItems.Remove(item);
-
-            if (ActiveItem == item)
-            {
-                ActiveItem = OpenItems.FirstOrDefault();
-            }
         }
 
         private void RegisterPlugins(Assembly assembly)

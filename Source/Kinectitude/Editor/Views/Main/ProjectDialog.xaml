@@ -1,0 +1,46 @@
+﻿<Window x:Class="Kinectitude.Editor.Views.Main.ProjectDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:m="clr-namespace:Kinectitude.Editor.Models"
+        Title="New Project"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize" Width="480" Height="320">
+    
+    <DockPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom" Margin="8,0,8,8">
+            <TextBlock Text="Project location is not empty">
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}">
+                        <Setter Property="Visibility" Value="Hidden" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding LocationIsEmpty}" Value="false">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+            <Button Name="btnCancel" IsCancel="True" Width="100">Cancel</Button>
+            <Button Name="btnOK" IsDefault="True" Click="btnOK_Click" Width="100" Margin="4,0,0,0" Command="{Binding CommitCommand}">OK</Button>
+        </StackPanel>
+        <Grid Margin="8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+                
+            <Label Grid.Row="0" Grid.Column="0">Project Location</Label>
+            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Location}" />
+            <Button Grid.Row="0" Grid.Column="2" Padding="0" Command="{Binding BrowseCommand}">Browse...</Button>
+            <Label Grid.Row="1" Grid.Column="0">Project Name</Label>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Title}" />
+            <TextBlock Grid.Row="2" Grid.ColumnSpan="3" Text="{Binding FileName}" />
+        </Grid>
+    </DockPanel>
+</Window>

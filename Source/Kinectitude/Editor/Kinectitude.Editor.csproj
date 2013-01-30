@@ -119,7 +119,7 @@
     <Compile Include="Models\Data\ValueReaders\SceneValueReader.cs" />
     <Compile Include="Models\Data\ValueReaders\ThisEntityValueReader.cs" />
     <Compile Include="Storage\IValueMaker.cs" />
-    <Compile Include="Storage\Kgl\KGLValueMaker.cs" />
+    <Compile Include="Storage\Kgl\KglValueMaker.cs" />
     <Compile Include="Models\Statements\Conditions\ReadOnlyConditionGroup.cs" />
     <Compile Include="Views\Behaviors\DragAdorner.cs" />
     <Compile Include="Base\DelegateCommand.cs" />
@@ -175,6 +175,9 @@
     <Compile Include="Models\Define.cs" />
     <Compile Include="Views\Main\Inspector.xaml.cs">
       <DependentUpon>Inspector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Main\ProjectDialog.xaml.cs">
+      <DependentUpon>ProjectDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Scenes\Presenters\DefaultEntityVisual.cs" />
     <Compile Include="Views\Scenes\Presenters\ShapeEntityVisual.cs" />
@@ -263,6 +266,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Main\Inspector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Main\ProjectDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

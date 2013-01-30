@@ -93,7 +93,8 @@
                 <ColumnDefinition Width="300" />
             </Grid.ColumnDefinitions>
 
-            <TabControl Grid.Column="0"
+            <TabControl DataContext="{Binding Project}"
+                        Grid.Column="0"
                         ItemsSource="{Binding OpenItems}"
                         Name="tabItems"
                         SelectedItem="{Binding ActiveItem}"
@@ -146,7 +147,7 @@
                                     </HierarchicalDataTemplate.ItemsSource>
                                     <StackPanel Orientation="Horizontal">
                                         <StackPanel.InputBindings>
-                                            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=OpenItemCommand, Mode=OneWay}" CommandParameter="{Binding}" />
+                                            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.OpenItemCommand, Mode=OneWay}" CommandParameter="{Binding}" />
                                         </StackPanel.InputBindings>
                                         <Image Source="{StaticResource icoGame}" />
                                         <TextBlock Text="{Binding Name}" FontWeight="Bold" Padding="3" />
@@ -168,7 +169,7 @@
                                 <HierarchicalDataTemplate DataType="{x:Type m:Scene}" ItemsSource="{Binding Entities}">
                                     <StackPanel Orientation="Horizontal">
                                         <StackPanel.InputBindings>
-                                            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=OpenItemCommand, Mode=OneWay}" CommandParameter="{Binding}" />
+                                            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.OpenItemCommand, Mode=OneWay}" CommandParameter="{Binding}" />
                                         </StackPanel.InputBindings>
                                         <Image Source="{StaticResource icoScene}" />
                                         <TextBlock Text="{Binding Name}" Padding="3" />
@@ -186,7 +187,7 @@
                                 <DataTemplate DataType="{x:Type m:Entity}">
                                     <StackPanel Orientation="Horizontal">
                                         <StackPanel.InputBindings>
-                                            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=OpenItemCommand, Mode=OneWay}" CommandParameter="{Binding}" />
+                                            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.OpenItemCommand, Mode=OneWay}" CommandParameter="{Binding}" />
                                         </StackPanel.InputBindings>
                                         <Image Source="{StaticResource icoEntity}" />
                                         <TextBlock Text="{Binding DisplayName}" Padding="3" />
@@ -212,7 +213,7 @@
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="SelectedItemChanged">
                                     <i:EventTrigger.Actions>
-                                        <i:InvokeCommandAction Command="{Binding Source={x:Static m:Workspace.Instance}, Path=InspectItemCommand, Mode=OneWay}"
+                                        <i:InvokeCommandAction Command="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.InspectItemCommand, Mode=OneWay}"
                                                                CommandParameter="{Binding ElementName=treGame, Path=SelectedItem}" />
                                     </i:EventTrigger.Actions>
                                 </i:EventTrigger>
@@ -224,7 +225,7 @@
 
                 <GridSplitter Height="4" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" Style="{StaticResource gridSplitter}" />
 
-                <DockPanel x:Name="dockDetails" Grid.Row="2" DataContext="{Binding InspectorItem, Mode=OneWay}">
+                <DockPanel x:Name="dockDetails" Grid.Row="2" DataContext="{Binding Project.InspectorItem, Mode=OneWay}">
                     <DockPanel.Resources>
                         <CompositeCollection x:Key="detailsCollection">
                             <Expander IsExpanded="True">

@@ -9,6 +9,7 @@ using Kinectitude.Editor.Models.Statements.Events;
 using Kinectitude.Editor.Models.Transactions;
 using Kinectitude.Editor.Models.Values;
 using Kinectitude.Editor.Storage;
+using Kinectitude.Editor.Views.Dialogs;
 using Kinectitude.Editor.Views.Utils;
 using System;
 using System.Collections.Generic;
@@ -107,12 +108,12 @@ namespace Kinectitude.Editor.Models
 
             RenameCommand = new DelegateCommand(null, (parameter) =>
             {
-                DialogService.ShowDialog(DialogService.Constants.NameDialog, new EntityRenameTransaction(this));
+                DialogService.ShowDialog<NameDialog>(new EntityRenameTransaction(this));
             });
 
             PropertiesCommand = new DelegateCommand(null, (parameter) =>
             {
-                DialogService.ShowDialog(DialogService.Constants.EntityDialog, new EntityTransaction(Scope.Prototypes, this));
+                DialogService.ShowDialog<EntityDialog>(new EntityTransaction(Scope.Prototypes, this));
             });
 
             AddAttributeCommand = new DelegateCommand(null, (parameter) =>

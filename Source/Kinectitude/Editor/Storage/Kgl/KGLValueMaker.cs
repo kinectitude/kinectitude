@@ -9,9 +9,9 @@ using System.Text;
 
 namespace Kinectitude.Editor.Storage.Kgl
 {
-    internal sealed class KGLValueMaker : KGLBase, IValueMaker
+    internal sealed class KglValueMaker : KGLBase, IValueMaker
     {
-        public KGLValueMaker()
+        public KglValueMaker()
         {
             grammar.Root = grammar.Expr;
         }
