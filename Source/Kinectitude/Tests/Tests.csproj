@@ -76,6 +76,7 @@
     <Compile Include="Editor\EntityTests.cs" />
     <Compile Include="Editor\EventTests.cs" />
     <Compile Include="Editor\GameTests.cs" />
+    <Compile Include="Editor\LoadSave.cs" />
     <Compile Include="Editor\PropertyTests.cs" />
     <Compile Include="Editor\SceneTests.cs" />
     <Compile Include="Editor\DataTests.cs" />
@@ -90,6 +91,10 @@
     <ProjectReference Include="..\Editor\Kinectitude.Editor.csproj">
       <Project>{541AF93B-398E-463E-9C11-BC957BE0DB19}</Project>
       <Name>Kinectitude.Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Physics\Kinectitude.Physics.csproj">
+      <Project>{6b0352b2-eecb-4810-bedc-b80c4417ab1b}</Project>
+      <Name>Kinectitude.Physics</Name>
     </ProjectReference>
     <ProjectReference Include="..\Render\Kinectitude.Render.csproj">
       <Project>{E6DD6F76-999C-4B56-887C-347FAF50DAB3}</Project>
@@ -150,6 +155,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Core\inheritence.kgl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Editor\original.kgl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Editor\read.kgl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="signature.snk" />

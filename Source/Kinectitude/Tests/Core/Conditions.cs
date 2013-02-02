@@ -8,6 +8,7 @@ namespace Kinectitude.Tests.Core
     {
         [TestMethod]
         [DeploymentItem("core/conditions.kgl")]
+        [DeploymentItem("core/conditions.kgl")]
         public void conditionTests()
         {
             Setup.StartGame("conditions.kgl");
