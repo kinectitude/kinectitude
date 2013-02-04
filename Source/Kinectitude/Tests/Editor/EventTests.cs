@@ -7,8 +7,6 @@ using Kinectitude.Editor.Models.Values;
 
 namespace Kinectitude.Editor.Tests
 {
-    //TODO FIX
-    /*
     [TestClass]
     public class EventTests
     {
@@ -26,7 +24,7 @@ namespace Kinectitude.Editor.Tests
             entity.AddEvent(evt);
 
             Assert.IsTrue(collectionChanged);
-            Assert.IsTrue(evt.IsLocal);
+            Assert.IsTrue(evt.IsEditable);
             Assert.AreEqual(1, entity.Events.Count);
         }
 
@@ -93,8 +91,8 @@ namespace Kinectitude.Editor.Tests
             parent.AddEvent(parentEvent);
 
             Assert.IsTrue(collectionChanged);
-            Assert.AreEqual(1, parent.Events.Count(x => x.IsLocal));
-            Assert.AreEqual(1, child.Events.Count(x => x.IsInherited));
+            Assert.AreEqual(1, parent.Events.Count(x => x.IsEditable));
+            Assert.AreEqual(1, child.Events.Count(x => x.IsReadOnly));
         }
 
         [TestMethod]
@@ -115,9 +113,9 @@ namespace Kinectitude.Editor.Tests
             otherParent.AddEvent(new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType)));
 
             Assert.AreEqual(2, eventsFired);
-            Assert.AreEqual(1, parent.Events.Count(x => x.IsLocal));
-            Assert.AreEqual(1, otherParent.Events.Count(x => x.IsLocal));
-            Assert.AreEqual(2, child.Events.Count(x => x.IsInherited));
+            Assert.AreEqual(1, parent.Events.Count(x => x.IsEditable));
+            Assert.AreEqual(1, otherParent.Events.Count(x => x.IsEditable));
+            Assert.AreEqual(2, child.Events.Count(x => x.IsReadOnly));
         }
 
         [TestMethod]
@@ -179,8 +177,8 @@ namespace Kinectitude.Editor.Tests
             child.AddPrototype(parent);
 
             Assert.IsTrue(collectionChanged);
-            Assert.AreEqual(1, parent.Events.Count(x => x.IsLocal));
-            Assert.AreEqual(1, child.Events.Count(x => x.IsInherited));
+            Assert.AreEqual(1, parent.Events.Count(x => x.IsEditable));
+            Assert.AreEqual(1, child.Events.Count(x => x.IsReadOnly));
         }
 
         [TestMethod]
@@ -223,5 +221,5 @@ namespace Kinectitude.Editor.Tests
             Assert.IsFalse(collectionChanged);
             Assert.AreEqual(1, child.Events.Count);
         }
-    }*/
+    }
 }
