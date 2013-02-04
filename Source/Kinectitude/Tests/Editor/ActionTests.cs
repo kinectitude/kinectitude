@@ -12,8 +12,6 @@ using Kinectitude.Editor.Models.Values;
 
 namespace Kinectitude.Editor.Tests
 {
-    //TODO FIX
-    /*
     [TestClass]
     public class ActionTests
     {
@@ -33,7 +31,7 @@ namespace Kinectitude.Editor.Tests
             evt.AddStatement(action);
 
             Assert.AreEqual(1, eventsRaised);
-            Assert.IsTrue(action.IsLocal);
+            Assert.IsTrue(action.IsEditable);
             Assert.AreEqual(1, evt.Statements.Count);
         }
 
@@ -201,5 +199,5 @@ namespace Kinectitude.Editor.Tests
 
             Assert.AreEqual(1, childEvent.Statements.Count);
         }
-    }*/
+    }
 }

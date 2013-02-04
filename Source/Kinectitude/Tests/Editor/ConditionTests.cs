@@ -9,8 +9,6 @@ using Kinectitude.Editor.Models.Statements.Base;
 
 namespace Kinectitude.Editor.Tests
 {
-    //TODO FIX
-    /*
     [TestClass]
     public class ConditionTests
     {
@@ -18,35 +16,68 @@ namespace Kinectitude.Editor.Tests
         private static readonly string FireTriggerActionType = typeof(Kinectitude.Core.Actions.FireTriggerAction).FullName;
 
         [TestMethod]
-        public void AddCondition()
+        public void AddConditionGroup()
         {
             bool collectionChanged = false;
 
             Event evt = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
             evt.Statements.CollectionChanged += (o, e) => collectionChanged = true;
 
-            Condition condition = new Condition() { If = "test > 1" };
-            evt.AddStatement(condition);
+            ConditionGroup group = new ConditionGroup();
+            evt.AddStatement(group);
 
             Assert.IsTrue(collectionChanged);
-            Assert.AreEqual("test > 1", condition.If);
             Assert.AreEqual(1, evt.Statements.Count);
+            Assert.IsNotNull(group.If);
+            Assert.IsNull(group.Else);
         }
 
         [TestMethod]
-        public void RemoveCondition()
+        public void RemoveConditionGroup()
         {
             int eventsFired = 0;
 
             Event evt = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
             evt.Statements.CollectionChanged += (o, e) => eventsFired++;
 
-            Condition condition = new Condition() { If = "test > 1" };
-            evt.AddStatement(condition);
-            evt.RemoveStatement(condition);
+            ConditionGroup group = new ConditionGroup();
+            evt.AddStatement(group);
+            evt.RemoveStatement(group);
 
             Assert.AreEqual(2, eventsFired);
             Assert.AreEqual(0, evt.Statements.Count);
+        }
+
+        [TestMethod]
+        public void AddElseIfCondition()
+        {
+            bool collectionChanged = false;
+
+            ConditionGroup group = new ConditionGroup();
+            group.Statements.CollectionChanged += (o, e) => collectionChanged = true;
+
+            Condition condition = new Condition() { Expression = "test > 1" };
+            group.AddStatement(condition);
+
+            Assert.IsTrue(collectionChanged);
+            Assert.AreEqual("test > 1", condition.Expression);
+            Assert.AreEqual(1, group.Statements.Count);
+        }
+
+        [TestMethod]
+        public void RemoveElseIfCondition()
+        {
+            int eventsFired = 0;
+
+            ConditionGroup group = new ConditionGroup();
+            group.Statements.CollectionChanged += (o, e) => eventsFired++;
+
+            Condition condition = new Condition() { Expression = "test > 1" };
+            group.AddStatement(condition);
+            group.RemoveStatement(condition);
+
+            Assert.AreEqual(2, eventsFired);
+            Assert.AreEqual(0, group.Statements.Count);
         }
 
         [TestMethod]
@@ -54,7 +85,7 @@ namespace Kinectitude.Editor.Tests
         {
             bool collectionChanged = false;
 
-            Condition condition = new Condition() { If = "test > 1" };
+            Condition condition = new Condition() { Expression = "test > 1" };
             condition.Statements.CollectionChanged += (o, e) => collectionChanged = true;
 
             Action action = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
@@ -69,7 +100,7 @@ namespace Kinectitude.Editor.Tests
         {
             int eventsFired = 0;
 
-            Condition condition = new Condition() { If = "test > 1" };
+            Condition condition = new Condition() { Expression = "test > 1" };
             condition.Statements.CollectionChanged += (o, e) => eventsFired++;
 
             Action action = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
@@ -81,25 +112,46 @@ namespace Kinectitude.Editor.Tests
         }
 
         [TestMethod]
-        public void AddReadOnlyCondition()
+        public void AddReadOnlyConditionGroup()
         {
             Event parentEvent = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
             ReadOnlyEvent childEvent = new ReadOnlyEvent(parentEvent);
 
-            parentEvent.AddStatement(new Condition() { If = "test > 1" });
+            parentEvent.AddStatement(new ConditionGroup());
 
             Assert.AreEqual(1, childEvent.Statements.Count);
 
-            ReadOnlyCondition childCondition = childEvent.Statements.OfType<ReadOnlyCondition>().Single();
+            ReadOnlyConditionGroup childGroup = childEvent.Statements.OfType<ReadOnlyConditionGroup>().Single();
 
-            Assert.IsNotNull(childCondition);
-            Assert.AreEqual("test > 1", childCondition.If);
+            Assert.IsNotNull(childGroup);
         }
 
         [TestMethod]
-        public void AddInheritedAction()
+        public void AddReadOnlyElseIfCondition()
         {
-            Condition parentCondition = new Condition() { If = "test > 1" };
+            Event parentEvent = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
+            ReadOnlyEvent childEvent = new ReadOnlyEvent(parentEvent);
+
+            ConditionGroup parentGroup = new ConditionGroup();
+            parentEvent.AddStatement(parentGroup);
+
+            parentGroup.AddStatement(new Condition() { Expression = "test > 1" });
+
+            Assert.AreEqual(1, childEvent.Statements.Count);
+
+            ReadOnlyConditionGroup childGroup = childEvent.Statements.OfType<ReadOnlyConditionGroup>().Single();
+
+            Assert.IsNotNull(childGroup);
+
+            ReadOnlyCondition childCondition = childGroup.Statements.OfType<ReadOnlyCondition>().Single();
+
+            Assert.AreEqual("test > 1", childCondition.Expression);
+        }
+
+        [TestMethod]
+        public void AddReadOnlyAction()
+        {
+            Condition parentCondition = new Condition() { Expression = "test > 1" };
             ReadOnlyCondition childCondition = new ReadOnlyCondition(parentCondition);
 
             parentCondition.AddStatement(new Action(Workspace.Instance.GetPlugin(FireTriggerActionType)));
@@ -108,9 +160,9 @@ namespace Kinectitude.Editor.Tests
         }
 
         [TestMethod]
-        public void RemoveInheritedAction()
+        public void RemoveReadOnlyAction()
         {
-            Condition parentCondition = new Condition() { If = "test > 1" };
+            Condition parentCondition = new Condition() { Expression = "test > 1" };
             ReadOnlyCondition childCondition = new ReadOnlyCondition(parentCondition);
 
             Action parentAction = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
@@ -123,7 +175,7 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void CannotRemoveInheritedActionFromInheritingCondition()
         {
-            Condition parentCondition = new Condition() { If = "test > 1" };
+            Condition parentCondition = new Condition() { Expression = "test > 1" };
             ReadOnlyCondition childCondition = new ReadOnlyCondition(parentCondition);
 
             Action parentAction = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
@@ -140,17 +192,17 @@ namespace Kinectitude.Editor.Tests
         {
             bool propertyChanged = false;
 
-            Condition parentCondition = new Condition() { If = "test > 1" };
+            Condition parentCondition = new Condition() { Expression = "test > 1" };
             
             ReadOnlyCondition childCondition = new ReadOnlyCondition(parentCondition);
-            childCondition.PropertyChanged += (o, e) => propertyChanged = (e.PropertyName == "If");
+            childCondition.PropertyChanged += (o, e) => propertyChanged = (e.PropertyName == "Expression");
 
-            Assert.AreEqual("test > 1", childCondition.If);
+            Assert.AreEqual("test > 1", childCondition.Expression);
 
-            parentCondition.If = "test <= 1";
+            parentCondition.Expression = "test <= 1";
 
             Assert.IsTrue(propertyChanged);
-            Assert.AreEqual("test <= 1", childCondition.If);
+            Assert.AreEqual("test <= 1", childCondition.Expression);
         }
-    }*/
+    }
 }
