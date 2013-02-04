@@ -86,15 +86,13 @@ namespace Kinectitude.Editor.Storage.Kgl
         public void Visit(Component component)
         {
             //Three tabs, game, scene, entity then component
-            result = new StringBuilder("\t\t\tComponent ")
+            result = new StringBuilder(tabs()).Append("Component ")
                 .Append(component.Type).Append(properties<Property>(component.Properties)).ToString();
         }
 
         public void Visit(Condition condition)
         {
-            string tabStr = tabs();
-            StringBuilder conditionBuilder = new StringBuilder(tabStr)
-                .Append("if(").Append(condition.Expression).Append(')').Append(openDef());
+            StringBuilder conditionBuilder = new StringBuilder(openDef());
             conditionBuilder.Append(visitMembers<AbstractStatement>(condition.Statements, "\n", allValid));
             conditionBuilder.Append(closeDef());
             result = conditionBuilder.ToString();
@@ -102,19 +100,33 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         public void Visit(ConditionGroup group)
         {
-            // TODO: implement this
+            string tabStr = tabs();
+            StringBuilder stmt = new StringBuilder(tabStr).Append("if(").Append(group.If.Expression).Append(')');
+            foreach (var elseif in group.Statements)
+            {
+                stmt.Append(tabStr).Append("else if(").Append(group.If.Expression).Append(')');
+                elseif.Accept(this);
+                stmt.Append(result);
+            }
+            if (group.Else != null)
+            {
+                stmt.Append(tabStr).Append("else");
+                group.Else.Accept(this);
+                stmt.Append(result);
+            }
+            result = stmt.ToString();
         }
 
         public void Visit(Define define)
         {
             //Tab from using
-            result = "\tdefine " + define.Name + " as " + define.Class;
+            result = "    define " + define.Name + " as " + define.Class;
         }
 
         public void Visit(Entity entity)
         {
             //tab from game and scene for entity and game for prototype.
-            string tabstr = entity.IsPrototype ? "\t" : "\t\t";
+            string tabstr = entity.IsPrototype ? "    " : "        ";
             StringBuilder entityBuilder = new StringBuilder(tabstr)
                 .Append(entity.IsPrototype? "Prototype " :  "Entity ").Append(entity.Name ?? "");
 
@@ -135,9 +147,9 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         public void Visit(Event evt)
         {
-            result = new StringBuilder("\t\t\tEvent ").Append(evt.Type)
+            result = new StringBuilder("            Event ").Append(evt.Type)
                 .Append(properties<AbstractProperty>(evt.Properties)).Append(openDef())
-                .Append(visitMembers<AbstractStatement>(evt.Statements, "\n", allValid)).Append("\t\t\t").Append(closeDef()).ToString();
+                .Append(visitMembers<AbstractStatement>(evt.Statements, "\n", allValid)).Append("            ").Append(closeDef()).ToString();
         }
 
         public void Visit(ForLoop loop)
@@ -203,7 +215,7 @@ namespace Kinectitude.Editor.Storage.Kgl
         public void Visit(Manager manager)
         {
             //Tab from scene, game
-            result = new StringBuilder("\t\tManager ")
+            result = new StringBuilder("        Manager ")
                 .Append(manager.Type).Append(properties<Property>(manager.Properties)).ToString();
         }
 
@@ -216,7 +228,7 @@ namespace Kinectitude.Editor.Storage.Kgl
         public void Visit(Scene scene)
         {
             //tab from game
-            StringBuilder sceneBuilder = new StringBuilder("\tScene ").Append(scene.Name).Append(actions(scene.Attributes)).Append(openDef());
+            StringBuilder sceneBuilder = new StringBuilder("    Scene ").Append(scene.Name).Append(actions(scene.Attributes)).Append(openDef());
 
             if (scene.Managers.Count != 0)
                 sceneBuilder.Append(visitMembers<Manager>(scene.Managers, "\n", allValid)).Append('\n');
@@ -227,7 +239,7 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         public void Visit(Service service)
         {
-            result = new StringBuilder("\t\tService ")
+            result = new StringBuilder("        Service ")
                 .Append(service.Type).Append(properties<Property>(service.Properties)).ToString();
         }
 
@@ -235,7 +247,7 @@ namespace Kinectitude.Editor.Storage.Kgl
         {
             if (use.File == null) return;
             result = new StringBuilder("using ").Append(use.File).Append(openDef())
-                .Append(visitMembers<Define>(use.Defines, "\n", allValid)).Append(closeDef()).ToString();
+                .Append(visitMembers<Define>(use.Defines, "\n", allValid)).Append(closeDef()).Append("\n").ToString();
         }
 
         public void Visit(Value val)
@@ -282,8 +294,10 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         private string openDef()
         {
+            
+            string ret = "\n" + tabs() + "{\n";
             numTabs++;
-            return "\n" + tabs() + "{\n";
+            return ret;
         }
 
         private string closeDef()

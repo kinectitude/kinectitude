@@ -222,10 +222,17 @@ namespace Kinectitude.Editor.Storage.Kgl
             }
             else if (statementNode.Term == grammar.Condition)
             {
-                Condition cond = new Condition() { Expression = getStrVal(statementNode)};
-                foreach (ParseTreeNode child in grammar.GetOfType(statementNode, grammar.Actions)) createStatement(child, evt, cond);
-                statement = cond;
-                //TODO else
+                ConditionGroup conditionGroup = new ConditionGroup();
+                conditionGroup.If.Expression = getStrVal(statementNode.ChildNodes.First(child => child.Term == grammar.Expr));
+                foreach (ParseTreeNode child in grammar.GetOfType(statementNode, grammar.Actions)) createStatement(child, evt, conditionGroup.If);
+                foreach (ParseTreeNode elseNode in grammar.GetOfType(statementNode, grammar.Else))
+                {
+                    Condition cond = new Condition() { Expression = getStrVal(elseNode.ChildNodes.FirstOrDefault(child => child.Term == grammar.Expr))};
+                    foreach (ParseTreeNode child in grammar.GetOfType(elseNode, grammar.Actions)) createStatement(child, evt, cond);
+                    if (cond.Expression == null) conditionGroup.Else = cond;
+                    else conditionGroup.AddStatement(cond);
+                }
+                statement = conditionGroup;
             }
             else if (statementNode.Term == grammar.Assignment)
             {
@@ -280,7 +287,7 @@ namespace Kinectitude.Editor.Storage.Kgl
                 //TODO value reader when ready
                 evt.SetProperty(property.Item1, new Value(getStrVal(propertyNode)));
             }
-            foreach (ParseTreeNode actionNode in grammar.GetOfType(node, grammar.Actions)) createStatement(node.ChildNodes[2].ChildNodes[0], evt, null);
+            foreach (ParseTreeNode actionNode in grammar.GetOfType(node, grammar.Actions)) createStatement(actionNode, evt, null);
             return evt;
         }
 
@@ -336,6 +343,7 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         private string getStrVal(ParseTreeNode node)
         {
+            if (node == null) return null;
             int pos = node.Span.Location.Position;
             int length = node.Span.Length;
             return src.Substring(pos, length);

@@ -148,7 +148,7 @@
                     <DockPanel LastChildFill="True" Background="White">
                         <Rectangle DockPanel.Dock="Left" Width="16" VerticalAlignment="Stretch" Fill="#C9F76F" />
                         <TextBlock DockPanel.Dock="Left" FontWeight="Bold" Margin="8">If</TextBlock>
-                        <TextBox Text="{Binding If}" MinWidth="125" Margin="0,8,8,8" />
+                        <TextBox Text="{Binding Expression}" MinWidth="125" Margin="0,8,8,8" />
                         <i:Interaction.Behaviors>
                             <b:DragBehavior DragParameter="{Binding}" />
                             <b:DropTargetBehavior DropCommand="{Binding InsertBeforeCommand}" />
