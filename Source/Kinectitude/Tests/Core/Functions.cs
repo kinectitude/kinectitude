@@ -8,7 +8,7 @@ namespace Kinectitude.Tests.Core
     public class Functions
     {   
         [TestMethod]
-        [DeploymentItem("core/functions.kgl")]
+        [DeploymentItem(@"Core\functions.kgl")]
         public void FunctionTest()
         {
             Setup.StartGame("functions.kgl");
