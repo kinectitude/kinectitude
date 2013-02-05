@@ -12,12 +12,13 @@ namespace Kinectitude.Tests.Editor.loadSave
         [TestMethod]
         [DeploymentItem("Editor/read.kgl")]
         [DeploymentItem("Editor/original.kgl")]
-        [DeploymentItem("Plugins")]
+        [DeploymentItem(@"Plugins\")]
         public void LoadAndSave()
         {
             Directory.CreateDirectory("Plugins");
-            File.Move("Kinectitude.Physics.dll", "Plugins/Kinectitude.Physics.dll");
-            File.Move("Kinectitude.Render.dll", "Plugins/Kinectitude.Render.dll");
+            File.Copy("Kinectitude.Physics.dll", "Plugins/Kinectitude.Physics.dll");
+            File.Copy("Kinectitude.Render.dll", "Plugins/Kinectitude.Render.dll");
+            File.Copy("Kinectitude.Kinect.dll", "Plugins/Kinectitude.Kinect.dll");
             KglGameStorage storage = new KglGameStorage(new FileInfo("read.kgl"));
             Game game = storage.LoadGame();
             storage.SaveGame(game);

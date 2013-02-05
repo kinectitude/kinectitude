@@ -92,6 +92,10 @@
       <Project>{541AF93B-398E-463E-9C11-BC957BE0DB19}</Project>
       <Name>Kinectitude.Editor</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Kinect\Kinectitude.Kinect.csproj">
+      <Project>{43dcbee6-f87e-4f59-9146-3e67b1ed3c45}</Project>
+      <Name>Kinectitude.Kinect</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Physics\Kinectitude.Physics.csproj">
       <Project>{6b0352b2-eecb-4810-bedc-b80c4417ab1b}</Project>
       <Name>Kinectitude.Physics</Name>

@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinectitude.Render", "Kinec
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinectitude.Physics", "Kinectitude\Physics\Kinectitude.Physics.csproj", "{6B0352B2-EECB-4810-BEDC-B80C4417AB1B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinectitude.Kinect", "Kinectitude\Kinect\Kinectitude.Kinect.csproj", "{43DCBEE6-F87E-4F59-9146-3E67B1ED3C45}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Kinectitude.Test.vsmdi
@@ -111,6 +113,21 @@ Global
 		{6B0352B2-EECB-4810-BEDC-B80C4417AB1B}.Test|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{6B0352B2-EECB-4810-BEDC-B80C4417AB1B}.Test|Mixed Platforms.Build.0 = Release|Any CPU
 		{6B0352B2-EECB-4810-BEDC-B80C4417AB1B}.Test|x86.ActiveCfg = Release|Any CPU
+		{43DCBEE6-F87E-4F59-9146-3E67B1ED3C45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43DCBEE6-F87E-4F59-9146-3E67B1ED3C45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43DCBEE6-F87E-4F59-9146-3E67B1ED3C45}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{43DCBEE6-F87E-4F59-9146-3E67B1ED3C45}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{43DCBEE6-F87E-4F59-9146-3E67B1ED3C45}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{43DCBEE6-F87E-4F59-9146-3E67B1ED3C45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43DCBEE6-F87E-4F59-9146-3E67B1ED3C45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43DCBEE6-F87E-4F59-9146-3E67B1ED3C45}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{43DCBEE6-F87E-4F59-9146-3E67B1ED3C45}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{43DCBEE6-F87E-4F59-9146-3E67B1ED3C45}.Release|x86.ActiveCfg = Release|Any CPU
+		{43DCBEE6-F87E-4F59-9146-3E67B1ED3C45}.Test|Any CPU.ActiveCfg = Test|Any CPU
+		{43DCBEE6-F87E-4F59-9146-3E67B1ED3C45}.Test|Any CPU.Build.0 = Test|Any CPU
+		{43DCBEE6-F87E-4F59-9146-3E67B1ED3C45}.Test|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{43DCBEE6-F87E-4F59-9146-3E67B1ED3C45}.Test|Mixed Platforms.Build.0 = Release|Any CPU
+		{43DCBEE6-F87E-4F59-9146-3E67B1ED3C45}.Test|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
