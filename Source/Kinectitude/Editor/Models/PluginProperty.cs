@@ -59,7 +59,7 @@ namespace Kinectitude.Editor.Models
 
             if (type.IsEnum)
             {
-                AvailableValues = Enum.GetNames(type);
+                AvailableValues = Enum.GetNames(type).Select(x => "\"" + x + "\"");
             }
             else if (type == typeof(bool))
             {

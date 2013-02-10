@@ -76,8 +76,11 @@ namespace Kinectitude.Editor.Models.Statements.Base
 
                     if (null != statement)
                     {
-                        statement.RemoveFromParent();
-                        AddStatement(statement);
+                        if (IsAllowed(statement))
+                        {
+                            statement.RemoveFromParent();
+                            AddStatement(statement);
+                        }
                     }
                 }
             });
@@ -187,8 +190,11 @@ namespace Kinectitude.Editor.Models.Statements.Base
                 int idx = Statements.IndexOf(statement);
                 if (idx != -1)
                 {
-                    toInsert.RemoveFromParent();
-                    PrivateAddStatement(idx, toInsert);
+                    if (IsAllowed(toInsert))
+                    {
+                        toInsert.RemoveFromParent();
+                        PrivateAddStatement(idx, toInsert);
+                    }
                 }
             }
         }

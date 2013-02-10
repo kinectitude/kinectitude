@@ -116,7 +116,7 @@
                           Width="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.Game.Width}"
                           Height="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.Game.Height}"
                           ItemsSource="{Binding EntityPresenters, Mode=OneWay}"
-                          SelectedItem="{Binding Source={x:Static m:Workspace.Instance}, Path=InspectorItem, Mode=OneWayToSource, Converter={StaticResource EntityConverter}}"
+                          SelectedItem="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.InspectorItem, Mode=OneWayToSource, Converter={StaticResource EntityConverter}}"
                           CutCommand="{Binding CutCommand, Mode=OneWay}"
                           PasteCommand="{Binding PasteCommand, Mode=OneWay}"
                           CopyCommand="{Binding CopyCommand, Mode=OneWay}"

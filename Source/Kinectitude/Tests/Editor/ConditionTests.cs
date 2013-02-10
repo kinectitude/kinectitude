@@ -163,7 +163,7 @@ namespace Kinectitude.Editor.Tests
         public void RemoveReadOnlyAction()
         {
             Condition parentCondition = new Condition() { Expression = "test > 1" };
-            ReadOnlyCondition childCondition = new ReadOnlyCondition(parentCondition);
+            ReadOnlyExpressionCondition childCondition = new ReadOnlyExpressionCondition(parentCondition);
 
             Action parentAction = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
             parentCondition.AddStatement(parentAction);
@@ -176,7 +176,7 @@ namespace Kinectitude.Editor.Tests
         public void CannotRemoveInheritedActionFromInheritingCondition()
         {
             Condition parentCondition = new Condition() { Expression = "test > 1" };
-            ReadOnlyCondition childCondition = new ReadOnlyCondition(parentCondition);
+            ReadOnlyExpressionCondition childCondition = new ReadOnlyExpressionCondition(parentCondition);
 
             Action parentAction = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
             parentCondition.AddStatement(parentAction);
@@ -194,7 +194,7 @@ namespace Kinectitude.Editor.Tests
 
             Condition parentCondition = new Condition() { Expression = "test > 1" };
             
-            ReadOnlyCondition childCondition = new ReadOnlyCondition(parentCondition);
+            ReadOnlyExpressionCondition childCondition = new ReadOnlyExpressionCondition(parentCondition);
             childCondition.PropertyChanged += (o, e) => propertyChanged = (e.PropertyName == "Expression");
 
             Assert.AreEqual("test > 1", childCondition.Expression);

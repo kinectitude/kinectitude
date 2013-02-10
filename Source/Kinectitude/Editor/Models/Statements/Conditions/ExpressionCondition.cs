@@ -2,7 +2,7 @@
 
 namespace Kinectitude.Editor.Models.Statements.Conditions
 {
-    internal class Condition : AbstractCondition
+    internal class ExpressionCondition : AbstractExpressionCondition
     {
         private string expression;
 

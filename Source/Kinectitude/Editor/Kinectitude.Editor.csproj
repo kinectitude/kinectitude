@@ -112,8 +112,12 @@
     <Compile Include="Models\Notifications\DefineRemoved.cs" />
     <Compile Include="Models\Service.cs" />
     <Compile Include="Models\Statements\Base\Statement.cs" />
+    <Compile Include="Models\Statements\Conditions\AbstractBasicCondition.cs" />
     <Compile Include="Models\Statements\Conditions\AbstractConditionGroup.cs" />
+    <Compile Include="Models\Statements\Conditions\AbstractExpressionCondition.cs" />
+    <Compile Include="Models\Statements\Conditions\BasicCondition.cs" />
     <Compile Include="Models\Statements\Conditions\ConditionGroup.cs" />
+    <Compile Include="Models\Statements\Conditions\ReadOnlyBasicCondition.cs" />
     <Compile Include="Models\Values\Value.cs" />
     <Compile Include="Models\Data\ValueReaders\GameValueReader.cs" />
     <Compile Include="Models\Data\ValueReaders\SceneValueReader.cs" />
@@ -171,7 +175,7 @@
     <Compile Include="Models\Attribute.cs" />
     <Compile Include="Base\BaseModel.cs" />
     <Compile Include="Models\Component.cs" />
-    <Compile Include="Models\Statements\Conditions\Condition.cs" />
+    <Compile Include="Models\Statements\Conditions\ExpressionCondition.cs" />
     <Compile Include="Models\Define.cs" />
     <Compile Include="Views\Main\Inspector.xaml.cs">
       <DependentUpon>Inspector.xaml</DependentUpon>
@@ -185,7 +189,7 @@
     <Compile Include="Models\Statements\Events\Event.cs" />
     <Compile Include="Models\Game.cs" />
     <Compile Include="Models\Statements\Actions\ReadOnlyAction.cs" />
-    <Compile Include="Models\Statements\Conditions\ReadOnlyCondition.cs" />
+    <Compile Include="Models\Statements\Conditions\ReadOnlyExpressionCondition.cs" />
     <Compile Include="Models\Statements\Events\ReadOnlyEvent.cs" />
     <Compile Include="Models\Properties\ReadOnlyProperty.cs" />
     <Compile Include="Models\Interfaces\IStatementScope.cs" />
@@ -394,7 +398,21 @@
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Icons\clear_val.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\recycle-bin-icon-128x128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\add.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\close.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\control_play_blue.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -90,12 +90,14 @@ namespace Kinectitude.Editor.Storage.Kgl
                 .Append(component.Type).Append(properties<Property>(component.Properties)).ToString();
         }
 
-        public void Visit(Condition condition)
+        public void Visit(BasicCondition condition)
         {
-            StringBuilder conditionBuilder = new StringBuilder(openDef());
-            conditionBuilder.Append(visitMembers<AbstractStatement>(condition.Statements, "\n", allValid));
-            conditionBuilder.Append(closeDef());
-            result = conditionBuilder.ToString();
+            visitCondition(condition);
+        }
+
+        public void Visit(ExpressionCondition condition)
+        {
+            visitCondition(condition);
         }
 
         public void Visit(ConditionGroup group)
@@ -105,14 +107,14 @@ namespace Kinectitude.Editor.Storage.Kgl
             foreach (var elseif in group.Statements)
             {
                 stmt.Append(tabStr).Append("else if(").Append(group.If.Expression).Append(')');
-                elseif.Accept(this);
-                stmt.Append(result);
+                //elseif.Accept(this);
+                stmt.Append(Apply(elseif));
             }
             if (group.Else != null)
             {
                 stmt.Append(tabStr).Append("else");
-                group.Else.Accept(this);
-                stmt.Append(result);
+                //group.Else.Accept(this);
+                stmt.Append(Apply(group.Else));
             }
             result = stmt.ToString();
         }
@@ -182,7 +184,12 @@ namespace Kinectitude.Editor.Storage.Kgl
             result = "";
         }
 
-        public void Visit(ReadOnlyCondition condition)
+        public void Visit(ReadOnlyBasicCondition condition)
+        {
+            result = "";
+        }
+
+        public void Visit(ReadOnlyExpressionCondition condition)
         {
             result = "";
         }
@@ -261,6 +268,14 @@ namespace Kinectitude.Editor.Storage.Kgl
                 .Append(openDef()).Append(visitMembers<GameModel>(loop.Children, "\n", allValid)).Append(closeDef());
 
             result = sb.ToString();
+        }
+
+        private void visitCondition(AbstractCondition condition)
+        {
+            StringBuilder conditionBuilder = new StringBuilder(openDef());
+            conditionBuilder.Append(visitMembers<AbstractStatement>(condition.Statements, "\n", allValid));
+            conditionBuilder.Append(closeDef());
+            result = conditionBuilder.ToString();
         }
 
         private string properties<T>(IEnumerable<T> properties) where T : AbstractProperty

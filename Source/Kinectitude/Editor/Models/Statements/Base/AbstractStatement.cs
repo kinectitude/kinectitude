@@ -45,12 +45,18 @@ namespace Kinectitude.Editor.Models.Statements.Base
                     if (IsEditable)
                     {
                         var toInsert = parameter as AbstractStatement;
-                        if (null != toInsert)
+                        if (null == toInsert)
                         {
-                            if (null != Scope)
+                            var factory = parameter as StatementFactory;
+                            if (null != factory)
                             {
-                                Scope.InsertBefore(this, toInsert);
+                                toInsert = factory.CreateStatement();
                             }
+                        }
+
+                        if (null != toInsert && toInsert.IsEditable && null != Scope)
+                        {
+                            Scope.InsertBefore(this, toInsert);
                         }
                     }
                 });

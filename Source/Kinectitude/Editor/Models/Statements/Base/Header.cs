@@ -18,13 +18,13 @@ namespace Kinectitude.Editor.Models.Statements.Base
 
     internal sealed class Header
     {
-        public bool IsInherited { get; private set; }
+        public bool IsEditable { get; private set; }
 
         public IEnumerable<object> Tokens { get; private set; }
 
-        public Header(string header, IEnumerable<AbstractProperty> properties, bool inherited)
+        public Header(string header, IEnumerable<AbstractProperty> properties, bool editable)
         {
-            IsInherited = inherited;
+            IsEditable = editable;
 
             string[] splitHeader = Regex.Split(header, "({.*?})");
             List<object> tokens = new List<object>();

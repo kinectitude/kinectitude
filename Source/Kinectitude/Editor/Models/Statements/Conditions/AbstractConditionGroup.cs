@@ -17,10 +17,10 @@ namespace Kinectitude.Editor.Models.Statements.Conditions
     internal abstract class AbstractConditionGroup : CompositeStatement
     {
         private readonly AbstractConditionGroup sourceGroup;
-        private AbstractCondition ifCondition;
-        private AbstractCondition elseCondition;
+        private AbstractExpressionCondition ifCondition;
+        private AbstractBasicCondition elseCondition;
 
-        public AbstractCondition If
+        public AbstractExpressionCondition If
         {
             get { return ifCondition; }
             protected set
@@ -44,7 +44,7 @@ namespace Kinectitude.Editor.Models.Statements.Conditions
             }
         }
 
-        public AbstractCondition Else
+        public AbstractBasicCondition Else
         {
             get { return elseCondition; }
             set
@@ -70,35 +70,31 @@ namespace Kinectitude.Editor.Models.Statements.Conditions
 
         public override IEnumerable<Type> AllowableStatements
         {
-            get { return new[] { typeof(AbstractCondition) }; }
+            get { return new[] { typeof(AbstractExpressionCondition) }; }
         }
 
-        public ICommand SetElseCommand { get; private set; }
+        public ICommand AddElseIfCommand { get; private set; }
+        public ICommand AddElseCommand { get; private set; }
 
         protected AbstractConditionGroup(AbstractConditionGroup sourceGroup = null) : base(sourceGroup)
         {
             this.sourceGroup = sourceGroup;
 
-            SetElseCommand = new DelegateCommand((parameter) => IsEditable,
+            AddElseIfCommand = new DelegateCommand((parameter) => IsEditable,
             (parameter) =>
             {
                 if (IsEditable)
                 {
-                    AbstractCondition condition = parameter as AbstractCondition;
-                    if (null == condition)
-                    {
-                        StatementFactory factory = parameter as StatementFactory;
-                        if (null != factory)
-                        {
-                            condition = factory.CreateStatement() as AbstractCondition;
-                        }
-                    }
+                    AddStatement(new ExpressionCondition());
+                }
+            });
 
-                    if (null != condition)
-                    {
-                        condition.RemoveFromParent();
-                        Else = condition;
-                    }
+            AddElseCommand = new DelegateCommand((parameter) => IsEditable && null == Else,
+            (parameter) =>
+            {
+                if (IsEditable && null == Else)
+                {
+                    Else = new BasicCondition();
                 }
             });
         }

@@ -16,19 +16,30 @@
     <DockPanel>
         <Button DockPanel.Dock="Right"
                 Command="{Binding ClearValueCommand}"
-                Content="Clear"
-                Width="16"
-                Height="16"
-                Margin="4"
+                Margin="2,0,0,0"
+                Padding="2,0,2,0"
                 Visibility="{Binding IsEditable, Converter={StaticResource BoolToVis}}"
-                IsEnabled="{Binding HasOwnValue}" />
+                IsEnabled="{Binding HasOwnValue}"
+                ToolTip="Reset Value">
+            <Image Source="{StaticResource icoClearValue}" Width="15" Height="11">
+                <Image.Style>
+                    <Style TargetType="Image">
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Image.Style>
+            </Image>
+        </Button>
         <ComboBox IsTextSearchEnabled="False"
                   IsEditable="True"
                   Text="{Binding Value, UpdateSourceTrigger=LostFocus, Converter={StaticResource ValueConverter}}"
                   IsEnabled="{Binding IsEditable}"
                   ItemsSource="{Binding AvailableValues}">
             <ComboBox.Style>
-                <Style TargetType="{x:Type ComboBox}">
+                <Style TargetType="ComboBox">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding HasOwnValue}" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource DefaultValueBrush}" />

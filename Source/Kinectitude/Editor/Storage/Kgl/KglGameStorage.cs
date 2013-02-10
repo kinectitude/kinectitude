@@ -227,10 +227,21 @@ namespace Kinectitude.Editor.Storage.Kgl
                 foreach (ParseTreeNode child in grammar.GetOfType(statementNode, grammar.Actions)) createStatement(child, evt, conditionGroup.If);
                 foreach (ParseTreeNode elseNode in grammar.GetOfType(statementNode, grammar.Else))
                 {
-                    Condition cond = new Condition() { Expression = getStrVal(elseNode.ChildNodes.FirstOrDefault(child => child.Term == grammar.Expr))};
+                    string expr = getStrVal(elseNode.ChildNodes.FirstOrDefault(child => child.Term == grammar.Expr));
+                    AbstractCondition cond;
+
+                    if (null == expr)
+                    {
+                        conditionGroup.Else = new BasicCondition();
+                        cond = conditionGroup.Else;
+                    }
+                    else
+                    {
+                        cond = new ExpressionCondition() { Expression = expr };
+                        conditionGroup.AddStatement(cond);
+                    }
+
                     foreach (ParseTreeNode child in grammar.GetOfType(elseNode, grammar.Actions)) createStatement(child, evt, cond);
-                    if (cond.Expression == null) conditionGroup.Else = cond;
-                    else conditionGroup.AddStatement(cond);
                 }
                 statement = conditionGroup;
             }

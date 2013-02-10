@@ -19,8 +19,12 @@
         <DataTemplate x:Key="TabItemTemplate">
             <DockPanel MinWidth="64">
                 <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
-                <Button HorizontalAlignment="Right" Margin="8,4,0,2" Width="16" Height="16" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=CloseItemCommand}" CommandParameter="{Binding}">
-                    <Image Source="{StaticResource icoClose}" />
+                <Button HorizontalAlignment="Right" Margin="8,4,0,2" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.CloseItemCommand}" CommandParameter="{Binding}">
+                    <Button.Template>
+                        <ControlTemplate>
+                            <Image Source="{StaticResource icoClose}" Width="16" Height="16" />
+                        </ControlTemplate>    
+                    </Button.Template>
                 </Button>
             </DockPanel>
         </DataTemplate>
@@ -77,15 +81,49 @@
                 </MenuItem>
                 <Separator />
             </MenuItem>
-            <MenuItem Header="_Game">
-                <MenuItem Header="_Create Scene" />
-                <MenuItem Header="_Delete Scene" />
-                <Separator />
-                <MenuItem Header="_Create Prototype" />
-                <MenuItem Header="_Delete Prototype" />
-            </MenuItem>
         </Menu>
 
+        <ToolBarTray DockPanel.Dock="Top" Orientation="Horizontal" IsLocked="True">
+            <ToolBar Band="1" BandIndex="1">
+                <Button>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{StaticResource icoNew}" Stretch="None" Margin="0,0,4,0" />
+                        <TextBlock VerticalAlignment="Center">New Project</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button>
+                    <Image Source="{StaticResource icoOpen}" Stretch="None" />
+                </Button>
+                <Button>
+                    <Image Source="{StaticResource icoSave}" Stretch="None" />
+                </Button>
+                <Separator Margin="4,0,4,0" />
+                <Button>
+                    <Image Source="{StaticResource icoCut}" Stretch="None" />
+                </Button>
+                <Button>
+                    <Image Source="{StaticResource icoCopy}" Stretch="None" />
+                </Button>
+                <Button>
+                    <Image Source="{StaticResource icoPaste}" Stretch="None" />
+                </Button>
+                <Separator Margin="4,0,4,0" />
+                <Button>
+                    <Image Source="{StaticResource icoUndo}" Stretch="None" />
+                </Button>
+                <Button>
+                    <Image Source="{StaticResource icoRedo}" Stretch="None" />
+                </Button>
+                <Separator Margin="4,0,4,0" />
+                <Button Margin="0,0,4,0">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{StaticResource icoPlay}" Stretch="None" Margin="0,0,4,0" />
+                        <TextBlock VerticalAlignment="Center">Play</TextBlock>
+                    </StackPanel>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+        
         <Grid DockPanel.Dock="Left" Margin="4,0,4,4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
@@ -94,13 +132,13 @@
             </Grid.ColumnDefinitions>
 
             <TabControl DataContext="{Binding Project}"
-                        Grid.Column="0"
-                        ItemsSource="{Binding OpenItems}"
-                        Name="tabItems"
-                        SelectedItem="{Binding ActiveItem}"
-                        ContentTemplate="{StaticResource TabContentTemplate}"
-                        ItemTemplate="{StaticResource TabItemTemplate}"
-                        Padding="4" />
+                    Grid.Column="0"
+                    ItemsSource="{Binding OpenItems}"
+                    Name="tabItems"
+                    SelectedItem="{Binding ActiveItem}"
+                    ContentTemplate="{StaticResource TabContentTemplate}"
+                    ItemTemplate="{StaticResource TabItemTemplate}"
+                    Padding="4" />            
 
             <GridSplitter Width="4" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Style="{StaticResource gridSplitter}" />
 

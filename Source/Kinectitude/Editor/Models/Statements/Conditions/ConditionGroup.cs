@@ -12,7 +12,7 @@ namespace Kinectitude.Editor.Models.Statements.Conditions
     {
         public ConditionGroup()
         {
-            If = new Condition();
+            If = new ExpressionCondition();
         }
 
         public override void Accept(Storage.IGameVisitor visitor)

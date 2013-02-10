@@ -14,12 +14,12 @@ namespace Kinectitude.Editor.Models.Statements.Conditions
         {
             this.sourceGroup = sourceGroup;
             
-            If = new ReadOnlyCondition(sourceGroup.If);
+            If = new ReadOnlyExpressionCondition(sourceGroup.If);
 
             sourceGroup.PropertyChanged += OnSourcePropertyChanged;
             if (null != sourceGroup.Else)
             {
-                Else = new ReadOnlyCondition(sourceGroup.Else);
+                Else = new ReadOnlyBasicCondition(sourceGroup.Else);
             }
         }
 
@@ -29,7 +29,7 @@ namespace Kinectitude.Editor.Models.Statements.Conditions
             {
                 if (null != sourceGroup.Else)
                 {
-                    Else = new ReadOnlyCondition(sourceGroup.Else);
+                    Else = new ReadOnlyBasicCondition(sourceGroup.Else);
                 }
                 else
                 {

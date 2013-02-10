@@ -46,7 +46,7 @@ namespace Kinectitude.Editor.Tests
             Assert.IsTrue(eventFired);
             Assert.AreEqual(500, component.Properties.Single(x => x.Name == "X").Value.Reader.GetIntValue());
             //Assert.IsTrue(property.IsRoot);
-            Assert.IsFalse(property.IsInherited);
+            Assert.IsFalse(property.IsReadOnly);
         }
 
         [TestMethod]

@@ -29,7 +29,7 @@ namespace Kinectitude.Editor.Models.Statements.Actions
                 AddProperty(localProperty);
             }
 
-            header = new Header(Plugin.Header, Properties, true);
+            header = new Header(Plugin.Header, Properties, false);
         }
 
         public override void Accept(IGameVisitor visitor)

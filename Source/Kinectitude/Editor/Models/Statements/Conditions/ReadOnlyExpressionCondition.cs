@@ -2,9 +2,9 @@
 
 namespace Kinectitude.Editor.Models.Statements.Conditions
 {
-    internal sealed class ReadOnlyCondition : AbstractCondition
+    internal sealed class ReadOnlyExpressionCondition : AbstractExpressionCondition
     {
-        private readonly AbstractCondition inheritedCondition;
+        private readonly AbstractExpressionCondition inheritedCondition;
 
         public override string Expression
         {
@@ -12,7 +12,7 @@ namespace Kinectitude.Editor.Models.Statements.Conditions
             set { }
         }
 
-        public ReadOnlyCondition(AbstractCondition inheritedCondition) : base(inheritedCondition)
+        public ReadOnlyExpressionCondition(AbstractExpressionCondition inheritedCondition) : base(inheritedCondition)
         {
             this.inheritedCondition = inheritedCondition;
         }

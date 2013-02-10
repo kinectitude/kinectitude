@@ -11,7 +11,8 @@
     <ImageSource x:Key="icoPaste">..\Icons\page_paste.png</ImageSource>
     <ImageSource x:Key="icoUndo">..\Icons\arrow_undo.png</ImageSource>
     <ImageSource x:Key="icoRedo">..\Icons\arrow_redo.png</ImageSource>
-    <ImageSource x:Key="icoClose">..\Icons\bullet_toggle_minus.png</ImageSource>
+    <ImageSource x:Key="icoClose">..\Icons\close.png</ImageSource>
+    <ImageSource x:Key="icoPlay">..\Icons\control_play_blue.png</ImageSource>
     
     <!-- Library Icons -->
     
@@ -57,5 +58,8 @@
     <ImageSource x:Key="icoArrowRight">..\Icons\arrow_right.png</ImageSource>
     <ImageSource x:Key="icoArrowUp">..\Icons\arrow_up.png</ImageSource>
     <ImageSource x:Key="icoArrowDown">..\Icons\arrow_down.png</ImageSource>
+    <ImageSource x:Key="icoClearValue">..\Icons\clear_val.png</ImageSource>
+    <ImageSource x:Key="icoAdd">..\Icons\add.png</ImageSource>
+    <ImageSource x:Key="icoRecycle">..\Icons\recycle-bin-icon-128x128.png</ImageSource>
 
 </ResourceDictionary>

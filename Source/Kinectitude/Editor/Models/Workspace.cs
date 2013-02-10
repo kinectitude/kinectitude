@@ -22,7 +22,6 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 using Action = Kinectitude.Editor.Models.Statements.Actions.Action;
-using Condition = Kinectitude.Editor.Models.Statements.Conditions.Condition;
 
 namespace Kinectitude.Editor.Models
 {
@@ -227,11 +226,10 @@ namespace Kinectitude.Editor.Models
 
             entityPresets.Add(textEntity);
 
-            Statements.Add(new StatementFactory("Conditions", StatementType.ConditionGroup, () => new ConditionGroup()));
-            Statements.Add(new StatementFactory("Condition", StatementType.Condition, () => new Condition()));
+            Statements.Add(new StatementFactory("If", StatementType.ConditionGroup, () => new ConditionGroup()));
             Statements.Add(new StatementFactory("While Loop", StatementType.WhileLoop, () => new WhileLoop()));
             Statements.Add(new StatementFactory("For Loop", StatementType.ForLoop, () => new ForLoop()));
-            Statements.Add(new StatementFactory("Assign a Value", StatementType.Assignment, () => new Assignment()));
+            Statements.Add(new StatementFactory("Change a Value", StatementType.Assignment, () => new Assignment()));
         }
 
         public void Exit()
