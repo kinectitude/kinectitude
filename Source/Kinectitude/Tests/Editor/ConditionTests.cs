@@ -56,7 +56,7 @@ namespace Kinectitude.Editor.Tests
             ConditionGroup group = new ConditionGroup();
             group.Statements.CollectionChanged += (o, e) => collectionChanged = true;
 
-            Condition condition = new Condition() { Expression = "test > 1" };
+            ExpressionCondition condition = new ExpressionCondition() { Expression = "test > 1" };
             group.AddStatement(condition);
 
             Assert.IsTrue(collectionChanged);
@@ -72,7 +72,7 @@ namespace Kinectitude.Editor.Tests
             ConditionGroup group = new ConditionGroup();
             group.Statements.CollectionChanged += (o, e) => eventsFired++;
 
-            Condition condition = new Condition() { Expression = "test > 1" };
+            ExpressionCondition condition = new ExpressionCondition() { Expression = "test > 1" };
             group.AddStatement(condition);
             group.RemoveStatement(condition);
 
@@ -85,7 +85,7 @@ namespace Kinectitude.Editor.Tests
         {
             bool collectionChanged = false;
 
-            Condition condition = new Condition() { Expression = "test > 1" };
+            ExpressionCondition condition = new ExpressionCondition() { Expression = "test > 1" };
             condition.Statements.CollectionChanged += (o, e) => collectionChanged = true;
 
             Action action = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
@@ -100,7 +100,7 @@ namespace Kinectitude.Editor.Tests
         {
             int eventsFired = 0;
 
-            Condition condition = new Condition() { Expression = "test > 1" };
+            ExpressionCondition condition = new ExpressionCondition() { Expression = "test > 1" };
             condition.Statements.CollectionChanged += (o, e) => eventsFired++;
 
             Action action = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
@@ -135,7 +135,7 @@ namespace Kinectitude.Editor.Tests
             ConditionGroup parentGroup = new ConditionGroup();
             parentEvent.AddStatement(parentGroup);
 
-            parentGroup.AddStatement(new Condition() { Expression = "test > 1" });
+            parentGroup.AddStatement(new ExpressionCondition() { Expression = "test > 1" });
 
             Assert.AreEqual(1, childEvent.Statements.Count);
 
@@ -143,7 +143,7 @@ namespace Kinectitude.Editor.Tests
 
             Assert.IsNotNull(childGroup);
 
-            ReadOnlyCondition childCondition = childGroup.Statements.OfType<ReadOnlyCondition>().Single();
+            ReadOnlyExpressionCondition childCondition = childGroup.Statements.OfType<ReadOnlyExpressionCondition>().Single();
 
             Assert.AreEqual("test > 1", childCondition.Expression);
         }
@@ -151,8 +151,8 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void AddReadOnlyAction()
         {
-            Condition parentCondition = new Condition() { Expression = "test > 1" };
-            ReadOnlyCondition childCondition = new ReadOnlyCondition(parentCondition);
+            ExpressionCondition parentCondition = new ExpressionCondition() { Expression = "test > 1" };
+            ReadOnlyExpressionCondition childCondition = new ReadOnlyExpressionCondition(parentCondition);
 
             parentCondition.AddStatement(new Action(Workspace.Instance.GetPlugin(FireTriggerActionType)));
 
@@ -162,7 +162,7 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void RemoveReadOnlyAction()
         {
-            Condition parentCondition = new Condition() { Expression = "test > 1" };
+            ExpressionCondition parentCondition = new ExpressionCondition() { Expression = "test > 1" };
             ReadOnlyExpressionCondition childCondition = new ReadOnlyExpressionCondition(parentCondition);
 
             Action parentAction = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
@@ -175,7 +175,7 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void CannotRemoveInheritedActionFromInheritingCondition()
         {
-            Condition parentCondition = new Condition() { Expression = "test > 1" };
+            ExpressionCondition parentCondition = new ExpressionCondition() { Expression = "test > 1" };
             ReadOnlyExpressionCondition childCondition = new ReadOnlyExpressionCondition(parentCondition);
 
             Action parentAction = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
@@ -192,7 +192,7 @@ namespace Kinectitude.Editor.Tests
         {
             bool propertyChanged = false;
 
-            Condition parentCondition = new Condition() { Expression = "test > 1" };
+            ExpressionCondition parentCondition = new ExpressionCondition() { Expression = "test > 1" };
             
             ReadOnlyExpressionCondition childCondition = new ReadOnlyExpressionCondition(parentCondition);
             childCondition.PropertyChanged += (o, e) => propertyChanged = (e.PropertyName == "Expression");
