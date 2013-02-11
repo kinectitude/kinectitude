@@ -141,6 +141,8 @@ namespace Kinectitude.Core.Language
             Constants.Add("E", new ConstantReader(Math.E));
             #endregion
 
+            Constants.Priority = Identifier.Priority + 1;
+
             #region operator terminals
             Terminal openBrace = ToTerm("{");
             Terminal closeBrace = ToTerm("}");
@@ -334,7 +336,7 @@ namespace Kinectitude.Core.Language
             //Removes from the tree, we don't care about having these there
             MarkPunctuation("{", "}", "(", ")", ":", "$", "@", "#", "^", "Game", "using", "define", "Scene", "Entity",
                  ",", "if", "Component", "Manager", "Prototype", "=", ".", "as", "Event", "else", "Service", ";", "while", "for");
-            MarkReservedWords("using", "define", "if", "true", "false", "Pi", "E", "else", "while", "for");
+            MarkReservedWords("using", "define", "if", "else", "while", "for");
             MarkTransient(BasicDefinition, value, IsPrototype, term, exactValue, optionalActions, optionalEvt, optionalComponent, 
                 optionalProperties, optionalManager, optionalPrototype, optionalService, optionalUses, optionalDefinitions,
                 optionalEntity, optionalScene, optionalIdentifier, optionalAssignment, becomesExpr);

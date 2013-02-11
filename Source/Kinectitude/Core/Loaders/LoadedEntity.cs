@@ -45,7 +45,7 @@ namespace Kinectitude.Core.Loaders
             
             //it is a prototype
 #if !TEST
-            if(Prototypes.ContainsKey(name)) Game.CurrentGame.Die("The prototype " + name + " was already defined");
+            if(name != null && Prototypes.ContainsKey(name)) Game.CurrentGame.Die("The prototype " + name + " was already defined");
 #endif
             if (id < 0) Prototypes[name] = this;
         }
