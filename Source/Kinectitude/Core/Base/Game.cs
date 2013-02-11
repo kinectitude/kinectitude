@@ -15,7 +15,6 @@ namespace Kinectitude.Core.Base
 
         internal readonly Action<string> Die;
         
-
         private readonly Dictionary<Type, Service> services = new Dictionary<Type, Service>();
 
         private readonly Func<Tuple<int, int>> WindowOffset;
