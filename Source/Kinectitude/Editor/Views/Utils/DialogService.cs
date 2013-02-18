@@ -53,6 +53,37 @@ namespace Kinectitude.Editor.Views.Utils
             }
         }
 
+        public static void ShowChooseImageDialog(FileDialogCallback onClose)
+        {
+            Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
+
+            dialog.Filter = "Image files|*.bmp;*.dib;*.jpg;*.jpeg;*.jpe;*.jfif;*.gif;*.tif;*.tiff;*.png;*.ico";
+            dialog.Title = "Select an image file";
+
+            bool? result = dialog.ShowDialog();
+
+            if (null != onClose)
+            {
+                onClose(result, dialog.FileName);
+            }
+        }
+
+        public static void ShowChooseSoundDialog(FileDialogCallback onClose)
+        {
+            Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
+
+            dialog.DefaultExt = ".wav";
+            dialog.Filter = "Waveform Audio Files (.wav)|*.wav;*.wave";
+            dialog.Title = "Select an audio file";
+
+            bool? result = dialog.ShowDialog();
+
+            if (null != onClose)
+            {
+                onClose(result, dialog.FileName);
+            }
+        }
+
         public static void ShowSaveDialog(FileDialogCallback onClose)
         {
             Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();

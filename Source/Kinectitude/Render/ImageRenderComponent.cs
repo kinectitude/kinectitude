@@ -21,7 +21,7 @@ namespace Kinectitude.Render
         private float scaleY;
 
         private string image;
-        [PluginProperty("Image", "")]
+        [PluginProperty("Image", "", null, true)]
         public string Image
         {
             get { return image; }

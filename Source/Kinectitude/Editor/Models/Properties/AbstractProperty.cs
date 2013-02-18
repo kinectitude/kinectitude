@@ -17,6 +17,11 @@ namespace Kinectitude.Editor.Models.Properties
             get { return PluginProperty.Name; }
         }
 
+        public bool UsesFileSelector
+        {
+            get { return PluginProperty.UsesFileSelector; }
+        }
+
         public bool IsInherited
         {
             get { return null != inheritedProperty; }

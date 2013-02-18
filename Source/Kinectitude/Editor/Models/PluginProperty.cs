@@ -27,6 +27,13 @@ namespace Kinectitude.Editor.Models
             get { return attribute.Description; }
         }
 
+        // Whether or not we can use windows explorer to look for a file. 
+        // Used for images and sound
+        public bool UsesFileSelector
+        {
+            get { return attribute.UsesFileSelector; }
+        }
+
         public object DefaultValue
         {
             get

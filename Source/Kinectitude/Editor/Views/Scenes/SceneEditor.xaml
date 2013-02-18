@@ -53,7 +53,15 @@
             </Grid>
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type Presenters:SpriteEntityVisual}" />
+        <DataTemplate DataType="{x:Type Presenters:SpriteEntityVisual}">
+            <Grid>
+                <Image Name="Image" 
+                       Source="{Binding Image}"
+                       Width="{Binding Presenter.Width}"
+                       Height="{Binding Presenter.Height}"
+                       Stretch="Fill"/>
+            </Grid>
+        </DataTemplate>
 
         <DataTemplate DataType="{x:Type Presenters:TextEntityVisual}">
             <TextBlock Text="{Binding Value}" FontSize="{Binding FontSize}" Foreground="{Binding FontColor}" />

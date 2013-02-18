@@ -13,6 +13,14 @@
 
     <DockPanel>
         <Button DockPanel.Dock="Right"
+                Command="{Binding DisplayFileChooserCommand}"
+                Content="..."
+                Width="16"
+                Height="16"
+                Margin="4"
+                Visibility="{Binding UsesFileSelector, Converter={StaticResource BoolToVis}}"
+                IsEnabled="True" />
+        <Button DockPanel.Dock="Right"
                 Command="{Binding ClearValueCommand}"
                 Content="Clear"
                 Width="16"

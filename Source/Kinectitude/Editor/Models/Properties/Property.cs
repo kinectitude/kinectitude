@@ -4,6 +4,7 @@ using Kinectitude.Editor.Storage;
 using System;
 using System.Collections.Generic;
 using System.Windows.Input;
+using Kinectitude.Editor.Views.Utils;
 
 namespace Kinectitude.Editor.Models.Properties
 {
@@ -43,11 +44,36 @@ namespace Kinectitude.Editor.Models.Properties
 
         public override ICommand ClearValueCommand { get; protected set; }
 
+        public ICommand DisplayFileChooserCommand { get; protected set; }
+
         public Property(PluginProperty pluginProperty)
         {
             this.pluginProperty = pluginProperty;
 
             ClearValueCommand = new DelegateCommand(parameter => HasOwnValue, parameter => Value = null);
+            DisplayFileChooserCommand = new DelegateCommand(null, parameter =>
+            {
+                if (PluginProperty.Name == "Image")
+                {
+                    DialogService.ShowChooseImageDialog((result, fileName) =>
+                    {
+                        if (result == true)
+                        {
+                            Value = fileName;
+                        }
+                    });
+                }
+                else
+                {
+                    DialogService.ShowChooseSoundDialog((result, fileName) =>
+                    {
+                        if (result == true)
+                        {
+                            Value = fileName;
+                        }
+                    });
+                }
+            });
         }
 
         public override void Accept(IGameVisitor visitor)

@@ -11,6 +11,7 @@ namespace Kinectitude.Core.Attributes
         private readonly string name;
         private readonly string description;
         private readonly object defaultValue;
+        private readonly bool usesFileSelector;
 
         public string Name
         {
@@ -27,11 +28,20 @@ namespace Kinectitude.Core.Attributes
             get { return defaultValue; }
         }
 
-        public PluginPropertyAttribute(string name, string description, object defaultValue = null)
+        public bool UsesFileSelector
+        {
+            get { return usesFileSelector; }
+        }
+
+        public PluginPropertyAttribute(string name, 
+                                       string description, 
+                                       object defaultValue = null, 
+                                       bool usesFileSelector = false)
         {
             this.name = name;
             this.description = description;
             this.defaultValue = defaultValue;
+            this.usesFileSelector = usesFileSelector;
         }
     }
 }
