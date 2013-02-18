@@ -435,6 +435,19 @@
                 </i:Interaction.Behaviors>
             </Border>
             <ScrollViewer>
+                <ScrollViewer.Resources>
+                    <Style TargetType="ListBox">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBox">
+                                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                                        <ItemsPresenter />
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ScrollViewer.Resources>
                 <StackPanel Orientation="Vertical">
                     <Expander IsExpanded="True">
                         <Expander.Header>

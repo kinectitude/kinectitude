@@ -94,23 +94,6 @@
             </DockPanel>
         </GroupBox-->
             
-        <GroupBox>
-            <GroupBox.Header>
-                <TextBlock>Scenes</TextBlock>
-            </GroupBox.Header>
-            <DockPanel Margin="0,0,0,8">
-                <ScrollViewer VerticalScrollBarVisibility="Visible">
-                    <ListBox Name="lstScenes" ItemsSource="{Binding Scenes}">
-                        <!--ListBox.Resources>
-                            <DataTemplate DataType="{x:Type vm:Scene}">
-                                <v:SceneThumbnail />
-                            </DataTemplate>
-                        </ListBox.Resources-->
-                    </ListBox>
-                </ScrollViewer>
-            </DockPanel>
-        </GroupBox>
-            
     </StackPanel>            
     
 </UserControl>
