@@ -126,8 +126,8 @@ namespace Kinectitude.Editor.Models
 
         private void HandleNotification<T>(GameModel source, T e)
         {
-            if (this != source)
-            {
+            //if (this != source)
+            //{
                 List<Delegate> handlers;
 
                 if (allHandlers.TryGetValue(typeof(T), out handlers))
@@ -157,7 +157,7 @@ namespace Kinectitude.Editor.Models
                         }
                     }
                 }
-            }
+            //}
         }
     }
 

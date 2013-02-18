@@ -14,7 +14,6 @@ namespace Kinectitude.Editor.Models.Values
     {
         private readonly string initializer;
         private readonly ValueReader reader;
-
         private readonly ThisDataContainer thisContainer;
         private readonly SceneDataContainer sceneContainer;
 
@@ -43,6 +42,16 @@ namespace Kinectitude.Editor.Models.Values
             get { return GetAncestor<Game>(); }
         }
 
+        public IDataContainer ThisContainer
+        {
+            get { return thisContainer; }
+        }
+
+        public IDataContainer SceneContainer
+        {
+            get { return sceneContainer; }
+        }
+
         public Value(string initializer)
         {
             thisContainer = new ThisDataContainer(this);
@@ -50,8 +59,6 @@ namespace Kinectitude.Editor.Models.Values
 
             this.initializer = initializer;
             reader = Workspace.ValueMaker.CreateValueReader(initializer, sceneContainer, thisContainer);
-
-            AddHandler<ScopeChanged>(OnScopeChanged);
         }
 
         public Value(object value, bool constant)
@@ -73,11 +80,6 @@ namespace Kinectitude.Editor.Models.Values
         public override void Accept(IGameVisitor visitor)
         {
             visitor.Visit(this);
-        }
-
-        private void OnScopeChanged(ScopeChanged e)
-        {
-            // TODO: Tell ThisDataContainer to update if needed
         }
 
         public double GetDoubleValue()
@@ -121,6 +123,11 @@ namespace Kinectitude.Editor.Models.Values
             }
 
             return result;
+        }
+
+        public void Subscribe(IChanges callback)
+        {
+            Reader.NotifyOfChange(callback);
         }
     }
 }

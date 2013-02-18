@@ -22,6 +22,8 @@ using Event = Kinectitude.Editor.Models.Statements.Events.Event;
 
 namespace Kinectitude.Editor.Models
 {
+    internal delegate void AttributeChangedEventHandler(Attribute attribute, string oldName);
+
     internal sealed class Entity : GameModel<IEntityScope>, IAttributeScope, IComponentScope, IStatementScope
     {
         private string name;

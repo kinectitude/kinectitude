@@ -2,9 +2,12 @@
 using Kinectitude.Core.Data;
 using Kinectitude.Editor.Models.Data.Changeables;
 using Kinectitude.Editor.Models.Data.ValueReaders;
+using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Values;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
@@ -17,76 +20,120 @@ namespace Kinectitude.Editor.Models.Data.DataContainers
     /// is not in any entity's scope, attempts to access data will return ConstantReader.NullValue.
     /// 
     /// If the scope of the Value changes, this class will publish the appropriate notifications.
-    /// 
-    /// If the owning entity changes:
-    ///     - Publish changes for all attributes and 
     /// </summary>
-    internal sealed class ThisDataContainer : IDataContainer
+    internal sealed class ThisDataContainer : BaseDataContainer
     {
         private readonly Value value;
-        private readonly Dictionary<string, ThisEntityValueReader> attributes;
-        private readonly Dictionary<string, ThisChangeable> changeables;
+        private Entity entity;
 
         public Entity Entity
         {
-            get { return value.Entity; }
+            get { return entity; }
+            private set
+            {
+                if (entity != value)
+                {
+                    if (null != entity)
+                    {
+                        entity.Attributes.CollectionChanged -= OnEntityAttributesChanged;
+
+                        foreach (var attribute in entity.Attributes)
+                        {
+                            UnfollowAttribute(attribute);
+                        }
+                    }
+
+                    entity = value;
+
+                    if (null != entity)
+                    {
+                        entity.Attributes.CollectionChanged += OnEntityAttributesChanged;
+
+                        foreach (var attribute in entity.Attributes)
+                        {
+                            FollowAttribute(attribute);
+                        }
+                    }
+
+                    if (null != EntityChanged)
+                    {
+                        EntityChanged();
+                    }
+
+                    PublishAll();
+                }
+            }
         }
+
+        public event System.Action EntityChanged;
 
         public ThisDataContainer(Value value)
         {
             this.value = value;
 
-            attributes = new Dictionary<string, ThisEntityValueReader>();
-            changeables = new Dictionary<string, ThisChangeable>();
+            Entity = value.Entity;
+            value.AddHandler<ScopeChanged>(OnScopeChanged);
         }
 
-        #region IDataContainer implementation
-
-        ValueReader IDataContainer.this[string key]
+        private void FollowAttribute(Attribute attribute)
         {
-            get
-            {
-                ThisEntityValueReader reader;
-                attributes.TryGetValue(key, out reader);
+            attribute.PropertyChanged += OnAttributePropertyChanged;
+            attribute.NameChanged += OnAttributeNameChanged;
+        }
 
-                if (null == reader)
+        private void UnfollowAttribute(Attribute attribute)
+        {
+            attribute.PropertyChanged -= OnAttributePropertyChanged;
+            attribute.NameChanged -= OnAttributeNameChanged;
+        }
+
+        private void OnScopeChanged(ScopeChanged obj)
+        {
+            Entity = value.Entity;
+        }
+
+        private void OnAttributePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Value")
+            {
+                PublishAttributeChange(((Attribute)sender).Name);
+            }
+        }
+
+        private void OnAttributeNameChanged(string oldName, string newName)
+        {
+            PublishAttributeChange(oldName);
+            PublishAttributeChange(newName);
+        }
+
+        private void OnEntityAttributesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (Attribute attribute in e.NewItems)
                 {
-                    reader = new ThisEntityValueReader(this, key);
-                    attributes[key] = reader;
+                    FollowAttribute(attribute);
+                    PublishAttributeChange(attribute.Name);
                 }
-
-                return reader;
             }
-            set
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                throw new NotSupportedException();
+                foreach (Attribute attribute in e.OldItems)
+                {
+                    UnfollowAttribute(attribute);
+                    PublishAttributeChange(attribute.Name);
+                }
             }
         }
 
-        IChangeable IDataContainer.GetChangeable(string name)
+        protected override ValueReader CreateAttributeReader(string key)
         {
-            ThisChangeable changeable;
-            changeables.TryGetValue(name, out changeable);
-
-            if (null == changeable)
-            {
-                changeable = new ThisChangeable(this, name);
-                changeables[name] = changeable;
-            }
-
-            return changeable;
+            return new ThisEntityValueReader(this, key);
         }
 
-        void IDataContainer.NotifyOfChange(string key, IChanges callback)
+        protected override IChangeable CreateChangeable(string name)
         {
-            throw new NotImplementedException();
+            return new ThisChangeable(this, name);
         }
-
-        void IDataContainer.NotifyOfComponentChange(Tuple<IChangeable, string> what, IChanges callback)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
     }
 }

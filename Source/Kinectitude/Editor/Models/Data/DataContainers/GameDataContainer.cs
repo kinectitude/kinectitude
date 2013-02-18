@@ -2,80 +2,130 @@
 using Kinectitude.Core.Data;
 using Kinectitude.Editor.Models.Data.Changeables;
 using Kinectitude.Editor.Models.Data.ValueReaders;
+using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Values;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
 namespace Kinectitude.Editor.Models.Data.DataContainers
 {
-    internal sealed class GameDataContainer : IDataContainer
+    internal sealed class GameDataContainer : BaseDataContainer
     {
         private readonly Value value;
-        private readonly Dictionary<string, GameValueReader> attributes;
-        private readonly Dictionary<string, ServiceChangeable> changeables;
+        private Game game;
 
         public Game Game
         {
-            get { return value.Game; }
+            get { return game; }
+            private set
+            {
+                if (game != value)
+                {
+                    if (null != game)
+                    {
+                        game.Attributes.CollectionChanged -= OnGameAttributesChanged;
+
+                        foreach (var attribute in game.Attributes)
+                        {
+                            UnfollowAttribute(attribute);
+                        }
+                    }
+
+                    game = value;
+
+                    if (null != game)
+                    {
+                        game.Attributes.CollectionChanged += OnGameAttributesChanged;
+
+                        foreach (var attribute in game.Attributes)
+                        {
+                            UnfollowAttribute(attribute);
+                        }
+                    }
+
+                    if (null != GameChanged)
+                    {
+                        GameChanged();
+                    }
+
+                    PublishAll();
+                }
+            }
         }
+
+        public event System.Action GameChanged;
 
         public GameDataContainer(Value value)
         {
             this.value = value;
-            
-            attributes = new Dictionary<string, GameValueReader>();
-            changeables = new Dictionary<string, ServiceChangeable>();
+
+            Game = value.Game;
+            value.AddHandler<ScopeChanged>(OnScopeChanged);
         }
 
-        #region IDataContainer implementation
-
-        ValueReader IDataContainer.this[string key]
+        private void FollowAttribute(Attribute attribute)
         {
-            get
-            {
-                GameValueReader reader;
-                attributes.TryGetValue(key, out reader);
+            attribute.PropertyChanged += OnAttributePropertyChanged;
+            attribute.NameChanged += OnAttributeNameChanged;
+        }
 
-                if (null == reader)
+        private void UnfollowAttribute(Attribute attribute)
+        {
+            attribute.PropertyChanged -= OnAttributePropertyChanged;
+            attribute.NameChanged -= OnAttributeNameChanged;
+        }
+        private void OnScopeChanged(ScopeChanged e)
+        {
+            Game = value.Game;
+        }
+
+        private void OnAttributePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Value")
+            {
+                PublishAttributeChange(((Attribute)sender).Name);
+            }
+        }
+
+        private void OnAttributeNameChanged(string oldName, string newName)
+        {
+            PublishAttributeChange(oldName);
+            PublishAttributeChange(newName);
+        }
+
+
+        private void OnGameAttributesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (Attribute attribute in e.NewItems)
                 {
-                    reader = new GameValueReader(this, key);
-                    attributes[key] = reader;
+                    FollowAttribute(attribute);
+                    PublishAttributeChange(attribute.Name);
                 }
-
-                return reader;
             }
-            set
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                throw new NotSupportedException();
+                foreach (Attribute attribute in e.OldItems)
+                {
+                    UnfollowAttribute(attribute);
+                    PublishAttributeChange(attribute.Name);
+                }
             }
         }
 
-        IChangeable IDataContainer.GetChangeable(string name)
+        protected override ValueReader CreateAttributeReader(string key)
         {
-            ServiceChangeable changeable;
-            changeables.TryGetValue(name, out changeable);
-
-            if (null == changeable)
-            {
-                changeable = new ServiceChangeable(this, name);
-                changeables[name] = changeable;
-            }
-
-            return changeable;
+            return new GameValueReader(this, key);
         }
 
-        void IDataContainer.NotifyOfChange(string key, IChanges callback)
+        protected override IChangeable CreateChangeable(string name)
         {
-            throw new NotImplementedException();
+            return new ServiceChangeable(this, name);
         }
-
-        void IDataContainer.NotifyOfComponentChange(Tuple<IChangeable, string> what, IChanges callback)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
     }
 }

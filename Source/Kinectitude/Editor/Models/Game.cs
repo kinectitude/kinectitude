@@ -477,6 +477,8 @@ namespace Kinectitude.Editor.Models
         {
             service.Scope = this;
             Services.Add(service);
+
+            Notify(new PluginUsed(service.Plugin));
         }
 
         public void RemoveService(Service service)

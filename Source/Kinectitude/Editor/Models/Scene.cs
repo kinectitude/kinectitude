@@ -228,6 +228,8 @@ namespace Kinectitude.Editor.Models
         {
             manager.Scope = this;
             Managers.Add(manager);
+
+            Notify(new PluginUsed(manager.Plugin));
         }
 
         public void RemoveManager(Manager manager)
