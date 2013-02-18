@@ -109,6 +109,11 @@ namespace Kinectitude.Editor.Models
             return ancestor;
         }
 
+        protected T GetAncestor<T>() where T : class, IScope
+        {
+            return GetAncestor<T>(this);
+        }
+
         public void Broadcast<T>(GameModel source, T e) where T : Notification
         {
             Game game = GetAncestor<Game>(source);

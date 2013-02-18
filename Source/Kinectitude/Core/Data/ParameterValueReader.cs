@@ -8,13 +8,13 @@ namespace Kinectitude.Core.Data
 {
     internal sealed class ParameterValueReader : ValueReader
     {
-        internal readonly object Obj;
+        internal readonly IChangeable Obj;
         internal readonly string Param;
-        internal readonly DataContainer Owner;
+        internal readonly IDataContainer Owner;
 
-        internal static ParameterValueReader GetParameterValueReader(object obj, string param, Scene scene)
+        internal static ParameterValueReader GetParameterValueReader(IChangeable obj, string param, IDataContainer owner)
         {
-            Func<ParameterValueReader> create = new Func<ParameterValueReader>(() => new ParameterValueReader(obj, param, scene));
+            Func<ParameterValueReader> create = new Func<ParameterValueReader>(() => new ParameterValueReader(obj, param, owner));
             return DoubleDictionary<object, string, ParameterValueReader>.GetItem(obj, param, create);
         }
 
@@ -23,60 +23,56 @@ namespace Kinectitude.Core.Data
             DoubleDictionary<object, string, ParameterValueReader>.DeleteDict(obj);
         }
 
-        private ParameterValueReader(object obj, string param, Scene scene)
+        private ParameterValueReader(IChangeable obj, string param, IDataContainer owner)
         {
             Obj = obj;
             Param = param;
-            Type objType = obj.GetType();
-            if (typeof(Component).IsAssignableFrom(objType)) Owner = ((Component)obj).Entity;
-            else if (typeof(IManager).IsAssignableFrom(objType)) Owner = scene;
-            else if (typeof(Service).IsAssignableFrom(objType)) Owner = scene.Game;
-            else Owner = null;
+            Owner = owner;
         }
 
         internal override void SetupNotifications()
         {
             if (null != Owner)
-                Owner.NotifyOfComponentChange(ClassFactory.GetReferedName(Obj.GetType()) + '.' + Param, this);
+                Owner.NotifyOfComponentChange(new Tuple<IChangeable, string>(Obj, Param), this);
         }
 
         internal override double GetDoubleValue() 
         {
-            object value = ClassFactory.GetParam(Obj, Param);
+            object value = Obj[Param];
             return value as ValueReader ?? ToNumber<double>(value); 
         }
         internal override float GetFloatValue()
         {
-            object value = ClassFactory.GetParam(Obj, Param);
+            object value = Obj[Param];
             return value as ValueReader ?? ToNumber<float>(value); 
         }
         internal override int GetIntValue()
         {
-            object value = ClassFactory.GetParam(Obj, Param);
+            object value = Obj[Param];
             return value as ValueReader ?? ToNumber<int>(value); 
         }
         
         internal override long GetLongValue() 
         {
-            object value = ClassFactory.GetParam(Obj, Param);
+            object value = Obj[Param];
             return value as ValueReader ?? ToNumber<long>(value); 
         }
 
         internal override bool GetBoolValue()
         {
-            object value = ClassFactory.GetParam(Obj, Param);
+            object value = Obj[Param];
             return value as ValueReader ?? ToBool(value); 
         }
 
         internal override string GetStrValue()
         {
-            object value = ClassFactory.GetParam(Obj, Param);
+            object value = Obj[Param];
             return value as ValueReader ?? value.ToString();
         }
 
         internal override PreferedType PreferedRetType()
         {
-            object value = ClassFactory.GetParam(Obj, Param);
+            object value = Obj[Param];
             ValueReader reader = value as ValueReader;
             return reader == null? NativeReturnType(value) : reader.PreferedRetType();
         }

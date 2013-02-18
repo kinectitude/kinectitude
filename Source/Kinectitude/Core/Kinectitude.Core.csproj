@@ -46,6 +46,13 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <WarningLevel>0</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>signature.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Irony">
@@ -90,8 +97,10 @@
     <Compile Include="Base\DataContainer.cs" />
     <Compile Include="Base\Entity.cs" />
     <Compile Include="Base\Game.cs" />
-    <Compile Include="Base\IEntity.cs" />
     <Compile Include="Base\Component.cs" />
+    <Compile Include="Base\IChangeable.cs" />
+    <Compile Include="Base\IEntity.cs" />
+    <Compile Include="Base\IScene.cs" />
     <Compile Include="Base\Loop.cs" />
     <Compile Include="Base\Service.cs" />
     <Compile Include="Base\Scene.cs" />
@@ -103,13 +112,13 @@
     <Compile Include="Base\Manager.cs" />
     <Compile Include="Components\TransformComponent.cs" />
     <Compile Include="Data\BasicFunctionReader.cs" />
+    <Compile Include="Data\IDataContainer.cs" />
     <Compile Include="Data\ParamsFunctionReader.cs" />
     <Compile Include="Data\DataContainerWriter.cs" />
     <Compile Include="Data\DoubleDictionary.cs" />
     <Compile Include="Data\FunctionHolder.cs" />
-    <Compile Include="Data\FunctionOpReader.cs" />
     <Compile Include="Data\FunctionReader.cs" />
-    <Compile Include="Data\IChangeable.cs" />
+    <Compile Include="Data\IPart.cs" />
     <Compile Include="Data\NeqOpReader.cs" />
     <Compile Include="Data\DataContainerReader.cs" />
     <Compile Include="Data\NullWriter.cs" />
@@ -155,7 +164,8 @@
     <Compile Include="Loaders\GameLoader.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Loaders\KGLLoaderUtility.cs" />
+    <Compile Include="Loaders\Kgl\KGLBase.cs" />
+    <Compile Include="Loaders\Kgl\KGLLoaderUtility.cs" />
     <Compile Include="Loaders\LoadedAction.cs" />
     <Compile Include="Loaders\LoadedActionable.cs" />
     <Compile Include="Loaders\LoadedAssignment.cs" />
@@ -188,6 +198,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="signature.snk" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

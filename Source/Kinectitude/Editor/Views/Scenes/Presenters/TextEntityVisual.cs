@@ -7,19 +7,19 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
     {
         public string Value
         {
-            get { return GetValue<TextRenderComponent, string>("Value"); }
+            get { return GetStringValue<TextRenderComponent>("Value"); }
             set { SetValue<TextRenderComponent, string>("Value", value); }
         }
 
         public float FontSize
         {
-            get { return GetValue<TextRenderComponent, float>("FontSize"); }
+            get { return GetFloatValue<TextRenderComponent>("FontSize"); }
             set { SetValue<TextRenderComponent, float>("FontSize", value); }
         }
 
         public string FontColor
         {
-            get { return GetValue<TextRenderComponent, string>("FontColor"); }
+            get { return GetStringValue<TextRenderComponent>("FontColor"); }
             set { SetValue<TextRenderComponent, string>("FontColor", value); }
         }
 

@@ -6,6 +6,7 @@ using System.Reflection;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Data;
 using Kinectitude.Core.Attributes;
+using Kinectitude.Core.Loaders.Kgl;
 
 namespace Kinectitude.Core.Loaders
 {
@@ -20,7 +21,7 @@ namespace Kinectitude.Core.Loaders
 
         internal Game Game { get; private set; }
 
-        public Game CreateGame()
+        internal Game CreateGame()
         {
             object root = loaderUtility.GetGame();
             PropertyHolder gameProperties = loaderUtility.GetProperties(root);

@@ -7,7 +7,6 @@
         ResizeMode="NoResize"
         SizeToContent="WidthAndHeight"
         FocusManager.FocusedElement="{Binding ElementName=txtName}"
-        Background="{DynamicResource WindowBackgroundBrush}"
         WindowStartupLocation="CenterScreen"
         SnapsToDevicePixels="True"
         x:Name="self">

@@ -35,7 +35,7 @@ namespace Kinectitude.Editor.Models.Statements.Actions
                 AddProperty(new Property(property));
             }
 
-            header = new Header(Plugin.Header, Properties, false);
+            header = new Header(Plugin.Header, Properties, true);
 
             AddDependency<ScopeChanged>("Type");
         }

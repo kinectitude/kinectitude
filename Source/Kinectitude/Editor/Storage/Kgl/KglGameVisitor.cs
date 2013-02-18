@@ -6,6 +6,7 @@ using Kinectitude.Editor.Models.Statements.Base;
 using Kinectitude.Editor.Models.Statements.Conditions;
 using Kinectitude.Editor.Models.Statements.Events;
 using Kinectitude.Editor.Models.Statements.Loops;
+using Kinectitude.Editor.Models.Values;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,13 +18,10 @@ namespace Kinectitude.Editor.Storage.Kgl
 {
     internal sealed class KglGameVisitor : IGameVisitor
     {
-        private const string OpenDef = "{\n";
-        private const string CloseDef = "}\n";
-
-        private static readonly Func<AbstractProperty, bool> validProperties = (property => property.IsLocal);
+        private static readonly Func<AbstractProperty, bool> validProperties = (property => property.HasOwnValue);
         private static readonly Func<GameModel, bool> allValid = (model => true);
         private static readonly Func<Component, bool> validComponent = (component => component.IsRoot || component.HasOwnValues);
-        private static readonly Func<AbstractEvent, bool> validEvt = (evt => evt.IsLocal);
+        private static readonly Func<AbstractEvent, bool> validEvt = (evt => evt.IsEditable);
 
         private int numTabs = 0;
         private string result;
@@ -82,38 +80,55 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         public void Visit(Attribute attribute)
         {
-            result = attribute.Name + " = " + attribute.Value;
+            result = attribute.Name + " = " + attribute.Value.Initializer;
         }
 
         public void Visit(Component component)
         {
             //Three tabs, game, scene, entity then component
-            result = new StringBuilder("\t\t\tComponent ")
-                .Append(component.DisplayName).Append(properties<Property>(component.Properties)).ToString();
+            result = new StringBuilder(tabs()).Append("Component ")
+                .Append(component.Type).Append(properties<Property>(component.Properties)).ToString();
         }
 
-        public void Visit(Condition condition)
+        public void Visit(BasicCondition condition)
+        {
+            visitCondition(condition);
+        }
+
+        public void Visit(ExpressionCondition condition)
+        {
+            visitCondition(condition);
+        }
+
+        public void Visit(ConditionGroup group)
         {
             string tabStr = tabs();
-            StringBuilder conditionBuilder = new StringBuilder(tabStr)
-                .Append("if(").Append(condition.If).Append(')').Append(OpenDef);
-            numTabs++;
-            conditionBuilder.Append(visitMembers<AbstractStatement>(condition.Statements, "\n", allValid));
-            numTabs--;
-            conditionBuilder.Append('\n').Append(tabStr).Append(CloseDef);
-            result = conditionBuilder.ToString();
+            StringBuilder stmt = new StringBuilder(tabStr).Append("if(").Append(group.If.Expression).Append(')');
+            foreach (var elseif in group.Statements)
+            {
+                stmt.Append(tabStr).Append("else if(").Append(group.If.Expression).Append(')');
+                //elseif.Accept(this);
+                stmt.Append(Apply(elseif));
+            }
+            if (group.Else != null)
+            {
+                stmt.Append(tabStr).Append("else");
+                //group.Else.Accept(this);
+                stmt.Append(Apply(group.Else));
+            }
+            result = stmt.ToString();
         }
 
         public void Visit(Define define)
         {
             //Tab from using
-            result = "\tdefine " + define.Name + " as " + define.Class;
+            result = "    define " + define.Name + " as " + define.Class;
         }
 
         public void Visit(Entity entity)
         {
             //tab from game and scene for entity and game for prototype.
-            string tabstr = entity.IsPrototype ? "\t" : "\t\t";
+            string tabstr = entity.IsPrototype ? "    " : "        ";
             StringBuilder entityBuilder = new StringBuilder(tabstr)
                 .Append(entity.IsPrototype? "Prototype " :  "Entity ").Append(entity.Name ?? "");
 
@@ -124,73 +139,82 @@ namespace Kinectitude.Editor.Storage.Kgl
                 entityBuilder.Append(string.Join(", ", prototypes));
             }
 
-            entityBuilder.Append(actions(entity.Attributes)).Append(OpenDef);
+            entityBuilder.Append(actions(entity.Attributes)).Append(openDef());
 
             if(entity.Components.Count != 0) entityBuilder.Append(visitMembers<Component>(entity.Components, "\n", validComponent)).Append('\n');
             if (entity.Events.Count != 0) entityBuilder.Append(visitMembers<AbstractEvent>(entity.Events, "\n", validEvt)).Append('\n');
 
-            result = entityBuilder.ToString();
+            result = entityBuilder.Append(closeDef()).ToString();
         }
 
         public void Visit(Event evt)
         {
-            result = new StringBuilder("\t\t\tEvent ").Append(evt.Type)
-                .Append(properties<AbstractProperty>(evt.Properties)).Append(OpenDef)
-                .Append(visitMembers<AbstractStatement>(evt.Statements, "\n", allValid)).Append("\t\t\t").ToString();
+            result = new StringBuilder("            Event ").Append(evt.Type)
+                .Append(properties<AbstractProperty>(evt.Properties)).Append(openDef())
+                .Append(visitMembers<AbstractStatement>(evt.Statements, "\n", allValid)).Append("            ").Append(closeDef()).ToString();
         }
 
         public void Visit(ForLoop loop)
         {
             string tabin = tabs();
             StringBuilder sb = new StringBuilder(tabin).Append("for(").Append(loop.PreExpression).Append("; ")
-                .Append(loop.Expression).Append("; ").Append(loop.PostExpression).Append(")").Append(OpenDef);
+                .Append(loop.Expression).Append("; ").Append(loop.PostExpression).Append(")").Append(openDef());
 
-            numTabs++;
-            sb.Append(visitMembers<GameModel>(loop.Children, "\n", allValid)).Append(tabs());
-            numTabs--;
+            sb.Append(visitMembers<GameModel>(loop.Children, "\n", allValid));
 
-            sb.Append("\n").Append(tabin).Append(CloseDef);
+            sb.Append("\n").Append(tabin).Append(closeDef());
             result = sb.ToString();
         }
 
         public void Visit(Game game)
         {
             result = new StringBuilder(visitMembers<Using>(game.Usings, "", allValid))
-                .Append(visitMembers<Entity>(game.Prototypes, "", allValid))
-                .Append(visitMembers<Scene>(game.Scenes, "", allValid)).ToString();
+                .Append("Game(").Append(visitMembers<Attribute>(game.Attributes, ",", allValid)).Append(")")
+                .Append(openDef()).Append(visitMembers<Entity>(game.Prototypes, "", allValid))
+                .Append(visitMembers<Scene>(game.Scenes, "", allValid)).Append(closeDef()).ToString();
         }
 
-        public void Visit(InheritedAction action)
+        public void Visit(ReadOnlyAction action)
         {
             result = "";
         }
 
-        public void Visit(InheritedAssignment assignment)
+        public void Visit(ReadOnlyAssignment assignment)
         {
             result = "";
         }
 
-        public void Visit(InheritedCondition condition)
+        public void Visit(ReadOnlyBasicCondition condition)
         {
             result = "";
         }
 
-        public void Visit(InheritedEvent evt)
+        public void Visit(ReadOnlyExpressionCondition condition)
         {
             result = "";
         }
 
-        public void Visit(InheritedForLoop loop)
+        public void Visit(ReadOnlyConditionGroup group)
         {
             result = "";
         }
 
-        public void Visit(InheritedProperty property)
+        public void Visit(ReadOnlyEvent evt)
         {
             result = "";
         }
 
-        public void Visit(InheritedWhileLoop loop)
+        public void Visit(ReadOnlyForLoop loop)
+        {
+            result = "";
+        }
+
+        public void Visit(ReadOnlyProperty property)
+        {
+            result = "";
+        }
+
+        public void Visit(ReadOnlyWhileLoop loop)
         {
             result = "";
         }
@@ -198,44 +222,60 @@ namespace Kinectitude.Editor.Storage.Kgl
         public void Visit(Manager manager)
         {
             //Tab from scene, game
-            result = new StringBuilder("\t\tManager ")
+            result = new StringBuilder("        Manager ")
                 .Append(manager.Type).Append(properties<Property>(manager.Properties)).ToString();
         }
 
         public void Visit(Property property)
         {
-            result = property.Name + '=' + property.Value;
+            //TODO change this when it is a value
+            result = property.Name + '=' + Apply(property.Value);
         }
 
         public void Visit(Scene scene)
         {
             //tab from game
-            StringBuilder sceneBuilder = new StringBuilder("\tScene ").Append(scene.Name);
+            StringBuilder sceneBuilder = new StringBuilder("    Scene ").Append(scene.Name).Append(actions(scene.Attributes)).Append(openDef());
+
             if (scene.Managers.Count != 0)
                 sceneBuilder.Append(visitMembers<Manager>(scene.Managers, "\n", allValid)).Append('\n');
 
-            sceneBuilder.Append(visitMembers<Entity>(scene.Entities, "", allValid));
+            sceneBuilder.Append(visitMembers<Entity>(scene.Entities, "", allValid)).Append(closeDef());
             result = sceneBuilder.ToString();
+        }
+
+        public void Visit(Service service)
+        {
+            result = new StringBuilder("        Service ")
+                .Append(service.Type).Append(properties<Property>(service.Properties)).ToString();
         }
 
         public void Visit(Using use)
         {
-            result = new StringBuilder("Using ").Append(use.File).Append(OpenDef)
-                .Append(visitMembers<Define>(use.Defines, "\n", allValid)).Append(CloseDef).ToString();
+            if (use.File == null) return;
+            result = new StringBuilder("using ").Append(use.File).Append(openDef())
+                .Append(visitMembers<Define>(use.Defines, "\n", allValid)).Append(closeDef()).Append("\n").ToString();
+        }
+
+        public void Visit(Value val)
+        {
+            result = val.Initializer;
         }
 
         public void Visit(WhileLoop loop)
         {
-            string tabin = tabs();
-            StringBuilder sb = new StringBuilder(tabin).Append("while(").Append("; ")
-                .Append(loop.Expression).Append("; ").Append(")").Append(OpenDef);
+            StringBuilder sb = new StringBuilder(tabs()).Append("while(").Append(loop.Expression).Append(")")
+                .Append(openDef()).Append(visitMembers<GameModel>(loop.Children, "\n", allValid)).Append(closeDef());
 
-            numTabs++;
-            sb.Append(visitMembers<GameModel>(loop.Children, "\n", allValid)).Append(tabs());
-            numTabs--;
-
-            sb.Append("\n").Append(tabin).Append(CloseDef);
             result = sb.ToString();
+        }
+
+        private void visitCondition(AbstractCondition condition)
+        {
+            StringBuilder conditionBuilder = new StringBuilder(openDef());
+            conditionBuilder.Append(visitMembers<AbstractStatement>(condition.Statements, "\n", allValid));
+            conditionBuilder.Append(closeDef());
+            result = conditionBuilder.ToString();
         }
 
         private string properties<T>(IEnumerable<T> properties) where T : AbstractProperty
@@ -263,8 +303,23 @@ namespace Kinectitude.Editor.Storage.Kgl
         private string tabs()
         {
             StringBuilder tabBuilder = new StringBuilder();
-            for (int i = 0; i < numTabs; i++) tabBuilder.Append('\t');
+            for (int i = 0; i < numTabs; i++) tabBuilder.Append("    ");
             return tabBuilder.ToString();
         }
+
+        private string openDef()
+        {
+            
+            string ret = "\n" + tabs() + "{\n";
+            numTabs++;
+            return ret;
+        }
+
+        private string closeDef()
+        {
+            numTabs--;
+            return "\n" + tabs() + "}\n" ;
+        }
+
     }
 }

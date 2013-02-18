@@ -17,7 +17,7 @@ namespace Kinectitude.Core.Data
             get { return Watcher.GetTypeMatcher()[Param]; }
         }
 
-        internal static TypeMatcherDCReader GetTypeMatcherDCValueReader(object obj, string objParam, string param,  Entity owner)
+        internal static TypeMatcherDCReader GetTypeMatcherDCValueReader(object obj, string objParam, string param, IDataContainer owner)
         {
             TypeMatcherWatcher watcher = TypeMatcherWatcher.GetTypeMatcherWatcher(obj, objParam, owner);
             Func<TypeMatcherDCReader> create = new Func<TypeMatcherDCReader>(() => new TypeMatcherDCReader(watcher, param));
@@ -37,7 +37,7 @@ namespace Kinectitude.Core.Data
             Entity entity = Watcher.GetTypeMatcher().Entity;
             lastEntity = entity;
             entity.StopNotifications(Param, this);
-            ((IChangeable)this).Change();
+            ((IChanges)this).Change();
         }
         internal override ValueWriter ConvertToWriter() { return new TypeMatcherDCWriter(this); }
     }

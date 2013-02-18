@@ -5,9 +5,11 @@ using Kinectitude.Editor.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Component = Kinectitude.Editor.Models.Component;
 using Kinectitude.Editor.Models.Properties;
+using Kinectitude.Editor.Models.Values;
 
 namespace Kinectitude.Editor.Tests
 {
+    /*
     [TestClass]
     public class PropertyTests
     {
@@ -39,12 +41,12 @@ namespace Kinectitude.Editor.Tests
             Property property = component.GetProperty("X");
             property.PropertyChanged += (o, e) => eventFired |= (e.PropertyName == "Value");
 
-            property.Value = 500;
+            property.Value = new Value("500");
 
             Assert.IsTrue(eventFired);
-            Assert.AreEqual(500, component.Properties.Single(x => x.Name == "X").Value);
+            Assert.AreEqual(500, component.Properties.Single(x => x.Name == "X").Value.Reader.GetIntValue());
             //Assert.IsTrue(property.IsRoot);
-            Assert.IsFalse(property.IsInherited);
+            Assert.IsFalse(property.IsReadOnly);
         }
 
         [TestMethod]
@@ -69,21 +71,21 @@ namespace Kinectitude.Editor.Tests
             Property childProperty = childComponent.GetProperty("X");
 
             Assert.IsFalse(childProperty.HasOwnValue);
-            Assert.AreEqual(childProperty.PluginProperty.DefaultValue, childProperty.Value);
+            Assert.AreEqual(childProperty.PluginProperty.DefaultValue.Reader.GetPreferedValue(), childProperty.Value.Reader.GetPreferedValue());
 
             Entity parent = new Entity() { Name = "parent" };
 
             Component parentComponent = new Component(plugin);
 
             Property parentProperty = parentComponent.GetProperty("X");
-            parentProperty.Value = 500;
+            parentProperty.Value = new Value("500");
 
             parent.AddComponent(parentComponent);
 
             child.AddPrototype(parent);
 
             Assert.IsFalse(childProperty.HasOwnValue);
-            Assert.AreEqual(500, childProperty.Value);
+            Assert.AreEqual(500, childProperty.Value.Reader.GetIntValue());
         }
 
         //[TestMethod]
@@ -119,7 +121,7 @@ namespace Kinectitude.Editor.Tests
             Component parentComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             
             Property parentProperty = parentComponent.GetProperty("X");
-            parentProperty.Value = 500;
+            parentProperty.Value = new Value("500");
             parent.AddComponent(parentComponent);
 
             Entity child = new Entity();
@@ -129,11 +131,11 @@ namespace Kinectitude.Editor.Tests
             
             Property childProperty = childComponent.GetProperty("X");
 
-            Assert.AreEqual(500, childProperty.Value);
+            Assert.AreEqual(500, childProperty.Value.Reader.GetIntValue());
 
-            parentProperty.Value = 250;
+            parentProperty.Value = new Value("250");
 
-            Assert.AreEqual(250, childProperty.Value);
+            Assert.AreEqual(250, childProperty.Value.Reader.GetIntValue());
         }
 
         [TestMethod]
@@ -144,7 +146,7 @@ namespace Kinectitude.Editor.Tests
             Component parentComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             
             Property parentProperty = parentComponent.GetProperty("X");
-            parentProperty.Value = 500;
+            parentProperty.Value = new Value("500");
             parent.AddComponent(parentComponent);
 
             Entity otherParent = new Entity() { Name = "otherParent" };
@@ -152,7 +154,7 @@ namespace Kinectitude.Editor.Tests
             Component otherParentComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             
             Property otherParentProperty = otherParentComponent.GetProperty("X");
-            otherParentProperty.Value = 250;
+            otherParentProperty.Value = new Value("250");
             otherParent.AddComponent(otherParentComponent);
 
             Entity child = new Entity();
@@ -162,14 +164,14 @@ namespace Kinectitude.Editor.Tests
             
             Property childProperty = childComponent.GetProperty("X");
 
-            Assert.AreEqual(500, childProperty.Value);
+            Assert.AreEqual(500, childProperty.Value.Reader.GetIntValue());
 
             child.RemovePrototype(parent);
             child.AddPrototype(otherParent);
             childComponent = child.GetComponentByType(TransformComponentType);
             childProperty = childComponent.GetProperty("X");
 
-            Assert.AreEqual(250, childProperty.Value);
+            Assert.AreEqual(250, childProperty.Value.Reader.GetIntValue());
         }
 
         [TestMethod]
@@ -181,7 +183,7 @@ namespace Kinectitude.Editor.Tests
 
             Assert.IsFalse(property.HasOwnValue);
 
-            property.Value = 5;
+            property.Value = new Value("5");
 
             Assert.IsTrue(property.HasOwnValue);
         }
@@ -192,7 +194,7 @@ namespace Kinectitude.Editor.Tests
             Entity parent = new Entity() { Name = "parent" };
 
             Component parentComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
-            parentComponent.SetProperty("X", 500);
+            parentComponent.SetProperty("X", new Value("500"));
 
             parent.AddComponent(parentComponent);
 
@@ -200,22 +202,22 @@ namespace Kinectitude.Editor.Tests
 
             Component childComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
             Property childProperty = childComponent.GetProperty("X");
-            childProperty.Value = 250;
+            childProperty.Value = new Value("250");
 
             child.AddComponent(childComponent);
 
             Assert.IsTrue(childProperty.HasOwnValue);
-            Assert.AreEqual(250, childProperty.Value);
+            Assert.AreEqual(250, childProperty.Value.Reader.GetIntValue());
 
             child.AddPrototype(parent);
 
             Assert.IsTrue(childProperty.HasOwnValue);
-            Assert.AreEqual(250, childProperty.Value);
+            Assert.AreEqual(250, childProperty.Value.Reader.GetIntValue());
 
             childProperty.Value = null;
 
             Assert.IsFalse(childProperty.HasOwnValue);
-            Assert.AreEqual(500, childProperty.Value);
+            Assert.AreEqual(500, childProperty.Value.Reader.GetIntValue());
         }
 
         [TestMethod]
@@ -253,5 +255,5 @@ namespace Kinectitude.Editor.Tests
         {
             
         }
-    }
+    }*/
 }

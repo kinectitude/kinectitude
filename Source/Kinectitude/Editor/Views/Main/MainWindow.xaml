@@ -19,8 +19,12 @@
         <DataTemplate x:Key="TabItemTemplate">
             <DockPanel MinWidth="64">
                 <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
-                <Button HorizontalAlignment="Right" Margin="8,4,0,2" Width="16" Height="16" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=CloseItemCommand}" CommandParameter="{Binding}">
-                    <Image Source="{StaticResource icoClose}" />
+                <Button HorizontalAlignment="Right" Margin="8,4,0,2" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.CloseItemCommand}" CommandParameter="{Binding}">
+                    <Button.Template>
+                        <ControlTemplate>
+                            <Image Source="{StaticResource icoClose}" Width="16" Height="16" />
+                        </ControlTemplate>    
+                    </Button.Template>
                 </Button>
             </DockPanel>
         </DataTemplate>
@@ -77,15 +81,49 @@
                 </MenuItem>
                 <Separator />
             </MenuItem>
-            <MenuItem Header="_Game">
-                <MenuItem Header="_Create Scene" />
-                <MenuItem Header="_Delete Scene" />
-                <Separator />
-                <MenuItem Header="_Create Prototype" />
-                <MenuItem Header="_Delete Prototype" />
-            </MenuItem>
         </Menu>
 
+        <ToolBarTray DockPanel.Dock="Top" Orientation="Horizontal" IsLocked="True">
+            <ToolBar Band="1" BandIndex="1">
+                <Button>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{StaticResource icoNew}" Stretch="None" Margin="0,0,4,0" />
+                        <TextBlock VerticalAlignment="Center">New Project</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button>
+                    <Image Source="{StaticResource icoOpen}" Stretch="None" />
+                </Button>
+                <Button>
+                    <Image Source="{StaticResource icoSave}" Stretch="None" />
+                </Button>
+                <Separator Margin="4,0,4,0" />
+                <Button>
+                    <Image Source="{StaticResource icoCut}" Stretch="None" />
+                </Button>
+                <Button>
+                    <Image Source="{StaticResource icoCopy}" Stretch="None" />
+                </Button>
+                <Button>
+                    <Image Source="{StaticResource icoPaste}" Stretch="None" />
+                </Button>
+                <Separator Margin="4,0,4,0" />
+                <Button>
+                    <Image Source="{StaticResource icoUndo}" Stretch="None" />
+                </Button>
+                <Button>
+                    <Image Source="{StaticResource icoRedo}" Stretch="None" />
+                </Button>
+                <Separator Margin="4,0,4,0" />
+                <Button Margin="0,0,4,0">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{StaticResource icoPlay}" Stretch="None" Margin="0,0,4,0" />
+                        <TextBlock VerticalAlignment="Center">Play</TextBlock>
+                    </StackPanel>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+        
         <Grid DockPanel.Dock="Left" Margin="4,0,4,4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
@@ -93,13 +131,14 @@
                 <ColumnDefinition Width="300" />
             </Grid.ColumnDefinitions>
 
-            <TabControl Grid.Column="0"
-                        ItemsSource="{Binding OpenItems}"
-                        Name="tabItems"
-                        SelectedItem="{Binding ActiveItem}"
-                        ContentTemplate="{StaticResource TabContentTemplate}"
-                        ItemTemplate="{StaticResource TabItemTemplate}"
-                        Padding="4" />
+            <TabControl DataContext="{Binding Project}"
+                    Grid.Column="0"
+                    ItemsSource="{Binding OpenItems}"
+                    Name="tabItems"
+                    SelectedItem="{Binding ActiveItem}"
+                    ContentTemplate="{StaticResource TabContentTemplate}"
+                    ItemTemplate="{StaticResource TabItemTemplate}"
+                    Padding="4" />            
 
             <GridSplitter Width="4" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Style="{StaticResource gridSplitter}" />
 
@@ -146,7 +185,7 @@
                                     </HierarchicalDataTemplate.ItemsSource>
                                     <StackPanel Orientation="Horizontal">
                                         <StackPanel.InputBindings>
-                                            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=OpenItemCommand, Mode=OneWay}" CommandParameter="{Binding}" />
+                                            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.OpenItemCommand, Mode=OneWay}" CommandParameter="{Binding}" />
                                         </StackPanel.InputBindings>
                                         <Image Source="{StaticResource icoGame}" />
                                         <TextBlock Text="{Binding Name}" FontWeight="Bold" Padding="3" />
@@ -168,7 +207,7 @@
                                 <HierarchicalDataTemplate DataType="{x:Type m:Scene}" ItemsSource="{Binding Entities}">
                                     <StackPanel Orientation="Horizontal">
                                         <StackPanel.InputBindings>
-                                            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=OpenItemCommand, Mode=OneWay}" CommandParameter="{Binding}" />
+                                            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.OpenItemCommand, Mode=OneWay}" CommandParameter="{Binding}" />
                                         </StackPanel.InputBindings>
                                         <Image Source="{StaticResource icoScene}" />
                                         <TextBlock Text="{Binding Name}" Padding="3" />
@@ -186,7 +225,7 @@
                                 <DataTemplate DataType="{x:Type m:Entity}">
                                     <StackPanel Orientation="Horizontal">
                                         <StackPanel.InputBindings>
-                                            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=OpenItemCommand, Mode=OneWay}" CommandParameter="{Binding}" />
+                                            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.OpenItemCommand, Mode=OneWay}" CommandParameter="{Binding}" />
                                         </StackPanel.InputBindings>
                                         <Image Source="{StaticResource icoEntity}" />
                                         <TextBlock Text="{Binding DisplayName}" Padding="3" />
@@ -212,7 +251,7 @@
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="SelectedItemChanged">
                                     <i:EventTrigger.Actions>
-                                        <i:InvokeCommandAction Command="{Binding Source={x:Static m:Workspace.Instance}, Path=InspectItemCommand, Mode=OneWay}"
+                                        <i:InvokeCommandAction Command="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.InspectItemCommand, Mode=OneWay}"
                                                                CommandParameter="{Binding ElementName=treGame, Path=SelectedItem}" />
                                     </i:EventTrigger.Actions>
                                 </i:EventTrigger>
@@ -224,7 +263,7 @@
 
                 <GridSplitter Height="4" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" Style="{StaticResource gridSplitter}" />
 
-                <DockPanel x:Name="dockDetails" Grid.Row="2" DataContext="{Binding InspectorItem, Mode=OneWay}">
+                <DockPanel x:Name="dockDetails" Grid.Row="2" DataContext="{Binding Project.InspectorItem, Mode=OneWay}">
                     <DockPanel.Resources>
                         <CompositeCollection x:Key="detailsCollection">
                             <Expander IsExpanded="True">
@@ -243,7 +282,7 @@
                                                             <ColumnDefinition Width="0.5*" />
                                                             <ColumnDefinition Width="*" />
                                                         </Grid.ColumnDefinitions>
-                                                        <TextBox IsEnabled="{Binding IsLocal}" Text="{Binding Name}" Grid.Column="0" Margin="0,0,2,0" />
+                                                        <TextBox IsEnabled="{Binding IsEditable}" Text="{Binding Name}" Grid.Column="0" Margin="0,0,2,0" />
                                                         <Properties:PropertyView DataContext="{Binding}" Grid.Column="1" />
                                                     </Grid>
                                                 </Border>
@@ -300,7 +339,7 @@
                                                             <ColumnDefinition Width="*" />
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Text="{Binding Name}" Grid.Column="0" />
-                                                        <Properties:PropertyView IsEnabled="{Binding IsLocal}" DataContext="{Binding TypedValue}" Grid.Column="1" />
+                                                        <Properties:PropertyView DataContext="{Binding}" Grid.Column="1" />
                                                     </Grid>
                                                 </Border>
                                             </DataTemplate>

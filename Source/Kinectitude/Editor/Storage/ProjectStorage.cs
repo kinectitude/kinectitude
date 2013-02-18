@@ -1,5 +1,5 @@
 ﻿using Kinectitude.Editor.Models;
-using Kinectitude.Editor.Storage.Xml;
+using Kinectitude.Editor.Storage.Kgl;
 using System.IO;
 using System.Xml.Linq;
 
@@ -22,32 +22,31 @@ namespace Kinectitude.Editor.Storage
 
             if (file.Extension == ".kgl")
             {
-                //storage = new KglGameStorage(file);
-            }
-            else if (file.Extension == ".xml")
-            {
-                storage = new XmlGameStorage(file);
+                storage = new KglGameStorage(file);
             }
 
             return storage;
         }
 
+        public static void CreateProject(Project project)
+        {
+            var directory = new DirectoryInfo(project.Location);
+            if (!directory.Exists)
+            {
+                directory.Create();
+            }
+
+            project.GameRoot = "Data/";
+            project.GameFile = "game.kgl";
+            
+            Directory.CreateDirectory(Path.Combine(project.Location, project.GameRoot));
+
+            SaveProject(project);
+        }
+
         public static void SaveProject(Project project)
         {
-            FileInfo projectFile = new FileInfo(project.File);
-
-            DirectoryInfo gameRoot = new DirectoryInfo(Path.Combine(projectFile.DirectoryName, project.GameRoot));
-            if (!gameRoot.Exists)
-            {
-                gameRoot.Create();
-            }
-
-            if (string.IsNullOrEmpty(project.GameFile))
-            {
-                project.GameFile = "game.xml";  // TODO: This is a temporary fix until we require GameFile to always exist
-            }
-
-            IGameStorage storage = CreateGameStorage(new FileInfo(Path.Combine(gameRoot.ToString(), project.GameFile)));
+            var storage = CreateGameStorage(new FileInfo(Path.Combine(project.Location, project.GameRoot, project.GameFile)));
             storage.SaveGame(project.Game);
 
             XElement projectElement = new XElement(
@@ -61,6 +60,7 @@ namespace Kinectitude.Editor.Storage
                 projectElement.Add(new XElement(Constants.Asset, new XAttribute(Constants.File, asset.File)));
             }
 
+            var projectFile = new FileInfo(project.FileName);
             projectElement.Save(projectFile.ToString());
         }
 
@@ -79,7 +79,7 @@ namespace Kinectitude.Editor.Storage
 
                     project = new Project()
                     {
-                        File = file.ToString(),
+                        Title = file.ToString(),
                         GameRoot = (string)projectElement.Attribute(Constants.GameRoot),
                         GameFile = (string)projectElement.Attribute(Constants.GameFile)
                     };
@@ -90,7 +90,7 @@ namespace Kinectitude.Editor.Storage
                         project.AddAsset(asset);
                     }
 
-                    FileInfo gameFile = new FileInfo(Path.Combine(Path.GetDirectoryName(project.File), project.GameRoot, project.GameFile));
+                    FileInfo gameFile = new FileInfo(Path.Combine(Path.GetDirectoryName(project.Title), project.GameRoot, project.GameFile));
 
                     if (gameFile.Exists)
                     {

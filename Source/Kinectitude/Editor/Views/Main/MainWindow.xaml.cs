@@ -1,4 +1,5 @@
 ﻿using Kinectitude.Editor.Models;
+using Kinectitude.Editor.Views.Utils;
 using System.Windows;
 
 namespace Kinectitude.Editor.Views.Main
@@ -10,12 +11,10 @@ namespace Kinectitude.Editor.Views.Main
     {
         public MainWindow()
         {
-            DataContext = Workspace.Instance;
-            Workspace.Instance.Initialize();
-
-            Workspace.Instance.NewProject();
-
             InitializeComponent();
+
+            Workspace.Instance.Initialize();
+            DataContext = Workspace.Instance;
         }
     }
 }

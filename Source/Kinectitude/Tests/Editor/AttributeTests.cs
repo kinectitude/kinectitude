@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Kinectitude.Editor.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Kinectitude.Editor.Models.Values;
 
 namespace Kinectitude.Editor.Tests
 {
@@ -29,10 +30,10 @@ namespace Kinectitude.Editor.Tests
             Attribute attribute = new Attribute("test");
             attribute.PropertyChanged += (o, e) => propertyChanged |= (e.PropertyName == "Value");
             
-            attribute.Value = "value";
+            attribute.Value = new Value("value");
 
             Assert.IsTrue(propertyChanged);
-            Assert.AreEqual("value", attribute.Value);
+            Assert.AreEqual("value", attribute.Value.Initializer);
         }
 
         [TestMethod]
@@ -71,10 +72,10 @@ namespace Kinectitude.Editor.Tests
             Attribute childAttribute = child.GetAttribute("test");
             //childAttribute.PropertyChanged += (o, e) => propertyChanged = (e.PropertyName == "Value");
 
-            parentAttribute.Value = "value";
+            parentAttribute.Value = new Value("value");
 
             //Assert.IsTrue(propertyChanged);
-            Assert.AreEqual("value", childAttribute.Value);
+            Assert.AreEqual("value", childAttribute.Value.Initializer);
         }
 
         [TestMethod]
@@ -95,7 +96,7 @@ namespace Kinectitude.Editor.Tests
             Attribute childAttribute = child.GetAttribute("test");
             childAttribute.PropertyChanged += (o, e) => propertyChanged |= (e.PropertyName == "HasOwnValue");
 
-            childAttribute.Value = "value";
+            childAttribute.Value = new Value("value");
 
             Assert.IsTrue(propertyChanged);
             Assert.AreEqual(1, child.Attributes.Count(x => x.HasOwnValue));
@@ -106,7 +107,7 @@ namespace Kinectitude.Editor.Tests
         {
             Entity parent = new Entity() { Name = "parent" };
 
-            Attribute parentAttribute = new Attribute("test") { Value = "originalValue" };
+            Attribute parentAttribute = new Attribute("test") { Value = new Value("originalValue") };
             parent.AddAttribute(parentAttribute);
 
             Entity child = new Entity();
@@ -114,14 +115,14 @@ namespace Kinectitude.Editor.Tests
 
             Attribute childAttribute = child.GetAttribute("test");
 
-            childAttribute.Value = "value";
+            childAttribute.Value = new Value("value");
 
-            Assert.AreEqual(childAttribute.Value, "value");
+            Assert.AreEqual(childAttribute.Value.Initializer, "value");
             Assert.AreEqual(1, child.Attributes.Count(x => x.HasOwnValue));
 
             childAttribute.Value = null;
 
-            Assert.AreEqual(childAttribute.Value, "originalValue");
+            Assert.AreEqual(childAttribute.Value.Initializer, "originalValue");
             Assert.AreEqual(0, child.Attributes.Count(x => x.HasOwnValue));
         }
     }

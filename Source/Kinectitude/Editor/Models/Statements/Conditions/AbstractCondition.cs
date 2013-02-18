@@ -5,25 +5,11 @@ namespace Kinectitude.Editor.Models.Statements.Conditions
 {
     internal abstract class AbstractCondition : CompositeStatement, IStatementScope
     {
-        public abstract string If { get; set; }
-
-        protected AbstractCondition(AbstractCondition inheritedCondition = null) : base(inheritedCondition) { }
-
-        public sealed override AbstractStatement DeepCopyStatement()
+        public virtual bool HasExpression
         {
-            Condition copy = new Condition() { If = this.If };
-
-            foreach (AbstractStatement statement in Statements)
-            {
-                copy.AddStatement(statement.DeepCopyStatement());
-            }
-
-            return copy;
+            get { return false; }
         }
 
-        public sealed override AbstractStatement CreateInheritor()
-        {
-            return new InheritedCondition(this);
-        }
+        protected AbstractCondition(AbstractCondition inheritedCondition) : base(inheritedCondition) { }
     }
 }

@@ -3,6 +3,7 @@ using Kinectitude.Editor.Views.Scenes;
 using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Forms;
 
 namespace Kinectitude.Editor.Views.Utils
 {
@@ -10,20 +11,11 @@ namespace Kinectitude.Editor.Views.Utils
     {
         public delegate void DialogCallback(bool? result);
         public delegate void FileDialogCallback(bool? result, string file);
+        public delegate void FolderDialogCallback(DialogResult result, string folder);
 
-        public static class Constants
+        public static void ShowDialog<TWindow>(object viewModel, DialogCallback onDialogClose) where TWindow : Window, new()
         {
-            public static readonly string EntityDialog = typeof(EntityDialog).Name;
-            public static readonly string AddEntityDialog = typeof(AddEntityDialog).Name;
-            public static readonly string NameDialog = typeof(NameDialog).Name;
-            public static readonly string SceneDialog = typeof(SceneDialog).Name;
-        }
-
-        private static readonly Dictionary<string, Type> views = new Dictionary<string, Type>();
-
-        public static void ShowDialog<TViewModel>(string name, TViewModel viewModel, DialogCallback onDialogClose)
-        {
-            Window view = GetWindow(name);
+            Window view = new TWindow();
             view.DataContext = viewModel;
 
             if (null != onDialogClose)
@@ -33,14 +25,14 @@ namespace Kinectitude.Editor.Views.Utils
             view.ShowDialog();
         }
 
-        public static void ShowDialog<TViewModel>(string name, TViewModel viewModel)
+        public static void ShowDialog<TWindow>(object viewModel = null) where TWindow : Window, new()
         {
-            ShowDialog(name, viewModel, null);
+            ShowDialog<TWindow>(viewModel, null);
         }
 
         public static void ShowLoadDialog(FileDialogCallback onClose)
         {
-            Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
+            var dialog = new Microsoft.Win32.OpenFileDialog();
 
             dialog.DefaultExt = ".xml";
             dialog.Filter = "Kinectitude XML Files (.xml)|*.xml";
@@ -86,7 +78,7 @@ namespace Kinectitude.Editor.Views.Utils
 
         public static void ShowSaveDialog(FileDialogCallback onClose)
         {
-            Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
+            var dialog = new Microsoft.Win32.SaveFileDialog();
 
             dialog.DefaultExt = ".xml";
             dialog.Filter = "Kinectitude XML Files (.xml)|*.xml";
@@ -99,21 +91,22 @@ namespace Kinectitude.Editor.Views.Utils
             }
         }
 
+        public static void ShowFolderDialog(FolderDialogCallback onClose)
+        {
+            var dialog = new FolderBrowserDialog();
+            //dialog.SelectedPath = Environment.SpecialFolder.Personal;
+
+            var result = dialog.ShowDialog();
+            
+            if (null != onClose)
+            {
+                onClose(result, dialog.SelectedPath);
+            }
+        }
+
         public static void ShowMessageDialog(string title, string message, DialogCallback onClose)
         {
 
-        }
-
-        private static Window GetWindow(string name)
-        {
-            Type type;
-            views.TryGetValue(name, out type);
-            return Activator.CreateInstance(type) as Window;
-        }
-
-        public static void RegisterWindow<TWindow>(string name) where TWindow : Window
-        {
-            views[name] = typeof(TWindow);
         }
     }
 }

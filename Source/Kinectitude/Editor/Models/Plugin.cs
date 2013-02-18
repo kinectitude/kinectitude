@@ -8,10 +8,11 @@ namespace Kinectitude.Editor.Models
 {
     public enum PluginType
     {
+        Service,
         Manager,
         Component,
         Event,
-        Action
+        Action,
     }
 
     internal sealed class Plugin : BaseModel

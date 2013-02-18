@@ -29,7 +29,7 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
             }
         }
 
-        private void OnPropertyChanged(PluginProperty property)
+        private void OnPropertyChanged(Component component, PluginProperty property)
         {
             NotifyPropertyChanged(property.Name);
         }

@@ -1,5 +1,7 @@
 ﻿using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
+using Kinectitude.Editor.Models.Values;
 using Kinectitude.Editor.Storage;
 using System;
 using System.Collections.Generic;
@@ -8,24 +10,34 @@ using Kinectitude.Editor.Views.Utils;
 
 namespace Kinectitude.Editor.Models.Properties
 {
-    internal sealed class Property : AbstractProperty
+    internal sealed class Property : AbstractProperty, IValueScope
     {
         private readonly PluginProperty pluginProperty;
-        private object val;
+        private Value val;
 
         public override PluginProperty PluginProperty
         {
             get { return pluginProperty; }
         }
 
-        public override object Value
+        public override Value Value
         {
             get { return val ?? GetInheritedValue(); }
             set
             {
                 if (val != value)
                 {
+                    if (null != val)
+                    {
+                        val.Scope = null;
+                    }
+
                     val = value;
+
+                    if (null != val)
+                    {
+                        val.Scope = this;
+                    }
                     NotifyPropertyChanged("Value");
                 }
             }
@@ -79,18 +91,6 @@ namespace Kinectitude.Editor.Models.Properties
         public override void Accept(IGameVisitor visitor)
         {
             visitor.Visit(this);
-        }
-
-        public T GetValue<T>()
-        {
-            T ret = default(T);
-
-            if (null != Value)
-            {
-                ret = (T)System.Convert.ChangeType(Value, typeof(T));
-            }
-
-            return ret;
         }
     }
 }

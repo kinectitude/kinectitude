@@ -51,6 +51,8 @@ namespace Kinectitude.Core.Base
         //used for each funciton name
         private static readonly Dictionary<string, FunctionHolder> functions = new Dictionary<string, FunctionHolder>();
 
+        private static readonly HashSet<string> registeredNames = new HashSet<string>();
+
         static ClassFactory()
         {
             RegisterType("AttributeChanges", typeof(AttributeChangesEvent));
@@ -61,7 +63,7 @@ namespace Kinectitude.Core.Base
             RegisterType("FireTrigger", typeof(FireTriggerAction));
             RegisterType("TriggerOccurs", typeof(TriggerOccursEvent));
             RegisterType("Transform", typeof(TransformComponent));
-            RegisterType("TimeManager", typeof(TimeManager));
+            RegisterType("Time", typeof(TimeManager));
             RegisterType("CreateEntity", typeof(CreateEntityAction));
             RegisterType("Destroy", typeof(DestroyAction));
             RegisterType("CreateTimer", typeof(CreateTimerAction));
@@ -91,14 +93,19 @@ namespace Kinectitude.Core.Base
 
         internal static void RegisterFunction(string registeredName, MethodInfo methodInfo)
         {
-            //if (FunctionHolder.HasFunction(registeredName)) Game.CurrentGame.Die("The function " + registeredName + " is declared twice");
+#if !TEST
+            if (registeredNames.Contains(registeredName)) Game.CurrentGame.Die(registeredName + " is defined twice!");
+#endif
+            registeredNames.Add(registeredName);
             FunctionHolder.AddFunction(registeredName, methodInfo);
         }
 
         internal static void RegisterType(string registeredName, Type type)
         {
-            //if (Constructors.ContainsKey(registeredName)) Game.CurrentGame.Die("The class " + registeredName + "  is declared twice");
-            if (typeof(Component).IsAssignableFrom(type))
+#if !TEST
+            if (registeredNames.Contains(registeredName)) Game.CurrentGame.Die(registeredName + " is defined twice!");
+#endif
+            registeredNames.Add(registeredName); if (typeof(Component).IsAssignableFrom(type))
             {
                 List<Type> provides = new List<Type>();
                 foreach (ProvidesAttribute provided in type.GetCustomAttributes(true).
@@ -293,10 +300,9 @@ namespace Kinectitude.Core.Base
             return name;
         }
 
-        internal Type getParamType(string refered, string param)
+        internal static bool isRegistered(string name)
         {
-            Type type = TypesDict[refered];
-            return paramType[type][param];
+            return registeredNames.Contains(name);
         }
     }
 }

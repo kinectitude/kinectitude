@@ -44,7 +44,10 @@ namespace Kinectitude.Core.Loaders
             }
             
             //it is a prototype
-            if (id < 0) Prototypes.Add(name, this);
+#if !TEST
+            if(name != null && Prototypes.ContainsKey(name)) Game.CurrentGame.Die("The prototype " + name + " was already defined");
+#endif
+            if (id < 0) Prototypes[name] = this;
         }
 
         internal void AddLoadedComponent(LoadedComponent component)

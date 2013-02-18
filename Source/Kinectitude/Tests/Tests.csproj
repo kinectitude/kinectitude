@@ -31,6 +31,12 @@
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>signature.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -51,6 +57,7 @@
     <Compile Include="Core\Actions.cs" />
     <Compile Include="Core\Changes.cs" />
     <Compile Include="Core\Conditions.cs" />
+    <Compile Include="Core\BadName.cs" />
     <Compile Include="Core\defaults.cs" />
     <Compile Include="Core\Functions.cs" />
     <Compile Include="Core\Loops.cs" />
@@ -69,8 +76,10 @@
     <Compile Include="Editor\EntityTests.cs" />
     <Compile Include="Editor\EventTests.cs" />
     <Compile Include="Editor\GameTests.cs" />
+    <Compile Include="Editor\LoadSave.cs" />
     <Compile Include="Editor\PropertyTests.cs" />
     <Compile Include="Editor\SceneTests.cs" />
+    <Compile Include="Editor\DataTests.cs" />
     <Compile Include="Editor\WorkspaceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -82,6 +91,14 @@
     <ProjectReference Include="..\Editor\Kinectitude.Editor.csproj">
       <Project>{541AF93B-398E-463E-9C11-BC957BE0DB19}</Project>
       <Name>Kinectitude.Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Kinect\Kinectitude.Kinect.csproj">
+      <Project>{43dcbee6-f87e-4f59-9146-3e67b1ed3c45}</Project>
+      <Name>Kinectitude.Kinect</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Physics\Kinectitude.Physics.csproj">
+      <Project>{6b0352b2-eecb-4810-bedc-b80c4417ab1b}</Project>
+      <Name>Kinectitude.Physics</Name>
     </ProjectReference>
     <ProjectReference Include="..\Render\Kinectitude.Render.csproj">
       <Project>{E6DD6F76-999C-4B56-887C-347FAF50DAB3}</Project>
@@ -100,6 +117,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Core\conditions.kgl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Core\badName.kgl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Core\defaults.kgl">
@@ -141,6 +161,13 @@
     <None Include="Core\inheritence.kgl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Editor\original.kgl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Editor\read.kgl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="signature.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

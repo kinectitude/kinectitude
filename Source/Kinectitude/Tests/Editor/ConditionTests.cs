@@ -16,35 +16,68 @@ namespace Kinectitude.Editor.Tests
         private static readonly string FireTriggerActionType = typeof(Kinectitude.Core.Actions.FireTriggerAction).FullName;
 
         [TestMethod]
-        public void AddCondition()
+        public void AddConditionGroup()
         {
             bool collectionChanged = false;
 
             Event evt = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
             evt.Statements.CollectionChanged += (o, e) => collectionChanged = true;
 
-            Condition condition = new Condition() { If = "test > 1" };
-            evt.AddStatement(condition);
+            ConditionGroup group = new ConditionGroup();
+            evt.AddStatement(group);
 
             Assert.IsTrue(collectionChanged);
-            Assert.AreEqual("test > 1", condition.If);
             Assert.AreEqual(1, evt.Statements.Count);
+            Assert.IsNotNull(group.If);
+            Assert.IsNull(group.Else);
         }
 
         [TestMethod]
-        public void RemoveCondition()
+        public void RemoveConditionGroup()
         {
             int eventsFired = 0;
 
             Event evt = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
             evt.Statements.CollectionChanged += (o, e) => eventsFired++;
 
-            Condition condition = new Condition() { If = "test > 1" };
-            evt.AddStatement(condition);
-            evt.RemoveStatement(condition);
+            ConditionGroup group = new ConditionGroup();
+            evt.AddStatement(group);
+            evt.RemoveStatement(group);
 
             Assert.AreEqual(2, eventsFired);
             Assert.AreEqual(0, evt.Statements.Count);
+        }
+
+        [TestMethod]
+        public void AddElseIfCondition()
+        {
+            bool collectionChanged = false;
+
+            ConditionGroup group = new ConditionGroup();
+            group.Statements.CollectionChanged += (o, e) => collectionChanged = true;
+
+            ExpressionCondition condition = new ExpressionCondition() { Expression = "test > 1" };
+            group.AddStatement(condition);
+
+            Assert.IsTrue(collectionChanged);
+            Assert.AreEqual("test > 1", condition.Expression);
+            Assert.AreEqual(1, group.Statements.Count);
+        }
+
+        [TestMethod]
+        public void RemoveElseIfCondition()
+        {
+            int eventsFired = 0;
+
+            ConditionGroup group = new ConditionGroup();
+            group.Statements.CollectionChanged += (o, e) => eventsFired++;
+
+            ExpressionCondition condition = new ExpressionCondition() { Expression = "test > 1" };
+            group.AddStatement(condition);
+            group.RemoveStatement(condition);
+
+            Assert.AreEqual(2, eventsFired);
+            Assert.AreEqual(0, group.Statements.Count);
         }
 
         [TestMethod]
@@ -52,7 +85,7 @@ namespace Kinectitude.Editor.Tests
         {
             bool collectionChanged = false;
 
-            Condition condition = new Condition() { If = "test > 1" };
+            ExpressionCondition condition = new ExpressionCondition() { Expression = "test > 1" };
             condition.Statements.CollectionChanged += (o, e) => collectionChanged = true;
 
             Action action = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
@@ -67,7 +100,7 @@ namespace Kinectitude.Editor.Tests
         {
             int eventsFired = 0;
 
-            Condition condition = new Condition() { If = "test > 1" };
+            ExpressionCondition condition = new ExpressionCondition() { Expression = "test > 1" };
             condition.Statements.CollectionChanged += (o, e) => eventsFired++;
 
             Action action = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
@@ -79,26 +112,47 @@ namespace Kinectitude.Editor.Tests
         }
 
         [TestMethod]
-        public void AddInheritedCondition()
+        public void AddReadOnlyConditionGroup()
         {
             Event parentEvent = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
-            InheritedEvent childEvent = new InheritedEvent(parentEvent);
+            ReadOnlyEvent childEvent = new ReadOnlyEvent(parentEvent);
 
-            parentEvent.AddStatement(new Condition() { If = "test > 1" });
+            parentEvent.AddStatement(new ConditionGroup());
 
             Assert.AreEqual(1, childEvent.Statements.Count);
 
-            InheritedCondition childCondition = childEvent.Statements.OfType<InheritedCondition>().Single();
+            ReadOnlyConditionGroup childGroup = childEvent.Statements.OfType<ReadOnlyConditionGroup>().Single();
 
-            Assert.IsNotNull(childCondition);
-            Assert.AreEqual("test > 1", childCondition.If);
+            Assert.IsNotNull(childGroup);
         }
 
         [TestMethod]
-        public void AddInheritedAction()
+        public void AddReadOnlyElseIfCondition()
         {
-            Condition parentCondition = new Condition() { If = "test > 1" };
-            InheritedCondition childCondition = new InheritedCondition(parentCondition);
+            Event parentEvent = new Event(Workspace.Instance.GetPlugin(TriggerOccursEventType));
+            ReadOnlyEvent childEvent = new ReadOnlyEvent(parentEvent);
+
+            ConditionGroup parentGroup = new ConditionGroup();
+            parentEvent.AddStatement(parentGroup);
+
+            parentGroup.AddStatement(new ExpressionCondition() { Expression = "test > 1" });
+
+            Assert.AreEqual(1, childEvent.Statements.Count);
+
+            ReadOnlyConditionGroup childGroup = childEvent.Statements.OfType<ReadOnlyConditionGroup>().Single();
+
+            Assert.IsNotNull(childGroup);
+
+            ReadOnlyExpressionCondition childCondition = childGroup.Statements.OfType<ReadOnlyExpressionCondition>().Single();
+
+            Assert.AreEqual("test > 1", childCondition.Expression);
+        }
+
+        [TestMethod]
+        public void AddReadOnlyAction()
+        {
+            ExpressionCondition parentCondition = new ExpressionCondition() { Expression = "test > 1" };
+            ReadOnlyExpressionCondition childCondition = new ReadOnlyExpressionCondition(parentCondition);
 
             parentCondition.AddStatement(new Action(Workspace.Instance.GetPlugin(FireTriggerActionType)));
 
@@ -106,10 +160,10 @@ namespace Kinectitude.Editor.Tests
         }
 
         [TestMethod]
-        public void RemoveInheritedAction()
+        public void RemoveReadOnlyAction()
         {
-            Condition parentCondition = new Condition() { If = "test > 1" };
-            InheritedCondition childCondition = new InheritedCondition(parentCondition);
+            ExpressionCondition parentCondition = new ExpressionCondition() { Expression = "test > 1" };
+            ReadOnlyExpressionCondition childCondition = new ReadOnlyExpressionCondition(parentCondition);
 
             Action parentAction = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
             parentCondition.AddStatement(parentAction);
@@ -121,8 +175,8 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void CannotRemoveInheritedActionFromInheritingCondition()
         {
-            Condition parentCondition = new Condition() { If = "test > 1" };
-            InheritedCondition childCondition = new InheritedCondition(parentCondition);
+            ExpressionCondition parentCondition = new ExpressionCondition() { Expression = "test > 1" };
+            ReadOnlyExpressionCondition childCondition = new ReadOnlyExpressionCondition(parentCondition);
 
             Action parentAction = new Action(Workspace.Instance.GetPlugin(FireTriggerActionType));
             parentCondition.AddStatement(parentAction);
@@ -134,21 +188,21 @@ namespace Kinectitude.Editor.Tests
         }
 
         [TestMethod]
-        public void InheritedConditionFollowsRuleChange()
+        public void ReadOnlyConditionFollowsRuleChange()
         {
             bool propertyChanged = false;
 
-            Condition parentCondition = new Condition() { If = "test > 1" };
+            ExpressionCondition parentCondition = new ExpressionCondition() { Expression = "test > 1" };
             
-            InheritedCondition childCondition = new InheritedCondition(parentCondition);
-            childCondition.PropertyChanged += (o, e) => propertyChanged = (e.PropertyName == "If");
+            ReadOnlyExpressionCondition childCondition = new ReadOnlyExpressionCondition(parentCondition);
+            childCondition.PropertyChanged += (o, e) => propertyChanged = (e.PropertyName == "Expression");
 
-            Assert.AreEqual("test > 1", childCondition.If);
+            Assert.AreEqual("test > 1", childCondition.Expression);
 
-            parentCondition.If = "test <= 1";
+            parentCondition.Expression = "test <= 1";
 
             Assert.IsTrue(propertyChanged);
-            Assert.AreEqual("test <= 1", childCondition.If);
+            Assert.AreEqual("test <= 1", childCondition.Expression);
         }
     }
 }

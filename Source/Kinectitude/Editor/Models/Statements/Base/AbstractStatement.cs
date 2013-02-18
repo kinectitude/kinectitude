@@ -17,14 +17,14 @@ namespace Kinectitude.Editor.Models.Statements.Base
             get { return Enumerable.Empty<Plugin>(); }
         }
         
-        public bool IsInherited
+        public bool IsReadOnly
         {
             get { return null != inheritedStatement; }
         }
 
-        public bool IsLocal
+        public bool IsEditable
         {
-            get { return !IsInherited; }
+            get { return !IsReadOnly; }
         }
 
         public ICommand InsertBeforeCommand { get; private set; }
@@ -39,18 +39,24 @@ namespace Kinectitude.Editor.Models.Statements.Base
             }
 
             InsertBeforeCommand = new DelegateCommand(
-                (parameter) => IsLocal,
+                (parameter) => IsEditable,
                 (parameter) =>
                 {
-                    if (IsLocal)
+                    if (IsEditable)
                     {
                         var toInsert = parameter as AbstractStatement;
-                        if (null != toInsert)
+                        if (null == toInsert)
                         {
-                            if (null != Scope)
+                            var factory = parameter as StatementFactory;
+                            if (null != factory)
                             {
-                                Scope.InsertBefore(this, toInsert);
+                                toInsert = factory.CreateStatement();
                             }
+                        }
+
+                        if (null != toInsert && toInsert.IsEditable && null != Scope)
+                        {
+                            Scope.InsertBefore(this, toInsert);
                         }
                     }
                 });
@@ -75,6 +81,6 @@ namespace Kinectitude.Editor.Models.Statements.Base
         }
 
         public abstract AbstractStatement DeepCopyStatement();
-        public abstract AbstractStatement CreateInheritor();
+        public abstract AbstractStatement CreateReadOnly();
     }
 }

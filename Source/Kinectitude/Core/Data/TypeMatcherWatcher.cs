@@ -7,36 +7,36 @@ using Action = Kinectitude.Core.Base.Action;
 
 namespace Kinectitude.Core.Data
 {
-    internal sealed class TypeMatcherWatcher : IChangeable
+    internal sealed class TypeMatcherWatcher : IChanges
     {
         private readonly object Obj;
         private readonly string Param;
-        private readonly DataContainer Owner;
+        private readonly IDataContainer Owner;
 
-        private readonly List<IChangeable> Callbacks = new List<IChangeable>();
+        private readonly List<IChanges> Callbacks = new List<IChanges>();
 
-        internal static TypeMatcherWatcher GetTypeMatcherWatcher(object obj, string param, Entity owner)
+        internal static TypeMatcherWatcher GetTypeMatcherWatcher(object obj, string param, IDataContainer owner)
         {
             Func<TypeMatcherWatcher> create = new Func<TypeMatcherWatcher>(() => new TypeMatcherWatcher(obj, param, owner));
             return DoubleDictionary<object, string, TypeMatcherWatcher>.GetItem(obj, param, create);
 
         }
 
-        private TypeMatcherWatcher(object obj, string param, Entity owner)
+        private TypeMatcherWatcher(object obj, string param, IDataContainer owner)
         {
             Obj = obj;
             Param = param;
             Type objType = obj.GetType();
             Owner = owner;
-            if(typeof(Changeable).IsAssignableFrom(obj.GetType()))
-                Owner.NotifyOfComponentChange(ClassFactory.GetReferedName(Obj.GetType()) + '.' + Param, this);
+            if(typeof(IChangeable).IsAssignableFrom(obj.GetType()))
+                Owner.NotifyOfComponentChange(new Tuple<IChangeable,string>((IChangeable)obj, param), this);
         }
 
         internal TypeMatcher GetTypeMatcher() { return ClassFactory.GetParam(Obj, Param) as TypeMatcher; }
 
-        internal void NotifyOfChange(IChangeable callback) { Callbacks.Add(callback); }
+        internal void NotifyOfChange(IChanges callback) { Callbacks.Add(callback); }
 
-        void IChangeable.Change() { foreach (IChangeable callback in Callbacks) callback.Change(); }
-        void IChangeable.Prepare() { foreach (IChangeable callback in Callbacks) callback.Prepare(); }
+        void IChanges.Change() { foreach (IChanges callback in Callbacks) callback.Change(); }
+        void IChanges.Prepare() { foreach (IChanges callback in Callbacks) callback.Prepare(); }
     }
 }

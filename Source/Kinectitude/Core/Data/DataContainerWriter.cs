@@ -10,7 +10,7 @@ namespace Kinectitude.Core.Data
     {
         private readonly string param;
 
-        internal DataContainer DataContainer { get; set; }
+        internal IDataContainer DataContainer { get; set; }
 
         internal DataContainerWriter(string param, ValueReader reader) : base(reader)
         {

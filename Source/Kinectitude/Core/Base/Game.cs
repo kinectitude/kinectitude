@@ -5,26 +5,26 @@ using Kinectitude.Core.Loaders;
 namespace Kinectitude.Core.Base
 {
 
-    public class Game : DataContainer, IUpdateable
+    internal class Game : DataContainer, IUpdateable
     {
-        //public to see if types exist
-        public readonly GameLoader GameLoader;
-        private readonly Stack<Scene> currentScenes = new Stack<Scene>();
+        internal readonly GameLoader GameLoader;
         internal static Game CurrentGame { get; private set; }
-        public bool Running { get; private set; }
-        
-        internal readonly Action<string> Die;
+        internal bool Running { get; private set; }
 
+        private readonly Stack<Scene> currentScenes = new Stack<Scene>();
+
+        internal readonly Action<string> Die;
+        
         private readonly Dictionary<Type, Service> services = new Dictionary<Type, Service>();
 
         private readonly Func<Tuple<int, int>> WindowOffset;
         
-        public int Width
+        internal int Width
         {
             get { return null != this["Width"] ? int.Parse(this["Width"]) : 800; }
         }
 
-        public int Height
+        internal int Height
         {
             get { return null != this["Height"] ? int.Parse(this["Height"]) : 600; }
         }
@@ -46,7 +46,7 @@ namespace Kinectitude.Core.Base
             Die = die;
         }
 
-        public void Start()
+        internal void Start()
         {
             //TODO check if the are us
             foreach (Service service in services.Values)
@@ -106,7 +106,7 @@ namespace Kinectitude.Core.Base
             services[service.GetType()] = service;
         }
 
-        public T GetService<T>() where T : Service
+        internal T GetService<T>() where T : Service
         {
             return services[typeof(T)] as T;
         }

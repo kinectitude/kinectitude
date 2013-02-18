@@ -1,5 +1,7 @@
 ﻿using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
+using Kinectitude.Editor.Models.Values;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Input;
@@ -8,7 +10,7 @@ namespace Kinectitude.Editor.Models.Properties
 {
     internal abstract class AbstractProperty : GameModel<IPropertyScope>, INameValue
     {
-        private readonly AbstractProperty inheritedProperty;
+        private readonly AbstractProperty sourceProperty;
 
         public abstract PluginProperty PluginProperty { get; }
 
@@ -22,22 +24,17 @@ namespace Kinectitude.Editor.Models.Properties
             get { return PluginProperty.UsesFileSelector; }
         }
 
-        public bool IsInherited
+        public bool IsReadOnly
         {
-            get { return null != inheritedProperty; }
-        }
-
-        public bool IsLocal
-        {
-            get { return !IsInherited; }
+            get { return null != sourceProperty; }
         }
 
         public bool IsEditable
         {
-            get { return IsLocal; }
+            get { return !IsReadOnly; }
         }
 
-        public abstract object Value { get; set; }
+        public abstract Value Value { get; set; }
 
         public abstract bool HasOwnValue { get; }
 
@@ -45,19 +42,19 @@ namespace Kinectitude.Editor.Models.Properties
 
         public abstract ICommand ClearValueCommand { get; protected set; }
 
-        protected AbstractProperty(AbstractProperty inheritedProperty = null)
+        protected AbstractProperty(AbstractProperty sourceProperty = null)
         {
-            this.inheritedProperty = inheritedProperty;
+            this.sourceProperty = sourceProperty;
 
-            if (null != inheritedProperty)
+            if (null != sourceProperty)
             {
-                inheritedProperty.PropertyChanged += OnInheritedPropertyChanged;
+                sourceProperty.PropertyChanged += OnSourcePropertyChanged;
             }
 
             AddDependency<ScopeChanged>("Value");
         }
 
-        private void OnInheritedPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void OnSourcePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             NotifyPropertyChanged(e.PropertyName);
         }
@@ -112,9 +109,44 @@ namespace Kinectitude.Editor.Models.Properties
             return property;
         }
 
-        public object GetInheritedValue()
+        public Value GetInheritedValue()
         {
             return null != Scope ? Scope.GetInheritedValue(PluginProperty) : PluginProperty.DefaultValue;
+        }
+
+        public double GetDoubleValue()
+        {
+            return Value.GetDoubleValue();
+        }
+
+        public float GetFloatValue()
+        {
+            return Value.GetFloatValue();
+        }
+
+        public int GetIntValue()
+        {
+            return Value.GetIntValue();
+        }
+
+        public long GetLongValue()
+        {
+            return Value.GetLongValue();
+        }
+
+        public bool GetBoolValue()
+        {
+            return Value.GetBoolValue();
+        }
+
+        public string GetStringValue()
+        {
+            return Value.GetStringValue();
+        }
+
+        public T GetEnumValue<T>() where T : struct, IConvertible
+        {
+            return Value.GetEnumValue<T>();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Kinectitude.Core.Attributes;
 using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models.Values;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,7 @@ namespace Kinectitude.Editor.Models
             get { return attribute.UsesFileSelector; }
         }
 
-        public object DefaultValue
+        public Value DefaultValue
         {
             get
             {
@@ -50,7 +51,7 @@ namespace Kinectitude.Editor.Models
                     }
                 }
 
-                return result;
+                return new Value(result, true);
             }
         }
 
@@ -65,7 +66,7 @@ namespace Kinectitude.Editor.Models
 
             if (type.IsEnum)
             {
-                AvailableValues = Enum.GetNames(type);
+                AvailableValues = Enum.GetNames(type).Select(x => "\"" + x + "\"");
             }
             else if (type == typeof(bool))
             {

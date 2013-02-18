@@ -5,13 +5,11 @@ using System.Text;
 
 namespace Kinectitude.Core.Base
 {
-    public class Changeable
+    public class Changeable : IChangeable
     {
         internal DataContainer DataContainer { get; set; }
 
-        internal bool ShouldCheck = false;
-
-        private readonly string change;
+        bool IChangeable.ShouldCheck { get; set; }
 
         public static float ScaleX(float X) { return X * Game.CurrentGame.ScaleX; }
         public static float ScaleY(float Y) { return Y * Game.CurrentGame.ScaleY; }
@@ -28,15 +26,14 @@ namespace Kinectitude.Core.Base
             y -= offset.Item2;
         }
 
-        protected Changeable()
-        {
-            string name = ClassFactory.GetReferedName(GetType());
-            change = name ?? "!__INVALID__";
-        }
-
         protected void Change(string str)
         {
-            if (ShouldCheck) DataContainer.ChangedProperty(change + '.' + str);
+            if (((IChangeable) this).ShouldCheck) DataContainer.ChangedProperty(new Tuple<IChangeable, string>((IChangeable)this, str));
+        }
+
+        public object this[string parameter]
+        {
+            get { return ClassFactory.GetParam(this, parameter); }
         }
     }
 }

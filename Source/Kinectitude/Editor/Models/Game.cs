@@ -1,17 +1,24 @@
-﻿using Kinectitude.Editor.Base;
+﻿using Kinectitude.Core.Base;
+using Kinectitude.Core.Data;
+using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models.Data.DataContainers;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Transactions;
+using Kinectitude.Editor.Models.Values;
 using Kinectitude.Editor.Storage;
+using Kinectitude.Editor.Views.Dialogs;
 using Kinectitude.Editor.Views.Utils;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 
 namespace Kinectitude.Editor.Models
 {
-    internal sealed class Game : GameModel<IScope>, IAttributeScope, IEntityScope, ISceneScope
+    internal sealed class Game : GameModel<IScope>, IAttributeScope, IEntityScope, ISceneScope, IServiceScope
     {
         private string name;
         private int width;
@@ -128,6 +135,7 @@ namespace Kinectitude.Editor.Models
         }
 
         public ObservableCollection<Using> Usings { get; private set; }
+        public ObservableCollection<Service> Services { get; private set; }
         public ObservableCollection<Entity> Prototypes { get; private set; }
         public ObservableCollection<Scene> Scenes { get; private set; }
         public ObservableCollection<Attribute> Attributes { get; private set; }
@@ -144,6 +152,7 @@ namespace Kinectitude.Editor.Models
             this.name = name;
             
             Usings = new ObservableCollection<Using>();
+            Services = new ObservableCollection<Service>();
             Prototypes = new ObservableCollection<Entity>();
             Scenes = new ObservableCollection<Scene>();
             Attributes = new ObservableCollection<Attribute>();
@@ -152,7 +161,7 @@ namespace Kinectitude.Editor.Models
 
             RenameCommand = new DelegateCommand(null, (parameter) =>
             {
-                DialogService.ShowDialog(DialogService.Constants.NameDialog, this);
+                DialogService.ShowDialog<NameDialog>(this);
             });
 
             AddPrototypeCommand = new DelegateCommand(null, (parameter) =>
@@ -160,7 +169,7 @@ namespace Kinectitude.Editor.Models
                 Entity prototype = CreatePrototype();
                 EntityTransaction transaction = new EntityTransaction(Prototypes, prototype);
                     
-                DialogService.ShowDialog(DialogService.Constants.EntityDialog, transaction, (result) =>
+                DialogService.ShowDialog<EntityDialog>(transaction, (result) =>
                 {
                     if (result == true)
                     {
@@ -173,7 +182,7 @@ namespace Kinectitude.Editor.Models
             {
                 Scene scene = CreateScene();
 
-                DialogService.ShowDialog(DialogService.Constants.NameDialog, new SceneTransaction(scene), (result) =>
+                DialogService.ShowDialog<NameDialog>(new SceneTransaction(scene), (result) =>
                 {
                     if (result == true)
                     {
@@ -220,12 +229,22 @@ namespace Kinectitude.Editor.Models
         {
             use.Scope = this;
             Usings.Add(use);
+
+            foreach (var define in use.Defines)
+            {
+                Notify(new DefineAdded(define));
+            }
         }
 
         public void RemoveUsing(Using use)
         {
             use.Scope = null;
             Usings.Remove(use);
+
+            foreach (var define in use.Defines)
+            {
+                Notify(new DefineRemoved(define));
+            }
         }
 
         private bool HasPrototypeWithName(string name)
@@ -321,6 +340,11 @@ namespace Kinectitude.Editor.Models
         public Scene GetScene(string name)
         {
             return Scenes.FirstOrDefault(x => x.Name == name);
+        }
+
+        public Attribute GetAttribute(string name)
+        {
+            return Attributes.FirstOrDefault(x => x.Name == name);
         }
 
         public void AddAttribute(Attribute attribute)
@@ -439,6 +463,28 @@ namespace Kinectitude.Editor.Models
             }
         }
 
+        public Service GetServiceByType(Plugin type)
+        {
+            return Services.FirstOrDefault(x => x.Plugin == type);
+        }
+
+        public Service GetServiceByDefinedName(string name)
+        {
+            return Services.FirstOrDefault(x => x.Type == name);
+        }
+
+        public void AddService(Service service)
+        {
+            service.Scope = this;
+            Services.Add(service);
+        }
+
+        public void RemoveService(Service service)
+        {
+            service.Scope = null;
+            Services.Remove(service);
+        }
+
         #region IEntityScope implementation
 
         IEnumerable<Entity> IEntityScope.Prototypes
@@ -469,11 +515,26 @@ namespace Kinectitude.Editor.Models
 
         #region IAttributeScope implementation
 
+        Entity IAttributeScope.Entity
+        {
+            get { return null; }
+        }
+
+        Scene IAttributeScope.Scene
+        {
+            get { return null; }
+        }
+
+        Game IAttributeScope.Game
+        {
+            get { return this; }
+        }
+
         public event AttributeEventHandler InheritedAttributeAdded { add { } remove { } }
         public event AttributeEventHandler InheritedAttributeRemoved { add { } remove { } }
         public event AttributeEventHandler InheritedAttributeChanged { add { } remove { } }
 
-        public object GetInheritedValue(string key)
+        public Value GetInheritedValue(string key)
         {
             return Attribute.DefaultValue;
         }

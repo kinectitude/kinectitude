@@ -1,5 +1,6 @@
 ﻿using Kinectitude.Core.Components;
 using Kinectitude.Editor.Models;
+using Kinectitude.Editor.Models.Values;
 using Kinectitude.Render;
 using System.Collections.Specialized;
 
@@ -14,35 +15,35 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
         [DependsOn("TransformComponent")]
         public double X
         {
-            get { return GetValue<TransformComponent, double>("X") - Width / 2.0d; }
+            get { return GetDoubleValue<TransformComponent>("X") - Width / 2.0d; }
             set { SetValue<TransformComponent, double>("X", value + Width / 2.0d); }
         }
 
         [DependsOn("TransformComponent")]
         public double Y
         {
-            get { return GetValue<TransformComponent, double>("Y") - Height / 2.0d; }
+            get { return GetDoubleValue<TransformComponent>("Y") - Height / 2.0d; }
             set { SetValue<TransformComponent, double>("Y", value + Height / 2.0d); }
         }
 
         [DependsOn("TransformComponent")]
         public double Width
         {
-            get { return GetValue<TransformComponent, double>("Width"); }
+            get { return GetDoubleValue<TransformComponent>("Width"); }
             set { SetValue<TransformComponent, double>("Width", value); }
         }
 
         [DependsOn("TransformComponent")]
         public double Height
         {
-            get { return GetValue<TransformComponent, double>("Height"); }
+            get { return GetDoubleValue<TransformComponent>("Height"); }
             set { SetValue<TransformComponent, double>("Height", value); }
         }
 
         [DependsOn("TransformComponent")]
         public double Rotation
         {
-            get { return GetValue<TransformComponent, double>("Rotation"); }
+            get { return GetDoubleValue<TransformComponent>("Rotation"); }
             set { SetValue<TransformComponent, double>("Rotation", value); }
         }
 
@@ -56,7 +57,7 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
                     var property = render.GetProperty("Opacity");
                     if (null != property)
                     {
-                        return property.GetValue<float>();
+                        return property.GetFloatValue();
                     }
                 }
 
@@ -66,7 +67,7 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
             {
                 if (null != RenderComponent)
                 {
-                    render.SetProperty("Opacity", value);
+                    render.SetProperty("Opacity", new Value(value.ToString()));
                 }
             }
         }
@@ -152,7 +153,7 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
             UpdateComponents();
         }
 
-        private void OnPropertyChanged(PluginProperty property)
+        private void OnPropertyChanged(Component component, PluginProperty property)
         {
             NotifyPropertyChanged(property.Name);
         }
