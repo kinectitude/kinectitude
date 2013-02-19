@@ -6,7 +6,6 @@ using Kinectitude.Core.Data;
 using Attribute = Kinectitude.Editor.Models.Attribute;
 using Kinectitude.Core.Components;
 using Kinectitude.Editor.Models.Values;
-using Kinectitude.Render;
 using Kinectitude.Core.Managers;
 using Kinectitude.Core.Attributes;
 
@@ -73,7 +72,6 @@ namespace Kinectitude.Tests.Editor
         private static readonly string MockServiceShort = "MockService";
         private static readonly string MockServiceType = typeof(MockService).FullName;
         private static readonly string TransformComponentType = typeof(TransformComponent).FullName;
-        private static readonly string RenderComponentType = typeof(RenderComponent).FullName;
         private static readonly string PhysicsManagerType = typeof(PhysicsManager).FullName;
         private static readonly string TimeManagerType = typeof(TimeManager).FullName;
 
