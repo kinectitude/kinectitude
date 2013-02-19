@@ -57,6 +57,9 @@ namespace Kinectitude.Editor.Models
 
             AddDependency<ScopeChanged>("Type");
             AddDependency<ScopeChanged>("IsRequired");
+            AddDependency<DefineAdded>("Type", e => e.Define.Class == Plugin.ClassName);
+            AddDependency<DefinedNameChanged>("Type", e => e.Plugin == Plugin);
+            AddDependency<DefineRemoved>("Type", e => e.Define.Class == Plugin.ClassName);
         }
 
         public override void Accept(IGameVisitor visitor)

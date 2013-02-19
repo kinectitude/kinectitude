@@ -94,17 +94,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Models\Data\Changeables\BaseChangeable.cs" />
     <Compile Include="Models\Data\Changeables\ComponentChangeable.cs" />
     <Compile Include="Models\Data\Changeables\ManagerChangeable.cs" />
     <Compile Include="Models\Data\Changeables\ServiceChangeable.cs" />
     <Compile Include="Models\Data\Changeables\ThisChangeable.cs" />
-    <Compile Include="Models\Data\DataContainers\CallbackCollection.cs" />
-    <Compile Include="Models\Data\DataContainers\EntityDataContainer.cs" />
+    <Compile Include="Models\Data\DataContainers\AmbiguousDataContainer.cs" />
+    <Compile Include="Models\Data\DataContainers\BaseDataContainer.cs" />
     <Compile Include="Models\Data\DataContainers\GameDataContainer.cs" />
     <Compile Include="Models\Data\DataContainers\SceneDataContainer.cs" />
     <Compile Include="Models\Data\DataContainers\ThisDataContainer.cs" />
+    <Compile Include="Models\Data\ValueReaders\AmbiguousValueReader.cs" />
     <Compile Include="Models\Data\ValueReaders\ComponentValueReader.cs" />
-    <Compile Include="Models\Data\ValueReaders\EntityValueReader.cs" />
     <Compile Include="Models\Data\ValueReaders\ManagerValueReader.cs" />
     <Compile Include="Models\Data\ValueReaders\ServiceValueReader.cs" />
     <Compile Include="Models\Data\ValueReaders\ThisComponentValueReader.cs" />
