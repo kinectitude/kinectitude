@@ -40,7 +40,6 @@ namespace Kinectitude.Editor.Storage
             project.GameFile = "game.kgl";
             
             Directory.CreateDirectory(Path.Combine(project.Location, project.GameRoot));
-
             SaveProject(project);
         }
 
@@ -79,7 +78,8 @@ namespace Kinectitude.Editor.Storage
 
                     project = new Project()
                     {
-                        Title = file.ToString(),
+                        Title = Path.GetFileNameWithoutExtension(file.Name),
+                        Location = file.DirectoryName,
                         GameRoot = (string)projectElement.Attribute(Constants.GameRoot),
                         GameFile = (string)projectElement.Attribute(Constants.GameFile)
                     };
@@ -90,8 +90,7 @@ namespace Kinectitude.Editor.Storage
                         project.AddAsset(asset);
                     }
 
-                    FileInfo gameFile = new FileInfo(Path.Combine(Path.GetDirectoryName(project.Title), project.GameRoot, project.GameFile));
-
+                    FileInfo gameFile = new FileInfo(Path.Combine(project.Location, project.GameRoot, project.GameFile));
                     if (gameFile.Exists)
                     {
                         // TODO: Display error if !Exists

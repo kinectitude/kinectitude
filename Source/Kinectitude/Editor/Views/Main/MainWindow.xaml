@@ -55,7 +55,7 @@
     <DockPanel>
 
         <StatusBar DockPanel.Dock="Bottom" Padding="4,0,4,4">
-            <TextBlock Text="{Binding Project.File}" />
+            <TextBlock Text="{Binding Project.FileName}" />
         </StatusBar>
 
         <Menu DockPanel.Dock="Top" Background="Transparent" Margin="4">
