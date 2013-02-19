@@ -32,13 +32,13 @@ namespace Kinectitude.Editor.Models
         }
 
         [DependsOn("Location")]
-        public bool LocationIsEmpty
+        public bool LocationIsNewOrEmpty
         {
             get
             {
                 if (null != Location)
                 {
-                    return !Directory.EnumerateFileSystemEntries(Location).Any();
+                    return !Directory.Exists(Location) || !Directory.EnumerateFileSystemEntries(Location).Any();
                 }
 
                 return false;
@@ -185,9 +185,9 @@ namespace Kinectitude.Editor.Models
                 });
             });
 
-            CommitCommand = new DelegateCommand((parameter) => LocationIsEmpty, (parameter) =>
+            CommitCommand = new DelegateCommand((parameter) => LocationIsNewOrEmpty, (parameter) =>
             {
-                if (LocationIsEmpty)
+                if (LocationIsNewOrEmpty)
                 {
                     ProjectStorage.CreateProject(this);
                     Workspace.Instance.Project = this;
