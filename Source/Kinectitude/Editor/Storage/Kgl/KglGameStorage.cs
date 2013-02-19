@@ -44,6 +44,7 @@ namespace Kinectitude.Editor.Storage.Kgl
         {
             //TODO add functions here as well later
             Using defaults = new Using();
+            defaults.File = null;
             List<string> defaultEvts = new List<string>()
             {
                 "AttributeChanges",
