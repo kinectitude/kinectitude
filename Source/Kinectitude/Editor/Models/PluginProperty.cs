@@ -12,6 +12,7 @@ namespace Kinectitude.Editor.Models
     {
         private readonly PropertyInfo info;
         private readonly PluginPropertyAttribute attribute;
+        private readonly Value defaultValue;
 
         public string Name
         {
@@ -30,22 +31,7 @@ namespace Kinectitude.Editor.Models
 
         public Value DefaultValue
         {
-            get
-            {
-                object result = attribute.DefaultValue;
-
-                if (null == result)
-                {
-                    Type type = info.PropertyType;
-
-                    if (type.IsValueType)
-                    {
-                        result = Activator.CreateInstance(type);
-                    }
-                }
-
-                return new Value(result, true);
-            }
+            get { return defaultValue; }
         }
 
         public IEnumerable<object> AvailableValues { get; private set; }
@@ -69,6 +55,18 @@ namespace Kinectitude.Editor.Models
             {
                 AvailableValues = Enumerable.Empty<object>();
             }
+
+            object rawDefault = attribute.DefaultValue;
+
+            if (null == rawDefault)
+            {
+                if (type.IsValueType)
+                {
+                    rawDefault = Activator.CreateInstance(type);
+                }
+            }
+
+            defaultValue = new Value(rawDefault, true);
         }
     }
 }

@@ -26,10 +26,18 @@ namespace Kinectitude.Editor.Models.Properties
             {
                 if (val != value)
                 {
+                    var oldVal = val;
+
                     if (null != val)
                     {
                         val.Scope = null;
                     }
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "change property value",
+                        () => Value = value,
+                        () => Value = oldVal
+                    );
 
                     val = value;
 
@@ -37,6 +45,7 @@ namespace Kinectitude.Editor.Models.Properties
                     {
                         val.Scope = this;
                     }
+
                     NotifyPropertyChanged("Value");
                 }
             }

@@ -13,6 +13,14 @@ namespace Kinectitude.Editor.Models.Statements.Loops
             {
                 if (expression != value)
                 {
+                    var oldExpression = expression;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "change loop expression",
+                        () => Expression = value,
+                        () => Expression = oldExpression
+                    );
+
                     expression = value;
                     NotifyPropertyChanged("Expression");
                 }
