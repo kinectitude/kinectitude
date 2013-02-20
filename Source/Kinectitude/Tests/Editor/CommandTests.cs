@@ -25,157 +25,9 @@ namespace Kinectitude.Tests.Editor
     [TestClass]
     public class CommandTests
     {
-        private sealed class MockDialogService : IDialogService
-        {
-            private static readonly Lazy<MockDialogService> instance = new Lazy<MockDialogService>(() => new MockDialogService());
-
-            public static MockDialogService Instance
-            {
-                get { return instance.Value; }
-            }
-
-            private Type dialogType;
-            private bool showedLoad;
-            private bool showedSave;
-            private bool showedFolder;
-
-            private MockDialogService() { }
-
-            public void Start()
-            {
-                dialogType = null;
-                showedLoad = false;
-                showedSave = false;
-                showedFolder = false;
-            }
-
-            public void AssertShowed<TWindow>()
-            {
-                Assert.AreEqual(typeof(TWindow), dialogType);
-            }
-
-            public void AssertShowedLoadDialog()
-            {
-                Assert.IsTrue(showedLoad);
-            }
-
-            public void AssertShowedSaveDialog()
-            {
-                Assert.IsTrue(showedSave);
-            }
-
-            public void AssertShowedFolderDialog()
-            {
-                Assert.IsTrue(showedFolder);
-            }
-
-            public void ShowDialog<TWindow>(object viewModel, DialogCallback onDialogClose) where TWindow : Window, new()
-            {
-                dialogType = typeof(TWindow);
-
-                if (null != onDialogClose)
-                {
-                    onDialogClose(true);
-                }
-            }
-
-            public void ShowDialog<TWindow>(object viewModel = null) where TWindow : Window, new()
-            {
-                ShowDialog<TWindow>(viewModel, null);
-            }
-
-            public void ShowLoadDialog(FileDialogCallback onClose)
-            {
-                showedLoad = true;
-            }
-
-            public void ShowSaveDialog(FileDialogCallback onClose)
-            {
-                showedSave = true;
-            }
-
-            public void ShowFolderDialog(FolderDialogCallback onClose)
-            {
-                showedFolder = true;
-            }
-        }
-
         public CommandTests()
         {
             Workspace.Instance.DialogService = MockDialogService.Instance;
-        }
-
-        private static void AssertAfterLog(int ignoreCommands)
-        {
-            Assert.AreEqual(1, Workspace.Instance.CommandHistory.UndoableCommands.Count - ignoreCommands);
-            Assert.AreEqual(0, Workspace.Instance.CommandHistory.RedoableCommands.Count);
-            Assert.IsTrue(ignoreCommands > 0 || null != Workspace.Instance.CommandHistory.LastUndoableCommand);
-            Assert.IsNull(Workspace.Instance.CommandHistory.LastRedoableCommand);
-        }
-
-        private static void AssertAfterUndo(int ignoreCommands)
-        {
-            Assert.AreEqual(0, Workspace.Instance.CommandHistory.UndoableCommands.Count - ignoreCommands);
-            Assert.AreEqual(1, Workspace.Instance.CommandHistory.RedoableCommands.Count);
-            Assert.IsNotNull(Workspace.Instance.CommandHistory.LastRedoableCommand);
-            Assert.IsTrue(ignoreCommands > 0 || null == Workspace.Instance.CommandHistory.LastUndoableCommand);
-        }
-
-        private static void AssertAfterRedo(int ignoreCommands)
-        {
-            AssertAfterLog(ignoreCommands);
-        }
-
-        private static void TestCommand(Action action, Action postconditions)
-        {
-            MockDialogService.Instance.Start();
-            Workspace.Instance.CommandHistory.Clear();
-            action();
-
-            if (null != postconditions)
-            {
-                postconditions();
-            }
-        }
-
-        private static void TestUndoableCommand(Action preconditions, Action action, Action postconditions, int ignoreCommands)
-        {
-            MockDialogService.Instance.Start();
-            Workspace.Instance.CommandHistory.Clear();
-            
-            if (null != preconditions)
-            {
-                preconditions();
-            }
-
-            action();
-            AssertAfterLog(ignoreCommands);
-            
-            if (null != postconditions)
-            {
-                postconditions();
-            }
-
-            Workspace.Instance.CommandHistory.Undo();
-            AssertAfterUndo(ignoreCommands);
-
-            if (null != preconditions)
-            {
-                preconditions();
-            }
-
-            Workspace.Instance.CommandHistory.Redo();
-            AssertAfterRedo(ignoreCommands);
-
-            if (null != postconditions)
-            {
-                postconditions();
-            }
-        }
-
-        private static void TestUndoableCommand(Action preconditions, Action action, Action postconditions)
-        {
-            TestUndoableCommand(preconditions, action, postconditions, 0);
         }
 
         [TestMethod]
@@ -183,7 +35,7 @@ namespace Kinectitude.Tests.Editor
         {
             var attribute = new Attribute("test") { Value = new Value(5, true) };
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(5, attribute.Value.GetIntValue()),
                 () => attribute.ClearValueCommand.Execute(null),
                 () => Assert.AreEqual(0, attribute.Value.GetIntValue())
@@ -195,7 +47,7 @@ namespace Kinectitude.Tests.Editor
         {
             var entity = new Entity();
 
-            TestCommand(
+            CommandHelper.TestCommand(
                 () => entity.RenameCommand.Execute(null),
                 () => MockDialogService.Instance.AssertShowed<NameDialog>()
             );
@@ -206,7 +58,7 @@ namespace Kinectitude.Tests.Editor
         {
             var entity = new Entity();
 
-            TestCommand(
+            CommandHelper.TestCommand(
                 () => entity.PropertiesCommand.Execute(null),
                 () => MockDialogService.Instance.AssertShowed<EntityDialog>()
             );
@@ -217,7 +69,7 @@ namespace Kinectitude.Tests.Editor
         {
             var entity = new Entity();
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(0, entity.Attributes.Count),
                 () => entity.AddAttributeCommand.Execute(null),
                 () => Assert.AreEqual(1, entity.Attributes.Count)
@@ -231,7 +83,7 @@ namespace Kinectitude.Tests.Editor
             var attribute = new Attribute("test");
             entity.AddAttribute(attribute);
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(1, entity.Attributes.Count),
                 () => entity.RemoveAttributeCommand.Execute(attribute),
                 () => Assert.AreEqual(0, entity.Attributes.Count)
@@ -243,7 +95,7 @@ namespace Kinectitude.Tests.Editor
         {
             var entity = new Entity();
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(0, entity.Events.Count),
                 () => entity.AddEventCommand.Execute(Workspace.Instance.Events.First()),
                 () => Assert.AreEqual(1, entity.Events.Count)
@@ -257,7 +109,7 @@ namespace Kinectitude.Tests.Editor
             var evt = new Event(Workspace.Instance.GetPlugin(typeof(TriggerOccursEvent).FullName));
             entity.AddEvent(evt);
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(1, entity.Events.Count),
                 () => entity.RemoveEventCommand.Execute(evt),
                 () => Assert.AreEqual(0, entity.Events.Count)
@@ -273,7 +125,7 @@ namespace Kinectitude.Tests.Editor
             var loop = new WhileLoop();
             evt.AddStatement(loop);
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(1, evt.Statements.Count),
                 () => entity.DeleteStatementCommand.Execute(loop),
                 () => Assert.AreEqual(0, evt.Statements.Count)
@@ -285,7 +137,7 @@ namespace Kinectitude.Tests.Editor
         {
             var game = new Game("Test Game");
 
-            TestCommand(
+            CommandHelper.TestCommand(
                 () => game.RenameCommand.Execute(null),
                 () => MockDialogService.Instance.AssertShowed<NameDialog>()
             );
@@ -296,7 +148,7 @@ namespace Kinectitude.Tests.Editor
         {
             var game = new Game("Test Game");
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(0, game.Prototypes.Count),
                 () => game.AddPrototypeCommand.Execute(null),
                 () => Assert.AreEqual(1, game.Prototypes.Count),
@@ -309,7 +161,7 @@ namespace Kinectitude.Tests.Editor
         {
             var game = new Game("Test Game");
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(0, game.Attributes.Count),
                 () => game.AddAttributeCommand.Execute(null),
                 () => Assert.AreEqual(1, game.Attributes.Count)
@@ -323,7 +175,7 @@ namespace Kinectitude.Tests.Editor
             var attribute = new Attribute("test");
             game.AddAttribute(attribute);
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(1, game.Attributes.Count),
                 () => game.RemoveAttributeCommand.Execute(attribute),
                 () => Assert.AreEqual(0, game.Attributes.Count)
@@ -335,7 +187,7 @@ namespace Kinectitude.Tests.Editor
         {
             var game = new Game("Test Game");
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(0, game.Scenes.Count),
                 () => game.AddSceneCommand.Execute(null),
                 () => Assert.AreEqual(1, game.Scenes.Count),
@@ -350,7 +202,7 @@ namespace Kinectitude.Tests.Editor
             var scene = new Scene("Test Scene");
             game.AddScene(scene);
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(1, game.Scenes.Count),
                 () => game.RemoveItemCommand.Execute(scene),
                 () => Assert.AreEqual(0, game.Scenes.Count)
@@ -359,7 +211,7 @@ namespace Kinectitude.Tests.Editor
             var prototype = new Entity() { Name = "Prototype" };
             game.AddPrototype(prototype);
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(1, game.Prototypes.Count),
                 () => game.RemoveItemCommand.Execute(prototype),
                 () => Assert.AreEqual(0, game.Prototypes.Count)
@@ -385,7 +237,7 @@ namespace Kinectitude.Tests.Editor
             var game = new Game("Test Game");
             project.Game = game;
 
-            TestCommand(
+            CommandHelper.TestCommand(
                 () => project.OpenItemCommand.Execute(game),
                 () =>
                 {
@@ -402,7 +254,7 @@ namespace Kinectitude.Tests.Editor
             var game = new Game("Test Game");
             project.Game = game;
 
-            TestCommand(
+            CommandHelper.TestCommand(
                 () => project.InspectItemCommand.Execute(game),
                 () => Assert.IsNotNull(project.InspectorItem)
             );
@@ -416,7 +268,7 @@ namespace Kinectitude.Tests.Editor
             project.Game = game;
             project.OpenItem(game);
 
-            TestCommand(
+            CommandHelper.TestCommand(
                 () => project.CloseItemCommand.Execute(game),
                 () =>
                 {
@@ -431,7 +283,7 @@ namespace Kinectitude.Tests.Editor
         {
             var project = new Project();
 
-            TestCommand(
+            CommandHelper.TestCommand(
                 () => project.BrowseCommand.Execute(null),
                 () => MockDialogService.Instance.AssertShowedFolderDialog()
             );
@@ -448,7 +300,7 @@ namespace Kinectitude.Tests.Editor
         {
             var scene = new Scene("Test Scene");
 
-            TestCommand(
+            CommandHelper.TestCommand(
                 () => scene.RenameCommand.Execute(null),
                 () => MockDialogService.Instance.AssertShowed<NameDialog>()
             );
@@ -459,7 +311,7 @@ namespace Kinectitude.Tests.Editor
         {
             var scene = new Scene("Test Scene");
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(0, scene.Attributes.Count),
                 () => scene.AddAttributeCommand.Execute(null),
                 () => Assert.AreEqual(1, scene.Attributes.Count)
@@ -473,7 +325,7 @@ namespace Kinectitude.Tests.Editor
             var attribute = new Attribute("test");
             scene.AddAttribute(attribute);
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(1, scene.Attributes.Count),
                 () => scene.RemoveAttributeCommand.Execute(attribute),
                 () => Assert.AreEqual(0, scene.Attributes.Count)
@@ -493,7 +345,7 @@ namespace Kinectitude.Tests.Editor
             var entity = new Entity();
             scene.AddEntity(entity);
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(1, scene.Entities.Count),
                 () => scene.RemoveEntityCommand.Execute(entity),
                 () => Assert.AreEqual(0, scene.Entities.Count)
@@ -505,7 +357,7 @@ namespace Kinectitude.Tests.Editor
         {
             var scene = new Scene("Test Scene");
 
-            TestCommand(
+            CommandHelper.TestCommand(
                 () => scene.PropertiesCommand.Execute(null),
                 () => MockDialogService.Instance.AssertShowed<SceneDialog>()
             );
@@ -537,7 +389,7 @@ namespace Kinectitude.Tests.Editor
             var entity = new Entity();
             scene.AddEntity(entity);
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(1, scene.EntityPresenters.Count),
                 () => scene.DeleteCommand.Execute(Enumerable.Repeat(scene.EntityPresenters.First(), 1)),
                 () => Assert.AreEqual(0, scene.EntityPresenters.Count)
@@ -552,7 +404,7 @@ namespace Kinectitude.Tests.Editor
             evt.AddStatement(loop);
             var stmt = new ForLoop();
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () =>
                 {
                     Assert.AreEqual(1, evt.Statements.Count);
@@ -575,7 +427,7 @@ namespace Kinectitude.Tests.Editor
             var loop = new WhileLoop();
             var stmt = new ForLoop();
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () =>
                 {
                     Assert.AreEqual(0, loop.Statements.Count);
@@ -595,7 +447,7 @@ namespace Kinectitude.Tests.Editor
         {
             var group = new ConditionGroup();
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(0, group.Statements.Count),
                 () => group.AddElseIfCommand.Execute(new ExpressionCondition()),
                 () => Assert.AreEqual(1, group.Statements.Count)
@@ -607,7 +459,7 @@ namespace Kinectitude.Tests.Editor
         {
             var group = new ConditionGroup();
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.IsNull(group.Else),
                 () => group.AddElseCommand.Execute(null),
                 () => Assert.IsNotNull(group.Else)
@@ -619,7 +471,7 @@ namespace Kinectitude.Tests.Editor
         {
             var evt = new Event(Workspace.Instance.GetPlugin(typeof(TriggerOccursEvent).FullName));
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(0, evt.Statements.Count),
                 () => evt.AddStatementCommand.Execute(new WhileLoop()),
                 () => Assert.AreEqual(1, evt.Statements.Count)
@@ -633,7 +485,7 @@ namespace Kinectitude.Tests.Editor
             var transaction = new EntityRenameTransaction(entity);
             transaction.Name = "testEntity";
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => Assert.IsNull(entity.Name),
                 () => transaction.CommitCommand.Execute(null),
                 () => Assert.AreEqual("testEntity", entity.Name)
@@ -650,7 +502,7 @@ namespace Kinectitude.Tests.Editor
             transaction.AddPrototype(prototype);
             transaction.AddComponent(transaction.AvailableComponents.First());
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () => 
                 {
                     Assert.IsNull(entity.Name);
@@ -675,7 +527,7 @@ namespace Kinectitude.Tests.Editor
             var transaction = new EntityTransaction(Enumerable.Repeat(prototype, 1), entity);
             transaction.PrototypeToAdd = prototype;
 
-            TestCommand(
+            CommandHelper.TestCommand(
                 () => transaction.AddPrototypeCommand.Execute(null),
                 () =>
                 {
@@ -694,7 +546,7 @@ namespace Kinectitude.Tests.Editor
             transaction.AddPrototype(prototype);
             transaction.SelectedPrototype = prototype;
 
-            TestCommand(
+            CommandHelper.TestCommand(
                 () => transaction.RemovePrototypeCommand.Execute(prototype),
                 () =>
                 {
@@ -715,7 +567,7 @@ namespace Kinectitude.Tests.Editor
             transaction.AddPrototype(prototype1);
             transaction.SelectedPrototype = prototype1;
 
-            TestCommand(
+            CommandHelper.TestCommand(
                 () => transaction.MovePrototypeUpCommand.Execute(null),
                 () =>
                 {
@@ -736,7 +588,7 @@ namespace Kinectitude.Tests.Editor
             transaction.AddPrototype(prototype1);
             transaction.SelectedPrototype = prototype0;
 
-            TestCommand(
+            CommandHelper.TestCommand(
                 () => transaction.MovePrototypeDownCommand.Execute(null),
                 () =>
                 {
@@ -753,7 +605,7 @@ namespace Kinectitude.Tests.Editor
             transaction.ComponentToAdd = transaction.AvailableComponents.First();
             int available = transaction.AvailableComponents.Count;
 
-            TestCommand(
+            CommandHelper.TestCommand(
                 () => transaction.AddComponentCommand.Execute(null),
                 () =>
                 {
@@ -771,7 +623,7 @@ namespace Kinectitude.Tests.Editor
             transaction.SelectedComponent = transaction.SelectedComponents.First();
             int available = transaction.AvailableComponents.Count;
 
-            TestCommand(
+            CommandHelper.TestCommand(
                 () => transaction.RemoveComponentCommand.Execute(null),
                 () =>
                 {
@@ -789,7 +641,7 @@ namespace Kinectitude.Tests.Editor
             transaction.Name = "Test Scene 2";
             transaction.AddManager(transaction.AvailableManagers.First());
 
-            TestUndoableCommand(
+            CommandHelper.TestUndoableCommand(
                 () =>
                 {
                     Assert.AreEqual("Test Scene", scene.Name);
@@ -811,7 +663,7 @@ namespace Kinectitude.Tests.Editor
             transaction.ManagerToAdd = transaction.AvailableManagers.First();
             int available = transaction.AvailableManagers.Count;
 
-            TestCommand(
+            CommandHelper.TestCommand(
                 () => transaction.AddManagerCommand.Execute(null),
                 () =>
                 {
@@ -830,7 +682,7 @@ namespace Kinectitude.Tests.Editor
             transaction.SelectedManager = transaction.SelectedManagers.First();
             int available = transaction.AvailableManagers.Count;
 
-            TestCommand(
+            CommandHelper.TestCommand(
                 () => transaction.RemoveManagerCommand.Execute(null),
                 () =>
                 {
