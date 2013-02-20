@@ -7,23 +7,12 @@ using System.Windows.Input;
 
 namespace Kinectitude.Editor.Commands
 {
-    internal sealed class CommandHistory : ICommandHistory
+    internal sealed class CommandHistory : BaseModel, ICommandHistory
     {
         private bool replay;
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public ObservableCollection<IUndoableCommand> UndoableCommands
-        {
-            get;
-            private set;
-        }
-
-        public ObservableCollection<IUndoableCommand> RedoableCommands
-        {
-            get;
-            private set;
-        }
+        public ObservableCollection<IUndoableCommand> UndoableCommands { get; private set; }
+        public ObservableCollection<IUndoableCommand> RedoableCommands { get; private set; }
 
         public IUndoableCommand LastUndoableCommand
         {
@@ -35,56 +24,53 @@ namespace Kinectitude.Editor.Commands
             get { return RedoableCommands.LastOrDefault(); }
         }
 
-        public ICommand UndoCommand
-        {
-            get;
-            private set;
-        }
-
-        public ICommand RedoCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand UndoCommand { get; private set; }
+        public ICommand RedoCommand { get; private set; }
 
         public CommandHistory()
         {
             UndoableCommands = new ObservableCollection<IUndoableCommand>();
             RedoableCommands = new ObservableCollection<IUndoableCommand>();
 
-            UndoCommand = new DelegateCommand(
-                (parameter) => UndoableCommands.Count > 0,
-                (parameter) =>
-                {
-                    replay = true;
+            UndoCommand = new DelegateCommand(p => UndoableCommands.Count > 0, p => Undo());
+            RedoCommand = new DelegateCommand(p => RedoableCommands.Count > 0, p => Redo());
+        }
 
-                    if (UndoableCommands.Count > 0)
-                    {
-                        IUndoableCommand command = PopUndo();
-                        command.Unexecute();
-                        PushRedo(command);
-                    }
+        public void Undo()
+        {
+            replay = true;
 
-                    replay = false;
-                }
-            );
+            if (UndoableCommands.Count > 0)
+            {
+                IUndoableCommand command = PopUndo();
+                command.Unexecute();
+                PushRedo(command);
+            }
 
-            RedoCommand = new DelegateCommand(
-                (parameter) => RedoableCommands.Count > 0,
-                (parameter) =>
-                {
-                    replay = true;
+            replay = false;
+        }
 
-                    if (RedoableCommands.Count > 0)
-                    {
-                        IUndoableCommand command = PopRedo();
-                        command.Execute();
-                        PushUndo(command);
-                    }
+        public void Redo()
+        {
+            replay = true;
 
-                    replay = false;
-                }
-            );
+            if (RedoableCommands.Count > 0)
+            {
+                IUndoableCommand command = PopRedo();
+                command.Execute();
+                PushUndo(command);
+            }
+
+            replay = false;
+        }
+
+        public void Clear()
+        {
+            UndoableCommands.Clear();
+            RedoableCommands.Clear();
+
+            NotifyPropertyChanged("LastUndoableCommand");
+            NotifyPropertyChanged("LastRedoableCommand");
         }
 
         private void PushUndo(IUndoableCommand command)
@@ -134,12 +120,17 @@ namespace Kinectitude.Editor.Commands
             }
         }
 
-        private void NotifyPropertyChanged(string name)
+        public void WithoutLogging(Action action)
         {
-            if (null != PropertyChanged)
+            bool oldReplay = replay;
+            replay = true;
+
+            if (null != action)
             {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
+                action();
             }
+
+            replay = oldReplay;
         }
     }
 }

@@ -8,6 +8,7 @@ using Kinectitude.Editor.Models.Transactions;
 using Kinectitude.Editor.Models.Values;
 using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.Views.Dialogs;
+using Kinectitude.Editor.Views.Scenes;
 using Kinectitude.Editor.Views.Scenes.Presenters;
 using Kinectitude.Editor.Views.Utils;
 using System;
@@ -60,7 +61,6 @@ namespace Kinectitude.Editor.Models
         public ICommand RenameCommand { get; private set; }
         public ICommand AddAttributeCommand { get; private set; }
         public ICommand RemoveAttributeCommand { get; private set; }
-        public ICommand PromptAddEntityCommand { get; private set; }
         public ICommand AddEntityCommand { get; private set; }
         public ICommand RemoveEntityCommand { get; private set; }
         public ICommand PropertiesCommand { get; private set; }
@@ -83,24 +83,35 @@ namespace Kinectitude.Editor.Models
 
             RenameCommand = new DelegateCommand(null, (parameter) =>
             {
-                DialogService.ShowDialog<NameDialog>(new SceneTransaction(this));
+                Workspace.Instance.DialogService.ShowDialog<NameDialog>(new SceneTransaction(this));
             });
 
             AddAttributeCommand = new DelegateCommand(null, (parameter) =>
             {
-                CreateAttribute();
+                var attribute = CreateAttribute();
+
+                Workspace.Instance.CommandHistory.Log(
+                    "add attribute '" + attribute.Name + "'",
+                    () => AddAttribute(attribute),
+                    () => RemoveAttribute(attribute)
+                );
             });
 
             RemoveAttributeCommand = new DelegateCommand(null, (parameter) =>
             {
                 Attribute attribute = parameter as Attribute;
                 RemoveAttribute(attribute);
+
+                Workspace.Instance.CommandHistory.Log(
+                    "remove attribute '" + attribute.Name + "'",
+                    () => RemoveAttribute(attribute),
+                    () => AddAttribute(attribute)
+                );
             });
 
             AddEntityCommand = new DelegateCommand(null, (parameter) =>
             {
                 Entity preset = parameter as Entity;
-                    
                 if (null != preset)
                 {
                     Entity entity = preset.DeepCopy();
@@ -116,7 +127,7 @@ namespace Kinectitude.Editor.Models
 
             PropertiesCommand = new DelegateCommand(null, (parameter) =>
             {
-                DialogService.ShowDialog<SceneDialog>(new SceneTransaction(this));
+                Workspace.Instance.DialogService.ShowDialog<SceneDialog>(new SceneTransaction(this));
             });
 
             CutCommand = new DelegateCommand(null, (parameter) =>
@@ -210,18 +221,13 @@ namespace Kinectitude.Editor.Models
         {
             attribute.Scope = null;
             Attributes.Remove(attribute);
-
-            Workspace.Instance.CommandHistory.Log(
-                "remove attribute '" + attribute.Name + "'",
-                () => RemoveAttribute(attribute),
-                () => AddAttribute(attribute)
-            );
         }
 
-        public void CreateAttribute()
+        public Attribute CreateAttribute()
         {
             Attribute attribute = new Attribute(GetNextAttributeKey());
             AddAttribute(attribute);
+            return attribute;
         }
 
         public void AddManager(Manager manager)
@@ -238,6 +244,16 @@ namespace Kinectitude.Editor.Models
             {
                 manager.Scope = null;
                 Managers.Remove(manager);
+            }
+        }
+
+        public void ClearManagers()
+        {
+            var managers = Managers.ToArray();
+
+            foreach (var manager in managers)
+            {
+                RemoveManager(manager);
             }
         }
 

@@ -110,23 +110,35 @@ namespace Kinectitude.Editor.Models
 
             RenameCommand = new DelegateCommand(null, (parameter) =>
             {
-                DialogService.ShowDialog<NameDialog>(new EntityRenameTransaction(this));
+                Workspace.Instance.DialogService.ShowDialog<NameDialog>(new EntityRenameTransaction(this));
             });
 
             PropertiesCommand = new DelegateCommand(null, (parameter) =>
             {
-                DialogService.ShowDialog<EntityDialog>(new EntityTransaction(Scope.Prototypes, this));
+                Workspace.Instance.DialogService.ShowDialog<EntityDialog>(new EntityTransaction(AvailablePrototypes(), this));
             });
 
             AddAttributeCommand = new DelegateCommand(null, (parameter) =>
             {
-                CreateAttribute();
+                var attribute = CreateAttribute();
+
+                Workspace.Instance.CommandHistory.Log(
+                    "add attribute '" + attribute.Name + "'",
+                    () => AddAttribute(attribute),
+                    () => RemoveAttribute(attribute)
+                );
             });
 
             RemoveAttributeCommand = new DelegateCommand(null, (parameter) =>
             {
                 Attribute attribute = parameter as Attribute;
                 RemoveAttribute(attribute);
+
+                Workspace.Instance.CommandHistory.Log(
+                    "remove attribute '" + attribute.Name + "'",
+                    () => RemoveAttribute(attribute),
+                    () => AddAttribute(attribute)
+                );
             });
 
             AddEventCommand = new DelegateCommand(null, (parameter) =>
@@ -138,6 +150,12 @@ namespace Kinectitude.Editor.Models
                     {
                         Event evt = factory.CreateStatement() as Event;
                         AddEvent(evt);
+
+                        Workspace.Instance.CommandHistory.Log(
+                            "add event '" + evt.Type + "'",
+                            () => AddEvent(evt),
+                            () => RemoveEvent(evt)
+                        );
                     }
                 }
             });
@@ -148,19 +166,38 @@ namespace Kinectitude.Editor.Models
                 if (null != evt)
                 {
                     RemoveEvent(evt);
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "remove event '" + evt.Type + "'",
+                        () => RemoveEvent(evt),
+                        () => AddEvent(evt)
+                    );
                 }
             });
 
             DeleteStatementCommand = new DelegateCommand(null, (parameter) =>
             {
                 var statement = (AbstractStatement)parameter;
+                var oldParent = statement.Scope;
+                int idx = oldParent.IndexOf(statement);
                 statement.RemoveFromParent();
+
+                Workspace.Instance.CommandHistory.Log(
+                    "remove statement",
+                    () => statement.RemoveFromParent(),
+                    () => oldParent.InsertAt(idx, statement)
+                );
             });
         }
 
         public override void Accept(IGameVisitor visitor)
         {
             visitor.Visit(this);
+        }
+
+        private IEnumerable<Entity> AvailablePrototypes()
+        {
+            return null != Scope ? Scope.Prototypes : Enumerable.Empty<Entity>();
         }
 
         public void AddPrototype(Entity prototype)
@@ -186,12 +223,6 @@ namespace Kinectitude.Editor.Models
                 {
                     InheritEvent(inheritedEvent);
                 }
-
-                Workspace.Instance.CommandHistory.Log(
-                    "change entity prototype",
-                    () => AddPrototype(prototype),
-                    () => RemovePrototype(prototype)
-                );
             }
         }
 
@@ -216,12 +247,6 @@ namespace Kinectitude.Editor.Models
             {
                 DisinheritEvent(inheritedEvent);
             }
-
-            Workspace.Instance.CommandHistory.Log(
-                "change entity prototype",
-                () => RemovePrototype(prototype),
-                () => AddPrototype(prototype)
-            );
         }
 
         public void ClearPrototypes()
@@ -231,6 +256,16 @@ namespace Kinectitude.Editor.Models
             foreach (Entity prototype in prototypes)
             {
                 RemovePrototype(prototype);
+            }
+        }
+
+        public void ClearComponents()
+        {
+            var components = Components.ToArray();
+
+            foreach (var component in components)
+            {
+                RemoveComponent(component);
             }
         }
 
@@ -340,12 +375,6 @@ namespace Kinectitude.Editor.Models
             if (!HasLocalAttribute(attribute.Name))
             {
                 PrivateAddAttribute(attribute);
-
-                Workspace.Instance.CommandHistory.Log(
-                    "add attribute '" + attribute.Name + "'",
-                    () => AddAttribute(attribute),
-                    () => RemoveAttribute(attribute)
-                );
             }
         }
 
@@ -360,19 +389,14 @@ namespace Kinectitude.Editor.Models
             if (!attribute.IsInherited)
             {
                 PrivateRemoveAttribute(attribute);
-
-                Workspace.Instance.CommandHistory.Log(
-                    "remove attribute '" + attribute.Name + "'",
-                    () => RemoveAttribute(attribute),
-                    () => AddAttribute(attribute)
-                );
             }
         }
 
-        public void CreateAttribute()
+        public Attribute CreateAttribute()
         {
-            Attribute attribute = new Attribute(GetNextAttributeKey());
+            var attribute = new Attribute(GetNextAttributeKey());
             AddAttribute(attribute);
+            return attribute;
         }
 
         private void InheritComponent(Component inheritedComponent)
@@ -445,12 +469,6 @@ namespace Kinectitude.Editor.Models
                 Components.Add(component);
 
                 Notify(new PluginUsed(component.Plugin));
-                
-                Workspace.Instance.CommandHistory.Log(
-                    "add component '" + component.DisplayName + "'",
-                    () => AddComponent(component),
-                    () => RemoveComponent(component)
-                );
             }
         }
 
@@ -464,12 +482,6 @@ namespace Kinectitude.Editor.Models
 
                     component.Scope = null;
                     Components.Remove(component);
-
-                    Workspace.Instance.CommandHistory.Log(
-                        "remove component '" + component.DisplayName + "'",
-                        () => RemoveComponent(component),
-                        () => AddComponent(component)
-                    );
                 }
             }
         }
@@ -517,12 +529,6 @@ namespace Kinectitude.Editor.Models
         public void AddEvent(AbstractEvent evt)
         {
             PrivateAddEvent(Events.Count, evt);
-
-            Workspace.Instance.CommandHistory.Log(
-                "add event '" + evt.Header + "'",
-                () => AddEvent(evt),
-                () => RemoveEvent(evt)
-            );
         }
 
         private void PrivateAddEvent(int idx, AbstractEvent evt)
@@ -541,12 +547,6 @@ namespace Kinectitude.Editor.Models
             if (evt.IsEditable)
             {
                 PrivateRemoveEvent(evt);
-
-                Workspace.Instance.CommandHistory.Log(
-                    "remove event '" + evt.Header + "'",
-                    () => RemoveEvent(evt),
-                    () => AddEvent(evt)
-                );
             }
         }
 
@@ -554,11 +554,6 @@ namespace Kinectitude.Editor.Models
         {
             evt.Scope = null;
             Events.Remove(evt);
-        }
-
-        void IStatementScope.RemoveStatement(AbstractStatement statement)
-        {
-            RemoveEvent((AbstractEvent)statement);
         }
 
         private string GetNextAttributeKey()
@@ -760,6 +755,38 @@ namespace Kinectitude.Editor.Models
             return copy;
         }
 
+        #region IStatementScope implementation
+
+        int IStatementScope.IndexOf(AbstractStatement statement)
+        {
+            int idx = -1;
+            var evt = statement as AbstractEvent;
+            if (null != evt)
+            {
+                idx = Events.IndexOf(evt);
+            }
+
+            return idx;
+        }
+        
+        void IStatementScope.RemoveStatement(AbstractStatement statement)
+        {
+            RemoveEvent((AbstractEvent)statement);
+        }
+
+        void IStatementScope.InsertAt(int idx, AbstractStatement statement)
+        {
+            if (idx != -1)
+            {
+                var evt = statement as AbstractEvent;
+                if (null != evt)
+                {
+                    evt.RemoveFromParent();
+                    PrivateAddEvent(idx, evt);
+                }
+            }
+        }
+
         void IStatementScope.InsertBefore(AbstractStatement statement, AbstractStatement toInsert)
         {
             int idx = Events.IndexOf((AbstractEvent)statement);
@@ -773,5 +800,7 @@ namespace Kinectitude.Editor.Models
                 }
             }
         }
+
+        #endregion
     }
 }

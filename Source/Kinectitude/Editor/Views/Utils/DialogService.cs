@@ -7,13 +7,9 @@ using System.Windows.Forms;
 
 namespace Kinectitude.Editor.Views.Utils
 {
-    internal static class DialogService
+    internal sealed class DialogService : IDialogService
     {
-        public delegate void DialogCallback(bool? result);
-        public delegate void FileDialogCallback(bool? result, string file);
-        public delegate void FolderDialogCallback(DialogResult result, string folder);
-
-        public static void ShowDialog<TWindow>(object viewModel, DialogCallback onDialogClose) where TWindow : Window, new()
+        public void ShowDialog<TWindow>(object viewModel, DialogCallback onDialogClose) where TWindow : Window, new()
         {
             Window view = new TWindow();
             view.DataContext = viewModel;
@@ -25,12 +21,12 @@ namespace Kinectitude.Editor.Views.Utils
             view.ShowDialog();
         }
 
-        public static void ShowDialog<TWindow>(object viewModel = null) where TWindow : Window, new()
+        public void ShowDialog<TWindow>(object viewModel = null) where TWindow : Window, new()
         {
             ShowDialog<TWindow>(viewModel, null);
         }
 
-        public static void ShowLoadDialog(FileDialogCallback onClose)
+        public void ShowLoadDialog(FileDialogCallback onClose)
         {
             var dialog = new Microsoft.Win32.OpenFileDialog();
 
@@ -45,7 +41,7 @@ namespace Kinectitude.Editor.Views.Utils
             }
         }
 
-        public static void ShowSaveDialog(FileDialogCallback onClose)
+        public void ShowSaveDialog(FileDialogCallback onClose)
         {
             var dialog = new Microsoft.Win32.SaveFileDialog();
 
@@ -60,7 +56,7 @@ namespace Kinectitude.Editor.Views.Utils
             }
         }
 
-        public static void ShowFolderDialog(FolderDialogCallback onClose)
+        public void ShowFolderDialog(FolderDialogCallback onClose)
         {
             var dialog = new FolderBrowserDialog();
             //dialog.SelectedPath = Environment.SpecialFolder.Personal;
@@ -71,11 +67,6 @@ namespace Kinectitude.Editor.Views.Utils
             {
                 onClose(result, dialog.SelectedPath);
             }
-        }
-
-        public static void ShowMessageDialog(string title, string message, DialogCallback onClose)
-        {
-
         }
     }
 }

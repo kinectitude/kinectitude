@@ -78,8 +78,27 @@ namespace Kinectitude.Editor.Models.Statements.Base
                     {
                         if (IsAllowed(statement))
                         {
-                            statement.RemoveFromParent();
+                            int oldIdx = -1;
+                            var oldParent = statement.Scope;
+                            if (null != oldParent)
+                            {
+                                oldIdx = oldParent.IndexOf(statement);
+                            }
+
                             AddStatement(statement);
+
+                            Workspace.Instance.CommandHistory.Log(
+                                "insert/move statement",
+                                () => AddStatement(statement),
+                                () =>
+                                {
+                                    statement.RemoveFromParent();
+                                    if (null != oldParent)
+                                    {
+                                        oldParent.InsertAt(oldIdx, statement);
+                                    }
+                                }
+                            );
                         }
                     }
                 }
@@ -95,6 +114,7 @@ namespace Kinectitude.Editor.Models.Statements.Base
         {
             if (IsAllowed(statement))
             {
+                statement.RemoveFromParent();
                 statement.Scope = this;
                 Statements.Insert(idx, statement);
 
@@ -116,14 +136,6 @@ namespace Kinectitude.Editor.Models.Statements.Base
             }
 
             return false;
-        }
-
-        public void RemoveStatement(AbstractStatement statement)
-        {
-            if (statement.IsEditable)
-            {
-                PrivateRemoveStatement(statement);
-            }
         }
 
         private void PrivateRemoveStatement(AbstractStatement statement)
@@ -183,19 +195,39 @@ namespace Kinectitude.Editor.Models.Statements.Base
 
         #region IStatementScope implementation
 
+        public int IndexOf(AbstractStatement statement)
+        {
+            return Statements.IndexOf(statement);
+        }
+
+        public void RemoveStatement(AbstractStatement statement)
+        {
+            if (statement.IsEditable)
+            {
+                PrivateRemoveStatement(statement);
+            }
+        }
+
+        public void InsertAt(int idx, AbstractStatement statement)
+        {
+            if (IsEditable)
+            {
+                if (idx != -1)
+                {
+                    if (IsAllowed(statement))
+                    {
+                        statement.RemoveFromParent();
+                        PrivateAddStatement(idx, statement);
+                    }
+                }
+            }
+        }
+
         public void InsertBefore(AbstractStatement statement, AbstractStatement toInsert)
         {
             if (IsEditable)
             {
-                int idx = Statements.IndexOf(statement);
-                if (idx != -1)
-                {
-                    if (IsAllowed(toInsert))
-                    {
-                        toInsert.RemoveFromParent();
-                        PrivateAddStatement(idx, toInsert);
-                    }
-                }
+                InsertAt(Statements.IndexOf(statement), toInsert);
             }
         }
 

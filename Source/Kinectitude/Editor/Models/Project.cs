@@ -161,7 +161,7 @@ namespace Kinectitude.Editor.Models
 
             AddAssetCommand = new DelegateCommand(null, (parameter) =>
             {
-                DialogService.ShowLoadDialog((result, file) =>
+                Workspace.Instance.DialogService.ShowLoadDialog((result, file) =>
                 {
                     Asset asset = new Asset("An Asset");
                     AddAsset(asset);
@@ -176,7 +176,7 @@ namespace Kinectitude.Editor.Models
 
             BrowseCommand = new DelegateCommand(null, (parameter) =>
             {
-                DialogService.ShowFolderDialog((result, path) =>
+                Workspace.Instance.DialogService.ShowFolderDialog((result, path) =>
                 {
                     if (result == System.Windows.Forms.DialogResult.OK)
                     {

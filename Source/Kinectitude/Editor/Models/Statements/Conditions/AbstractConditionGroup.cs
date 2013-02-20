@@ -85,7 +85,14 @@ namespace Kinectitude.Editor.Models.Statements.Conditions
             {
                 if (IsEditable)
                 {
-                    AddStatement(new ExpressionCondition());
+                    var condition = new ExpressionCondition();
+                    AddStatement(condition);
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "add else if",
+                        () => AddStatement(condition),
+                        () => RemoveStatement(condition)
+                    );
                 }
             });
 
@@ -94,7 +101,14 @@ namespace Kinectitude.Editor.Models.Statements.Conditions
             {
                 if (IsEditable && null == Else)
                 {
-                    Else = new BasicCondition();
+                    var condition = new BasicCondition();
+                    Else = condition;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "add else",
+                        () => Else = condition,
+                        () => Else = null
+                    );
                 }
             });
         }

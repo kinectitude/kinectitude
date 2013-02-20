@@ -63,6 +63,8 @@ namespace Kinectitude.Editor.Models.Values
 
         public Value(object value, bool constant)
         {
+            initializer = "";
+
             if (null != value)
             {
                 initializer = value.ToString();

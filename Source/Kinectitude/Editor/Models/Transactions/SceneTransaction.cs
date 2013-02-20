@@ -8,6 +8,9 @@ namespace Kinectitude.Editor.Models.Transactions
 {
     internal class SceneTransaction : BaseModel
     {
+        private readonly Scene scene;
+        private readonly string oldName;
+        private readonly IEnumerable<Manager> oldManagers;
         private string name;
         private Plugin managerToAdd;
         private PluginSelection selectedManager;
@@ -66,8 +69,12 @@ namespace Kinectitude.Editor.Models.Transactions
 
         public SceneTransaction(Scene scene)
         {
-            Name = scene.Name;
+            this.scene = scene;
 
+            oldName = scene.Name;
+            oldManagers = scene.Managers.ToArray();
+
+            Name = scene.Name;
             RequiredManagers = new ObservableCollection<PluginSelection>();
             SelectedManagers = new ObservableCollection<PluginSelection>();
 
@@ -95,25 +102,13 @@ namespace Kinectitude.Editor.Models.Transactions
 
             CommitCommand = new DelegateCommand(null, (parameter) =>
             {
-                scene.Name = Name;
+                Commit();
 
-                IEnumerable<Manager> existingManagers = scene.Managers.ToArray();
-
-                foreach (Manager manager in existingManagers)
-                {
-                    if (!SelectedManagers.Any(x => x.Plugin == manager.Plugin) && !RequiredManagers.Any(x => x.Plugin == manager.Plugin))
-                    {
-                        scene.RemoveManager(manager);
-                    }
-                }
-
-                foreach (PluginSelection selection in SelectedManagers)
-                {
-                    if (!scene.HasManagerOfType(selection.Plugin))
-                    {
-                        scene.AddManager(new Manager(selection.Plugin));
-                    }
-                }
+                Workspace.Instance.CommandHistory.Log(
+                    "change scene properties",
+                    () => Commit(),
+                    () => Rollback()
+                );
             });
 
             AddManagerCommand = new DelegateCommand(null, (parameter) =>
@@ -122,8 +117,7 @@ namespace Kinectitude.Editor.Models.Transactions
 
                 if (null != plugin)
                 {
-                    AvailableManagers.Remove(plugin);
-                    SelectedManagers.Add(new PluginSelection(plugin, false));
+                    AddManager(plugin);
                 }
             });
 
@@ -133,10 +127,53 @@ namespace Kinectitude.Editor.Models.Transactions
 
                 if (null != selectedManager)
                 {
-                    SelectedManagers.Remove(pluginSelection);
-                    AvailableManagers.Add(pluginSelection.Plugin);
+                    RemoveManager(selectedManager);
                 }
             });
+        }
+
+        public void AddManager(Plugin plugin)
+        {
+            AvailableManagers.Remove(plugin);
+            SelectedManagers.Add(new PluginSelection(plugin, false));
+        }
+
+        public void RemoveManager(PluginSelection selection)
+        {
+            SelectedManagers.Remove(selection);
+            AvailableManagers.Add(selection.Plugin);
+        }
+
+        public void Commit()
+        {
+            Workspace.Instance.CommandHistory.WithoutLogging(() => scene.Name = Name);
+
+            foreach (Manager manager in oldManagers)
+            {
+                if (!SelectedManagers.Any(x => x.Plugin == manager.Plugin) && !RequiredManagers.Any(x => x.Plugin == manager.Plugin))
+                {
+                    scene.RemoveManager(manager);
+                }
+            }
+
+            foreach (PluginSelection selection in SelectedManagers)
+            {
+                if (!scene.HasManagerOfType(selection.Plugin))
+                {
+                    scene.AddManager(new Manager(selection.Plugin));
+                }
+            }
+        }
+
+        public void Rollback()
+        {
+            Workspace.Instance.CommandHistory.WithoutLogging(() => scene.Name = oldName);
+            scene.ClearManagers();
+
+            foreach (var manager in oldManagers)
+            {
+                scene.AddManager(manager);
+            }
         }
     }
 }

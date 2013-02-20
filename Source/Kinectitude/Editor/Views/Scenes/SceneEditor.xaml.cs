@@ -1,4 +1,5 @@
-﻿using Kinectitude.Editor.Views.Utils;
+﻿using Kinectitude.Editor.Models;
+using Kinectitude.Editor.Views.Utils;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -16,7 +17,7 @@ namespace Kinectitude.Editor.Views.Scenes
 
         private void AddEntity_Click(object sender, RoutedEventArgs e)
         {
-            DialogService.ShowDialog<AddEntityDialog>(DataContext);
+            Workspace.Instance.DialogService.ShowDialog<AddEntityDialog>(DataContext);
         }
     }
 }

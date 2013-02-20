@@ -16,7 +16,12 @@ namespace Kinectitude.Editor.Commands
         ICommand UndoCommand { get; }
         ICommand RedoCommand { get; }
 
+        void Undo();
+        void Redo();
+        void Clear();
+
         void Log(IUndoableCommand command);
         void Log(string name, Action executeDelegate, Action unexecuteDelegate);
+        void WithoutLogging(Action action);
     }
 }

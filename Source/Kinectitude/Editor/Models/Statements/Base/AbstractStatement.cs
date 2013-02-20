@@ -56,7 +56,27 @@ namespace Kinectitude.Editor.Models.Statements.Base
 
                         if (null != toInsert && toInsert.IsEditable && null != Scope)
                         {
+                            int oldIdx = -1;
+                            var oldParent = toInsert.Scope;
+                            if (null != oldParent)
+                            {
+                                oldIdx = oldParent.IndexOf(toInsert);
+                            }
+
                             Scope.InsertBefore(this, toInsert);
+
+                            Workspace.Instance.CommandHistory.Log(
+                                "insert/move statement",
+                                () => Scope.InsertBefore(this, toInsert),
+                                () =>
+                                {
+                                    toInsert.RemoveFromParent();
+                                    if (null != oldParent)
+                                    {
+                                        oldParent.InsertAt(oldIdx, toInsert);
+                                    }
+                                }
+                            );
                         }
                     }
                 });

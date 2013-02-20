@@ -12,7 +12,7 @@ namespace Kinectitude.Editor.Models
     
     internal sealed class Attribute : GameModel<IAttributeScope>, IValueScope
     {
-        public static readonly Value DefaultValue = new Value("");
+        public static readonly Value DefaultValue = new Value(null, true);
 
         private string name;
         private Value val;

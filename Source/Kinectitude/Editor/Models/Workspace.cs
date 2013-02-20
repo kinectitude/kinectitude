@@ -31,14 +31,13 @@ namespace Kinectitude.Editor.Models
 
         private const string PluginDirectory = "Plugins";
 
-        private static readonly Lazy<Workspace> instance = new Lazy<Workspace>();
+        private static readonly Lazy<Workspace> instance = new Lazy<Workspace>(() => new Workspace());
 
         public static Workspace Instance
         {
             get { return instance.Value; }
         }
 
-        private readonly Lazy<CommandHistory> commandHistory;
         private readonly List<Entity> entityPresets;
         private object clippedItem;
         private Project project;
@@ -69,10 +68,8 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        public ICommandHistory CommandHistory
-        {
-            get { return commandHistory.Value; }
-        }
+        public ICommandHistory CommandHistory { get; set; }
+        public IDialogService DialogService { get; set; }
 
         public IEnumerable<Entity> EntityPresets
         {
@@ -92,7 +89,7 @@ namespace Kinectitude.Editor.Models
         public ICommand SaveProjectAsCommand { get; private set; }
         public ICommand ExitCommand { get; private set; }
 
-        public Workspace()
+        private Workspace()
         {
             Plugins = new ObservableCollection<Plugin>();
 
@@ -103,8 +100,6 @@ namespace Kinectitude.Editor.Models
             Events = new ObservableCollection<StatementFactory>();
             Actions = new ObservableCollection<StatementFactory>();
             Statements = new ObservableCollection<StatementFactory>();
-
-            commandHistory = new Lazy<CommandHistory>();
 
             NewProjectCommand = new DelegateCommand(null, (parameter) =>
             {
@@ -188,6 +183,9 @@ namespace Kinectitude.Editor.Models
             }
 
             entityPresets = new List<Entity>();
+
+            CommandHistory = new CommandHistory();
+            DialogService = new DialogService();
         }
 
         public void Initialize()

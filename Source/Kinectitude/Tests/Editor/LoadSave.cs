@@ -20,6 +20,7 @@ namespace Kinectitude.Tests.Editor.loadSave
             File.Copy("Kinectitude.Render.dll", "Plugins/Kinectitude.Render.dll");
             File.Copy("Kinectitude.Kinect.dll", "Plugins/Kinectitude.Kinect.dll");
             KglGameStorage storage = new KglGameStorage(new FileInfo("read.kgl"));
+
             Game game = storage.LoadGame();
             storage.SaveGame(game);
             string after = File.ReadAllText("read.kgl");
