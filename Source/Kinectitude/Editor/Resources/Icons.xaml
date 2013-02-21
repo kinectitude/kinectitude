@@ -4,7 +4,7 @@
     <!-- Toolbar and Menu Icons -->
     
     <ImageSource x:Key="icoNew">..\Icons\page_white.png</ImageSource>
-    <ImageSource x:Key="icoOpen">..\Icons\folder.png</ImageSource>
+    <ImageSource x:Key="icoOpen">..\Icons\folder_page.png</ImageSource>
     <ImageSource x:Key="icoSave">..\Icons\disk.png</ImageSource>
     <ImageSource x:Key="icoCut">..\Icons\cut.png</ImageSource>
     <ImageSource x:Key="icoCopy">..\Icons\page_copy.png</ImageSource>

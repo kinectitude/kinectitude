@@ -81,18 +81,18 @@
             </MenuItem>
         </Menu>
 
-        <ToolBarTray DockPanel.Dock="Top" Orientation="Horizontal" IsLocked="True" Margin="0,0,0,4">
+        <ToolBarTray DockPanel.Dock="Top" Orientation="Horizontal" IsLocked="True" Margin="0,4,0,4">
             <ToolBar Band="1" BandIndex="1">
-                <Button>
+                <Button Command="{Binding NewProjectCommand, Mode=OneWay}">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="{StaticResource icoNew}" Stretch="None" Margin="0,0,4,0" />
                         <TextBlock VerticalAlignment="Center">New Project</TextBlock>
                     </StackPanel>
                 </Button>
-                <Button>
+                <Button Command="{Binding LoadProjectCommand, Mode=OneWay}">
                     <Image Source="{StaticResource icoOpen}" Stretch="None" />
                 </Button>
-                <Button>
+                <Button Command="{Binding SaveProjectCommand, Mode=OneWay}">
                     <Image Source="{StaticResource icoSave}" Stretch="None" />
                 </Button>
                 <Separator Margin="4,0,4,0" />
@@ -106,10 +106,10 @@
                     <Image Source="{StaticResource icoPaste}" Stretch="None" />
                 </Button>
                 <Separator Margin="4,0,4,0" />
-                <Button>
+                <Button Command="{Binding CommandHistory.UndoCommand, Mode=OneWay}">
                     <Image Source="{StaticResource icoUndo}" Stretch="None" />
                 </Button>
-                <Button>
+                <Button Command="{Binding CommandHistory.RedoCommand, Mode=OneWay}">
                     <Image Source="{StaticResource icoRedo}" Stretch="None" />
                 </Button>
                 <Separator Margin="4,0,4,0" />
