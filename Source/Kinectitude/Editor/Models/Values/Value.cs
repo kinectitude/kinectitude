@@ -72,6 +72,11 @@ namespace Kinectitude.Editor.Models.Values
                 var type = value.GetType();
                 if (type == typeof(string) || type.IsEnum)
                 {
+                    if (type.IsEnum)
+                    {
+                        value = value.ToString();
+                    }
+
                     initializer = "\"" + initializer + "\"";
                 }
             }

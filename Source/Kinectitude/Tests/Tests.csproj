@@ -88,7 +88,6 @@
     <Compile Include="Editor\DataTests.cs" />
     <Compile Include="Editor\CommandTests.cs" />
     <Compile Include="Editor\UndoTests.cs" />
-    <Compile Include="Editor\WorkspaceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
