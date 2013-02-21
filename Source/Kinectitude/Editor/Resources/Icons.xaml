@@ -36,6 +36,10 @@
     <!-- Scene Editor -->
     
     <ImageSource x:Key="icoCursor">..\Icons\cursor.png</ImageSource>
+    <ImageSource x:Key="icoShapeEntity">..\Icons\shape_square.png</ImageSource>
+    <ImageSource x:Key="icoTextEntity">..\Icons\style.png</ImageSource>
+    <ImageSource x:Key="icoSpriteEntity">..\Icons\status_online.png</ImageSource>
+    <ImageSource x:Key="icoBlankEntity">..\Icons\blank.png</ImageSource>
     <ImageSource x:Key="icoSendToBack">..\Icons\shape_move_back.png</ImageSource>
     <ImageSource x:Key="icoSendToFront">..\Icons\shape_move_front.png</ImageSource>
     <ImageSource x:Key="icoSendBackward">..\Icons\shape_move_backwards.png</ImageSource>

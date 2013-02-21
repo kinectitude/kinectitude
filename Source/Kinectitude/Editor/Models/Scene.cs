@@ -1,4 +1,5 @@
 ﻿using Kinectitude.Core.Base;
+using Kinectitude.Core.Components;
 using Kinectitude.Core.Data;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Data.DataContainers;
@@ -18,15 +19,26 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 namespace Kinectitude.Editor.Models
 {
+    internal enum EntityPlacementMode
+    {
+        None,
+        Image,
+        Shape,
+        Text,
+        Blank
+    }
+
     internal sealed class Scene : GameModel<ISceneScope>, IAttributeScope, IEntityScope, IManagerScope
     {
         private string name;
         private int nextAttribute;
-
+        private EntityPlacementMode placementMode;
+        
         public string Name
         {
             get { return name; }
@@ -48,6 +60,19 @@ namespace Kinectitude.Editor.Models
             }
         }
 
+        public EntityPlacementMode PlacementMode
+        {
+            get { return placementMode; }
+            set
+            {
+                if (placementMode != value)
+                {
+                    placementMode = value;
+                    NotifyPropertyChanged("PlacementMode");
+                }
+            }
+        }
+
         public IEnumerable<Plugin> Plugins
         {
             get { return Entities.SelectMany(x => x.Plugins).Union(Managers.Select(x => x.Plugin)).Distinct(); }
@@ -61,6 +86,7 @@ namespace Kinectitude.Editor.Models
         public ICommand RenameCommand { get; private set; }
         public ICommand AddAttributeCommand { get; private set; }
         public ICommand RemoveAttributeCommand { get; private set; }
+        public ICommand SetEntityFactoryCommand { get; private set; }
         public ICommand AddEntityCommand { get; private set; }
         public ICommand RemoveEntityCommand { get; private set; }
         public ICommand PropertiesCommand { get; private set; }
@@ -111,11 +137,27 @@ namespace Kinectitude.Editor.Models
 
             AddEntityCommand = new DelegateCommand(null, (parameter) =>
             {
-                Entity preset = parameter as Entity;
-                if (null != preset)
+                var point = (Point)parameter;
+                var entityFactory = EntityFactoryForPlacementMode();
+
+                if (null != entityFactory)
                 {
-                    Entity entity = preset.DeepCopy();
+                    var entity = entityFactory();
+                    var transform = entity.GetComponentByType(typeof(TransformComponent));
+                    if (null != transform)
+                    {
+                        transform.SetProperty("X", new Value(point.X, true));
+                        transform.SetProperty("Y", new Value(point.Y, true));
+                    }
+
                     AddEntity(entity);
+                    PlacementMode = EntityPlacementMode.None;
+
+                    Workspace.Instance.CommandHistory.Log(
+                    "add entity",
+                    () => AddEntity(entity),
+                    () => RemoveEntity(entity)
+                );
                 }
             });
 
@@ -185,6 +227,27 @@ namespace Kinectitude.Editor.Models
         public override void Accept(IGameVisitor visitor)
         {
             visitor.Visit(this);
+        }
+
+        private EntityFactory EntityFactoryForPlacementMode()
+        {
+            EntityFactory entityFactory = null;
+            switch (PlacementMode)
+            {
+                case EntityPlacementMode.Blank:
+                    entityFactory = Workspace.Instance.BlankEntityFactory;
+                    break;
+                case EntityPlacementMode.Image:
+                    entityFactory = Workspace.Instance.ImageEntityFactory;
+                    break;
+                case EntityPlacementMode.Shape:
+                    entityFactory = Workspace.Instance.ShapeEntityFactory;
+                    break;
+                case EntityPlacementMode.Text:
+                    entityFactory = Workspace.Instance.TextEntityFactory;
+                    break;
+            }
+            return entityFactory;
         }
 
         private void OnEntitiesChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -274,12 +337,6 @@ namespace Kinectitude.Editor.Models
                 {
                     Notify(new PluginUsed(plugin));
                 }
-
-                Workspace.Instance.CommandHistory.Log(
-                    "add entity",
-                    () => AddEntity(entity),
-                    () => RemoveEntity(entity)
-                );
             }
         }
 
@@ -366,7 +423,7 @@ namespace Kinectitude.Editor.Models
 
         public bool EntityNameExists(string name)
         {
-            return Entities.Any(x => x.Name != null && x.Name == name) || null != Scope && Scope.EntityNameExists(name);
+            return name != null && Entities.Any(x => x.Name != null && x.Name == name) || null != Scope && Scope.EntityNameExists(name);
         }
 
         void IEntityScope.RemoveEntity(Entity entity)

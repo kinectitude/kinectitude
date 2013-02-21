@@ -25,6 +25,8 @@ using Action = Kinectitude.Editor.Models.Statements.Actions.Action;
 
 namespace Kinectitude.Editor.Models
 {
+    internal delegate Entity EntityFactory();
+
     internal sealed class Workspace : BaseModel
     {
         public static IValueMaker ValueMaker = new KglValueMaker();
@@ -38,7 +40,6 @@ namespace Kinectitude.Editor.Models
             get { return instance.Value; }
         }
 
-        private readonly List<Entity> entityPresets;
         private object clippedItem;
         private Project project;
 
@@ -71,11 +72,11 @@ namespace Kinectitude.Editor.Models
         public ICommandHistory CommandHistory { get; set; }
         public IDialogService DialogService { get; set; }
 
-        public IEnumerable<Entity> EntityPresets
-        {
-            get { return entityPresets; }
-        }
-
+        public EntityFactory ImageEntityFactory { get; private set; }
+        public EntityFactory TextEntityFactory { get; private set; }
+        public EntityFactory ShapeEntityFactory { get; private set; }
+        public EntityFactory BlankEntityFactory { get; private set; }
+        
         public ObservableCollection<Plugin> Plugins { get; private set; }
         public ObservableCollection<Plugin> Managers { get; private set; }
         public ObservableCollection<Plugin> Components { get; private set; }
@@ -86,7 +87,6 @@ namespace Kinectitude.Editor.Models
         public ICommand NewProjectCommand { get; private set; }
         public ICommand LoadProjectCommand { get; private set; }
         public ICommand SaveProjectCommand { get; private set; }
-        public ICommand SaveProjectAsCommand { get; private set; }
         public ICommand ExitCommand { get; private set; }
 
         private Workspace()
@@ -152,20 +152,6 @@ namespace Kinectitude.Editor.Models
                 }
             });
 
-            SaveProjectAsCommand = new DelegateCommand(null, (parameter) =>
-            {
-                DialogService.ShowSaveDialog(
-                    (result, fileName) =>
-                    {
-                        if (result == true)
-                        {
-                            Project.Title = fileName;
-                            SaveProject();
-                        }
-                    }
-                );
-            });
-
             ExitCommand = new DelegateCommand(null, (parameter) => Exit());
 
             Assembly core = typeof(Kinectitude.Core.Base.Component).Assembly;
@@ -182,47 +168,53 @@ namespace Kinectitude.Editor.Models
                 }
             }
 
-            entityPresets = new List<Entity>();
-
             CommandHistory = new CommandHistory();
             DialogService = new DialogService();
         }
 
         public void Initialize()
         {
-            Entity blankEntity = new Entity() { Name = "Blank Entity" };
-            Component blankEntityTransform = new Component(GetPlugin(typeof(TransformComponent)));
-            blankEntityTransform.SetProperty("Width", new Value(48, true));
-            blankEntityTransform.SetProperty("Height", new Value(48, true));
-            blankEntity.AddComponent(blankEntityTransform);
+            BlankEntityFactory = () =>
+            {
+                var entity = new Entity();
+                var transform = new Component(GetPlugin(typeof(TransformComponent)));
+                transform.SetProperty("Width", new Value(48, true));
+                transform.SetProperty("Height", new Value(48, true));
+                entity.AddComponent(transform);
+                return entity;
+            };
 
-            entityPresets.Add(blankEntity);
+            ImageEntityFactory = () =>
+            {
+                var entity = new Entity();
+                entity.AddComponent(new Component(GetPlugin(typeof(ImageRenderComponent))));
+                return entity;
+            };
 
-            Entity imageEntity = new Entity() { Name = "Image Entity" };
-            imageEntity.AddComponent(new Component(GetPlugin(typeof(ImageRenderComponent))));
+            ShapeEntityFactory = () =>
+            {
+                var entity = new Entity();
+                var transform = new Component(GetPlugin(typeof(TransformComponent)));
+                transform.SetProperty("Width", new Value(48, true));
+                transform.SetProperty("Height", new Value(48, true));
+                entity.AddComponent(transform);
+                var render = new Component(GetPlugin(typeof(RenderComponent)));
+                render.SetProperty("Shape", new Value("Rectangle", true));
+                render.SetProperty("FillColor", new Value("Blue", true));
+                entity.AddComponent(render);
+                return entity;
+            };
 
-            entityPresets.Add(imageEntity);
-
-            Entity shapeEntity = new Entity() { Name = "Shape Entity" };
-            Component shapeEntityTransform = new Component(GetPlugin(typeof(TransformComponent)));
-            shapeEntityTransform.SetProperty("Width", new Value(48, true));
-            shapeEntityTransform.SetProperty("Height", new Value(48, true));
-            shapeEntity.AddComponent(blankEntityTransform);
-            Component shapeEntityRender = new Component(GetPlugin(typeof(RenderComponent)));
-            shapeEntityRender.SetProperty("Shape", new Value("Rectangle", true));
-            shapeEntityRender.SetProperty("FillColor", new Value("Blue", true));
-            shapeEntity.AddComponent(shapeEntityRender);
-
-            entityPresets.Add(shapeEntity);
-
-            Entity textEntity = new Entity() { Name = "Text Entity" };
-            Component textEntityText = new Component(GetPlugin(typeof(TextRenderComponent)));
-            textEntityText.SetProperty("FontSize", new Value(36, true));
-            textEntityText.SetProperty("FontColor", new Value("Black", true));
-            textEntityText.SetProperty("Value", new Value("Your Text Here", true));
-            textEntity.AddComponent(textEntityText);
-
-            entityPresets.Add(textEntity);
+            TextEntityFactory = () =>
+            {
+                var entity = new Entity();
+                var text = new Component(GetPlugin(typeof(TextRenderComponent)));
+                text.SetProperty("FontSize", new Value(36, true));
+                text.SetProperty("FontColor", new Value("Black", true));
+                text.SetProperty("Value", new Value("Your Text Here", true));
+                entity.AddComponent(text);
+                return entity;
+            };
 
             Statements.Add(new StatementFactory("If", StatementType.ConditionGroup, () => new ConditionGroup()));
             Statements.Add(new StatementFactory("While Loop", StatementType.WhileLoop, () => new WhileLoop()));

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Kinectitude.Editor.Models;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,13 +42,16 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             DependencyProperty.Register("DeleteCommand", typeof(ICommand), typeof(DesignerCanvas));
 
         public static DependencyProperty CutCommandProperty =
-            DependencyProperty.Register("CutCommand", typeof(ICommand), typeof(DesignerCanvas), new FrameworkPropertyMetadata(null));
+            DependencyProperty.Register("CutCommand", typeof(ICommand), typeof(DesignerCanvas));
 
         public static DependencyProperty CopyCommandProperty =
             DependencyProperty.Register("CopyCommand", typeof(ICommand), typeof(DesignerCanvas));
 
         public static DependencyProperty PasteCommandProperty =
             DependencyProperty.Register("PasteCommand", typeof(ICommand), typeof(DesignerCanvas));
+
+        public static DependencyProperty PointCommandProperty =
+            DependencyProperty.Register("PointCommand", typeof(ICommand), typeof(DesignerCanvas));
 
         private enum Mode
         {
@@ -115,6 +119,12 @@ namespace Kinectitude.Editor.Views.Controls.Designer
         {
             get { return (ICommand)GetValue(PasteCommandProperty); }
             set { SetValue(PasteCommandProperty, value); }
+        }
+
+        public ICommand PointCommand
+        {
+            get { return (ICommand)GetValue(PointCommandProperty); }
+            set { SetValue(PointCommandProperty, value); }
         }
 
         public DesignerCanvas()
@@ -381,6 +391,10 @@ namespace Kinectitude.Editor.Views.Controls.Designer
                         Select(item);
                     }
                 }
+                else if (null != PointCommand)
+                {
+                    PointCommand.Execute(currentPoint);
+                }
             }
             else if (mode == Mode.Transforming)
             {
@@ -526,6 +540,11 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             {
                 translator.Update();
             }
+        }
+
+        public void StartPlacement(EntityFactory factory)
+        {
+
         }
     }
 }

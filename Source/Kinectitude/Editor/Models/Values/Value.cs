@@ -131,5 +131,10 @@ namespace Kinectitude.Editor.Models.Values
         {
             Reader.NotifyOfChange(callback);
         }
+
+        public void Unsubscribe(IChanges callback)
+        {
+            // TODO implement this
+        }
     }
 }

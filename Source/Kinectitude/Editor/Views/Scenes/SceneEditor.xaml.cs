@@ -14,10 +14,5 @@ namespace Kinectitude.Editor.Views.Scenes
         {
             InitializeComponent();
         }
-
-        private void AddEntity_Click(object sender, RoutedEventArgs e)
-        {
-            Workspace.Instance.DialogService.ShowDialog<AddEntityDialog>(DataContext);
-        }
     }
 }

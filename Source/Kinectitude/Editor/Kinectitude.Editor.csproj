@@ -108,6 +108,7 @@
     <Compile Include="Models\Data\ValueReaders\ManagerValueReader.cs" />
     <Compile Include="Models\Data\ValueReaders\ServiceValueReader.cs" />
     <Compile Include="Models\Data\ValueReaders\ThisComponentValueReader.cs" />
+    <Compile Include="Views\Utils\PlacementModeConverter.cs" />
     <Compile Include="Views\Utils\IDialogService.cs" />
     <Compile Include="Models\Interfaces\IServiceScope.cs" />
     <Compile Include="Models\Interfaces\IValueScope.cs" />
@@ -227,9 +228,6 @@
     <Compile Include="Views\Dialogs\NameDialog.xaml.cs">
       <DependentUpon>NameDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Scenes\AddEntityDialog.xaml.cs">
-      <DependentUpon>AddEntityDialog.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\Utils\FolderConverter.cs" />
     <Compile Include="Views\Dialogs\EntityDialog.xaml.cs">
       <DependentUpon>EntityDialog.xaml</DependentUpon>
@@ -284,10 +282,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialogs\NameDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Scenes\AddEntityDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -414,6 +408,14 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\control_play_blue.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\shape_square.png" />
+    <Resource Include="Icons\status_online.png" />
+    <Resource Include="Icons\style.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\blank.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
