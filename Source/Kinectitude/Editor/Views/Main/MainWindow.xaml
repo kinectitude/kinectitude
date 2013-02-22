@@ -81,35 +81,34 @@
             </MenuItem>
         </Menu>
 
-        <ToolBarTray DockPanel.Dock="Top" Orientation="Horizontal" IsLocked="True" Margin="0,4,0,4">
-            <ToolBar Band="1" BandIndex="1">
-                <Button Command="{Binding NewProjectCommand, Mode=OneWay}">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="{StaticResource icoNew}" Stretch="None" Margin="0,0,4,0" />
-                        <TextBlock VerticalAlignment="Center">New Project</TextBlock>
-                    </StackPanel>
-                </Button>
-                <Button Command="{Binding LoadProjectCommand, Mode=OneWay}">
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="4,0,0,4">
+            <Button Command="{Binding NewProjectCommand, Mode=OneWay}" Margin="0,0,4,0">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="{StaticResource icoNew}" Stretch="None" Margin="0,0,4,0" />
+                    <TextBlock VerticalAlignment="Center">New Project</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Command="{Binding LoadProjectCommand, Mode=OneWay}" Margin="0,0,4,0">
                     <Image Source="{StaticResource icoOpen}" Stretch="None" />
                 </Button>
-                <Button Command="{Binding SaveProjectCommand, Mode=OneWay}">
+            <Button Command="{Binding SaveProjectCommand, Mode=OneWay}" Margin="0,0,4,0">
                     <Image Source="{StaticResource icoSave}" Stretch="None" />
                 </Button>
                 <Separator Margin="4,0,4,0" />
-                <Button>
+            <Button Margin="0,0,4,0">
                     <Image Source="{StaticResource icoCut}" Stretch="None" />
                 </Button>
-                <Button>
+            <Button Margin="0,0,4,0">
                     <Image Source="{StaticResource icoCopy}" Stretch="None" />
                 </Button>
-                <Button>
+            <Button Margin="0,0,4,0">
                     <Image Source="{StaticResource icoPaste}" Stretch="None" />
                 </Button>
                 <Separator Margin="4,0,4,0" />
-                <Button Command="{Binding CommandHistory.UndoCommand, Mode=OneWay}">
+            <Button Command="{Binding CommandHistory.UndoCommand, Mode=OneWay}" Margin="0,0,4,0">
                     <Image Source="{StaticResource icoUndo}" Stretch="None" />
                 </Button>
-                <Button Command="{Binding CommandHistory.RedoCommand, Mode=OneWay}">
+            <Button Command="{Binding CommandHistory.RedoCommand, Mode=OneWay}" Margin="0,0,4,0">
                     <Image Source="{StaticResource icoRedo}" Stretch="None" />
                 </Button>
                 <Separator Margin="4,0,4,0" />
@@ -119,8 +118,7 @@
                         <TextBlock VerticalAlignment="Center">Play</TextBlock>
                     </StackPanel>
                 </Button>
-            </ToolBar>
-        </ToolBarTray>
+        </StackPanel>
         
         <Grid DockPanel.Dock="Left" Margin="4,0,4,4">
             <Grid.ColumnDefinitions>

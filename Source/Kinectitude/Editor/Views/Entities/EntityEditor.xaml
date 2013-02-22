@@ -284,10 +284,10 @@
                         </Style>
                     </ContentPresenter.Style>
                 </ContentPresenter>
-                <StackPanel Orientation="Horizontal" Margin="2" Visibility="{Binding IsEditable, Converter={StaticResource BoolToVis}}">
+                <StackPanel Orientation="Horizontal" Margin="2,4,2,2" Visibility="{Binding IsEditable, Converter={StaticResource BoolToVis}}">
                     <Button Command="{Binding AddElseIfCommand}" Padding="4,2,4,2">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="{StaticResource icoAdd}" Width="16" Height="16">
+                            <Image Source="{StaticResource icoAdd}" Width="16" Height="16" Margin="0,0,4,0">
                                 <Image.Style>
                                     <Style TargetType="Image">
                                         <Style.Triggers>
@@ -301,9 +301,9 @@
                             <TextBlock VerticalAlignment="Center">else if</TextBlock>
                         </StackPanel>
                     </Button>
-                    <Button Command="{Binding AddElseCommand}" Padding="4,2,4,2" Margin="2,0,0,0">
+                    <Button Command="{Binding AddElseCommand}" Padding="4,2,4,2" Margin="4,0,0,0">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="{StaticResource icoAdd}" Width="16" Height="16">
+                            <Image Source="{StaticResource icoAdd}" Width="16" Height="16" Margin="0,0,4,0">
                                 <Image.Style>
                                     <Style TargetType="Image">
                                         <Style.Triggers>
@@ -493,6 +493,11 @@
             </StackPanel>
             <ScrollViewer HorizontalScrollBarVisibility="Visible" Background="White">
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="16">
+                    <StackPanel.Resources>
+                        <Style BasedOn="{StaticResource {x:Type Button}}" TargetType="{x:Type Button}">
+                            <Setter Property="BorderThickness" Value="0" />
+                        </Style>
+                    </StackPanel.Resources>
                     <ItemsControl ItemsSource="{Binding Source={StaticResource Events}}" Margin="8,0,0,8" />
                     <ContentControl Style="{StaticResource DropTarget}" Margin="8,0,0,8">
                         <i:Interaction.Behaviors>

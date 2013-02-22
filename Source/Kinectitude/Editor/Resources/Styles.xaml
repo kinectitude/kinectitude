@@ -9,6 +9,7 @@
 
     <Style TargetType="{x:Type Button}">
         <Setter Property="Padding" Value="8" />
+        <Setter Property="BorderThickness" Value="0" />
     </Style>
 
     <Style TargetType="{x:Type ToolBarTray}">
@@ -18,7 +19,11 @@
     <Style TargetType="{x:Type ToolBar}">
         <Setter Property="Background" Value="Transparent" />
     </Style>
-    
+
+    <Style TargetType="{x:Type TabControl}">
+        <!--Setter Property="BorderThickness" Value="0" /-->
+    </Style>
+
     <Style x:Key="workspaceList">
         <Setter Property="Control.BorderThickness" Value="0" />
     </Style>
