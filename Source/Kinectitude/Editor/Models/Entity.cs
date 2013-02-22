@@ -668,6 +668,32 @@ namespace Kinectitude.Editor.Models
             return Prototypes.SelectMany(x => x.Components).Any(x => x.Plugin == plugin);
         }
 
+        public bool HasInheritedNonDefaultValue(Plugin plugin, PluginProperty property)
+        {
+            var localComponent = Components.FirstOrDefault(x => x.Plugin == plugin);
+            if (null != localComponent)
+            {
+                var localProperty = localComponent.Properties.FirstOrDefault(x => x.PluginProperty == property);
+                if (null != localProperty)
+                {
+                    if (localProperty.HasOwnValue)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            foreach (var prototype in Prototypes)
+            {
+                if (prototype.HasInheritedNonDefaultValue(plugin, property))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public Value GetInheritedValue(Plugin plugin, PluginProperty pluginProperty)
         {
             foreach (Entity prototype in Prototypes)
@@ -676,10 +702,10 @@ namespace Kinectitude.Editor.Models
                 if (null != component)
                 {
                     Property property = component.GetProperty(pluginProperty.Name);
-                    //if (property.HasOwnValue)
-                    //{
+                    if (property.HasOwnOrInheritedValue)
+                    {
                         return property.Value;
-                    //}
+                    }
                 }
             }
 

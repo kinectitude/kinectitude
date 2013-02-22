@@ -136,16 +136,6 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        public bool HasInheritedProperty(PluginProperty property)
-        {
-            return null != Scope ? Scope.HasInheritedComponent(plugin) : false;
-        }
-
-        public Value GetInheritedValue(PluginProperty property)
-        {
-            return null != Scope ? Scope.GetInheritedValue(plugin, property) : property.DefaultValue;
-        }
-
         private void OnInheritedComponentAdded(Plugin plugin)
         {
             if (this.plugin == plugin)
@@ -214,5 +204,24 @@ namespace Kinectitude.Editor.Models
 
             return copy;
         }
+
+        #region IPropertyScope implementation
+
+        public bool HasInheritedProperty(PluginProperty property)
+        {
+            return null != Scope ? Scope.HasInheritedComponent(Plugin) : false;
+        }
+
+        public bool HasInheritedNonDefaultValue(PluginProperty property)
+        {
+            return null != Scope ? Scope.HasInheritedNonDefaultValue(Plugin, property) : false;
+        }
+
+        public Value GetInheritedValue(PluginProperty property)
+        {
+            return null != Scope ? Scope.GetInheritedValue(Plugin, property) : property.DefaultValue;
+        }
+
+        #endregion
     }
 }

@@ -82,6 +82,12 @@ namespace Kinectitude.Editor.Models.Properties
             get { return null != val; }
         }
 
+        [DependsOn("Value")]
+        public bool HasOwnOrInheritedValue
+        {
+            get { return HasOwnValue || InheritsNonDefaultValue(); }
+        }
+
         public override IEnumerable<object> AvailableValues
         {
             get { return PluginProperty.AvailableValues; }
@@ -101,6 +107,11 @@ namespace Kinectitude.Editor.Models.Properties
         public override void Accept(IGameVisitor visitor)
         {
             visitor.Visit(this);
+        }
+
+        private bool InheritsNonDefaultValue()
+        {
+            return null != Scope ? Scope.HasInheritedNonDefaultValue(PluginProperty) : false;
         }
     }
 }

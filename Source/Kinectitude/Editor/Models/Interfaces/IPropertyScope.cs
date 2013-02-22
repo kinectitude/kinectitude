@@ -10,6 +10,7 @@ namespace Kinectitude.Editor.Models.Interfaces
         event PropertyEventHandler InheritedPropertyChanged;
 
         bool HasInheritedProperty(PluginProperty property);
+        bool HasInheritedNonDefaultValue(PluginProperty PluginProperty);
         Value GetInheritedValue(PluginProperty property);
     }
 }

@@ -73,6 +73,11 @@ namespace Kinectitude.Editor.Models.Statements.Events
             return false;
         }
 
+        public bool HasInheritedNonDefaultValue(PluginProperty property)
+        {
+            return false;
+        }
+
         public Value GetInheritedValue(PluginProperty property)
         {
             return property.DefaultValue;
