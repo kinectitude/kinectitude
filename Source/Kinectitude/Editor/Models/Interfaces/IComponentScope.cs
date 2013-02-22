@@ -12,7 +12,7 @@ namespace Kinectitude.Editor.Models.Interfaces
 
         bool HasInheritedComponent(Plugin plugin);
         bool HasRootComponent(Plugin plugin);
-        bool HasInheritedNonDefaultValue(Plugin plugin, PluginProperty property);
+        bool HasInheritedNonDefaultProperty(Plugin plugin, PluginProperty property);
         Value GetInheritedValue(Plugin plugin, PluginProperty property);
     }
 }

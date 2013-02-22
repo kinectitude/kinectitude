@@ -317,5 +317,37 @@ namespace Kinectitude.Editor.Tests
             attr = testEntity.GetAttribute("test");
             Assert.AreEqual(5, attr.Value.GetIntValue());
         }
+
+        [TestMethod]
+        public void Attribute_LowPriority_HighPriorityHasDefaultAttribute()
+        {
+            var game = CreateTestGame();
+            var testEntity = GetTestEntity(game);
+
+            var prototypeA1 = game.GetPrototype("prototypeA1");
+            prototypeA1.AddAttribute(new Attribute("test"));
+
+            var prototypeB1 = game.GetPrototype("prototypeB1");
+            prototypeB1.AddAttribute(CreateTestAttribute());
+
+            var attr = testEntity.GetAttribute("test");
+            Assert.AreEqual(5, attr.Value.GetIntValue());
+        }
+
+        [TestMethod]
+        public void Attribute_HighPriority_HighPriorityInherits_LowPriorityHasDefaultAttribute()
+        {
+            var game = CreateTestGame();
+            var testEntity = GetTestEntity(game);
+
+            var prototypeA0 = game.GetPrototype("prototypeA0");
+            prototypeA0.AddAttribute(CreateTestAttribute());
+
+            var prototypeB1 = game.GetPrototype("prototypeB1");
+            prototypeB1.AddAttribute(new Attribute("test"));
+
+            var attr = testEntity.GetAttribute("test");
+            Assert.AreEqual(5, attr.Value.GetIntValue());
+        }
     }
 }

@@ -473,6 +473,11 @@ namespace Kinectitude.Editor.Models
             return false;
         }
 
+        public bool HasInheritedNonDefaultAttribute(string key)
+        {
+            return false;
+        }
+
         public Value GetInheritedValue(string key)
         {
             return Attribute.DefaultValue;

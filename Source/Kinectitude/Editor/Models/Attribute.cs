@@ -66,6 +66,12 @@ namespace Kinectitude.Editor.Models
             }
         }
 
+        [DependsOn("Value")]
+        public bool HasOwnOrInheritedValue
+        {
+            get { return HasOwnValue || InheritsNonDefaultValue(); }
+        }
+
         [DependsOn("IsInherited")]
         public bool IsLocal
         {
@@ -169,6 +175,11 @@ namespace Kinectitude.Editor.Models
         private Value GetInheritedValue()
         {
             return null != Scope ? Scope.GetInheritedValue(Name) : DefaultValue;
+        }
+
+        private bool InheritsNonDefaultValue()
+        {
+            return null != Scope ? Scope.HasInheritedNonDefaultAttribute(Name) : false;
         }
     }
 }

@@ -16,6 +16,9 @@ namespace Kinectitude.Editor.Models.Interfaces
 
         Value GetInheritedValue(string key);
         bool HasInheritedAttribute(string key);
+        bool HasInheritedNonDefaultAttribute(string key);
         bool HasLocalAttribute(string key);
+
+        
     }
 }

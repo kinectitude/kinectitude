@@ -546,6 +546,11 @@ namespace Kinectitude.Editor.Models
             return false;
         }
 
+        public bool HasInheritedNonDefaultAttribute(string key)
+        {
+            return false;
+        }
+
         public bool HasLocalAttribute(string key)
         {
             return Attributes.Any(x => x.Name == key);

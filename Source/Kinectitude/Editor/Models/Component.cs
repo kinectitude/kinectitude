@@ -214,7 +214,7 @@ namespace Kinectitude.Editor.Models
 
         public bool HasInheritedNonDefaultValue(PluginProperty property)
         {
-            return null != Scope ? Scope.HasInheritedNonDefaultValue(Plugin, property) : false;
+            return null != Scope ? Scope.HasInheritedNonDefaultProperty(Plugin, property) : false;
         }
 
         public Value GetInheritedValue(PluginProperty property)

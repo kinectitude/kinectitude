@@ -631,18 +631,37 @@ namespace Kinectitude.Editor.Models
             foreach (Entity prototype in Prototypes)
             {
                 var attribute = prototype.GetAttribute(key);
-                if (null != attribute)
+                if (null != attribute && attribute.HasOwnOrInheritedValue)
                 {
                     return attribute.Value;
                 }
             }
 
-            return null;
+            return Attribute.DefaultValue;
         }
 
         public bool HasInheritedAttribute(string key)
         {
             return Prototypes.Any(x => x.HasLocalAttribute(key));
+        }
+
+        public bool HasInheritedNonDefaultAttribute(string key)
+        {
+            var localAttribute = GetAttribute(key);
+            if (null != localAttribute && localAttribute.HasOwnValue)
+            {
+                return true;
+            }
+
+            foreach (var prototype in Prototypes)
+            {
+                if (prototype.HasInheritedNonDefaultAttribute(key))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public bool HasLocalAttribute(string key)
@@ -668,7 +687,7 @@ namespace Kinectitude.Editor.Models
             return Prototypes.SelectMany(x => x.Components).Any(x => x.Plugin == plugin);
         }
 
-        public bool HasInheritedNonDefaultValue(Plugin plugin, PluginProperty property)
+        public bool HasInheritedNonDefaultProperty(Plugin plugin, PluginProperty property)
         {
             var localComponent = Components.FirstOrDefault(x => x.Plugin == plugin);
             if (null != localComponent)
@@ -685,7 +704,7 @@ namespace Kinectitude.Editor.Models
 
             foreach (var prototype in Prototypes)
             {
-                if (prototype.HasInheritedNonDefaultValue(plugin, property))
+                if (prototype.HasInheritedNonDefaultProperty(plugin, property))
                 {
                     return true;
                 }
