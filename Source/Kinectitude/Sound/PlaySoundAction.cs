@@ -7,7 +7,10 @@ namespace Kinectitude.Sound
     [Plugin("Plays the following sound. Filename: {Filename}, Loop audio: {Looping}, Volume: {Volume}", "")]
     public class PlaySoundAction : Action
     {
-        [PluginProperty("Filename", "File name of sound to play", null, true)]
+        [PluginProperty("Filename", "File name of sound to play", 
+                        null, 
+                        "Waveform Audio Files (.wav)|*.wav;*.wave",
+                        "Select the sound file to play")]
         public string Filename { get; set; }
 
         [PluginProperty("Looping", "Whether this sound loops or not")]

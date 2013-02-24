@@ -230,6 +230,7 @@
     <Compile Include="Views\Scenes\AddEntityDialog.xaml.cs">
       <DependentUpon>AddEntityDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Utils\StringNullOrEmptyToVisibilityConverter.cs" />
     <Compile Include="Views\Utils\FolderConverter.cs" />
     <Compile Include="Views\Dialogs\EntityDialog.xaml.cs">
       <DependentUpon>EntityDialog.xaml</DependentUpon>

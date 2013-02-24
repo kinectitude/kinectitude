@@ -21,7 +21,9 @@ namespace Kinectitude.Render
         private float scaleY;
 
         private string image;
-        [PluginProperty("Image", "", null, true)]
+        [PluginProperty("Image", "", null, 
+                        "Image files|*.bmp;*.dib;*.jpg;*.jpeg;*.jpe;*.jfif;*.gif;*.tif;*.tiff;*.png;*.ico", 
+                        "Select an image file")]
         public string Image
         {
             get { return image; }

@@ -9,7 +9,7 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
     {
         public string Image
         {
-            get { return GetValue<ImageRenderComponent, string>("Image"); }
+            get { return GetStringValue<ImageRenderComponent>("Image"); }
             set { SetValue<ImageRenderComponent, string>("Image", value); }
         }
 

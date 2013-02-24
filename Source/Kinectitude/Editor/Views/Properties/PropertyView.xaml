@@ -11,6 +11,7 @@
     <UserControl.Resources>
         <SolidColorBrush x:Key="DefaultValueBrush" Color="#1B67E0" />
         <u:ValueConverter x:Key="ValueConverter" />
+        <u:StringNullOrEmptyToVisibilityConverter x:Key="StringNullOrEmptyToVisibilityConverter" />
     </UserControl.Resources>
 
     <DockPanel>
@@ -20,7 +21,7 @@
                 Width="16"
                 Height="16"
                 Margin="4"
-                Visibility="{Binding UsesFileSelector, Converter={StaticResource BoolToVis}}"
+                Visibility="{Binding FileFilter, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}"
                 IsEnabled="True" />
         <Button DockPanel.Dock="Right"
                 Command="{Binding ClearValueCommand}"

@@ -45,28 +45,17 @@ namespace Kinectitude.Editor.Views.Utils
             }
         }
 
-        public static void ShowChooseImageDialog(FileDialogCallback onClose)
+        public static void ShowFileChooserDialog(FileDialogCallback onClose, string fileFilter, string fileChooserTitle)
         {
-            Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
-
-            dialog.Filter = "Image files|*.bmp;*.dib;*.jpg;*.jpeg;*.jpe;*.jfif;*.gif;*.tif;*.tiff;*.png;*.ico";
-            dialog.Title = "Select an image file";
-
-            bool? result = dialog.ShowDialog();
-
-            if (null != onClose)
+            if (fileChooserTitle == null || fileFilter == null)
             {
-                onClose(result, dialog.FileName);
+                onClose(false, null);
             }
-        }
 
-        public static void ShowChooseSoundDialog(FileDialogCallback onClose)
-        {
             Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
 
-            dialog.DefaultExt = ".wav";
-            dialog.Filter = "Waveform Audio Files (.wav)|*.wav;*.wave";
-            dialog.Title = "Select an audio file";
+            dialog.Filter = fileFilter;
+            dialog.Title = fileChooserTitle;
 
             bool? result = dialog.ShowDialog();
 

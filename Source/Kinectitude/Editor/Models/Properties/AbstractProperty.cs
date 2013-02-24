@@ -19,9 +19,14 @@ namespace Kinectitude.Editor.Models.Properties
             get { return PluginProperty.Name; }
         }
 
-        public bool UsesFileSelector
+        public string FileFilter
         {
-            get { return PluginProperty.UsesFileSelector; }
+            get { return PluginProperty.FileFilter; }
+        }
+
+        public string FileChooserTitle
+        {
+            get { return PluginProperty.FileChooserTitle; }
         }
 
         public bool IsReadOnly

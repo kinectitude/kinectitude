@@ -65,26 +65,19 @@ namespace Kinectitude.Editor.Models.Properties
             ClearValueCommand = new DelegateCommand(parameter => HasOwnValue, parameter => Value = null);
             DisplayFileChooserCommand = new DelegateCommand(null, parameter =>
             {
-                if (PluginProperty.Name == "Image")
+                DialogService.ShowFileChooserDialog((result, pathName) =>
                 {
-                    DialogService.ShowChooseImageDialog((result, fileName) =>
+                    if (result == true)
                     {
-                        if (result == true)
-                        {
-                            Value = fileName;
-                        }
-                    });
-                }
-                else
-                {
-                    DialogService.ShowChooseSoundDialog((result, fileName) =>
-                    {
-                        if (result == true)
-                        {
-                            Value = fileName;
-                        }
-                    });
-                }
+                        string fileName = System.IO.Path.GetFileName(pathName);
+                        string targetPath = @Workspace.Instance.Project.Location;
+                        string destFile = System.IO.Path.Combine(targetPath, fileName);
+
+                        System.IO.File.Copy(pathName, destFile, true);
+
+                        Value = new Value("\"" + fileName + "\"");
+                    }
+                }, this.PluginProperty.FileFilter, this.PluginProperty.FileChooserTitle);
             });
         }
 
