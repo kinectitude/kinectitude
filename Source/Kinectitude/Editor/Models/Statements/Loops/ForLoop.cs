@@ -15,6 +15,14 @@ namespace Kinectitude.Editor.Models.Statements.Loops
             {
                 if (preExpression != value)
                 {
+                    var oldPreExpression = preExpression;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "change for loop initializer",
+                        () => PreExpression = value,
+                        () => PreExpression = oldPreExpression
+                    );
+
                     preExpression = value;
                     NotifyPropertyChanged("PreExpression");
                 }
@@ -28,6 +36,14 @@ namespace Kinectitude.Editor.Models.Statements.Loops
             {
                 if (expression != value)
                 {
+                    var oldExpression = expression;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "change for loop expression",
+                        () => Expression = value,
+                        () => Expression = oldExpression
+                    );
+
                     expression = value;
                     NotifyPropertyChanged("Expression");
                 }
@@ -41,6 +57,14 @@ namespace Kinectitude.Editor.Models.Statements.Loops
             {
                 if (postExpression != value)
                 {
+                    var oldPostExpression = postExpression;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "change for loop updater",
+                        () => PostExpression = value,
+                        () => PostExpression = oldPostExpression
+                    );
+
                     postExpression = value;
                     NotifyPropertyChanged("PostExpression");
                 }

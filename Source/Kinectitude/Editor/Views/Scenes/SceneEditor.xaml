@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:v="clr-namespace:Kinectitude.Editor.Views"
              xmlns:m="clr-namespace:Kinectitude.Editor.Models"
              xmlns:Utils="clr-namespace:Kinectitude.Editor.Views.Utils"
              xmlns:Presenters="clr-namespace:Kinectitude.Editor.Views.Scenes.Presenters"
@@ -14,7 +13,8 @@
     <UserControl.Resources>
 
         <Utils:EntityConverter x:Key="EntityConverter" />
-
+        <Utils:PlacementModeConverter x:Key="PlacementModeConverter" />
+        
         <DataTemplate DataType="{x:Type Presenters:EntityPresenter}">
             <ContentControl Content="{Binding Visual}" Opacity="{Binding Opacity}">
                 <ContentControl.ContextMenu>
@@ -73,13 +73,45 @@
 
         <ToolBarTray DockPanel.Dock="Left" Margin="0,0,4,0" Orientation="Vertical" IsLocked="True">
             <ToolBar Band="1" BandIndex="1">
-                <Button Margin="0,0,0,4" ToolTip="Select Tool">
+                <RadioButton IsChecked="{Binding PlacementMode,
+                             Converter={StaticResource PlacementModeConverter},
+                             ConverterParameter={x:Static m:EntityPlacementMode.None},
+                             Mode=TwoWay}"
+                             Margin="0,0,0,4"
+                             ToolTip="Select Tool">
                     <Image Source="{StaticResource icoCursor}" Stretch="None" />
-                </Button>
-                <!--Button Content="Hand Tool" /-->
-                <Button Click="AddEntity_Click" Margin="0,0,0,4" ToolTip="Add Entity">
-                    <Image Source="{StaticResource icoEntity}" Stretch="None" />
-                </Button>
+                </RadioButton>
+                <RadioButton IsChecked="{Binding PlacementMode,
+                             Converter={StaticResource PlacementModeConverter},
+                             ConverterParameter={x:Static m:EntityPlacementMode.Image},
+                             Mode=TwoWay}"
+                        Margin="0,0,0,4"
+                        ToolTip="New Image">
+                    <Image Source="{StaticResource icoSpriteEntity}" Stretch="None" />
+                </RadioButton>
+                <RadioButton IsChecked="{Binding PlacementMode,
+                             Converter={StaticResource PlacementModeConverter},
+                             ConverterParameter={x:Static m:EntityPlacementMode.Text},
+                             Mode=TwoWay}"
+                             Margin="0,0,0,4"
+                             ToolTip="New Text">
+                    <Image Source="{StaticResource icoTextEntity}" Stretch="None" />
+                </RadioButton>
+                <RadioButton IsChecked="{Binding PlacementMode,
+                             Converter={StaticResource PlacementModeConverter},
+                             ConverterParameter={x:Static m:EntityPlacementMode.Shape},
+                             Mode=TwoWay}"
+                             Margin="0,0,0,4" ToolTip="New Shape">
+                    <Image Source="{StaticResource icoShapeEntity}" Stretch="None" />
+                </RadioButton>
+                <RadioButton IsChecked="{Binding PlacementMode,
+                             Converter={StaticResource PlacementModeConverter},
+                             ConverterParameter={x:Static m:EntityPlacementMode.Blank},
+                             Mode=TwoWay}"
+                             Margin="0,0,0,4"
+                             ToolTip="New Blank Entity">
+                    <Image Source="{StaticResource icoBlankEntity}" Width="16" Height="16" />
+                </RadioButton>
             </ToolBar>
             <ToolBar Band="1" BandIndex="2">
                 <Button ToolTip="Send Forward" Margin="0,0,0,4">
@@ -120,7 +152,8 @@
         <!--ScrollViewer Background="Gray" HorizontalScrollBarVisibility="Visible">
         </ScrollViewer-->
 
-        <Designer:DesignerCanvas Margin="16"
+        <Designer:DesignerCanvas x:Name="canvas"
+                          Margin="16"
                           Width="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.Game.Width}"
                           Height="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.Game.Height}"
                           ItemsSource="{Binding EntityPresenters, Mode=OneWay}"
@@ -128,7 +161,8 @@
                           CutCommand="{Binding CutCommand, Mode=OneWay}"
                           PasteCommand="{Binding PasteCommand, Mode=OneWay}"
                           CopyCommand="{Binding CopyCommand, Mode=OneWay}"
-                          DeleteCommand="{Binding DeleteCommand, Mode=OneWay}">
+                          DeleteCommand="{Binding DeleteCommand, Mode=OneWay}"
+                          PointCommand="{Binding AddEntityCommand, Mode=OneWay}">
 
         </Designer:DesignerCanvas>
     </DockPanel>

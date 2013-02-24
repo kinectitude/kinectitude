@@ -1,4 +1,5 @@
-﻿using Kinectitude.Editor.Base;
+﻿using Kinectitude.Core.Data;
+using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Values;
@@ -12,7 +13,28 @@ namespace Kinectitude.Editor.Models.Properties
 {
     internal sealed class Property : AbstractProperty, IValueScope
     {
+        private sealed class DataListener : IChanges
+        {
+            private readonly Property property;
+
+            public DataListener(Property property)
+            {
+                this.property = property;
+            }
+
+            public void Prepare()
+            {
+                // TODO confirm I can leave this empty
+            }
+
+            public void Change()
+            {
+                property.NotifyEffectiveValueChanged();
+            }
+        }
+
         private readonly PluginProperty pluginProperty;
+        private readonly DataListener callback;
         private Value val;
 
         public override PluginProperty PluginProperty
@@ -27,17 +49,29 @@ namespace Kinectitude.Editor.Models.Properties
             {
                 if (val != value)
                 {
+                    var oldVal = val;
+
                     if (null != val)
                     {
                         val.Scope = null;
+                        val.Unsubscribe(callback);
                     }
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "change property value",
+                        () => Value = value,
+                        () => Value = oldVal
+                    );
 
                     val = value;
 
                     if (null != val)
                     {
                         val.Scope = this;
+                        val.Subscribe(callback);
                     }
+
+                    NotifyEffectiveValueChanged();
                     NotifyPropertyChanged("Value");
                 }
             }
@@ -47,6 +81,12 @@ namespace Kinectitude.Editor.Models.Properties
         public override bool HasOwnValue
         {
             get { return null != val; }
+        }
+
+        [DependsOn("Value")]
+        public bool HasOwnOrInheritedValue
+        {
+            get { return HasOwnValue || InheritsNonDefaultValue(); }
         }
 
         public override IEnumerable<object> AvailableValues
@@ -63,6 +103,7 @@ namespace Kinectitude.Editor.Models.Properties
             this.pluginProperty = pluginProperty;
 
             ClearValueCommand = new DelegateCommand(parameter => HasOwnValue, parameter => Value = null);
+            callback = new DataListener(this);
             DisplayFileChooserCommand = new DelegateCommand(null, parameter =>
             {
                 DialogService.ShowFileChooserDialog((result, pathName) =>
@@ -84,6 +125,11 @@ namespace Kinectitude.Editor.Models.Properties
         public override void Accept(IGameVisitor visitor)
         {
             visitor.Visit(this);
+        }
+
+        private bool InheritsNonDefaultValue()
+        {
+            return null != Scope ? Scope.HasInheritedNonDefaultValue(PluginProperty) : false;
         }
     }
 }

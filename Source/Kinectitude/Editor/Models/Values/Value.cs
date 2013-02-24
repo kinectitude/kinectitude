@@ -63,6 +63,8 @@ namespace Kinectitude.Editor.Models.Values
 
         public Value(object value, bool constant)
         {
+            initializer = "";
+
             if (null != value)
             {
                 initializer = value.ToString();
@@ -70,6 +72,11 @@ namespace Kinectitude.Editor.Models.Values
                 var type = value.GetType();
                 if (type == typeof(string) || type.IsEnum)
                 {
+                    if (type.IsEnum)
+                    {
+                        value = value.ToString();
+                    }
+
                     initializer = "\"" + initializer + "\"";
                 }
             }
@@ -128,6 +135,11 @@ namespace Kinectitude.Editor.Models.Values
         public void Subscribe(IChanges callback)
         {
             Reader.NotifyOfChange(callback);
+        }
+
+        public void Unsubscribe(IChanges callback)
+        {
+            // TODO implement this
         }
     }
 }

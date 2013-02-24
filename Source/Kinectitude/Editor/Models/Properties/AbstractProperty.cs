@@ -47,6 +47,8 @@ namespace Kinectitude.Editor.Models.Properties
 
         public abstract ICommand ClearValueCommand { get; protected set; }
 
+        public event System.Action EffectiveValueChanged;
+
         protected AbstractProperty(AbstractProperty sourceProperty = null)
         {
             this.sourceProperty = sourceProperty;
@@ -54,6 +56,7 @@ namespace Kinectitude.Editor.Models.Properties
             if (null != sourceProperty)
             {
                 sourceProperty.PropertyChanged += OnSourcePropertyChanged;
+                sourceProperty.EffectiveValueChanged += OnSourceEffectiveValueChanged;
             }
 
             AddDependency<ScopeChanged>("Value");
@@ -62,6 +65,11 @@ namespace Kinectitude.Editor.Models.Properties
         private void OnSourcePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             NotifyPropertyChanged(e.PropertyName);
+        }
+
+        private void OnSourceEffectiveValueChanged()
+        {
+            NotifyEffectiveValueChanged();
         }
 
         protected override void OnScopeDetaching(IPropertyScope scope)
@@ -152,6 +160,14 @@ namespace Kinectitude.Editor.Models.Properties
         public T GetEnumValue<T>() where T : struct, IConvertible
         {
             return Value.GetEnumValue<T>();
+        }
+
+        protected void NotifyEffectiveValueChanged()
+        {
+            if (null != EffectiveValueChanged)
+            {
+                EffectiveValueChanged();
+            }
         }
     }
 }

@@ -6,7 +6,6 @@ using Kinectitude.Core.Data;
 using Attribute = Kinectitude.Editor.Models.Attribute;
 using Kinectitude.Core.Components;
 using Kinectitude.Editor.Models.Values;
-using Kinectitude.Render;
 using Kinectitude.Core.Managers;
 using Kinectitude.Core.Attributes;
 
@@ -42,6 +41,21 @@ namespace Kinectitude.Tests.Editor
             }
         }
 
+        private enum ShapeType
+        {
+            Rectangle,
+            Ellipse
+        }
+
+        [Plugin("Mock Render Component", "")]
+        private sealed class RenderComponent : Kinectitude.Core.Base.Component
+        {
+            [PluginProperty("Shape", "")]
+            public ShapeType Shape { get; set; }
+
+            public override void Destroy() { }
+        }
+
         [Plugin("Mock Physics Manager", "")]
         private sealed class PhysicsManager : Kinectitude.Core.Base.Manager<Kinectitude.Core.Base.Component>
         {
@@ -73,7 +87,6 @@ namespace Kinectitude.Tests.Editor
         private static readonly string MockServiceShort = "MockService";
         private static readonly string MockServiceType = typeof(MockService).FullName;
         private static readonly string TransformComponentType = typeof(TransformComponent).FullName;
-        private static readonly string RenderComponentType = typeof(RenderComponent).FullName;
         private static readonly string PhysicsManagerType = typeof(PhysicsManager).FullName;
         private static readonly string TimeManagerType = typeof(TimeManager).FullName;
 
@@ -102,6 +115,7 @@ namespace Kinectitude.Tests.Editor
 
         public DataTests()
         {
+            Workspace.Instance.AddPlugin(new Plugin(typeof(RenderComponent)));
             Workspace.Instance.AddPlugin(new Plugin(typeof(PhysicsManager)));
             Workspace.Instance.AddPlugin(new Plugin(typeof(MockService)));
         }
@@ -1926,6 +1940,99 @@ namespace Kinectitude.Tests.Editor
 
             listener.Validate();
             Assert.AreEqual(10.0d, readerAttr.Value.GetDoubleValue());
+        }
+
+        [TestMethod]
+        public void Value_Int()
+        {
+            var game = CreateTestGame();
+            game.AddAttribute(new Attribute("test") { Value = new Value(5, true) });
+
+            var testEntity = GetTestEntity(game);
+            var readerAttr = CreateReaderAttribute("game.test");
+            testEntity.AddAttribute(readerAttr);
+
+            Assert.AreEqual(5, readerAttr.Value.GetIntValue());
+        }
+
+        [TestMethod]
+        public void Value_String()
+        {
+            var game = CreateTestGame();
+            game.AddAttribute(new Attribute("test") { Value = new Value("value", true) });
+
+            var testEntity = GetTestEntity(game);
+            var readerAttr = CreateReaderAttribute("game.test");
+            testEntity.AddAttribute(readerAttr);
+
+            Assert.AreEqual("value", readerAttr.Value.GetStringValue());
+        }
+
+        [TestMethod]
+        public void Value_Enum()
+        {
+            var game = CreateTestGame();
+            var component = new Component(Workspace.Instance.GetPlugin(typeof(RenderComponent)));
+            component.SetProperty("Shape", new Value(ShapeType.Ellipse, true));
+
+            var testEntity = GetTestEntity(game);
+            testEntity.AddComponent(component);
+            var readerAttr = CreateReaderAttribute("RenderComponent.Shape");
+            testEntity.AddAttribute(readerAttr);
+
+            Assert.AreEqual(ShapeType.Ellipse, readerAttr.Value.GetEnumValue<ShapeType>());
+        }
+
+        [TestMethod]
+        public void Value_Float()
+        {
+            var game = CreateTestGame();
+            game.AddAttribute(new Attribute("test") { Value = new Value(16.0f, true) });
+
+            var testEntity = GetTestEntity(game);
+            var readerAttr = CreateReaderAttribute("game.test");
+            testEntity.AddAttribute(readerAttr);
+
+            Assert.AreEqual(16.0f, readerAttr.Value.GetFloatValue());
+        }
+
+        [TestMethod]
+        public void Value_Double()
+        {
+            var game = CreateTestGame();
+            game.AddAttribute(new Attribute("test") { Value = new Value(32.0d, true) });
+
+            var testEntity = GetTestEntity(game);
+            var readerAttr = CreateReaderAttribute("game.test");
+            testEntity.AddAttribute(readerAttr);
+
+            Assert.AreEqual(32.0d, readerAttr.Value.GetDoubleValue());
+        }
+
+        [TestMethod]
+        public void Value_Bool()
+        {
+            var game = CreateTestGame();
+            game.AddAttribute(new Attribute("test") { Value = new Value(true, true) });
+
+            var testEntity = GetTestEntity(game);
+            var readerAttr = CreateReaderAttribute("game.test");
+            testEntity.AddAttribute(readerAttr);
+
+            Assert.AreEqual(true, readerAttr.Value.GetBoolValue());
+        }
+
+        [TestMethod]
+        public void Value_Long()
+        {
+            var game = CreateTestGame();
+            game.AddAttribute(new Attribute("test") { Value = new Value(64L, true) });
+
+            var testEntity = GetTestEntity(game);
+            var readerAttr = CreateReaderAttribute("game.test");
+            testEntity.AddAttribute(readerAttr);
+
+            Assert.AreEqual(64L, readerAttr.Value.GetLongValue());
         }
     }
 }

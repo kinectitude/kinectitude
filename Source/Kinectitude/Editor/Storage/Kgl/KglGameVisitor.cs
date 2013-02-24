@@ -103,7 +103,9 @@ namespace Kinectitude.Editor.Storage.Kgl
         public void Visit(ConditionGroup group)
         {
             string tabStr = tabs();
-            StringBuilder stmt = new StringBuilder(tabStr).Append("if(").Append(group.If.Expression).Append(')');
+            StringBuilder stmt = new StringBuilder(tabStr).Append("if(").Append(group.If.Expression).Append(')')
+                .Append(Apply(group.If));
+
             foreach (var elseif in group.Statements)
             {
                 stmt.Append(tabStr).Append("else if(").Append(group.If.Expression).Append(')');

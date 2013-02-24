@@ -32,13 +32,13 @@ namespace Kinectitude.Editor.Models
         }
 
         [DependsOn("Location")]
-        public bool LocationIsEmpty
+        public bool LocationIsNewOrEmpty
         {
             get
             {
                 if (null != Location)
                 {
-                    return !Directory.EnumerateFileSystemEntries(Location).Any();
+                    return !Directory.Exists(Location) || !Directory.EnumerateFileSystemEntries(Location).Any();
                 }
 
                 return false;
@@ -161,7 +161,7 @@ namespace Kinectitude.Editor.Models
 
             AddAssetCommand = new DelegateCommand(null, (parameter) =>
             {
-                DialogService.ShowLoadDialog((result, file) =>
+                Workspace.Instance.DialogService.ShowLoadDialog((result, file) =>
                 {
                     Asset asset = new Asset("An Asset");
                     AddAsset(asset);
@@ -176,7 +176,7 @@ namespace Kinectitude.Editor.Models
 
             BrowseCommand = new DelegateCommand(null, (parameter) =>
             {
-                DialogService.ShowFolderDialog((result, path) =>
+                Workspace.Instance.DialogService.ShowFolderDialog((result, path) =>
                 {
                     if (result == System.Windows.Forms.DialogResult.OK)
                     {
@@ -185,9 +185,9 @@ namespace Kinectitude.Editor.Models
                 });
             });
 
-            CommitCommand = new DelegateCommand((parameter) => LocationIsEmpty, (parameter) =>
+            CommitCommand = new DelegateCommand((parameter) => LocationIsNewOrEmpty, (parameter) =>
             {
-                if (LocationIsEmpty)
+                if (LocationIsNewOrEmpty)
                 {
                     ProjectStorage.CreateProject(this);
                     Workspace.Instance.Project = this;

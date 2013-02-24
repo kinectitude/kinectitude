@@ -12,7 +12,7 @@ namespace Kinectitude.Editor.Models
     
     internal sealed class Attribute : GameModel<IAttributeScope>, IValueScope
     {
-        public static readonly Value DefaultValue = new Value("");
+        public static readonly Value DefaultValue = new Value(null, true);
 
         private string name;
         private Value val;
@@ -64,6 +64,12 @@ namespace Kinectitude.Editor.Models
                     NotifyPropertyChanged("IsInherited");
                 }
             }
+        }
+
+        [DependsOn("Value")]
+        public bool HasOwnOrInheritedValue
+        {
+            get { return HasOwnValue || InheritsNonDefaultValue(); }
         }
 
         [DependsOn("IsInherited")]
@@ -169,6 +175,11 @@ namespace Kinectitude.Editor.Models
         private Value GetInheritedValue()
         {
             return null != Scope ? Scope.GetInheritedValue(Name) : DefaultValue;
+        }
+
+        private bool InheritsNonDefaultValue()
+        {
+            return null != Scope ? Scope.HasInheritedNonDefaultAttribute(Name) : false;
         }
     }
 }

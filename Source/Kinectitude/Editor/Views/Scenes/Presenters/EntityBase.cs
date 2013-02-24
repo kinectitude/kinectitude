@@ -44,7 +44,7 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
             if (null != component)
             {
                 Property property = component.GetProperty(propertyName);
-                property.Value = new Value(value.ToString());   // TODO: Change the usage of setvalue to not require a TValue type here
+                property.Value = new Value(value, true);
             }
 
             NotifyPropertyChanged(propertyName);

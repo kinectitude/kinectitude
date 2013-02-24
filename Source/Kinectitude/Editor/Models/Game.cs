@@ -161,7 +161,7 @@ namespace Kinectitude.Editor.Models
 
             RenameCommand = new DelegateCommand(null, (parameter) =>
             {
-                DialogService.ShowDialog<NameDialog>(this);
+                Workspace.Instance.DialogService.ShowDialog<NameDialog>(this);
             });
 
             AddPrototypeCommand = new DelegateCommand(null, (parameter) =>
@@ -169,11 +169,17 @@ namespace Kinectitude.Editor.Models
                 Entity prototype = CreatePrototype();
                 EntityTransaction transaction = new EntityTransaction(Prototypes, prototype);
                     
-                DialogService.ShowDialog<EntityDialog>(transaction, (result) =>
+                Workspace.Instance.DialogService.ShowDialog<EntityDialog>(transaction, (result) =>
                 {
                     if (result == true)
                     {
                         AddPrototype(prototype);
+
+                        Workspace.Instance.CommandHistory.Log(
+                            "add prototype '" + prototype.Name + "'",
+                            () => AddPrototype(prototype),
+                            () => RemovePrototype(prototype)
+                        );
                     }
                 });
             });
@@ -182,7 +188,7 @@ namespace Kinectitude.Editor.Models
             {
                 Scene scene = CreateScene();
 
-                DialogService.ShowDialog<NameDialog>(new SceneTransaction(scene), (result) =>
+                Workspace.Instance.DialogService.ShowDialog<NameDialog>(new SceneTransaction(scene), (result) =>
                 {
                     if (result == true)
                     {
@@ -270,12 +276,6 @@ namespace Kinectitude.Editor.Models
 
                 prototype.IsPrototype = true;
                 Prototypes.Add(prototype);
-
-                Workspace.Instance.CommandHistory.Log(
-                    "add prototype '" + prototype.Name + "'",
-                    () => AddPrototype(prototype),
-                    () => RemovePrototype(prototype)
-                );
             }
         }
 
@@ -542,6 +542,11 @@ namespace Kinectitude.Editor.Models
         }
 
         public bool HasInheritedAttribute(string key)
+        {
+            return false;
+        }
+
+        public bool HasInheritedNonDefaultAttribute(string key)
         {
             return false;
         }

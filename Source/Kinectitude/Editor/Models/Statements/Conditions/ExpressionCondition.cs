@@ -13,6 +13,14 @@ namespace Kinectitude.Editor.Models.Statements.Conditions
             {
                 if (expression != value)
                 {
+                    var oldExpression = expression;
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "change if expression",
+                        () => Expression = value,
+                        () => Expression = oldExpression
+                    );
+
                     expression = value;
                     NotifyPropertyChanged("Expression");
                 }

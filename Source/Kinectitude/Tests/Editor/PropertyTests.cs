@@ -9,7 +9,6 @@ using Kinectitude.Editor.Models.Values;
 
 namespace Kinectitude.Editor.Tests
 {
-    /*
     [TestClass]
     public class PropertyTests
     {
@@ -37,7 +36,7 @@ namespace Kinectitude.Editor.Tests
             bool eventFired = false;
 
             Component component = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
-            
+
             Property property = component.GetProperty("X");
             property.PropertyChanged += (o, e) => eventFired |= (e.PropertyName == "Value");
 
@@ -62,7 +61,7 @@ namespace Kinectitude.Editor.Tests
         public void DefaultPropertyBecomesInheritedOnPrototypeChange()
         {
             Entity child = new Entity();
-            
+
             Plugin plugin = Workspace.Instance.GetPlugin(TransformComponentType);
 
             Component childComponent = new Component(plugin);
@@ -88,47 +87,22 @@ namespace Kinectitude.Editor.Tests
             Assert.AreEqual(500, childProperty.Value.Reader.GetIntValue());
         }
 
-        //[TestMethod]
-        //public void CannotSetValueForInheritedProperty()
-        //{
-        //    Entity parent = new Entity() { Name = "parent" };
-            
-        //    Component parentComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
-            
-        //    Property parentProperty = parentComponent.GetProperty("X");
-        //    parentProperty.Value = 500;
-        //    parent.AddComponent(parentComponent);
-
-        //    Entity child = new Entity();
-        //    child.AddPrototype(parent);
-
-        //    Component childComponent = child.GetComponentByType(TransformComponentType);
-            
-        //    Property childProperty = childComponent.GetProperty("X");
-        //    childProperty.Value = 250;
-
-        //    Assert.IsTrue(childProperty.IsInherited);
-        //    //Assert.IsTrue(childProperty.CanInherit);
-        //    Assert.AreEqual(500, childProperty.Value);
-        //    Assert.AreEqual(0, childComponent.Properties.Count(x => x.IsLocal));
-        //}
-
         [TestMethod]
         public void ValueFollowsInheritedProperty()
         {
             Entity parent = new Entity() { Name = "parent" };
-            
+
             Component parentComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
-            
+
             Property parentProperty = parentComponent.GetProperty("X");
             parentProperty.Value = new Value("500");
             parent.AddComponent(parentComponent);
 
             Entity child = new Entity();
             child.AddPrototype(parent);
-            
+
             Component childComponent = child.GetComponentByType(TransformComponentType);
-            
+
             Property childProperty = childComponent.GetProperty("X");
 
             Assert.AreEqual(500, childProperty.Value.Reader.GetIntValue());
@@ -142,17 +116,17 @@ namespace Kinectitude.Editor.Tests
         public void ValueFollowsInheritedComponentChange()
         {
             Entity parent = new Entity() { Name = "parent" };
-            
+
             Component parentComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
-            
+
             Property parentProperty = parentComponent.GetProperty("X");
             parentProperty.Value = new Value("500");
             parent.AddComponent(parentComponent);
 
             Entity otherParent = new Entity() { Name = "otherParent" };
-            
+
             Component otherParentComponent = new Component(Workspace.Instance.GetPlugin(TransformComponentType));
-            
+
             Property otherParentProperty = otherParentComponent.GetProperty("X");
             otherParentProperty.Value = new Value("250");
             otherParent.AddComponent(otherParentComponent);
@@ -161,7 +135,7 @@ namespace Kinectitude.Editor.Tests
             child.AddPrototype(parent);
 
             Component childComponent = child.GetComponentByType(TransformComponentType);
-            
+
             Property childProperty = childComponent.GetProperty("X");
 
             Assert.AreEqual(500, childProperty.Value.Reader.GetIntValue());
@@ -220,40 +194,224 @@ namespace Kinectitude.Editor.Tests
             Assert.AreEqual(500, childProperty.Value.Reader.GetIntValue());
         }
 
-        [TestMethod]
-        public void CreateDefaultProperty()
+        // Multiple inheritance tests
+
+        private static Game CreateTestGame()
         {
-            
+            var game = new Game("Test Game");
+
+            var prototypeA0 = new Entity() { Name = "prototypeA0" };
+            game.AddPrototype(prototypeA0);
+            var prototypeB0 = new Entity() { Name = "prototypeB0" };
+            game.AddPrototype(prototypeB0);
+            var prototypeC0 = new Entity() { Name = "prototypeC0" };
+            game.AddPrototype(prototypeC0);
+
+            var prototypeA1 = new Entity() { Name = "prototypeA1" };
+            prototypeA1.AddPrototype(prototypeA0);
+            game.AddPrototype(prototypeA1);
+
+            var prototypeB1 = new Entity() { Name = "prototypeB1" };
+            prototypeB1.AddPrototype(prototypeB0);
+            prototypeB1.AddPrototype(prototypeC0);
+            game.AddPrototype(prototypeB1);
+
+            var scene = new Scene("Test Scene");
+            game.FirstScene = scene;
+            var testEntity = new Entity() { Name = "testEntity" };
+            scene.AddEntity(testEntity);
+            testEntity.AddPrototype(prototypeA1);
+            testEntity.AddPrototype(prototypeB1);
+
+            return game;
+        }
+
+        private static Entity GetTestEntity(Game game)
+        {
+            return game.FirstScene.Entities.First();
+        }
+
+        private static Component CreateTestComponent(int val = 5)
+        {
+            var component = new Component(Workspace.Instance.GetPlugin(typeof(TransformComponent)));
+            component.SetProperty("X", new Value(val, true));
+            return component;
         }
 
         [TestMethod]
-        public void CreateBooleanProperty()
+        public void Property_Local()
         {
-            
+            var game = CreateTestGame();
+            var testEntity = GetTestEntity(game);
+
+            testEntity.AddComponent(CreateTestComponent());
+
+            var property = testEntity.GetComponentByType(typeof(TransformComponent)).GetProperty("X");
+            Assert.AreEqual(5, property.Value.GetIntValue());
         }
 
         [TestMethod]
-        public void CreateEnumerationProperty()
+        public void Property_HighPriority_OneLevel()
         {
-            
+            var game = CreateTestGame();
+            var testEntity = GetTestEntity(game);
+
+            var prototypeA1 = game.GetPrototype("prototypeA1");
+            prototypeA1.AddComponent(CreateTestComponent());
+
+            var property = testEntity.GetComponentByType(typeof(TransformComponent)).GetProperty("X");
+            Assert.AreEqual(5, property.Value.GetIntValue());
         }
 
         [TestMethod]
-        public void CreateKeyProperty()
+        public void Property_HighPriority_MultipleLevels()
         {
-            
+            var game = CreateTestGame();
+            var testEntity = GetTestEntity(game);
+
+            var prototypeA0 = game.GetPrototype("prototypeA0");
+            prototypeA0.AddComponent(CreateTestComponent());
+
+            var property = testEntity.GetComponentByType(typeof(TransformComponent)).GetProperty("X");
+            Assert.AreEqual(5, property.Value.GetIntValue());
         }
 
         [TestMethod]
-        public void CreateExpressionProperty()
+        public void Property_LowPriority_OneLevel()
         {
-            
+            var game = CreateTestGame();
+            var testEntity = GetTestEntity(game);
+
+            var prototypeB1 = game.GetPrototype("prototypeB1");
+            prototypeB1.AddComponent(CreateTestComponent());
+
+            var property = testEntity.GetComponentByType(typeof(TransformComponent)).GetProperty("X");
+            Assert.AreEqual(5, property.Value.GetIntValue());
         }
 
         [TestMethod]
-        public void CreateEntitySelectorProperty()
+        public void Property_LowPriority_MultipleLevels()
         {
-            
+            var game = CreateTestGame();
+            var testEntity = GetTestEntity(game);
+
+            var prototypeB0 = game.GetPrototype("prototypeB0");
+            prototypeB0.AddComponent(CreateTestComponent());
+
+            var property = testEntity.GetComponentByType(typeof(TransformComponent)).GetProperty("X");
+            Assert.AreEqual(5, property.Value.GetIntValue());
         }
-    }*/
+
+        [TestMethod]
+        public void Property_LowPriority_OneLevel_Obscured()
+        {
+            var game = CreateTestGame();
+            var testEntity = GetTestEntity(game);
+
+            var prototypeB1 = game.GetPrototype("prototypeB1");
+            prototypeB1.AddComponent(CreateTestComponent());
+
+            var prototypeA1 = game.GetPrototype("prototypeA1");
+            prototypeA1.AddComponent(CreateTestComponent(10));
+
+            var property = testEntity.GetComponentByType(typeof(TransformComponent)).GetProperty("X");
+            Assert.AreEqual(10, property.Value.GetIntValue());
+        }
+
+        [TestMethod]
+        public void Property_LowPriority_MultipleLevels_Obscured()
+        {
+            var game = CreateTestGame();
+            var testEntity = GetTestEntity(game);
+
+            var prototypeB1 = game.GetPrototype("prototypeB1");
+            prototypeB1.AddComponent(CreateTestComponent());
+
+            var prototypeA0 = game.GetPrototype("prototypeA1");
+            prototypeA0.AddComponent(CreateTestComponent(10));
+
+            var property = testEntity.GetComponentByType(typeof(TransformComponent)).GetProperty("X");
+            Assert.AreEqual(10, property.Value.GetIntValue());
+        }
+
+        [TestMethod]
+        public void Property_ChangeFromLowToHigh_OneLevel()
+        {
+            var game = CreateTestGame();
+            var testEntity = GetTestEntity(game);
+
+            var prototypeB1 = game.GetPrototype("prototypeB1");
+            prototypeB1.AddComponent(CreateTestComponent());
+
+            var prototypeA1 = game.GetPrototype("prototypeA1");
+            prototypeA1.AddComponent(CreateTestComponent(10));
+
+            var property = testEntity.GetComponentByType(typeof(TransformComponent)).GetProperty("X");
+            Assert.AreEqual(10, property.Value.GetIntValue());
+
+            testEntity.ClearPrototypes();
+            testEntity.AddPrototype(prototypeB1);
+            testEntity.AddPrototype(prototypeA1);
+
+            property = testEntity.GetComponentByType(typeof(TransformComponent)).GetProperty("X");
+            Assert.AreEqual(5, property.Value.GetIntValue());
+        }
+
+        [TestMethod]
+        public void Property_ChangeFromLowToHigh_MultipleLevels()
+        {
+            var game = CreateTestGame();
+            var testEntity = GetTestEntity(game);
+
+            var prototypeB1 = game.GetPrototype("prototypeB1");
+            prototypeB1.AddComponent(CreateTestComponent());
+
+            var prototypeA0 = game.GetPrototype("prototypeA0");
+            prototypeA0.AddComponent(CreateTestComponent(10));
+
+            var property = testEntity.GetComponentByType(typeof(TransformComponent)).GetProperty("X");
+            Assert.AreEqual(10, property.Value.GetIntValue());
+
+            var prototypeA1 = game.GetPrototype("prototypeA1");
+
+            testEntity.ClearPrototypes();
+            testEntity.AddPrototype(prototypeB1);
+            testEntity.AddPrototype(prototypeA1);
+
+            property = testEntity.GetComponentByType(typeof(TransformComponent)).GetProperty("X");
+            Assert.AreEqual(5, property.Value.GetIntValue());
+        }
+
+        [TestMethod]
+        public void Property_LowPriority_HighPriorityHasEmptyComponent()
+        {
+            var game = CreateTestGame();
+            var testEntity = GetTestEntity(game);
+
+            var prototypeA1 = game.GetPrototype("prototypeA1");
+            prototypeA1.AddComponent(new Component(Workspace.Instance.GetPlugin(typeof(TransformComponent))));
+
+            var prototypeB1 = game.GetPrototype("prototypeB1");
+            prototypeB1.AddComponent(CreateTestComponent());
+
+            var property = testEntity.GetComponentByType(typeof(TransformComponent)).GetProperty("X");
+            Assert.AreEqual(5, property.Value.GetIntValue());
+        }
+
+        [TestMethod]
+        public void Property_HighPriority_HighPriorityInherits_LowPriorityHasEmptyComponent()
+        {
+            var game = CreateTestGame();
+            var testEntity = GetTestEntity(game);
+
+            var prototypeA0 = game.GetPrototype("prototypeA0");
+            prototypeA0.AddComponent(CreateTestComponent());
+
+            var prototypeB1 = game.GetPrototype("prototypeB1");
+            prototypeB1.AddComponent(new Component(Workspace.Instance.GetPlugin(typeof(TransformComponent))));
+
+            var property = testEntity.GetComponentByType(typeof(TransformComponent)).GetProperty("X");
+            Assert.AreEqual(5, property.Value.GetIntValue());
+        }
+    }
 }

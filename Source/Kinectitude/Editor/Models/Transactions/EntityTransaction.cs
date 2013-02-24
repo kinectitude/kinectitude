@@ -9,6 +9,10 @@ namespace Kinectitude.Editor.Models.Transactions
 {
     internal sealed class EntityTransaction : BaseModel
     {
+        private readonly Entity entity;
+        private readonly string oldName;
+        private readonly IEnumerable<Component> oldComponents;
+        private readonly IEnumerable<Entity> oldPrototypes;
         private string name;
         private Entity prototypeToAdd;
         private Entity selectedPrototype;
@@ -96,11 +100,16 @@ namespace Kinectitude.Editor.Models.Transactions
 
         public EntityTransaction(IEnumerable<Entity> prototypes, Entity entity)
         {
+            this.entity = entity;
+
+            oldName = entity.Name;
+            oldComponents = entity.Components.ToArray();
+            oldPrototypes = entity.Prototypes.ToArray();
+
             Name = entity.Name;
+            AvailablePrototypes = new ObservableCollection<Entity>();
 
             // TODO: Disallow circular prototyping
-
-            AvailablePrototypes = new ObservableCollection<Entity>();
 
             foreach (Entity prototype in prototypes)
             {
@@ -132,7 +141,7 @@ namespace Kinectitude.Editor.Models.Transactions
 
             foreach (Plugin plugin in Workspace.Instance.Components)
             {
-                if (!SelectedComponents.Any(x => x.Plugin == plugin) && !InheritedComponents.Any(x => x.Plugin == plugin))
+                if (IsAvailable(plugin))
                 {
                     AvailableComponents.Add(plugin);
                 }
@@ -140,36 +149,13 @@ namespace Kinectitude.Editor.Models.Transactions
 
             CommitCommand = new DelegateCommand(null, (parameter) =>
             {
-                entity.Name = Name;
+                Commit();
 
-                entity.ClearPrototypes();
-
-                foreach (Entity prototype in SelectedPrototypes)
-                {
-                    entity.AddPrototype(prototype);
-                }
-
-                // remove all components that are in the entity and not the selected components. roots only.
-
-                IEnumerable<Component> existingComponents = entity.Components.ToArray();
-
-                foreach (Component existingComponent in existingComponents)
-                {
-                    if (!SelectedComponents.Any(x => x.Plugin == existingComponent.Plugin) && !InheritedComponents.Any(x => x.Plugin == existingComponent.Plugin))
-                    {
-                        entity.RemoveComponent(existingComponent);
-                    }
-                }
-
-                // add all components that are in the selected components and not the entity
-
-                foreach (PluginSelection selection in SelectedComponents)
-                {
-                    if (!entity.HasComponentOfType(selection.Plugin.ClassName))
-                    {
-                        entity.AddComponent(new Component(selection.Plugin));
-                    }
-                }
+                Workspace.Instance.CommandHistory.Log(
+                    "change entity properties",
+                    () => Commit(),
+                    () => Rollback()
+                );
             });
 
             AddPrototypeCommand = new DelegateCommand(null, (parameter) =>
@@ -178,8 +164,7 @@ namespace Kinectitude.Editor.Models.Transactions
 
                 if (null != prototype)
                 {
-                    AvailablePrototypes.Remove(prototype);
-                    SelectedPrototypes.Add(prototype);
+                    AddPrototype(prototype);
                 }
             });
 
@@ -189,8 +174,7 @@ namespace Kinectitude.Editor.Models.Transactions
 
                 if (null != prototype)
                 {
-                    SelectedPrototypes.Remove(prototype);
-                    AvailablePrototypes.Add(prototype);
+                    RemovePrototype(prototype);
                 }
             });
 
@@ -220,8 +204,7 @@ namespace Kinectitude.Editor.Models.Transactions
 
                 if (null != plugin)
                 {
-                    AvailableComponents.Remove(plugin);
-                    SelectedComponents.Add(new PluginSelection(plugin, false));
+                    AddComponent(plugin);
                 }
             });
 
@@ -231,13 +214,41 @@ namespace Kinectitude.Editor.Models.Transactions
 
                 if (null != selection)
                 {
-                    SelectedComponents.Remove(selection);
-                    AvailableComponents.Add(selection.Plugin);
+                    RemoveComponent(selection);
                 }
             });
         }
 
-        void SelectedPrototypes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private bool IsAvailable(Plugin plugin)
+        {
+            return !SelectedComponents.Any(x => x.Plugin == plugin) && !InheritedComponents.Any(x => x.Plugin == plugin);
+        }
+
+        public void AddPrototype(Entity prototype)
+        {
+            AvailablePrototypes.Remove(prototype);
+            SelectedPrototypes.Add(prototype);
+        }
+
+        public void RemovePrototype(Entity prototype)
+        {
+            SelectedPrototypes.Remove(prototype);
+            AvailablePrototypes.Add(prototype);
+        }
+
+        public void AddComponent(Plugin plugin)
+        {
+            AvailableComponents.Remove(plugin);
+            SelectedComponents.Add(new PluginSelection(plugin, false));
+        }
+
+        public void RemoveComponent(PluginSelection selection)
+        {
+            SelectedComponents.Remove(selection);
+            AvailableComponents.Add(selection.Plugin);
+        }
+
+        private void SelectedPrototypes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             IEnumerable<PluginSelection> previousComponents = InheritedComponents.ToArray();
 
@@ -267,6 +278,54 @@ namespace Kinectitude.Editor.Models.Transactions
                 {
                     AvailableComponents.Add(selection.Plugin);
                 }
+            }
+        }
+
+        public void Commit()
+        {
+            Workspace.Instance.CommandHistory.WithoutLogging(() => entity.Name = Name);
+            entity.ClearPrototypes();
+
+            foreach (Entity prototype in SelectedPrototypes)
+            {
+                entity.AddPrototype(prototype);
+            }
+
+            // remove all components that are in the entity and not the selected components. roots only.
+
+            foreach (Component existingComponent in oldComponents)
+            {
+                if (IsAvailable(existingComponent.Plugin))
+                {
+                    entity.RemoveComponent(existingComponent);
+                }
+            }
+
+            // add all components that are in the selected components and not the entity
+
+            foreach (PluginSelection selection in SelectedComponents)
+            {
+                if (!entity.HasComponentOfType(selection.Plugin.ClassName))
+                {
+                    entity.AddComponent(new Component(selection.Plugin));
+                }
+            }
+        }
+
+        public void Rollback()
+        {
+            Workspace.Instance.CommandHistory.WithoutLogging(() => entity.Name = oldName);
+            entity.ClearPrototypes();
+            entity.ClearComponents();
+
+            foreach (var prototype in oldPrototypes)
+            {
+                entity.AddPrototype(prototype);
+            }
+
+            foreach (var component in oldComponents)
+            {
+                entity.AddComponent(component);
             }
         }
     }

@@ -98,6 +98,11 @@ namespace Kinectitude.Editor.Models
             return false;
         }
 
+        public bool HasInheritedNonDefaultValue(PluginProperty property)
+        {
+            return false;
+        }
+
         public Value GetInheritedValue(PluginProperty property)
         {
             return property.DefaultValue;

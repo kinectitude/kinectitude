@@ -43,10 +43,39 @@ namespace Kinectitude.Editor.Models.Statements.Events
 
             AddStatementCommand = new DelegateCommand(null, (parameter) =>
             {
-                StatementFactory factory = parameter as StatementFactory;
-                if (null != factory)
+                var statement = parameter as AbstractStatement;
+                if (null == statement)
                 {
-                    AddStatement(factory.CreateStatement());
+                    var factory = parameter as StatementFactory;
+                    if (null != factory)
+                    {
+                        statement = factory.CreateStatement();
+                    }
+                }
+
+                if (null != statement)
+                {
+                    int oldIdx = -1;
+                    var oldParent = statement.Scope;
+                    if (null != oldParent)
+                    {
+                        oldIdx = oldParent.IndexOf(statement);
+                    }
+
+                    AddStatement(statement);
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "insert/move statement",
+                        () => AddStatement(statement),
+                        () =>
+                        {
+                            statement.RemoveFromParent();
+                            if (null != oldParent)
+                            {
+                                oldParent.InsertAt(oldIdx, statement);
+                            }
+                        }
+                    );
                 }
             });
 
