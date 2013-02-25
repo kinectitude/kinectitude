@@ -68,5 +68,15 @@ namespace Kinectitude.Editor.Views.Utils
                 onClose(result, dialog.SelectedPath);
             }
         }
+
+        public void Warn(string title, string message, MessageBoxButton buttons, MessageBoxCallback onClose)
+        {
+            var result = System.Windows.MessageBox.Show(message, title, buttons, MessageBoxImage.Warning);
+
+            if (null != onClose)
+            {
+                onClose(result);
+            }
+        }
     }
 }

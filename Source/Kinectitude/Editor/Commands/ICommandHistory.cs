@@ -16,6 +16,8 @@ namespace Kinectitude.Editor.Commands
         ICommand UndoCommand { get; }
         ICommand RedoCommand { get; }
 
+        bool HasUnsavedChanges { get; }
+
         void Undo();
         void Redo();
         void Clear();
@@ -23,5 +25,6 @@ namespace Kinectitude.Editor.Commands
         void Log(IUndoableCommand command);
         void Log(string name, Action executeDelegate, Action unexecuteDelegate);
         void WithoutLogging(Action action);
+        void Save();
     }
 }

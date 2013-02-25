@@ -130,15 +130,7 @@ namespace Kinectitude.Editor.Models.Statements.Base
 
         private bool IsAllowed(AbstractStatement statement)
         {
-            foreach (var type in AllowableStatements)
-            {
-                if (type.IsAssignableFrom(statement.GetType()))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return AllowableStatements.Any(x => x.IsAssignableFrom(statement.GetType()));
         }
 
         private void PrivateRemoveStatement(AbstractStatement statement)
