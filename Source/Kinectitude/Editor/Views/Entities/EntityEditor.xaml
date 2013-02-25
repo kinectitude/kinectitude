@@ -191,8 +191,8 @@
                     <TextBlock Margin="0,0,8,0">if</TextBlock>
                     <TextBox Text="{Binding Expression}" MinWidth="125" Margin="0,0,8,0" />
                     <i:Interaction.Behaviors>
-                        <b:DragBehavior DragParameter="{Binding}" />
-                        <b:DropTargetBehavior DropCommand="{Binding InsertBeforeCommand}" />
+                        <b:DragBehavior DragParameter="{Binding Path=DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=3, AncestorType=StackPanel}}" />
+                        <b:DropTargetBehavior DropCommand="{Binding DataContext.InsertBeforeCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=3, AncestorType=StackPanel}}" />
                     </i:Interaction.Behaviors>
                 </StackPanel>
                 <TextBlock>{</TextBlock>

@@ -63,88 +63,92 @@
 
     <DockPanel>
 
-        <ToolBarTray DockPanel.Dock="Left" Margin="0,0,4,0" Orientation="Vertical" IsLocked="True">
-            <ToolBar Band="1" BandIndex="1">
-                <RadioButton IsChecked="{Binding PlacementMode,
-                             Converter={StaticResource PlacementModeConverter},
-                             ConverterParameter={x:Static m:EntityPlacementMode.None},
-                             Mode=TwoWay}"
-                             Margin="0,0,0,4"
-                             ToolTip="Select Tool">
-                    <Image Source="{StaticResource icoCursor}" Stretch="None" />
-                </RadioButton>
-                <RadioButton IsChecked="{Binding PlacementMode,
-                             Converter={StaticResource PlacementModeConverter},
-                             ConverterParameter={x:Static m:EntityPlacementMode.Image},
-                             Mode=TwoWay}"
-                        Margin="0,0,0,4"
-                        ToolTip="New Image">
-                    <Image Source="{StaticResource icoSpriteEntity}" Stretch="None" />
-                </RadioButton>
-                <RadioButton IsChecked="{Binding PlacementMode,
-                             Converter={StaticResource PlacementModeConverter},
-                             ConverterParameter={x:Static m:EntityPlacementMode.Text},
-                             Mode=TwoWay}"
-                             Margin="0,0,0,4"
-                             ToolTip="New Text">
-                    <Image Source="{StaticResource icoTextEntity}" Stretch="None" />
-                </RadioButton>
-                <RadioButton IsChecked="{Binding PlacementMode,
-                             Converter={StaticResource PlacementModeConverter},
-                             ConverterParameter={x:Static m:EntityPlacementMode.Shape},
-                             Mode=TwoWay}"
-                             Margin="0,0,0,4" ToolTip="New Shape">
-                    <Image Source="{StaticResource icoShapeEntity}" Stretch="None" />
-                </RadioButton>
-                <RadioButton IsChecked="{Binding PlacementMode,
-                             Converter={StaticResource PlacementModeConverter},
-                             ConverterParameter={x:Static m:EntityPlacementMode.Blank},
-                             Mode=TwoWay}"
-                             Margin="0,0,0,4"
-                             ToolTip="New Blank Entity">
-                    <Image Source="{StaticResource icoBlankEntity}" Width="16" Height="16" />
-                </RadioButton>
-            </ToolBar>
-            <ToolBar Band="1" BandIndex="2">
-                <Button ToolTip="Send Forward" Margin="0,0,0,4">
-                    <Image Source="{StaticResource icoSendForward}" Stretch="None" />
-                </Button>
-                <Button ToolTip="Send Backward" Margin="0,0,0,4">
-                    <Image Source="{StaticResource icoSendBackward}" Stretch="None" />
-                </Button>
-                <Button ToolTip="Send To Front" Margin="0,0,0,4">
-                    <Image Source="{StaticResource icoSendToFront}" Stretch="None" />
-                </Button>
-                <Button ToolTip="Send To Back" Margin="0,0,0,4">
-                    <Image Source="{StaticResource icoSendToBack}" Stretch="None" />
-                </Button>
-            </ToolBar>
-            <ToolBar Band="1" BandIndex="3">
-                <Button ToolTip="Align Left" Margin="0,0,0,4">
-                    <Image Source="{StaticResource icoAlignLeft}" Stretch="None" />
-                </Button>
-                <Button ToolTip="Align Center" Margin="0,0,0,4">
-                    <Image Source="{StaticResource icoAlignCenter}" Stretch="None" />
-                </Button>
-                <Button ToolTip="Align Right" Margin="0,0,0,4">
-                    <Image Source="{StaticResource icoAlignRight}" Stretch="None" />
-                </Button>
-                <Button ToolTip="Align Top" Margin="0,0,0,4">
-                    <Image Source="{StaticResource icoAlignTop}" Stretch="None" />
-                </Button>
-                <Button ToolTip="Align Middle" Margin="0,0,0,4">
-                    <Image Source="{StaticResource icoAlignMiddle}" Stretch="None" />
-                </Button>
-                <Button ToolTip="Align Bottom">
-                    <Image Source="{StaticResource icoAlignBottom}" Stretch="None" />
-                </Button>
-            </ToolBar>
-        </ToolBarTray>
-        
-        <!--ScrollViewer Background="Gray" HorizontalScrollBarVisibility="Visible">
-        </ScrollViewer-->
+        <StackPanel DockPanel.Dock="Left" Margin="0,0,4,0" Orientation="Vertical">
+            <StackPanel.Resources>
+                <Style BasedOn="{StaticResource {x:Type ToggleButton}}" TargetType="RadioButton">
+                    <Setter Property="Padding" Value="8" />
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Style.Triggers>
+                        <Trigger Property="IsChecked" Value="true">
+                            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Resources>
+            <RadioButton IsChecked="{Binding PlacementMode,
+                         Converter={StaticResource PlacementModeConverter},
+                         ConverterParameter={x:Static m:EntityPlacementMode.None},
+                         Mode=TwoWay}"
+                         Margin="0,0,0,4"
+                         ToolTip="Select Tool">
+                <Image Source="{StaticResource icoCursor}" Stretch="None" />
+            </RadioButton>
+            <RadioButton IsChecked="{Binding PlacementMode,
+                         Converter={StaticResource PlacementModeConverter},
+                         ConverterParameter={x:Static m:EntityPlacementMode.Image},
+                         Mode=TwoWay}"
+                         Margin="0,0,0,4"
+                         ToolTip="New Image">
+                <Image Source="{StaticResource icoSpriteEntity}" Stretch="None" />
+            </RadioButton>
+            <RadioButton IsChecked="{Binding PlacementMode,
+                         Converter={StaticResource PlacementModeConverter},
+                         ConverterParameter={x:Static m:EntityPlacementMode.Text},
+                         Mode=TwoWay}"
+                         Margin="0,0,0,4"
+                         ToolTip="New Text">
+                <Image Source="{StaticResource icoTextEntity}" Stretch="None" />
+            </RadioButton>
+            <RadioButton IsChecked="{Binding PlacementMode,
+                         Converter={StaticResource PlacementModeConverter},
+                         ConverterParameter={x:Static m:EntityPlacementMode.Shape},
+                         Mode=TwoWay}"
+                         Margin="0,0,0,4"
+                         ToolTip="New Shape">
+                <Image Source="{StaticResource icoShapeEntity}" Stretch="None" />
+            </RadioButton>
+            <RadioButton IsChecked="{Binding PlacementMode,
+                         Converter={StaticResource PlacementModeConverter},
+                         ConverterParameter={x:Static m:EntityPlacementMode.Blank},
+                         Mode=TwoWay}"
+                         Margin="0,0,0,4"
+                         ToolTip="New Blank Entity">
+                <Image Source="{StaticResource icoBlankEntity}" Width="16" Height="16" />
+            </RadioButton>
+            <Button ToolTip="Send Forward" Margin="0,4,0,4">
+                <Image Source="{StaticResource icoSendForward}" Stretch="None" />
+            </Button>
+            <Button ToolTip="Send Backward" Margin="0,0,0,4">
+                <Image Source="{StaticResource icoSendBackward}" Stretch="None" />
+            </Button>
+            <Button ToolTip="Send To Front" Margin="0,0,0,4">
+                <Image Source="{StaticResource icoSendToFront}" Stretch="None" />
+            </Button>
+            <Button ToolTip="Send To Back" Margin="0,0,0,4">
+                <Image Source="{StaticResource icoSendToBack}" Stretch="None" />
+            </Button>
+            <Button ToolTip="Align Left" Margin="0,4,0,4">
+                <Image Source="{StaticResource icoAlignLeft}" Stretch="None" />
+            </Button>
+            <Button ToolTip="Align Center" Margin="0,0,0,4">
+                <Image Source="{StaticResource icoAlignCenter}" Stretch="None" />
+            </Button>
+            <Button ToolTip="Align Right" Margin="0,0,0,4">
+                <Image Source="{StaticResource icoAlignRight}" Stretch="None" />
+            </Button>
+            <Button ToolTip="Align Top" Margin="0,0,0,4">
+                <Image Source="{StaticResource icoAlignTop}" Stretch="None" />
+            </Button>
+            <Button ToolTip="Align Middle" Margin="0,0,0,4">
+                <Image Source="{StaticResource icoAlignMiddle}" Stretch="None" />
+            </Button>
+            <Button ToolTip="Align Bottom">
+                <Image Source="{StaticResource icoAlignBottom}" Stretch="None" />
+            </Button>
+        </StackPanel>
 
-        <Designer:DesignerCanvas x:Name="canvas"
+        <ScrollViewer Background="Gray" HorizontalScrollBarVisibility="Visible">
+            <Designer:DesignerCanvas x:Name="canvas"
                           Margin="16"
                           Width="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.Game.Width}"
                           Height="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.Game.Height}"
@@ -156,7 +160,8 @@
                           DeleteCommand="{Binding DeleteCommand, Mode=OneWay}"
                           PointCommand="{Binding AddEntityCommand, Mode=OneWay}">
 
-        </Designer:DesignerCanvas>
-    </DockPanel>
-    
+            </Designer:DesignerCanvas>
+        </ScrollViewer>
+
+    </DockPanel>    
 </UserControl>
