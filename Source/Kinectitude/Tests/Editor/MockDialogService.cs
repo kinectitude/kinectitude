@@ -21,6 +21,7 @@ namespace Kinectitude.Tests.Editor
         private bool showedLoad;
         private bool showedSave;
         private bool showedFolder;
+        private bool warned;
 
         private MockDialogService() { }
 
@@ -30,6 +31,7 @@ namespace Kinectitude.Tests.Editor
             showedLoad = false;
             showedSave = false;
             showedFolder = false;
+            warned = false;
         }
 
         public void AssertShowed<TWindow>()
@@ -50,6 +52,11 @@ namespace Kinectitude.Tests.Editor
         public void AssertShowedFolderDialog()
         {
             Assert.IsTrue(showedFolder);
+        }
+
+        public void AssertWarned()
+        {
+            Assert.IsTrue(warned);
         }
 
         public void ShowDialog<TWindow>(object viewModel, DialogCallback onDialogClose) where TWindow : Window, new()
@@ -80,6 +87,11 @@ namespace Kinectitude.Tests.Editor
         public void ShowFolderDialog(FolderDialogCallback onClose)
         {
             showedFolder = true;
+        }
+
+        public void Warn(string title, string message, MessageBoxButton buttons, MessageBoxCallback onClose)
+        {
+            warned = true;
         }
     }
 }
