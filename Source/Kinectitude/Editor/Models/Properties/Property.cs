@@ -111,10 +111,14 @@ namespace Kinectitude.Editor.Models.Properties
                     if (result == true)
                     {
                         string fileName = System.IO.Path.GetFileName(pathName);
-                        string targetPath = @Workspace.Instance.Project.Location;
+                        string localProject = System.IO.Path.Combine(Workspace.Instance.Project.Location, Workspace.Instance.Project.GameRoot);
+                        string targetPath = @localProject;
                         string destFile = System.IO.Path.Combine(targetPath, fileName);
 
-                        System.IO.File.Copy(pathName, destFile, true);
+                        if (!System.IO.File.Exists(destFile))
+                        {
+                            System.IO.File.Copy(pathName, destFile, true);
+                        }
 
                         Value = new Value("\"" + fileName + "\"");
                     }

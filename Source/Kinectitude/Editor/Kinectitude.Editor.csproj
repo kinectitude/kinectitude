@@ -248,6 +248,7 @@
       <DependentUpon>SceneEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Controls\Designer\TranslateAdorner.cs" />
+    <Compile Include="Views\Utils\StringNullOrEmptyToVisibilityConverter.cs" />
     <Compile Include="Views\Utils\ValueConverter.cs" />
     <Page Include="Resources\Icons.xaml">
       <SubType>Designer</SubType>

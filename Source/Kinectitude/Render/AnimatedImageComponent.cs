@@ -8,8 +8,8 @@ using Kinectitude.Core.ComponentInterfaces;
 
 namespace Kinectitude.Render
 {
-    [Plugin("Image Render Component", "")]
-    public class ImageRenderComponent : BaseRenderComponent
+    [Plugin("Animated Image Component", "")]
+    public class AnimatedImageComponent : BaseRenderComponent
     {
         private Bitmap bitmap;
         private RectangleF destRectangle;
@@ -21,8 +21,8 @@ namespace Kinectitude.Render
         private float scaleY;
 
         private string image;
-        [PluginProperty("Image", "", null, 
-                        "Image files|*.bmp;*.dib;*.jpg;*.jpeg;*.jpe;*.jfif;*.gif;*.tif;*.tiff;*.png;*.ico", 
+        [PluginProperty("Image", "", null,
+                        "Image files|*.bmp;*.dib;*.jpg;*.jpeg;*.jpe;*.jfif;*.gif;*.tif;*.tiff;*.png;*.ico",
                         "Select an image file")]
         public string Image
         {
@@ -88,7 +88,7 @@ namespace Kinectitude.Render
             }
         }
 
-        public ImageRenderComponent()
+        public AnimatedImageComponent()
         {
             Animated = false;
             currentFrame = 0;
@@ -115,8 +115,8 @@ namespace Kinectitude.Render
 
             sourceRectangle.X = transformComponent.Width * currentFrame / scaleX;
             sourceRectangle.Y = transformComponent.Height * (Row - 1) / scaleY;
-            sourceRectangle.Width = bitmap.PixelSize.Width / scaleX;
-            sourceRectangle.Height = bitmap.PixelSize.Height / scaleY;
+            sourceRectangle.Width = transformComponent.Height / scaleX;
+            sourceRectangle.Height = transformComponent.Width / scaleY;
 
             renderTarget.DrawBitmap(bitmap, destRectangle, Opacity, SlimDX.Direct2D.InterpolationMode.Linear, sourceRectangle);
         }

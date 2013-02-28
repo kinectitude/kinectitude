@@ -9,7 +9,10 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
     {
         public string Image
         {
-            get { return GetStringValue<ImageRenderComponent>("Image"); }
+            get {
+                string localProject = System.IO.Path.Combine(Workspace.Instance.Project.Location, Workspace.Instance.Project.GameRoot);
+                return System.IO.Path.Combine(localProject, GetStringValue<ImageRenderComponent>("Image")); 
+            }
             set { SetValue<ImageRenderComponent, string>("Image", value); }
         }
 

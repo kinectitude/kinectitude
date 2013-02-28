@@ -74,7 +74,7 @@ namespace Kinectitude.Sound
             if (!soundManager.SoundDictionary.ContainsKey(filename))
             {
                 // Add our sound to the sound library
-                var s = System.IO.File.OpenRead(Path.Combine("Sounds", filename));
+                var s = System.IO.File.OpenRead(Path.Combine("Assets", filename));
                 stream = new WaveStream(s);
                 s.Close();
                 soundManager.SoundDictionary[filename] = stream;
