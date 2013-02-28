@@ -11,7 +11,8 @@
         xmlns:Properties="clr-namespace:Kinectitude.Editor.Views.Properties"
         Title="Kinectitude Editor"
         WindowState="Maximized"
-        UseLayoutRounding="True">
+        UseLayoutRounding="True"
+        Closing="Window_Closing">
 
     <Window.Resources>
 
@@ -57,70 +58,65 @@
             <TextBlock Text="{Binding Project.FileName}" />
         </StatusBar>
 
-        <Menu DockPanel.Dock="Top" Background="Transparent" Margin="4">
-            <MenuItem Header="_File">
-                <MenuItem Header="_New Project" Command="{Binding NewProjectCommand, Mode=OneWay}" InputGestureText="Ctrl+N" />
-                <MenuItem Header="_Open Project" Command="{Binding LoadProjectCommand, Mode=OneWay}" InputGestureText="Ctrl+O" />
-                <MenuItem Header="_Save Project" Command="{Binding SaveProjectCommand, Mode=OneWay}" InputGestureText="Ctrl+S" />
-                <MenuItem Header="_Revert To Saved" Command="{Binding RevertProjectCommand, Mode=OneWay}" />
-                <Separator />
-                <MenuItem Header="_Exit" Command="{Binding ExitCommand, Mode=OneWay}" InputGestureText="Alt+F4" />
-            </MenuItem>
-            <MenuItem Header="_Edit">
-                <MenuItem Command="{Binding CommandHistory.UndoCommand, Mode=OneWay}" InputGestureText="Ctrl+Z">
-                    <MenuItem.Header>
-                        <TextBlock Text="{Binding CommandHistory.LastUndoableCommand.Name, StringFormat=Undo {0}}" />
-                    </MenuItem.Header>
-                </MenuItem>
-                <MenuItem Command="{Binding CommandHistory.RedoCommand, Mode=OneWay}" InputGestureText="Ctrl+Y">
-                    <MenuItem.Header>
-                        <TextBlock Text="{Binding CommandHistory.LastRedoableCommand.Name, StringFormat=Redo {0}}" />
-                    </MenuItem.Header>
-                </MenuItem>
-                <Separator />
-            </MenuItem>
-        </Menu>
-
-        <ToolBarTray DockPanel.Dock="Top" Orientation="Horizontal" IsLocked="True" Margin="0,4,0,4">
-            <ToolBar Band="1" BandIndex="1">
-                <Button Command="{Binding NewProjectCommand, Mode=OneWay}">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="{StaticResource icoNew}" Stretch="None" Margin="0,0,4,0" />
-                        <TextBlock VerticalAlignment="Center">New Project</TextBlock>
-                    </StackPanel>
-                </Button>
-                <Button Command="{Binding LoadProjectCommand, Mode=OneWay}">
-                    <Image Source="{StaticResource icoOpen}" Stretch="None" />
-                </Button>
-                <Button Command="{Binding SaveProjectCommand, Mode=OneWay}">
-                    <Image Source="{StaticResource icoSave}" Stretch="None" />
-                </Button>
-                <Separator Margin="4,0,4,0" />
-                <Button>
-                    <Image Source="{StaticResource icoCut}" Stretch="None" />
-                </Button>
-                <Button>
-                    <Image Source="{StaticResource icoCopy}" Stretch="None" />
-                </Button>
-                <Button>
-                    <Image Source="{StaticResource icoPaste}" Stretch="None" />
-                </Button>
-                <Separator Margin="4,0,4,0" />
-                <Button Command="{Binding CommandHistory.UndoCommand, Mode=OneWay}">
-                    <Image Source="{StaticResource icoUndo}" Stretch="None" />
-                </Button>
-                <Button Command="{Binding CommandHistory.RedoCommand, Mode=OneWay}">
-                    <Image Source="{StaticResource icoRedo}" Stretch="None" />
-                </Button>
-                <Separator Margin="4,0,4,0" />
-                <Button Margin="0,0,4,0">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="{StaticResource icoPlay}" Stretch="None" Margin="0,0,4,0" />
-                        <TextBlock VerticalAlignment="Center">Play</TextBlock>
-                    </StackPanel>
-                </Button>
-            </ToolBar>
-        </ToolBarTray>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="4,4,0,4">
+            <StackPanel.Resources>
+                <Style BasedOn="{StaticResource {x:Type Button}}" TargetType="Button">
+                    <Setter Property="Background" Value="Transparent" />
+                </Style>
+                <Style TargetType="Image">
+                    <Style.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Resources>
+            <Button Command="{Binding NewProjectCommand, Mode=OneWay}" ToolTip="New Project" Margin="0,0,4,0">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="{StaticResource icoNew}" Stretch="None" Margin="0,0,4,0" />
+                    <TextBlock VerticalAlignment="Center">New Project</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Command="{Binding LoadProjectCommand, Mode=OneWay}" ToolTip="Load Project" Margin="0,0,4,0">
+                <Image Source="{StaticResource icoOpen}" Stretch="None" />
+            </Button>
+            <Button Command="{Binding SaveProjectCommand, Mode=OneWay}" ToolTip="Save Project" Margin="0,0,4,0">
+                <Image Source="{StaticResource icoSave}" Stretch="None" />
+            </Button>
+            <Button Command="{Binding RevertProjectCommand, Mode=OneWay}" ToolTip="Revert To Saved" Margin="0,0,4,0">
+                <Image Source="{StaticResource icoRevert}" Stretch="None" />
+            </Button>
+            <Separator Margin="4,0,4,0" />
+            <Button Command="ApplicationCommands.Cut" ToolTip="Cut" Margin="0,0,4,0">
+                <Image Source="{StaticResource icoCut}" Stretch="None" />
+            </Button>
+            <Button Command="ApplicationCommands.Copy" ToolTip="Copy" Margin="0,0,4,0">
+                <Image Source="{StaticResource icoCopy}" Stretch="None" />
+            </Button>
+            <Button Command="ApplicationCommands.Paste" ToolTip="Paste" Margin="0,0,4,0">
+                <Image Source="{StaticResource icoPaste}" Stretch="None" />
+            </Button>
+            <Separator Margin="4,0,4,0" />
+            <Button Command="{Binding CommandHistory.UndoCommand, Mode=OneWay}" Margin="0,0,4,0">
+                <Button.ToolTip>
+                    <TextBlock Text="{Binding CommandHistory.LastUndoableCommand.Name, StringFormat=Undo {0}}" />
+                </Button.ToolTip>
+                <Image Source="{StaticResource icoUndo}" Stretch="None" />
+            </Button>
+            <Button Command="{Binding CommandHistory.RedoCommand, Mode=OneWay}" Margin="0,0,4,0">
+                <Button.ToolTip>
+                    <TextBlock Text="{Binding CommandHistory.LastRedoableCommand.Name, StringFormat=Redo {0}}" />
+                </Button.ToolTip>
+                <Image Source="{StaticResource icoRedo}" Stretch="None" />
+            </Button>
+            <Separator Margin="4,0,4,0" />
+            <Button ToolTip="Play" Margin="0,0,4,0">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="{StaticResource icoPlay}" Stretch="None" Margin="0,0,4,0" />
+                    <TextBlock VerticalAlignment="Center">Play</TextBlock>
+                </StackPanel>
+            </Button>
+        </StackPanel>
         
         <Grid DockPanel.Dock="Left" Margin="4,0,4,4">
             <Grid.ColumnDefinitions>

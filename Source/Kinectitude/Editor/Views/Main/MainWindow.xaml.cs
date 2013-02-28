@@ -1,5 +1,6 @@
 ﻿using Kinectitude.Editor.Models;
 using Kinectitude.Editor.Views.Utils;
+using System.ComponentModel;
 using System.Windows;
 
 namespace Kinectitude.Editor.Views.Main
@@ -15,6 +16,17 @@ namespace Kinectitude.Editor.Views.Main
 
             Workspace.Instance.Initialize();
             DataContext = Workspace.Instance;
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            Workspace.Instance.WarnOnClose(r =>
+            {
+                if (r == MessageBoxResult.Cancel)
+                {
+                    e.Cancel = true;
+                }
+            });
         }
     }
 }

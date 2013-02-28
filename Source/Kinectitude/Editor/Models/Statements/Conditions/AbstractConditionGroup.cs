@@ -134,5 +134,36 @@ namespace Kinectitude.Editor.Models.Statements.Conditions
         {
             return new ReadOnlyConditionGroup(this);
         }
+
+        public override void RemoveStatement(AbstractStatement statement)
+        {
+            if (IsEditable)
+            {
+                if (statement == Else)
+                {
+                    Else = null;
+                }
+                else
+                {
+                    base.RemoveStatement(statement);
+                }
+            }
+        }
+
+        public override void InsertAt(int idx, AbstractStatement statement)
+        {
+            if (IsEditable)
+            {
+                var basicCondition = statement as AbstractBasicCondition;
+                if (null != basicCondition && idx == -1)
+                {
+                    Else = basicCondition;
+                }
+                else
+                {
+                    base.InsertAt(idx, statement);
+                }
+            }
+        }
     }
 }

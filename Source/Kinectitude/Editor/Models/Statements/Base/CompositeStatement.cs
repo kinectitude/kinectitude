@@ -107,14 +107,17 @@ namespace Kinectitude.Editor.Models.Statements.Base
 
         public void AddStatement(AbstractStatement statement)
         {
-            PrivateAddStatement(Statements.Count, statement);
+            if (IsAllowed(statement))
+            {
+                statement.RemoveFromParent();
+                PrivateAddStatement(Statements.Count, statement);
+            }
         }
 
         private void PrivateAddStatement(int idx, AbstractStatement statement)
         {
             if (IsAllowed(statement))
             {
-                statement.RemoveFromParent();
                 statement.Scope = this;
                 Statements.Insert(idx, statement);
 
@@ -127,15 +130,7 @@ namespace Kinectitude.Editor.Models.Statements.Base
 
         private bool IsAllowed(AbstractStatement statement)
         {
-            foreach (var type in AllowableStatements)
-            {
-                if (type.IsAssignableFrom(statement.GetType()))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return AllowableStatements.Any(x => x.IsAssignableFrom(statement.GetType()));
         }
 
         private void PrivateRemoveStatement(AbstractStatement statement)
@@ -200,7 +195,7 @@ namespace Kinectitude.Editor.Models.Statements.Base
             return Statements.IndexOf(statement);
         }
 
-        public void RemoveStatement(AbstractStatement statement)
+        public virtual void RemoveStatement(AbstractStatement statement)
         {
             if (statement.IsEditable)
             {
@@ -208,7 +203,7 @@ namespace Kinectitude.Editor.Models.Statements.Base
             }
         }
 
-        public void InsertAt(int idx, AbstractStatement statement)
+        public virtual void InsertAt(int idx, AbstractStatement statement)
         {
             if (IsEditable)
             {

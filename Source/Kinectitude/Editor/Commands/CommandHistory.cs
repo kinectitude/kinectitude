@@ -10,6 +10,7 @@ namespace Kinectitude.Editor.Commands
     internal sealed class CommandHistory : BaseModel, ICommandHistory
     {
         private bool replay;
+        private bool unsaved;
 
         public ObservableCollection<IUndoableCommand> UndoableCommands { get; private set; }
         public ObservableCollection<IUndoableCommand> RedoableCommands { get; private set; }
@@ -22,6 +23,11 @@ namespace Kinectitude.Editor.Commands
         public IUndoableCommand LastRedoableCommand
         {
             get { return RedoableCommands.LastOrDefault(); }
+        }
+
+        public bool HasUnsavedChanges
+        {
+            get { return unsaved; }
         }
 
         public ICommand UndoCommand { get; private set; }
@@ -45,6 +51,7 @@ namespace Kinectitude.Editor.Commands
                 IUndoableCommand command = PopUndo();
                 command.Unexecute();
                 PushRedo(command);
+                unsaved = true;
             }
 
             replay = false;
@@ -59,6 +66,7 @@ namespace Kinectitude.Editor.Commands
                 IUndoableCommand command = PopRedo();
                 command.Execute();
                 PushUndo(command);
+                unsaved = true;
             }
 
             replay = false;
@@ -68,6 +76,7 @@ namespace Kinectitude.Editor.Commands
         {
             UndoableCommands.Clear();
             RedoableCommands.Clear();
+            Save();
 
             NotifyPropertyChanged("LastUndoableCommand");
             NotifyPropertyChanged("LastRedoableCommand");
@@ -109,6 +118,7 @@ namespace Kinectitude.Editor.Commands
             {
                 PushUndo(command);
                 RedoableCommands.Clear();
+                unsaved = true;
             }
         }
 
@@ -131,6 +141,11 @@ namespace Kinectitude.Editor.Commands
             }
 
             replay = oldReplay;
+        }
+
+        public void Save()
+        {
+            unsaved = false;
         }
     }
 }

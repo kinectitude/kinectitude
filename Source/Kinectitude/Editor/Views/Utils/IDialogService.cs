@@ -10,6 +10,7 @@ namespace Kinectitude.Editor.Views.Utils
     delegate void DialogCallback(bool? result);
     delegate void FileDialogCallback(bool? result, string file);
     delegate void FolderDialogCallback(DialogResult result, string folder);
+    delegate void MessageBoxCallback(MessageBoxResult result);
 
     interface IDialogService
     {
@@ -18,5 +19,6 @@ namespace Kinectitude.Editor.Views.Utils
         void ShowLoadDialog(FileDialogCallback onClose);
         void ShowSaveDialog(FileDialogCallback onClose);
         void ShowFolderDialog(FolderDialogCallback onClose);
+        void Warn(string title, string message, MessageBoxButton buttons, MessageBoxCallback onClose);
     }
 }

@@ -467,6 +467,31 @@ namespace Kinectitude.Tests.Editor
         }
 
         [TestMethod]
+        public void AbstractConditionGroup_RemoveStatement()
+        {
+            var entity = new Entity();
+            var evt = new Event(Workspace.Instance.GetPlugin(typeof(TriggerOccursEvent)));
+            var group = new ConditionGroup();
+            var elif = new ExpressionCondition();
+            var el = new BasicCondition();
+            group.AddStatement(elif);
+            group.Else = el;
+            evt.AddStatement(group);
+
+            CommandHelper.TestUndoableCommand(
+                () => Assert.AreEqual(elif, group.Statements.First()),
+                () => entity.DeleteStatementCommand.Execute(elif),
+                () => Assert.AreEqual(0, group.Statements.Count)
+            );
+
+            CommandHelper.TestUndoableCommand(
+                () => Assert.AreEqual(el, group.Else),
+                () => entity.DeleteStatementCommand.Execute(el),
+                () => Assert.IsNull(group.Else)
+            );
+        }
+
+        [TestMethod]
         public void Event_AddStatement()
         {
             var evt = new Event(Workspace.Instance.GetPlugin(typeof(TriggerOccursEvent).FullName));

@@ -29,6 +29,16 @@ namespace Kinectitude.Editor.Models
 
     internal sealed class Workspace : BaseModel
     {
+        private static class Messages
+        {
+            public const string RevertProject = "Revert Project";
+            public const string LoadProject = "Load Project";
+            public const string NewProject = "New Project";
+            public const string Exit = "Exit Application";
+            public const string RevertMessage = "This will revert your project to its last saved state and cannot be undone. Are you sure you want to continue?";
+            public const string UnsavedMessage = "Do you want to save changes to your project?";
+        }
+
         public static IValueMaker ValueMaker = new KglValueMaker();
 
         private const string PluginDirectory = "Plugins";
@@ -51,6 +61,8 @@ namespace Kinectitude.Editor.Models
                 if (project != value)
                 {
                     project = value;
+                    CommandHistory.Clear();
+
                     NotifyPropertyChanged("Project");
                 }
             }
@@ -87,7 +99,7 @@ namespace Kinectitude.Editor.Models
         public ICommand NewProjectCommand { get; private set; }
         public ICommand LoadProjectCommand { get; private set; }
         public ICommand SaveProjectCommand { get; private set; }
-        public ICommand ExitCommand { get; private set; }
+        public ICommand RevertProjectCommand { get; private set; }
 
         private Workspace()
         {
@@ -101,37 +113,76 @@ namespace Kinectitude.Editor.Models
             Actions = new ObservableCollection<StatementFactory>();
             Statements = new ObservableCollection<StatementFactory>();
 
-            NewProjectCommand = new DelegateCommand(null, (parameter) =>
+            NewProjectCommand = new DelegateCommand(null, p =>
             {
-                Game game = new Game("Untitled Game") { Width = 800, Height = 600 };
-                game.AddScene(new Scene("Scene 1"));
+                var create = true;
 
-                //Project project = new Project() { GameRoot = "Data/" };
-                Project project = new Project();
-                project.Game = game;
-
-                DialogService.ShowDialog<ProjectDialog>(project, (result) =>
+                if (null != Project && CommandHistory.HasUnsavedChanges)
                 {
-                    if (result == true)
+                    DialogService.Warn(Messages.NewProject, Messages.UnsavedMessage, MessageBoxButton.YesNoCancel, r =>
                     {
-                        ProjectStorage.CreateProject(project);
-                        Project = project;
-                    }
-                });
+                        if (r == MessageBoxResult.Yes)
+                        {
+                            SaveProject();
+                        }
+                        else if (r == MessageBoxResult.Cancel)
+                        {
+                            create = false;
+                        }
+                    });
+                }
+
+                if (create)
+                {
+                    Game game = new Game("Untitled Game") { Width = 800, Height = 600 };
+                    game.AddScene(new Scene("Scene 1"));
+
+                    Project project = new Project();
+                    project.Game = game;
+
+                    DialogService.ShowDialog<ProjectDialog>(project, (result) =>
+                    {
+                        if (result == true)
+                        {
+                            ProjectStorage.CreateProject(project);
+                            Project = project;
+                        }
+                    });
+                }
             });
 
-            LoadProjectCommand = new DelegateCommand(null, (parameter) =>
+            LoadProjectCommand = new DelegateCommand(null, p =>
             {
-                DialogService.ShowLoadDialog((result, fileName) =>
+                var load = true;
+
+                if (null != Project && CommandHistory.HasUnsavedChanges)
                 {
-                    if (result == true)
+                    DialogService.Warn(Messages.LoadProject, Messages.UnsavedMessage, MessageBoxButton.YesNoCancel, r =>
                     {
-                        LoadProject(fileName);
-                    }
-                });
+                        if (r == MessageBoxResult.Yes)
+                        {
+                            SaveProject();
+                        }
+                        else if (r == MessageBoxResult.Cancel)
+                        {
+                            load = false;
+                        }
+                    });
+                }
+
+                if (load)
+                {
+                    DialogService.ShowLoadDialog((result, fileName) =>
+                    {
+                        if (result == true)
+                        {
+                            LoadProject(fileName);
+                        }
+                    });
+                }
             });
 
-            SaveProjectCommand = new DelegateCommand(null, (parameter) =>
+            SaveProjectCommand = new DelegateCommand(p => null != project, p =>
             {
                 if (null == Project.Title)
                 {
@@ -152,7 +203,7 @@ namespace Kinectitude.Editor.Models
                 }
             });
 
-            ExitCommand = new DelegateCommand(null, (parameter) => Exit());
+            RevertProjectCommand = new DelegateCommand(p => null != Project, p => RevertProject());
 
             Assembly core = typeof(Kinectitude.Core.Base.Component).Assembly;
             RegisterPlugins(core);
@@ -222,14 +273,23 @@ namespace Kinectitude.Editor.Models
             Statements.Add(new StatementFactory("Change a Value", StatementType.Assignment, () => new Assignment()));
         }
 
-        public void Exit()
+        public void RevertProject()
         {
-            Application.Current.Shutdown();
+            if (null != Project)
+            {
+                DialogService.Warn( Messages.RevertProject, Messages.RevertMessage, MessageBoxButton.YesNo, r =>
+                {
+                    if (r == MessageBoxResult.Yes)
+                    {
+                        LoadProject(Project.FileName);
+                    }
+                });
+            }
         }
 
         public void LoadProject(string fileName)
         {
-            Project = ProjectStorage.LoadProject(fileName);
+            CommandHistory.WithoutLogging(() => Project = ProjectStorage.LoadProject(fileName));
         }
 
         public void SaveProject()
@@ -282,6 +342,25 @@ namespace Kinectitude.Editor.Models
         public Plugin GetPlugin(Type type)
         {
             return GetPlugin(type.FullName);
+        }
+
+        public void WarnOnClose(MessageBoxCallback onClose)
+        {
+            if (null != Project && CommandHistory.HasUnsavedChanges)
+            {
+                DialogService.Warn(Messages.Exit, Messages.UnsavedMessage, MessageBoxButton.YesNoCancel, r =>
+                {
+                    if (r == MessageBoxResult.Yes)
+                    {
+                        SaveProject();
+                    }
+
+                    if (null != onClose)
+                    {
+                        onClose(r);
+                    }
+                });
+            }
         }
     }
 }
