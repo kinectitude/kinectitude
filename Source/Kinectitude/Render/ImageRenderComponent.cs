@@ -88,6 +88,21 @@ namespace Kinectitude.Render
             }
         }
 
+        private bool stretched;
+        [PluginProperty("Stretched", "", true)]
+        public bool Stretched
+        {
+            get { return stretched; }
+            set
+            {
+                if (stretched != value)
+                {
+                    stretched = value;
+                    Change("Stretched");
+                }
+            }
+        }
+
         public ImageRenderComponent()
         {
             Animated = false;
@@ -115,8 +130,17 @@ namespace Kinectitude.Render
 
             sourceRectangle.X = transformComponent.Width * currentFrame / scaleX;
             sourceRectangle.Y = transformComponent.Height * (Row - 1) / scaleY;
-            sourceRectangle.Width = bitmap.PixelSize.Width / scaleX;
-            sourceRectangle.Height = bitmap.PixelSize.Height / scaleY;
+
+            if (Stretched)
+            {
+                sourceRectangle.Width = bitmap.PixelSize.Width / scaleX;
+                sourceRectangle.Height = bitmap.PixelSize.Height / scaleY;
+            }
+            else
+            {
+                sourceRectangle.Width = transformComponent.Height / scaleX;
+                sourceRectangle.Height = transformComponent.Width / scaleY;
+            }
 
             renderTarget.DrawBitmap(bitmap, destRectangle, Opacity, SlimDX.Direct2D.InterpolationMode.Linear, sourceRectangle);
         }
