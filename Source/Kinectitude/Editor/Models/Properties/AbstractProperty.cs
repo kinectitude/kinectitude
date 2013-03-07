@@ -43,6 +43,11 @@ namespace Kinectitude.Editor.Models.Properties
 
         public abstract bool HasOwnValue { get; }
 
+        public bool HasFileChooser
+        {
+            get { return null != FileFilter; }
+        }
+
         public abstract IEnumerable<object> AvailableValues { get; }
 
         public abstract ICommand ClearValueCommand { get; protected set; }

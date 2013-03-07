@@ -32,29 +32,29 @@ namespace Kinectitude.Tests.Editor
             );
         }
 
-        [TestMethod]
-        public void Game_Width()
-        {
-            var game = new Game("Test Game");
+        //[TestMethod]
+        //public void Game_Width()
+        //{
+        //    var game = new Game("Test Game");
 
-            CommandHelper.TestUndoableCommand(
-                () => Assert.AreEqual(0, game.Width),
-                () => game.Width = 800,
-                () => Assert.AreEqual(800, game.Width)
-            );
-        }
+        //    CommandHelper.TestUndoableCommand(
+        //        () => Assert.AreEqual(0, game.Width),
+        //        () => game.Width = 800,
+        //        () => Assert.AreEqual(800, game.Width)
+        //    );
+        //}
 
-        [TestMethod]
-        public void Game_Height()
-        {
-            var game = new Game("Test Game");
+        //[TestMethod]
+        //public void Game_Height()
+        //{
+        //    var game = new Game("Test Game");
 
-            CommandHelper.TestUndoableCommand(
-                () => Assert.AreEqual(0, game.Height),
-                () => game.Height = 600,
-                () => Assert.AreEqual(600, game.Height)
-            );
-        }
+        //    CommandHelper.TestUndoableCommand(
+        //        () => Assert.AreEqual(0, game.Height),
+        //        () => game.Height = 600,
+        //        () => Assert.AreEqual(600, game.Height)
+        //    );
+        //}
 
         [TestMethod]
         public void Game_FirstScene()

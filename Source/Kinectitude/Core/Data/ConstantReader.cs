@@ -40,7 +40,7 @@ namespace Kinectitude.Core.Data
             ConstantReader val;
             if(!SavedValues.TryGetValue(value, out val))
             {
-                val = new ConstantReader(val);
+                val = new ConstantReader(value);
                 SavedValues[val] = val;
             }
             return val;

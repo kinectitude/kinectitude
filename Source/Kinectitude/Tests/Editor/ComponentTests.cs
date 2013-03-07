@@ -167,12 +167,7 @@ namespace Kinectitude.Editor.Tests
             Assert.AreEqual(1, child.Components.Count(x => x.Type == TransformComponentType));
             Assert.AreEqual(0, child.Entity.Components.Count(x => x.Type == TransformComponentType));*/
 
-            Game game = new Game("Test Game")
-            {
-                Width = 800,
-                Height = 600,
-                IsFullScreen = false
-            };
+            Game game = new Game("Test Game");
 
             Entity parent = new Entity() { Name = "parent" };
             

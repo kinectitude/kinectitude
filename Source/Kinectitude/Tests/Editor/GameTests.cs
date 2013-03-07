@@ -24,7 +24,7 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void SetWidth()
         {
-            Game game = new Game("Test Game") { Width = 800 };
+            Game game = new Game("Test Game");
 
             Assert.AreEqual(game.Width, 800);
         }
@@ -32,17 +32,9 @@ namespace Kinectitude.Editor.Tests
         [TestMethod]
         public void SetHeight()
         {
-            Game game = new Game("Test Game") { Height = 600 };
+            Game game = new Game("Test Game");
 
             Assert.AreEqual(game.Height, 600);
-        }
-
-        [TestMethod]
-        public void SetIsFullScreen()
-        {
-            Game game = new Game("Test Game") { IsFullScreen = true };
-
-            Assert.AreEqual(game.IsFullScreen, true);
         }
 
         [TestMethod]
