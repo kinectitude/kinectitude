@@ -1,4 +1,5 @@
 ﻿using Kinectitude.Editor.Models;
+using Kinectitude.Editor.Models.Notifications;
 using System;
 using System.Windows.Media;
 
@@ -29,6 +30,16 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
             if (null != render)
             {
                 render.LocalPropertyChanged += OnPropertyChanged;
+            }
+
+            entity.AddHandler<EffectiveValueChanged>(OnEffectiveValueChanged);
+        }
+
+        private void OnEffectiveValueChanged(EffectiveValueChanged e)
+        {
+            if (null != render && render.Plugin == e.Plugin)
+            {
+                NotifyPropertyChanged(e.PluginProperty.Name);
             }
         }
 
