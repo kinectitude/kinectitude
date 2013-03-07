@@ -29,7 +29,7 @@ namespace Kinectitude.Sound
         }
 
         private string filename;
-        [PluginProperty("Filename", "")]
+        [PluginProperty("File Name", "")]
         public string Filename
         {
             get { return filename; }

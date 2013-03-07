@@ -4,10 +4,10 @@ using Action = Kinectitude.Core.Base.Action;
 
 namespace Kinectitude.Sound
 {
-    [Plugin("Stop playing the following sound. Filename: {Filename}", "")]
+    [Plugin("stop playing sound {Filename}", "Stop a sound")]
     public class StopSoundAction : Action
     {
-        [PluginProperty("Filename", "File name of the sound to stop", 
+        [PluginProperty("File Name", "File name of the sound to stop", 
                          null, 
                         "Waveform Audio Files (.wav)|*.wav;*.wave",
                         "Select the sound file to stop")]

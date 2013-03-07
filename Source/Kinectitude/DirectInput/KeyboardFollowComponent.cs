@@ -8,7 +8,7 @@ using SlimDX.DirectInput;
 
 namespace Kinectitude.DirectInput
 {
-    [Plugin("Follow Component for the keyboard", "")]
+    [Plugin("Keyboard Motion Component", "")]
     [Provides(typeof(BasicFollowComponent))]
     public class KeyboardFollowComponent : BasicFollowComponent
     {
@@ -21,7 +21,7 @@ namespace Kinectitude.DirectInput
          
         private KeyChangeCallback moveUp;
         [Preset("default", Key.UpArrow)]
-        [PluginProperty("Up key to move with", "Defaults to UpArrow")]
+        [PluginProperty("Up Key", "Up key to move with. Defaults to UpArrow")]
         public Key Up
         {
             get { return moveUp.Button; }
@@ -30,7 +30,7 @@ namespace Kinectitude.DirectInput
 
         private KeyChangeCallback moveDown;
         [Preset("default", Key.DownArrow)]
-        [PluginProperty("Down key to move with", "Defaults to DownArrow")]
+        [PluginProperty("Down Key", "Down key to move with. Defaults to DownArrow")]
         public Key Down
         {
             get { return moveDown.Button; }
@@ -39,7 +39,7 @@ namespace Kinectitude.DirectInput
 
         private KeyChangeCallback moveRight;
         [Preset("default", Key.RightArrow)]
-        [PluginProperty("Right key to move with", "Defaults to RightArrow")]
+        [PluginProperty("Right Key", "Right key to move with. Defaults to RightArrow")]
         public Key Right
         {
             get { return moveRight.Button; }
@@ -48,7 +48,7 @@ namespace Kinectitude.DirectInput
 
         private KeyChangeCallback moveLeft;
         [Preset("default", Key.LeftArrow)]
-        [PluginProperty("Left key to move with", "Defaults to LeftArrow")]
+        [PluginProperty("Left Key", "Left key to move with. Defaults to LeftArrow")]
         public Key Left
         {
             get { return moveLeft.Button; }
@@ -57,7 +57,7 @@ namespace Kinectitude.DirectInput
 
         private float speed = 1;
         [Preset("default", 1)]
-        [PluginProperty("Speed to move at", "Defaults to 1")]
+        [PluginProperty("Speed", "Speed to move at. Defaults to 1")]
         public float Speed
         {
             get { return speed; }

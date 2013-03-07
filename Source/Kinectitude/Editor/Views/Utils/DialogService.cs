@@ -89,7 +89,7 @@ namespace Kinectitude.Editor.Views.Utils
             }
         }
 
-        public void Warn(string title, string message, MessageBoxButton buttons, MessageBoxCallback onClose)
+        public void Warn(string title, string message, MessageBoxButton buttons, MessageBoxCallback onClose = null)
         {
             var result = System.Windows.MessageBox.Show(message, title, buttons, MessageBoxImage.Warning);
 

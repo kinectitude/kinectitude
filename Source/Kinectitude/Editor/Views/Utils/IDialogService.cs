@@ -19,6 +19,6 @@ namespace Kinectitude.Editor.Views.Utils
         void ShowLoadDialog(FileDialogCallback onClose);
         void ShowSaveDialog(FileDialogCallback onClose);
         void ShowFolderDialog(FolderDialogCallback onClose);
-        void Warn(string title, string message, MessageBoxButton buttons, MessageBoxCallback onClose);
+        void Warn(string title, string message, MessageBoxButton buttons, MessageBoxCallback onClose = null);
     }
 }

@@ -89,7 +89,7 @@ namespace Kinectitude.Render
         }
 
         private bool stretched;
-        [PluginProperty("Stretched", "", true)]
+        [PluginProperty("Stretch", "", true)]
         public bool Stretched
         {
             get { return stretched; }

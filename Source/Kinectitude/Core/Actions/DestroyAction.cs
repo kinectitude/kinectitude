@@ -3,7 +3,7 @@ using Action = Kinectitude.Core.Base.Action;
 
 namespace Kinectitude.Core.Actions
 {
-    [Plugin("Destroy this Entity", "")]
+    [Plugin("destroy this entity", "Destroy entity")]
     class DestroyAction : Action
     {
         public override void Run()

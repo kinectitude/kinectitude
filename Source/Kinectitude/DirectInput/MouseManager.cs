@@ -21,8 +21,9 @@ namespace Kinectitude.DirectInput
         private readonly List<MouseClickEvent> mouseClickEvens = new List<MouseClickEvent>();
 
         private bool visibleCursor = true;
-        [PluginProperty("Cursor is shown when true", "")]
-        public bool VisibleCursor {
+        [PluginProperty("Show Cursor", "")]
+        public bool VisibleCursor
+        {
             get { return visibleCursor; }
             set
             {

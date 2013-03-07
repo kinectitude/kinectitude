@@ -10,7 +10,7 @@ namespace Kinectitude.DirectInput
 {
     public enum KeyState { Pressed, Released, Down }
 
-    [Plugin("Key {Button} is {KeyState}", "")]
+    [Plugin("when key {Button} is {KeyState}", "Key Event")]
     public class KeyEvent : Event, IKeyChange
     {
         [PluginProperty("Key State", "State of the key. Down, Pressed or Released")]

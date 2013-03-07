@@ -333,11 +333,11 @@ namespace Kinectitude.Editor.Models
 
             if (plugin.Type == PluginType.Action)
             {
-                Actions.Add(new StatementFactory(plugin.ShortName, StatementType.Action, () => new Action(plugin)));
+                Actions.Add(new StatementFactory(plugin.Description, StatementType.Action, () => new Action(plugin)));
             }
             else if (plugin.Type == PluginType.Event)
             {
-                Events.Add(new StatementFactory(plugin.ShortName, StatementType.Event, () => new Event(plugin)));
+                Events.Add(new StatementFactory(plugin.Description, StatementType.Event, () => new Event(plugin)));
             }
         }
 

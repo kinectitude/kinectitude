@@ -8,7 +8,7 @@ namespace Kinectitude.Core.Events
 {
     // Use this as a base class for any attribute change.  It will always fire
 
-    [Plugin("Expression {Target} changes", "")]
+    [Plugin("when the value of {Target} changes", "A value changes")]
     internal sealed class AttributeChangesEvent : Event, IChanges
     {
         [PluginProperty("Expression", "")]

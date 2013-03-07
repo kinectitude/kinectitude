@@ -4,10 +4,10 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Physics
 {
-    [Plugin("Entity collides with {CollidesWith}", "")]
+    [Plugin("when this entity collides with {CollidesWith}", "Entity collides")]
     public class CollisionEvent : Event
     {
-        [PluginProperty("Collides with","")]
+        [PluginProperty("Collides With","")]
         public TypeMatcher CollidesWith { get; set; }
 
         public CollisionEvent() { }

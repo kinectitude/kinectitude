@@ -4,7 +4,7 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Actions
 {
-    [Plugin("Change Scene to {Target}", "")]
+    [Plugin("change scene to {Target}", "Change scene")]
     internal sealed class ChangeSceneAction : Action
     {
         [PluginProperty("Scene", "")]

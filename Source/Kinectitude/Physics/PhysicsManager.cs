@@ -10,7 +10,7 @@ namespace Kinectitude.Physics
     {
 
         private float yGravity;
-        [PluginProperty("Y gravity", "How fast things are pulled down")]
+        [PluginProperty("Y Gravity", "How fast things are pulled down")]
         public float YGravity 
         {
             get { return yGravity; }
@@ -26,7 +26,7 @@ namespace Kinectitude.Physics
         }
 
         private float xGravity;
-        [PluginProperty("X gravity", "How fast things are pulled to the left")]
+        [PluginProperty("X Gravity", "How fast things are pulled to the left")]
         public float XGravity 
         {
             get { return xGravity; }

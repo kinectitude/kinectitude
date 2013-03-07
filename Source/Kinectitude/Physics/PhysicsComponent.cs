@@ -121,7 +121,7 @@ namespace Kinectitude.Physics
         }
 
         private float maximumSpeed = float.PositiveInfinity;
-        [PluginProperty("Maximum velocity", "", float.PositiveInfinity)]
+        [PluginProperty("Maximum Speed", "", float.PositiveInfinity)]
         public float MaximumSpeed
         {
             get { return maximumSpeed; }
@@ -136,7 +136,7 @@ namespace Kinectitude.Physics
         }
 
         private float minimumSpeed = 0f;
-        [PluginProperty("Minimum velocity", "", 0)]
+        [PluginProperty("Minimum Speed", "", 0)]
         public float MinimumSpeed
         {
             get { return minimumSpeed; }
@@ -214,7 +214,7 @@ namespace Kinectitude.Physics
         [Preset("Bouncy Ball", true)]
         [Preset("Collision Event Line", false)]
         [Preset("Wall", false)]
-        [PluginProperty("Object moves when hit", "")]
+        [PluginProperty("Stationary", "Object moves when hit")]
         public bool MovesWhenHit {
             get { return movesWhenHit; }
             set
@@ -233,7 +233,7 @@ namespace Kinectitude.Physics
         [Preset("Bouncy Ball", true)]
         [Preset("Collision Event Line", false)]
         [Preset("Wall", false)]
-        [PluginProperty("Object can rotate as it moves", "", false)]
+        [PluginProperty("Can Rotate", "Object can rotate as it moves", false)]
         public bool FixedRotation
         {
             get { return fixedRotation; }
@@ -249,7 +249,7 @@ namespace Kinectitude.Physics
 
         private TypeMatcher ignoreCollisionsWith = null;
 
-        [PluginProperty("Ignores collisions with", "Any entities that match this type matcher will pass through this object")]
+        [PluginProperty("Ignores Collisions", "Any entities that match this type matcher will pass through this object")]
         public TypeMatcher IgnoreCollisionsWith
         {
             get { return ignoreCollisionsWith; }

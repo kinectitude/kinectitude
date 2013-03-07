@@ -6,7 +6,7 @@ namespace Kinectitude.Core.Events
 {
     // Trigger can just be an event that does nothing special on its own, but can be treated special
 
-    [Plugin("Trigger {Trigger} occurs", "")]
+    [Plugin("when trigger {Trigger} occurs", "Trigger occurs")]
     internal sealed class TriggerOccursEvent : Event
     {
 

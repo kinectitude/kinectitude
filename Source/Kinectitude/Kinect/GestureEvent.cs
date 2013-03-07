@@ -10,7 +10,7 @@ using System.IO;
 
 namespace Kinectitude.Kinect
 {
-    [Plugin("Player {Player} performs gesture {GestureName} with joint {Joint}", "")]
+    [Plugin("when player {Player} performs gesture {GestureName} with joint {Joint}", "Player makes a gesture")]
     public class GestureEvent : Event
     {
         private KinectManager manager;

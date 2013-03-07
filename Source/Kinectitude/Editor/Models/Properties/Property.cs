@@ -22,10 +22,7 @@ namespace Kinectitude.Editor.Models.Properties
                 this.property = property;
             }
 
-            public void Prepare()
-            {
-                // TODO confirm I can leave this empty
-            }
+            public void Prepare() { }
 
             public void Change()
             {
@@ -118,9 +115,12 @@ namespace Kinectitude.Editor.Models.Properties
                         if (!System.IO.File.Exists(destFile))
                         {
                             System.IO.File.Copy(pathName, destFile, true);
+                            Value = new Value("\"" + fileName + "\"");
                         }
-
-                        Value = new Value("\"" + fileName + "\"");
+                        else
+                        {
+                            Workspace.Instance.DialogService.Warn("Asset Already Exists", "This project already contains an asset named " + fileName + ".", System.Windows.MessageBoxButton.OK);
+                        }
                     }
                 }, this.PluginProperty.FileFilter, this.PluginProperty.FileChooserTitle);
             });

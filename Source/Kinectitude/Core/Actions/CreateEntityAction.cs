@@ -3,7 +3,7 @@ using Action = Kinectitude.Core.Base.Action;
 
 namespace Kinectitude.Core.Actions
 {
-    [Plugin("Create Entity based on {Prototype}", "")]
+    [Plugin("create entity based on {Prototype}", "Create an entity")]
     class CreateEntityAction : Action
     {
         [PluginProperty("Prototype", "Name of Prototype to make")]

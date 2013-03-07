@@ -4,7 +4,7 @@ using Kinectitude.Core.Data;
 
 namespace Kinectitude.Core.Actions
 {
-    [Plugin("Fire trigger {Name}", "")]
+    [Plugin("fire trigger {Name}", "Fire a trigger")]
     internal sealed class FireTriggerAction : Action
     {
         [PluginProperty("Trigger", "")]

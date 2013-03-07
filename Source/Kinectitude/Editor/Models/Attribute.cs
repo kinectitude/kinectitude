@@ -53,6 +53,11 @@ namespace Kinectitude.Editor.Models
             get { return null != val; }
         }
 
+        public bool HasFileChooser
+        {
+            get { return false; }
+        }
+
         public bool IsInherited
         {
             get { return inherited; }

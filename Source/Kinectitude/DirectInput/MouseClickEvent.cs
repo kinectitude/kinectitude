@@ -7,12 +7,12 @@ using Kinectitude.Core.Attributes;
 
 namespace Kinectitude.DirectInput
 {
-    [Plugin("Mouse button is clicked: (Button: {Button}, Button Number: {ButtonNumber})", "")]
+    [Plugin("when mouse button is clicked: (Button: {Button}, Button Number: {ButtonNumber})", "Mouse Event")]
     public class MouseClickEvent : Event
     {
         private MouseManager mouseManager;
 
-        [PluginProperty("Button", "Button to create evt with")]
+        [PluginProperty("Button", "Standard button to check")]
         public Button Button { get; set; }
 
         [PluginProperty("Button Number", "Button number for other buttons. If button type is other, the button with id ButtonNumber is used")]

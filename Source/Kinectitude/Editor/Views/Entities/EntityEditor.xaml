@@ -155,7 +155,7 @@
                 </Style>
             </DataTemplate.Resources>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,2" IsEnabled="{Binding IsEditable}">
-                <TextBlock Margin="0,0,8,0">Set value</TextBlock>
+                <TextBlock Margin="0,0,8,0">set value</TextBlock>
                 <TextBox Text="{Binding Key}" MinWidth="125" Margin="0,0,8,0" />
                 <ComboBox SelectedItem="{Binding Operator}" ItemsSource="{Binding Source={StaticResource Operators}}" />
                 <TextBox Text="{Binding Value}" MinWidth="125" Margin="8,0,0,0" />

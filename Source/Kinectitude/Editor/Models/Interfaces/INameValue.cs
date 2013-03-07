@@ -14,6 +14,7 @@ namespace Kinectitude.Editor.Models.Interfaces
 
         bool IsEditable { get; }
         bool HasOwnValue { get; }
+        bool HasFileChooser { get; }
 
         ICommand ClearValueCommand { get; }
     }
