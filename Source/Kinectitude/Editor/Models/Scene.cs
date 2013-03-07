@@ -12,6 +12,7 @@ using Kinectitude.Editor.Views.Dialogs;
 using Kinectitude.Editor.Views.Scenes;
 using Kinectitude.Editor.Views.Scenes.Presenters;
 using Kinectitude.Editor.Views.Utils;
+using Kinectitude.Render;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -57,6 +58,88 @@ namespace Kinectitude.Editor.Models
                     name = value;
                     NotifyPropertyChanged("Name");
                 }
+            }
+        }
+
+        public double Width
+        {
+            get
+            {
+                var manager = GetManagerByType(typeof(RenderManager));
+                if (null != manager)
+                {
+                    var property = manager.GetProperty("Width");
+                    if (null != property)
+                    {
+                        return property.GetDoubleValue();
+                    }
+                }
+
+                if (null != Scope)
+                {
+                    return Scope.Width;
+                }
+
+                return ConstantReader.CacheOrCreate(800);
+            }
+        }
+
+        public double Height
+        {
+            get
+            {
+                var manager = GetManagerByType(typeof(RenderManager));
+                if (null != manager)
+                {
+                    var property = manager.GetProperty("Height");
+                    if (null != property)
+                    {
+                        return property.GetDoubleValue();
+                    }
+                }
+
+                if (null != Scope)
+                {
+                    return Scope.Height;
+                }
+
+                return ConstantReader.CacheOrCreate(600);
+            }
+        }
+
+        public double CameraX
+        {
+            get
+            {
+                var manager = GetManagerByType(typeof(RenderManager));
+                if (null != manager)
+                {
+                    var property = manager.GetProperty("CameraX");
+                    if (null != property)
+                    {
+                        return property.GetDoubleValue();
+                    }
+                }
+
+                return ConstantReader.CacheOrCreate(0);
+            }
+        }
+
+        public double CameraY
+        {
+            get
+            {
+                var manager = GetManagerByType(typeof(RenderManager));
+                if (null != manager)
+                {
+                    var property = manager.GetProperty("CameraY");
+                    if (null != property)
+                    {
+                        return property.GetDoubleValue();
+                    }
+                }
+
+                return ConstantReader.CacheOrCreate(0);
             }
         }
 
@@ -222,6 +305,11 @@ namespace Kinectitude.Editor.Models
                     }
                 }
             });
+
+            AddDependency<EffectiveValueChanged>("Width", e => e.Plugin.CoreType == typeof(RenderManager) && e.PluginProperty.Name == "Width");
+            AddDependency<EffectiveValueChanged>("Height", e => e.Plugin.CoreType == typeof(RenderManager) && e.PluginProperty.Name == "Height");
+            AddDependency<EffectiveValueChanged>("CameraX", e => e.Plugin.CoreType == typeof(RenderManager) && e.PluginProperty.Name == "CameraX");
+            AddDependency<EffectiveValueChanged>("CameraY", e => e.Plugin.CoreType == typeof(RenderManager) && e.PluginProperty.Name == "CameraY");
         }
 
         public override void Accept(IGameVisitor visitor)
@@ -402,6 +490,11 @@ namespace Kinectitude.Editor.Models
         public Manager GetManagerByType(Plugin type)
         {
             return Managers.FirstOrDefault(x => x.Plugin == type);
+        }
+
+        public Manager GetManagerByType(Type type)
+        {
+            return Managers.FirstOrDefault(x => x.Plugin.CoreType == type);
         }
 
         public Manager GetManagerByDefinedName(string name)

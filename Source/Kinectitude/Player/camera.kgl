@@ -18,7 +18,7 @@ Game (FirstScene = "game", IsFullScreen = false, Name = "Camera Tests")
     
     Scene game()
     {
-        Manager RenderManager(CameraX = 0, CameraY = 0, Width = 1600, Height = 1200)
+        Manager RenderManager(CameraX = 50, CameraY = 50, Width = 1600, Height = 1200)
 
         Entity : text()
         {

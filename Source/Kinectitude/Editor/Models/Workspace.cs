@@ -134,8 +134,19 @@ namespace Kinectitude.Editor.Models
 
                 if (create)
                 {
-                    Game game = new Game("Untitled Game") { Width = 800, Height = 600 };
-                    game.AddScene(new Scene("Scene 1"));
+                    Game game = new Game("Untitled Game");
+
+                    var service = new Service(GetPlugin(typeof(RenderService)));
+                    service.SetProperty("Width", new Value(800, true));
+                    service.SetProperty("Height", new Value(600, true));
+                    game.AddService(service);
+
+                    var scene = new Scene("Scene1");
+                    
+                    var manager = new Manager(GetPlugin(typeof(RenderManager)));
+                    scene.AddManager(manager);
+
+                    game.AddScene(scene);
 
                     Project project = new Project();
                     project.Game = game;

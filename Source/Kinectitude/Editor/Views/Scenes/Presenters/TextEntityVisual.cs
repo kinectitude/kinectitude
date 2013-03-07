@@ -10,7 +10,6 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
         public string Value
         {
             get { return GetStringValue<TextRenderComponent>("Value"); }
-            set { SetValue<TextRenderComponent, string>("Value", value); }
         }
 
         public string FontFamily

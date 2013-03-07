@@ -24,7 +24,6 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
         protected EntityVisual(EntityPresenter presenter, Component render, Entity entity) : base(entity)
         {
             this.presenter = presenter;
-
             this.render = render;
 
             if (null != render)

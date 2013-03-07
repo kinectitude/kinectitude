@@ -295,6 +295,7 @@
                             </Expander>
                             <CollectionContainer Collection="{Binding DataContext.Components, Source={x:Reference dockDetails}}" />
                             <CollectionContainer Collection="{Binding DataContext.Managers, Source={x:Reference dockDetails}}" />
+                            <CollectionContainer Collection="{Binding DataContext.Services, Source={x:Reference dockDetails}}" />
                         </CompositeCollection>
                         <DataTemplate DataType="{x:Type m:Component}">
                             <Expander IsExpanded="True">
@@ -350,6 +351,34 @@
                                 </Expander.Content>
                             </Expander>
                         </DataTemplate>
+                        <DataTemplate DataType="{x:Type m:Service}">
+                            <Expander IsExpanded="True">
+                                <Expander.Header>
+                                    <Border Padding="8">
+                                        <TextBlock FontWeight="Bold" Text="{Binding DisplayName}" />
+                                    </Border>
+                                </Expander.Header>
+                                <Expander.Content>
+                                    <ItemsControl ItemsSource="{Binding Properties}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Padding="0,0,0,2">
+                                                    <Grid HorizontalAlignment="Stretch">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="0.5*" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="{Binding Name}" Grid.Column="0" />
+                                                        <Properties:PropertyView DataContext="{Binding}" Grid.Column="1" />
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Expander.Content>
+                            </Expander>
+                        </DataTemplate>
+
                     </DockPanel.Resources>
 
                     <Border DockPanel.Dock="Bottom" Padding="0,4,4,0">

@@ -109,6 +109,7 @@
     <Compile Include="Models\Data\ValueReaders\ManagerValueReader.cs" />
     <Compile Include="Models\Data\ValueReaders\ServiceValueReader.cs" />
     <Compile Include="Models\Data\ValueReaders\ThisComponentValueReader.cs" />
+    <Compile Include="Models\Notifications\EffectiveValueChanged.cs" />
     <Compile Include="Views\Utils\PlacementModeConverter.cs" />
     <Compile Include="Views\Utils\IDialogService.cs" />
     <Compile Include="Models\Interfaces\IServiceScope.cs" />

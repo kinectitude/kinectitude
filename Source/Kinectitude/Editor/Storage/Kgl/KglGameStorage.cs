@@ -102,9 +102,8 @@ namespace Kinectitude.Editor.Storage.Kgl
             }
 
             //TODO this could be an expression set it later
-            game.Width = 800;
-            game.Height = 600;
-            game.IsFullScreen = false;
+            //game.Width = 800;
+            //game.Height = 600;
 
             foreach (Tuple<string, object> attribute in GetProperties(root))
             {

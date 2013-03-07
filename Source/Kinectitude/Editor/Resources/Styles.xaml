@@ -2,7 +2,6 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                    xmlns:v="clr-namespace:Kinectitude.Editor.Views"
                     xmlns:Designer="clr-namespace:Kinectitude.Editor.Views.Controls.Designer"
                     xmlns:m="clr-namespace:Kinectitude.Editor.Models"
                     mc:Ignorable="d">
@@ -18,10 +17,6 @@
     
     <Style TargetType="{x:Type ToolBar}">
         <Setter Property="Background" Value="Transparent" />
-    </Style>
-
-    <Style TargetType="{x:Type TabControl}">
-        <!--Setter Property="BorderThickness" Value="0" /-->
     </Style>
 
     <Style x:Key="workspaceList">
@@ -81,25 +76,42 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Designer:DesignerCanvas}">
                     <AdornerDecorator>
-                        <Canvas Background="White" IsItemsHost="True">
-                            <Canvas.Effect>
+                        <Grid>
+                            <Grid.Resources>
+                                <SolidColorBrush x:Key="CameraStrokeBrush" Opacity="0.5" Color="Black" />
+                            </Grid.Resources>
+                            <Grid.Effect>
                                 <DropShadowEffect BlurRadius="16" ShadowDepth="0" />
-                            </Canvas.Effect>
-                            <!--Canvas.InputBindings>
-                                <KeyBinding Key="C" Modifiers="Control"
-                                            Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=CopyCommand}"
-                                            CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=SelectedItems}" />
-                                <KeyBinding Gesture="CTRL+X"
-                                            Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=CutCommand}"
-                                            CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=SelectedItems}" />
-                                <KeyBinding Key="V" Modifiers="Control"
-                                            Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=PasteCommand}"
-                                            CommandParameter="{Binding Source={x:Static m:Workspace.Instance}, Path=ClippedItem}" />
-                                <KeyBinding Key="Delete"
-                                            Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=DeleteCommand}"
-                                            CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=SelectedItems}" />
-                            </Canvas.InputBindings-->
-                        </Canvas>
+                            </Grid.Effect>
+                            <Canvas Background="White" IsItemsHost="True">
+                                <!--Canvas.InputBindings>
+                                    <KeyBinding Key="C" Modifiers="Control"
+                                                Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=CopyCommand}"
+                                                CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=SelectedItems}" />
+                                    <KeyBinding Gesture="CTRL+X"
+                                                Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=CutCommand}"
+                                                CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=SelectedItems}" />
+                                    <KeyBinding Key="V" Modifiers="Control"
+                                                Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=PasteCommand}"
+                                                CommandParameter="{Binding Source={x:Static m:Workspace.Instance}, Path=ClippedItem}" />
+                                    <KeyBinding Key="Delete"
+                                                Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=DeleteCommand}"
+                                                CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=SelectedItems}" />
+                                </Canvas.InputBindings-->
+                            </Canvas>
+                            <Canvas>
+                                <Rectangle Stroke="{StaticResource CameraStrokeBrush}"
+                                           StrokeDashArray="2 2"
+                                           StrokeThickness="1"
+                                           Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=CameraWidth}"
+                                           Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=CameraHeight}">
+                                    <Rectangle.RenderTransform>
+                                        <TranslateTransform X="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=CameraLeft}"
+                                                            Y="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=CameraTop}"/>
+                                    </Rectangle.RenderTransform>
+                                </Rectangle>
+                            </Canvas>
+                        </Grid>
                     </AdornerDecorator>
                 </ControlTemplate>
             </Setter.Value>

@@ -9,6 +9,7 @@ using Kinectitude.Editor.Models.Values;
 using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.Views.Dialogs;
 using Kinectitude.Editor.Views.Utils;
+using Kinectitude.Render;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -21,9 +22,6 @@ namespace Kinectitude.Editor.Models
     internal sealed class Game : GameModel<IScope>, IAttributeScope, IEntityScope, ISceneScope, IServiceScope
     {
         private string name;
-        private int width;
-        private int height;
-        private bool fullScreen;
         private Scene firstScene;
         private int nextAttribute;
         private int nextScene;
@@ -50,66 +48,39 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        public int Width
+        public double Width
         {
-            get { return width; }
-            set
+            get
             {
-                if (width != value)
+                var service = GetServiceByType(typeof(RenderService));
+                if (null != service)
                 {
-                    int oldWidth = width;
-
-                    Workspace.Instance.CommandHistory.Log(
-                        "set game width",
-                        () => Width = value,
-                        () => Width = oldWidth
-                    );
-
-                    width = value;
-                    NotifyPropertyChanged("Width");
+                    var property = service.GetProperty("Width");
+                    if (null != property)
+                    {
+                        return property.Value.GetDoubleValue();
+                    }
                 }
+
+                return ConstantReader.CacheOrCreate(800);
             }
         }
 
-        public int Height
+        public double Height
         {
-            get { return height; }
-            set
+            get
             {
-                if (height != value)
+                var service = GetServiceByType(typeof(RenderService));
+                if (null != service)
                 {
-                    int oldHeight = height;
-
-                    Workspace.Instance.CommandHistory.Log(
-                        "set game height",
-                        () => Height = value,
-                        () => Height = oldHeight
-                    );
-
-                    height = value;
-                    NotifyPropertyChanged("Height");
+                    var property = service.GetProperty("Height");
+                    if (null != property)
+                    {
+                        return property.Value.GetDoubleValue();
+                    }
                 }
-            }
-        }
 
-        public bool IsFullScreen
-        {
-            get { return fullScreen; }
-            set
-            {
-                if (fullScreen != value)
-                {
-                    bool oldFullScreen = fullScreen;
-
-                    Workspace.Instance.CommandHistory.Log(
-                        "toggle full screen",
-                        () => IsFullScreen = value,
-                        () => IsFullScreen = oldFullScreen
-                    );
-
-                    fullScreen = value;
-                    NotifyPropertyChanged("IsFullScreen");
-                }
+                return ConstantReader.CacheOrCreate(600);
             }
         }
 
@@ -224,6 +195,9 @@ namespace Kinectitude.Editor.Models
                     }
                 }
             });
+
+            AddDependency<EffectiveValueChanged>("Width", e => e.Plugin.CoreType == typeof(RenderService) && e.PluginProperty.Name == "Width");
+            AddDependency<EffectiveValueChanged>("Height", e => e.Plugin.CoreType == typeof(RenderService) && e.PluginProperty.Name == "Height");
         }
 
         public override void Accept(IGameVisitor visitor)
@@ -466,6 +440,11 @@ namespace Kinectitude.Editor.Models
         public Service GetServiceByType(Plugin type)
         {
             return Services.FirstOrDefault(x => x.Plugin == type);
+        }
+
+        public Service GetServiceByType(Type type)
+        {
+            return Services.FirstOrDefault(x => x.Plugin.CoreType == type);
         }
 
         public Service GetServiceByDefinedName(string name)

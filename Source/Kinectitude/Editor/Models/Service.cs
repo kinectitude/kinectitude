@@ -20,6 +20,11 @@ namespace Kinectitude.Editor.Models
             get { return plugin; }
         }
 
+        public string DisplayName
+        {
+            get { return plugin.Header; }
+        }
+
         public string Type
         {
             get { return null != Scope ? Scope.GetDefinedName(plugin) : plugin.ClassName; }
@@ -60,7 +65,13 @@ namespace Kinectitude.Editor.Models
         private void AddProperty(Property property)
         {
             property.Scope = this;
+            property.EffectiveValueChanged += OnPropertyEffectiveValueChanged;
             properties.Add(property);
+        }
+
+        private void OnPropertyEffectiveValueChanged(PluginProperty property)
+        {
+            Notify(new EffectiveValueChanged(Plugin, property));
         }
 
         public Property GetProperty(string name)

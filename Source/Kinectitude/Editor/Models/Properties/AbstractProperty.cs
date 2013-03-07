@@ -47,7 +47,7 @@ namespace Kinectitude.Editor.Models.Properties
 
         public abstract ICommand ClearValueCommand { get; protected set; }
 
-        public event System.Action EffectiveValueChanged;
+        public event PropertyEventHandler EffectiveValueChanged;
 
         protected AbstractProperty(AbstractProperty sourceProperty = null)
         {
@@ -67,7 +67,7 @@ namespace Kinectitude.Editor.Models.Properties
             NotifyPropertyChanged(e.PropertyName);
         }
 
-        private void OnSourceEffectiveValueChanged()
+        private void OnSourceEffectiveValueChanged(PluginProperty property)
         {
             NotifyEffectiveValueChanged();
         }
@@ -166,7 +166,7 @@ namespace Kinectitude.Editor.Models.Properties
         {
             if (null != EffectiveValueChanged)
             {
-                EffectiveValueChanged();
+                EffectiveValueChanged(PluginProperty);
             }
         }
     }

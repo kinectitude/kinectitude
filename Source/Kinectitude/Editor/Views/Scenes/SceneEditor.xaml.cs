@@ -14,5 +14,10 @@ namespace Kinectitude.Editor.Views.Scenes
         {
             InitializeComponent();
         }
+
+        private void OnRequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
+        {
+            e.Handled = true;
+        }
     }
 }

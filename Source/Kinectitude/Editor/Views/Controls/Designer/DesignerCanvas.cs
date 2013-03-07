@@ -53,6 +53,18 @@ namespace Kinectitude.Editor.Views.Controls.Designer
         public static DependencyProperty PointCommandProperty =
             DependencyProperty.Register("PointCommand", typeof(ICommand), typeof(DesignerCanvas));
 
+        public static DependencyProperty CameraLeftProperty =
+            DependencyProperty.Register("CameraLeft", typeof(double), typeof(DesignerCanvas));
+
+        public static DependencyProperty CameraTopProperty =
+            DependencyProperty.Register("CameraTop", typeof(double), typeof(DesignerCanvas));
+
+        public static DependencyProperty CameraWidthProperty =
+            DependencyProperty.Register("CameraWidth", typeof(double), typeof(DesignerCanvas));
+
+        public static DependencyProperty CameraHeightProperty =
+            DependencyProperty.Register("CameraHeight", typeof(double), typeof(DesignerCanvas));
+
         private enum Mode
         {
             Selecting,
@@ -125,6 +137,30 @@ namespace Kinectitude.Editor.Views.Controls.Designer
         {
             get { return (ICommand)GetValue(PointCommandProperty); }
             set { SetValue(PointCommandProperty, value); }
+        }
+
+        public double CameraLeft
+        {
+            get { return (double)GetValue(CameraLeftProperty); }
+            set { SetValue(CameraLeftProperty, value); }
+        }
+
+        public double CameraTop
+        {
+            get { return (double)GetValue(CameraTopProperty); }
+            set { SetValue(CameraTopProperty, value); }
+        }
+
+        public double CameraWidth
+        {
+            get { return (double)GetValue(CameraWidthProperty); }
+            set { SetValue(CameraWidthProperty, value); }
+        }
+
+        public double CameraHeight
+        {
+            get { return (double)GetValue(CameraHeightProperty); }
+            set { SetValue(CameraHeightProperty, value); }
         }
 
         public DesignerCanvas()

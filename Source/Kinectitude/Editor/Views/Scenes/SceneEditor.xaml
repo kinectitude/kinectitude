@@ -162,20 +162,23 @@
             </Button>
         </StackPanel>
 
-        <ScrollViewer Background="Gray" HorizontalScrollBarVisibility="Visible">
+        <ScrollViewer Background="Gray" HorizontalScrollBarVisibility="Visible" CanContentScroll="False">
             <Designer:DesignerCanvas x:Name="canvas"
-                          Margin="16"
-                          Width="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.Game.Width}"
-                          Height="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.Game.Height}"
-                          ItemsSource="{Binding EntityPresenters, Mode=OneWay}"
-                          SelectedItem="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.InspectorItem, Mode=OneWayToSource, Converter={StaticResource EntityConverter}}"
-                          CutCommand="{Binding CutCommand, Mode=OneWay}"
-                          PasteCommand="{Binding PasteCommand, Mode=OneWay}"
-                          CopyCommand="{Binding CopyCommand, Mode=OneWay}"
-                          DeleteCommand="{Binding DeleteCommand, Mode=OneWay}"
-                          PointCommand="{Binding AddEntityCommand, Mode=OneWay}">
-
-            </Designer:DesignerCanvas>
+                                     Margin="32"
+                                     Width="{Binding Width}"
+                                     Height="{Binding Height}"
+                                     CameraLeft="{Binding CameraX}"
+                                     CameraTop="{Binding CameraY}"
+                                     CameraWidth="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.Game.Width}"
+                                     CameraHeight="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.Game.Height}"
+                                     ItemsSource="{Binding EntityPresenters, Mode=OneWay}"
+                                     SelectedItem="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.InspectorItem, Mode=OneWayToSource, Converter={StaticResource EntityConverter}}"
+                                     CutCommand="{Binding CutCommand, Mode=OneWay}"
+                                     PasteCommand="{Binding PasteCommand, Mode=OneWay}"
+                                     CopyCommand="{Binding CopyCommand, Mode=OneWay}"
+                                     DeleteCommand="{Binding DeleteCommand, Mode=OneWay}"
+                                     PointCommand="{Binding AddEntityCommand, Mode=OneWay}"
+                                     RequestBringIntoView="OnRequestBringIntoView" />
         </ScrollViewer>
 
     </DockPanel>    
