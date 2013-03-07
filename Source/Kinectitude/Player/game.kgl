@@ -214,6 +214,7 @@ Game (Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = false, Nam
         
         Entity : primaryBall(){
             Component RenderComponent(FillColor = "CornflowerBlue")
+
         }
         
         Entity : text(){
@@ -241,6 +242,13 @@ Game (Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = false, Nam
             Component TextRenderComponent(Value = "", FontSize = 20, TextAlignment = "Center")
             Event AttributeChanges(Target = scene.show){
                 TextRenderComponent.Value  = "The value of scene.show " + scene.show
+            }
+        }
+        Entity hello : text() {
+            Component Transform(X = 50, Y = 150, Width = 800)
+            Component TextRenderComponent(Value = "Hello World!", FontSize = 20, TextAlignment = "Leading", FontColor = "LimeGreen")
+            Event AttributeChanges(Target = scene.blocks) {
+                TextRenderComponent.FontColor = "Magenta"
             }
         }
     }

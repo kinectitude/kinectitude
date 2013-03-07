@@ -16,7 +16,7 @@ namespace Kinectitude.Render
 
 
         private string _value = "";
-        [PluginProperty("Value", "")]
+        [PluginProperty("Value", "", "")]
         public string Value
         {
             get { return _value ?? ""; }
@@ -40,6 +40,7 @@ namespace Kinectitude.Render
                 if (value != fontFamily)
                 {
                     fontFamily = value;
+                    UpdateTextFormat();
                     Change("FontFamily");
                 }
             }
@@ -55,6 +56,7 @@ namespace Kinectitude.Render
                 if (value != fontWeight)
                 {
                     fontWeight = value;
+                    UpdateTextFormat();
                     Change("FontWeight");
                 }
             }
@@ -70,6 +72,7 @@ namespace Kinectitude.Render
                 if (value != fontStyle)
                 {
                     fontStyle = value;
+                    UpdateTextFormat();
                     Change("FontStyle");
                 }
             }
@@ -85,6 +88,7 @@ namespace Kinectitude.Render
                 if (value != fontStretch)
                 {
                     fontStretch = value;
+                    UpdateTextFormat();
                     Change("FontStretch");
                 }
             }
@@ -100,6 +104,7 @@ namespace Kinectitude.Render
                 if (value != fontSize)
                 {
                     fontSize = value;
+                    UpdateTextFormat();
                     Change("FontSize");
                 }
             }
@@ -115,82 +120,8 @@ namespace Kinectitude.Render
                 if (value != fontColor)
                 {
                     fontColor = value;
+                    UpdateBrush();
                     Change("FontColor");
-                }
-            }
-        }
-
-        private string locale;
-        [PluginProperty("Locale", "", "en-us")]
-        public string Locale
-        {
-            get { return locale; }
-            set
-            {
-                if (value != locale)
-                {
-                    locale = value;
-                    Change("Locale");
-                }
-            }
-        }
-
-        private FlowDirection flowDirection;
-        [PluginProperty("Flow Direction", "", FlowDirection.TopToBottom)]
-        public FlowDirection FlowDirection
-        {
-            get { return flowDirection; }
-            set
-            {
-                if (value != flowDirection)
-                {
-                    flowDirection = value;
-                    Change("FlowDirection");
-                }
-            }
-        }
-
-        private int tabSize;
-        [PluginProperty("Tab Size", "", 4)]
-        public int TabSize
-        {
-            get { return tabSize; }
-            set
-            {
-                if (value != tabSize)
-                {
-                    tabSize = value;
-                    Change("TabSize");
-                }
-            }
-        }
-
-        private ParagraphAlignment paragraphAlignment;
-        [PluginProperty("Paragraph Alignment", "", ParagraphAlignment.Near)]
-        public ParagraphAlignment ParagraphAlignment
-        {
-            get { return paragraphAlignment; }
-            set
-            {
-                if (value != paragraphAlignment)
-                {
-                    paragraphAlignment = value;
-                    Change("ParagraphAlignment");
-                }
-            }
-        }
-
-        private ReadingDirection readingDirection;
-        [PluginProperty("Reading Direction", "", ReadingDirection.LeftToRight)]
-        public ReadingDirection ReadingDirection
-        {
-            get { return readingDirection; }
-            set
-            {
-                if (value != readingDirection)
-                {
-                    readingDirection = value;
-                    Change("ReadingDirection");
                 }
             }
         }
@@ -205,22 +136,8 @@ namespace Kinectitude.Render
                 if (value != textAlignment)
                 {
                     textAlignment = value;
+                    UpdateTextFormat();
                     Change("TextAlignment");
-                }
-            }
-        }
-
-        private WordWrapping wordWrapping;
-        [PluginProperty("Word Wrapping", "", WordWrapping.NoWrap)]
-        public WordWrapping WordWrapping
-        {
-            get { return wordWrapping; }
-            set
-            {
-                if (value != wordWrapping)
-                {
-                    wordWrapping = value;
-                    Change("WordWrapping");
                 }
             }
         }
@@ -257,25 +174,11 @@ namespace Kinectitude.Render
 
         public TextRenderComponent()
         {
-            FontFamily = "Arial";
-            FontWeight = FontWeight.Normal;
-            FontStyle = FontStyle.Normal;
-            FontStretch = FontStretch.Normal;
-            FontSize = 36.0f;
-            Locale = "en-us";
-            FlowDirection = FlowDirection.TopToBottom;
-            TabSize = 4;
-            ParagraphAlignment = ParagraphAlignment.Near;
-            ReadingDirection = ReadingDirection.LeftToRight;
-            TextAlignment = TextAlignment.Leading;
-            WordWrapping = WordWrapping.NoWrap;
-            Value = "";
+            layoutRectangle = new RectangleF();
         }
 
         protected override void OnRender(RenderTarget renderTarget)
         {
-            OnReady();
-
             layoutRectangle.X = transformComponent.X + OffsetX;
             layoutRectangle.Y = transformComponent.Y + OffsetY;
             layoutRectangle.Width = transformComponent.Width;
@@ -284,17 +187,37 @@ namespace Kinectitude.Render
             renderTarget.DrawText(Value, textFormat, layoutRectangle, brush);
         }
 
+        private void UpdateTextFormat()
+        {
+            if (null != textFormat)
+            {
+                textFormat.Dispose();
+            }
+
+            if (null != renderManager)
+            {
+                textFormat = renderManager.DirectWriteFactory.CreateTextFormat(FontFamily, FontWeight, FontStyle, FontStretch, FontSize, "en-us");
+                textFormat.TextAlignment = TextAlignment;
+                textFormat.FlowDirection = FlowDirection.TopToBottom;
+                textFormat.IncrementalTabStop = textFormat.FontSize * 4;
+                textFormat.ParagraphAlignment = ParagraphAlignment.Near;
+                textFormat.ReadingDirection = ReadingDirection.LeftToRight;
+                textFormat.WordWrapping = WordWrapping.NoWrap;
+            }
+        }
+
+        private void UpdateBrush()
+        {
+            if (null != renderManager)
+            {
+                brush = renderManager.GetSolidColorBrush(FontColor, Opacity);
+            }
+        }
+
         protected override void OnReady()
         {
-            textFormat = renderManager.DirectWriteFactory.CreateTextFormat(FontFamily, FontWeight, FontStyle, FontStretch, FontSize, Locale);
-            textFormat.FlowDirection = FlowDirection;
-            textFormat.IncrementalTabStop = textFormat.FontSize * TabSize;
-            textFormat.ParagraphAlignment = ParagraphAlignment;
-            textFormat.ReadingDirection = ReadingDirection;
-            textFormat.TextAlignment = TextAlignment;
-            textFormat.WordWrapping = WordWrapping;
-            brush = renderManager.GetSolidColorBrush(FontColor, Opacity);
-            layoutRectangle = new RectangleF();
+            UpdateTextFormat();
+            UpdateBrush();
         }
 
         protected override void OnDestroy()
