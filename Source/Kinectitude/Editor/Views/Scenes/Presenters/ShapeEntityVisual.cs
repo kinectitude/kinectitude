@@ -1,5 +1,7 @@
 ﻿using Kinectitude.Editor.Models;
 using Kinectitude.Render;
+using System;
+using System.Windows.Media;
 
 namespace Kinectitude.Editor.Views.Scenes.Presenters
 {
@@ -11,22 +13,39 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
             set { SetValue<RenderComponent, RenderComponent.ShapeType>("Shape", value); }
         }
 
-        public string FillColor
+        public Brush FillColor
         {
-            get { return GetStringValue<RenderComponent>("FillColor"); }
-            set { SetValue<RenderComponent, string>("FillColor", value); }
+            get
+            {
+                try
+                {
+                    return (Brush)BrushConverter.ConvertFromString(GetStringValue<RenderComponent>("FillColor"));
+                }
+                catch (Exception e)
+                {
+                    return Brushes.Black;
+                }
+            }
         }
 
         public float LineThickness
         {
             get { return GetFloatValue<RenderComponent>("LineThickness"); }
-            set { SetValue<RenderComponent, float>("LineThickness", value); }
         }
 
-        public string LineColor
+        public Brush LineColor
         {
-            get { return GetStringValue<RenderComponent>("LineColor"); }
-            set { SetValue<RenderComponent, string>("LineColor", value); }
+            get
+            {
+                try
+                {
+                    return (Brush)BrushConverter.ConvertFromString(GetStringValue<RenderComponent>("LineColor"));
+                }
+                catch (NotSupportedException e)
+                {
+                    return Brushes.Black;
+                }
+            }
         }
 
         [DependsOn("Shape")]

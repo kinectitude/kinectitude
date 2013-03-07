@@ -19,21 +19,10 @@ namespace Kinectitude.Core.Base
 
         private readonly Func<Tuple<int, int>> WindowOffset;
         
-        internal int Width
-        {
-            get { return null != this["Width"] ? int.Parse(this["Width"]) : 800; }
-        }
-
-        internal int Height
-        {
-            get { return null != this["Height"] ? int.Parse(this["Height"]) : 600; }
-        }
-
         internal float ScaleX { get; private set; }
         internal float ScaleY { get; private set; }
 
         internal Tuple<int, int> GetWidowOffset() { return WindowOffset(); }
-        internal Tuple<int, int> GetWinowSize() { return new Tuple<int, int>(Width, Height); }
 
         internal Game(GameLoader gameLoader, float scaleX, float scaleY, Func<Tuple<int, int>> windowOffset, Action<string> die) : base(-2)
         {

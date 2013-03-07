@@ -64,7 +64,14 @@
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type Presenters:TextEntityVisual}">
-            <TextBlock Text="{Binding Value}" FontSize="{Binding FontSize}" Foreground="{Binding FontColor}" />
+            <TextBlock Text="{Binding Value}"
+                       FontFamily="{Binding FontFamily}"
+                       FontWeight="{Binding FontWeight}"
+                       FontStyle="{Binding FontStyle}"
+                       FontStretch="{Binding FontStretch}"
+                       FontSize="{Binding FontSize}"
+                       Foreground="{Binding FontColor}"
+                       TextAlignment="{Binding TextAlignment}" />
         </DataTemplate>
         
     </UserControl.Resources>

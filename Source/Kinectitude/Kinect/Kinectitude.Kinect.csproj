@@ -77,6 +77,10 @@
       <Name>Kinectitude.Core</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\Render\Kinectitude.Render.csproj">
+      <Project>{e6dd6f76-999c-4b56-887c-347faf50dab3}</Project>
+      <Name>Kinectitude.Render</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Data\circle.save" />

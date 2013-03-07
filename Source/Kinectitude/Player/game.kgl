@@ -10,12 +10,14 @@ using Kinectitude.Physics.dll{
 }
 
 using Kinectitude.Render.dll{
+    define RenderService as Kinectitude.Render.RenderService
     define RenderComponent as Kinectitude.Render.RenderComponent
     define TextRenderComponent as Kinectitude.Render.TextRenderComponent
     define ImageRenderComponent as Kinectitude.Render.ImageRenderComponent
 }
 
-Game (Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = false, Name="breakout"){
+Game (FirstScene = "game", IsFullScreen = false, Name="breakout"){
+
     Prototype paddle () {
         Component KinectFollowComponent(Direction = "X", Player = 1, Joint = "HandRight")
         Component RenderComponent(FillColor = "Black", Shape="Rectangle")
@@ -88,6 +90,8 @@ Game (Width = 800,  Height = 600, FirstScene = "game", IsFullScreen = false, Nam
         Component TextRenderComponent(FontFamily="Arial", FontWeight="Normal", FontStyle="Normal", FontStretch="Normal", 
             FontSize="36", FontColor="Black")
     }
+	
+	Service RenderService(Width = 1000, Height = 800)
     
     Scene game(balls = 10, blocks = 24){
         Entity player : paddle(){

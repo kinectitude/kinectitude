@@ -3,6 +3,7 @@ using Microsoft.Kinect;
 using System.Collections.Generic;
 using System;
 using Kinectitude.Core.Attributes;
+using Kinectitude.Render;
 
 namespace Kinectitude.Kinect
 {
@@ -16,7 +17,7 @@ namespace Kinectitude.Kinect
         private static readonly int numJoints = Enum.GetValues(typeof(JointType)).Length;
         private readonly List<GestureEvent>[][] events = new List<GestureEvent>[numPlayers][];
 
-        //private readonly 
+        private Tuple<int, int> windowSize;
 
         private void update(Skeleton[] skeletons)
         {
@@ -59,7 +60,7 @@ namespace Kinectitude.Kinect
                     if (y < 0) y = 0;
                 }
 
-                Tuple<int, int> windowSize = GetWindowSize();
+                //Tuple<int, int> windowSize = renderService.//GetWindowSize();
 
                 kfc.UpdatePosition(x * windowSize.Item1, y * windowSize.Item2);
                 kfc.OnUpdate(frameDelta);
@@ -93,6 +94,9 @@ namespace Kinectitude.Kinect
             }
             service.Callback = update;
             service.SpeechCallback = said;
+            
+            RenderService renderService = GetService<RenderService>();
+            windowSize = Tuple.Create((int)renderService.Width, (int)renderService.Height);
         }
 
         protected override void OnStop()

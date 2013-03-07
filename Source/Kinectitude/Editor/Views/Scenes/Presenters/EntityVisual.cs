@@ -1,9 +1,13 @@
 ﻿using Kinectitude.Editor.Models;
+using System;
+using System.Windows.Media;
 
 namespace Kinectitude.Editor.Views.Scenes.Presenters
 {
     internal class EntityVisual : EntityBase
     {
+        protected static readonly BrushConverter BrushConverter = new BrushConverter();
+
         private readonly EntityPresenter presenter;
         private Component render;
 

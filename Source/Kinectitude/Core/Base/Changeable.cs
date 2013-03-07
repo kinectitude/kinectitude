@@ -14,12 +14,6 @@ namespace Kinectitude.Core.Base
         public static float ScaleX(float X) { return X * Game.CurrentGame.ScaleX; }
         public static float ScaleY(float Y) { return Y * Game.CurrentGame.ScaleY; }
 
-        /// <summary>
-        /// Returns the x,y of the current size of the window
-        /// </summary>
-        /// <returns></returns>
-        public static Tuple<int, int> GetWindowSize() { return Game.CurrentGame.GetWinowSize(); }
-
         public void OffsetByWindow(ref int x, ref int y){
             Tuple<int, int> offset = Game.CurrentGame.GetWidowOffset();
             x -= offset.Item1;

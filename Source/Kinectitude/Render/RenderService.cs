@@ -8,9 +8,11 @@ using SlimDX.Direct2D;
 using Bitmap = SlimDX.Direct2D.Bitmap;
 using Color = System.Windows.Media.Color;
 using ColorConverter = System.Windows.Media.ColorConverter;
+using Kinectitude.Core.Attributes;
 
 namespace Kinectitude.Render
 {
+    [Plugin("Render Service", "")]
     public class RenderService : Service, IDisposable
     {
         public static Color4 ColorFromString(string color)
@@ -27,6 +29,12 @@ namespace Kinectitude.Render
         private readonly SlimDX.DirectWrite.Factory writeFactory;
         private readonly Color4 clearColor;
         private readonly BitmapProperties bitmapProperties;
+
+        [PluginProperty("Window Width", "", 800)]
+        public double Width { get; set; }
+
+        [PluginProperty("Window Height", "", 600)]
+        public double Height { get; set; }
 
         public RenderTarget RenderTarget
         {
