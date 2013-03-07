@@ -37,7 +37,7 @@ namespace Kinectitude.Player
 
             Func<Tuple<int, int>> windowOffset = () => new Tuple<int, int>(form.Left, form.Top);
 
-            GameLoader gameLoader = new GameLoader("game.kgl", new Assembly[] { renderAssembly, directAssembly },
+            GameLoader gameLoader = new GameLoader("camera.kgl", new Assembly[] { renderAssembly, directAssembly },
                 96 / dpi.Width, 90 / dpi.Height, windowOffset, die);
 
             game = gameLoader.CreateGame();

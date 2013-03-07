@@ -31,10 +31,10 @@ namespace Kinectitude.Render
         private readonly BitmapProperties bitmapProperties;
 
         [PluginProperty("Window Width", "", 800)]
-        public double Width { get; set; }
+        public float Width { get; set; }
 
         [PluginProperty("Window Height", "", 600)]
-        public double Height { get; set; }
+        public float Height { get; set; }
 
         public RenderTarget RenderTarget
         {

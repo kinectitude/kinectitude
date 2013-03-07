@@ -8,25 +8,98 @@ namespace Kinectitude.Render
     [Plugin("Render Manager", "")]
     public class RenderManager : Manager<IRender>
     {
-        private readonly RenderService renderService;
+        private RenderService renderService;
+        private Matrix3x2 cameraTransform;
+        private float cameraX;
+        private float cameraY;
+        private float width;
+        private float height;
 
         public SlimDX.DirectWrite.Factory DirectWriteFactory
         {
             get { return renderService.DirectWriteFactory; }
         }
 
+        [PluginProperty("Camera X", "", 0)]
+        public float CameraX
+        {
+            get { return cameraX; }
+            set
+            {
+                if (cameraX != value)
+                {
+                    cameraX = value;
+                    UpdateCameraTransform();
+                    Change("CameraX");
+                }
+            }
+        }
+
+        [PluginProperty("Camera Y", "", 0)]
+        public float CameraY
+        {
+            get { return cameraY; }
+            set
+            {
+                if (cameraY != value)
+                {
+                    cameraY = value;
+                    UpdateCameraTransform();
+                    Change("CameraY");
+                }
+            }
+        }
+
+        [PluginProperty("Scene Width", "", 0)]
+        public float Width
+        {
+            get { return width; }
+            set
+            {
+                if (width != value)
+                {
+                    width = value;
+                    Change("Width");
+                }
+            }
+        }
+
+        [PluginProperty("Scene Height", "", 0)]
+        public float Height
+        {
+            get { return height; }
+            set
+            {
+                if (height != value)
+                {
+                    height = value;
+                    Change("Height");
+                }
+            }
+        }
+
         public RenderManager()
         {
             renderService = GetService<RenderService>();
+            UpdateCameraTransform();
+        }
 
-            SlimDX.DirectWrite.Factory factory = renderService.DirectWriteFactory;
+        private void UpdateCameraTransform()
+        {
+            cameraTransform = Matrix3x2.Translation(-CameraX, -CameraY);
         }
 
         public void Render(RenderTarget renderTarget)
         {
             foreach (IRender render in Children)
             {
+                Matrix3x2 oldTransform = renderTarget.Transform;
+                if (!render.FixedPosition)
+                {
+                    renderTarget.Transform = Matrix3x2.Multiply(oldTransform, cameraTransform);
+                }
                 render.Render(renderTarget);
+                renderTarget.Transform = oldTransform;
             }
         }
 

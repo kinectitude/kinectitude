@@ -27,6 +27,21 @@ namespace Kinectitude.Render
             }
         }
 
+        private bool fixedPosition;
+        [PluginProperty("Fixed Position", "", false)]
+        public bool FixedPosition
+        {
+            get { return fixedPosition; }
+            set
+            {
+                if (fixedPosition != value)
+                {
+                    fixedPosition = value;
+                    Change("FixedPosition");
+                }
+            }
+        }
+
         protected BaseRenderComponent()
         {
             Opacity = 1.0f;
@@ -43,7 +58,7 @@ namespace Kinectitude.Render
         public void Render(RenderTarget renderTarget)
         {
             Matrix3x2 oldTransform = renderTarget.Transform;
-            renderTarget.Transform = Matrix3x2.Rotation(transformComponent.Rotation, new System.Drawing.PointF(transformComponent.X, transformComponent.Y));
+            renderTarget.Transform = Matrix3x2.Multiply(oldTransform, Matrix3x2.Rotation(transformComponent.Rotation, new System.Drawing.PointF(transformComponent.X, transformComponent.Y)));
             OnRender(renderTarget);
             renderTarget.Transform = oldTransform;
         }

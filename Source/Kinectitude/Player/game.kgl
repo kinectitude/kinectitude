@@ -11,6 +11,7 @@ using Kinectitude.Physics.dll{
 
 using Kinectitude.Render.dll{
     define RenderService as Kinectitude.Render.RenderService
+    define RenderManager as Kinectitude.Render.RenderManager
     define RenderComponent as Kinectitude.Render.RenderComponent
     define TextRenderComponent as Kinectitude.Render.TextRenderComponent
     define ImageRenderComponent as Kinectitude.Render.ImageRenderComponent
@@ -91,9 +92,12 @@ Game (FirstScene = "game", IsFullScreen = false, Name="breakout"){
             FontSize="36", FontColor="Black")
     }
 	
-	Service RenderService(Width = 1000, Height = 800)
+	Service RenderService(Width = 800, Height = 600)
     
     Scene game(balls = 10, blocks = 24){
+
+        Manager RenderManager(CameraX = 5, CameraY = 5)
+
         Entity player : paddle(){
             Component Transform(X = 400, Y = 560)
         }

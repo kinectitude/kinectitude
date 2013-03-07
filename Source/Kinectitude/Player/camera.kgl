@@ -1,0 +1,46 @@
+﻿using Kinectitude.Render.dll
+{
+    define RenderService as Kinectitude.Render.RenderService
+    define RenderManager as Kinectitude.Render.RenderManager
+    define RenderComponent as Kinectitude.Render.RenderComponent
+    define TextRenderComponent as Kinectitude.Render.TextRenderComponent
+    define ImageRenderComponent as Kinectitude.Render.ImageRenderComponent
+}
+
+Game (FirstScene = "game", IsFullScreen = false, Name = "Camera Tests")
+{
+    Prototype text()
+    {
+        Component TextRenderComponent(FontFamily="Arial", FontWeight="Normal", FontStyle="Normal", FontStretch="Normal",  FontSize="36", FontColor="Black")
+    }
+	
+	Service RenderService(Width = 800, Height = 600)
+    
+    Scene game()
+    {
+        Manager RenderManager(CameraX = 0, CameraY = 0)
+
+        Entity : text()
+        {
+            Component Transform(X = 10, Y = 10)
+            Component TextRenderComponent(Value = "This is some fixed position text", TextAlignment = "Leading", FixedPosition = true)
+        }
+
+        Entity()
+        {
+            Component Transform(X = 800, Y = 600, Width = 32, Height = 32)
+            Component RenderComponent(FillColor = "LimeGreen")
+
+            Event SceneStarts()
+            {
+                CreateTimer(Name = "Animator", Duration = 0.1, Trigger = "Animate", Recurring = true)
+            }
+
+            Event TriggerOccurs(Trigger = "Animate")
+            {
+                scene.RenderManager.CameraX += 1
+                scene.RenderManager.CameraY += 1
+            }
+        }
+    }
+}

@@ -9,6 +9,8 @@ namespace Kinectitude.Render
     [Requires(typeof(TransformComponent))]
     public interface IRender : IUpdateable
     {
+        bool FixedPosition { get; }
+
         void Render(RenderTarget renderTarget);
     }
 }

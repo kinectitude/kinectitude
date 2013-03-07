@@ -84,6 +84,9 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="App.config" />
+    <None Include="camera.kgl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="game.kgl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
