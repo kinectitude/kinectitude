@@ -2,6 +2,7 @@
 using Kinectitude.Core.Base;
 using SlimDX;
 using SlimDX.Direct2D;
+using System;
 
 namespace Kinectitude.Render
 {
@@ -28,7 +29,7 @@ namespace Kinectitude.Render
             {
                 if (cameraX != value)
                 {
-                    cameraX = value;
+                    cameraX = Math.Min(Width - renderService.Width, Math.Max(0, value));
                     UpdateCameraTransform();
                     Change("CameraX");
                 }
@@ -43,7 +44,7 @@ namespace Kinectitude.Render
             {
                 if (cameraY != value)
                 {
-                    cameraY = value;
+                    cameraY = Math.Min(Height - renderService.Height, Math.Max(0, value));
                     UpdateCameraTransform();
                     Change("CameraY");
                 }
@@ -53,7 +54,7 @@ namespace Kinectitude.Render
         [PluginProperty("Scene Width", "", 0)]
         public float Width
         {
-            get { return width; }
+            get { return width != 0 ? width : renderService.Width; }
             set
             {
                 if (width != value)
@@ -67,7 +68,7 @@ namespace Kinectitude.Render
         [PluginProperty("Scene Height", "", 0)]
         public float Height
         {
-            get { return height; }
+            get { return height != 0 ? height : renderService.Height; }
             set
             {
                 if (height != value)
