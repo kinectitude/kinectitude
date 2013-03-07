@@ -6,6 +6,7 @@ using Kinectitude.Physics.dll{
 }
 
 using Kinectitude.Render.dll{
+    define RenderService as Kinectitude.Render.RenderService
     define Render as Kinectitude.Render.RenderComponent
     define TextRender as Kinectitude.Render.TextRenderComponent
     define ImageRender as Kinectitude.Render.ImageRenderComponent
@@ -118,6 +119,8 @@ Game (Width = 800,  Height = 600, FirstScene = "main", IsFullScreen = false, Nam
         Component TextRender(FontFamily = "Arial", FontWeight = "Normal", 
             FontStyle = "Normal", FontStretch = "Normal", FontSize = 36, FontColor = "Black")
     }
+
+    Service RenderService(Width = 1000, Height = 800)
     
     Scene main(){
         Entity hello : text(){
