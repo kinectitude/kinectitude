@@ -68,7 +68,7 @@ namespace Kinectitude.Editor.Views.Controls.Designer
         private enum Mode
         {
             Selecting,
-            Transforming,
+            Translating,
             ScalingRotating
         }
 
@@ -233,10 +233,10 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             {
                 if (mode == Mode.Selecting && selected.Count > 0)
                 {
-                    mode = Mode.Transforming;
+                    mode = Mode.Translating;
                 }
 
-                if (mode == Mode.Transforming)
+                if (mode == Mode.Translating)
                 {
                     TranslateSelection(delta);
                 }
@@ -316,14 +316,14 @@ namespace Kinectitude.Editor.Views.Controls.Designer
                 if (null != item)
                 {
                     Select(item);
-                    mode = Mode.Transforming;
+                    mode = Mode.Translating;
                 }
                 else
                 {
                     ShowElasticBand();
                 }
             }
-            else if (mode == Mode.Transforming)
+            else if (mode == Mode.Translating)
             {
                 var item = FindDesignerItemAt(currentPoint);
                 if (null != item && item.IsSelected)
@@ -383,7 +383,7 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             {
                 elasticBand.Update(e.GetPosition(this));
             }
-            else if (mode == Mode.Transforming)
+            else if (mode == Mode.Translating)
             {
                 var currentPoint = e.GetPosition(this);
                 var delta = currentPoint - previousPoint;
@@ -398,9 +398,17 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             {
                 HideElasticBand();
             }
-            else if (mode == Mode.Transforming)
+            else if (mode == Mode.Translating)
             {
-
+                foreach (var item in Items)
+                {
+                    var designerItem = (DesignerItem)ItemContainerGenerator.ContainerFromItem(item);
+                    designerItem.GetBindingExpression(DesignerItem.DesignLeftProperty).UpdateSource();
+                    designerItem.GetBindingExpression(DesignerItem.DesignTopProperty).UpdateSource();
+                    designerItem.GetBindingExpression(DesignerItem.DesignWidthProperty).UpdateSource();
+                    designerItem.GetBindingExpression(DesignerItem.DesignHeightProperty).UpdateSource();
+                    designerItem.GetBindingExpression(DesignerItem.DesignRotationProperty).UpdateSource();
+                }
             }
         }
 
@@ -432,7 +440,7 @@ namespace Kinectitude.Editor.Views.Controls.Designer
                     PointCommand.Execute(currentPoint);
                 }
             }
-            else if (mode == Mode.Transforming)
+            else if (mode == Mode.Translating)
             {
                 DesignerItem item = FindDesignerItemAt(currentPoint);
                 if (null != item)

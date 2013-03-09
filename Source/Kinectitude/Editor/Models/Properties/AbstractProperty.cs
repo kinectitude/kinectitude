@@ -19,6 +19,11 @@ namespace Kinectitude.Editor.Models.Properties
             get { return PluginProperty.Name; }
         }
 
+        public string DisplayName
+        {
+            get { return PluginProperty.DisplayName; }
+        }
+
         public string FileFilter
         {
             get { return PluginProperty.FileFilter; }

@@ -5,10 +5,12 @@ using System.Windows.Input;
 using System.Linq;
 using System.IO;
 using Kinectitude.Editor.Storage;
+using Kinectitude.Editor.Models.Interfaces;
+using Kinectitude.Editor.Models.Notifications;
 
 namespace Kinectitude.Editor.Models
 {
-    internal sealed class Project : BaseModel
+    internal sealed class Project : GameModel<IScope>
     {
         private string location;
         private string file;
@@ -94,6 +96,7 @@ namespace Kinectitude.Editor.Models
                 if (game != value)
                 {
                     game = value;
+                    game.Scope = this;
                     NotifyPropertyChanged("Game");
                 }
             }
@@ -199,28 +202,71 @@ namespace Kinectitude.Editor.Models
             InspectItemCommand = new DelegateCommand(null, (parameter) => InspectorItem = parameter as BaseModel);
 
             CloseItemCommand = new DelegateCommand(null, (parameter) => CloseItem(parameter as BaseModel));
+
+            AddHandler<AssetUsed>(OnAssetUsed);
+        }
+
+        public override void Accept(IGameVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        private void OnAssetUsed(AssetUsed e)
+        {
+            var file = Path.GetFileName(e.PathName);
+            if (!HasAssetWithFileName(file))
+            {
+                var assetsDirectory = new DirectoryInfo(Path.Combine(Location, GameRoot, "Assets"));
+                if (!assetsDirectory.Exists)
+                {
+                    assetsDirectory.Create();
+                }
+
+                string destFile = Path.Combine(Location, GameRoot, "Assets", file);
+                File.Copy(e.PathName, destFile, true);
+
+                AddAsset(new Asset(file));
+            }
         }
 
         public void AddAsset(Asset asset)
         {
             Assets.Add(asset);
 
-            Workspace.Instance.CommandHistory.Log(
-                "add asset '" + asset.File + "'",
-                () => AddAsset(asset),
-                () => RemoveAsset(asset)
-            );
+            // Disabling undo since it would mean deleting/undeleting files
+
+            //Workspace.Instance.CommandHistory.Log(
+            //    "add asset '" + asset.File + "'",
+            //    () => AddAsset(asset),
+            //    () => RemoveAsset(asset)
+            //);
         }
 
         public void RemoveAsset(Asset asset)
         {
-            Assets.Remove(asset);
+            if (Assets.Contains(asset))
+            {
+                Assets.Remove(asset);
 
-            Workspace.Instance.CommandHistory.Log(
-                "remove asset '" + asset.File + "'",
-                () => RemoveAsset(asset),
-                () => AddAsset(asset)
-            );
+                var file = new FileInfo(Path.Combine(Location, GameRoot, "Assets", asset.File));
+                if (file.Exists)
+                {
+                    file.Delete();
+                }
+
+                // Disabling undo since it would mean deleting/undeleting files
+
+                //Workspace.Instance.CommandHistory.Log(
+                //    "remove asset '" + asset.File + "'",
+                //    () => RemoveAsset(asset),
+                //    () => AddAsset(asset)
+                //);
+            }
+        }
+
+        public bool HasAssetWithFileName(string fileName)
+        {
+            return Assets.Any(x => x.File == fileName);
         }
 
         public void OpenItem(BaseModel item)

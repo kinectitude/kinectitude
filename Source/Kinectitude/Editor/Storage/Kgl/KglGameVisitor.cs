@@ -176,6 +176,11 @@ namespace Kinectitude.Editor.Storage.Kgl
                 .Append(visitMembers<Scene>(game.Scenes, "", allValid)).Append(closeDef()).ToString();
         }
 
+        public void Visit(Project project)
+        {
+            result = "";
+        }
+
         public void Visit(ReadOnlyAction action)
         {
             result = "";

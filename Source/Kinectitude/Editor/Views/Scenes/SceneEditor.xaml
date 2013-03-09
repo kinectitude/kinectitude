@@ -19,10 +19,10 @@
             <ContentControl Content="{Binding Visual}" Opacity="{Binding Opacity}">
                 <ContentControl.ContextMenu>
                     <ContextMenu DataContext="{Binding Entity}">
-                        <MenuItem Header="Rename..." Command="{Binding RenameCommand}" />
+                        <MenuItem Header="Rename..." Command="{Binding Entity.RenameCommand}" />
                         <MenuItem Header="Delete" Command="{Binding ElementName=self, Path=DataContext.RemoveEntityCommand, Mode=OneWay}" CommandParameter="{Binding}" />
                         <Separator />
-                        <MenuItem Header="Properties..." Command="{Binding PropertiesCommand}" />
+                        <MenuItem Header="Properties..." Command="{Binding Entity.PropertiesCommand}" />
                     </ContextMenu>
                 </ContentControl.ContextMenu>
             </ContentControl>
@@ -59,7 +59,7 @@
                        Source="{Binding Image}"
                        Width="{Binding Presenter.Width}"
                        Height="{Binding Presenter.Height}"
-                       Stretch="Fill"/>
+                       Stretch="{Binding Stretched, Mode=OneWay}" />
             </Grid>
         </DataTemplate>
 
@@ -70,8 +70,11 @@
                        FontStyle="{Binding FontStyle}"
                        FontStretch="{Binding FontStretch}"
                        FontSize="{Binding FontSize}"
-                       Foreground="{Binding FontColor}"
-                       TextAlignment="{Binding TextAlignment}" />
+                       Foreground="{Binding FontColor}">
+                <TextBlock.RenderTransform>
+                    <TranslateTransform X="{Binding OffsetX}" />
+                </TextBlock.RenderTransform>
+            </TextBlock>
         </DataTemplate>
         
     </UserControl.Resources>

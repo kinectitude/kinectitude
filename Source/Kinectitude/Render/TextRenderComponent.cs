@@ -142,36 +142,6 @@ namespace Kinectitude.Render
             }
         }
 
-        private float offsetX;
-        [PluginProperty("Horizontal Offset", "")]
-        public float OffsetX
-        {
-            get { return offsetX; }
-            set
-            {
-                if (value != offsetX)
-                {
-                    offsetX = value;
-                    Change("OffsetX");
-                }
-            }
-        }
-
-        private float offsetY;
-        [PluginProperty("Vertical Offset", "")]
-        public float OffsetY
-        {
-            get { return offsetY; }
-            set
-            {
-                if (value != offsetY)
-                {
-                    offsetY = value;
-                    Change("OffsetY");
-                }
-            }
-        }
-
         public TextRenderComponent()
         {
             layoutRectangle = new RectangleF();
@@ -179,8 +149,8 @@ namespace Kinectitude.Render
 
         protected override void OnRender(RenderTarget renderTarget)
         {
-            layoutRectangle.X = transformComponent.X + OffsetX;
-            layoutRectangle.Y = transformComponent.Y + OffsetY;
+            layoutRectangle.X = transformComponent.X;
+            layoutRectangle.Y = transformComponent.Y;
             layoutRectangle.Width = transformComponent.Width;
             layoutRectangle.Height = transformComponent.Height;
 

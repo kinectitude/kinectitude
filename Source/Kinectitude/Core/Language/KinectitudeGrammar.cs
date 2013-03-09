@@ -264,15 +264,11 @@ namespace Kinectitude.Core.Language
 
             BasicDefinition.Rule = openBrac + optionalProperties + closeBrac;
 
-            NonTerminal optionalEvt = new NonTerminal("optionalEvt", "optionalEvt");
-            optionalEvt.Rule = Evt | Empty;
-            Evt.Rule = "Event" + Identifier + BasicDefinition + openBrace + Actions + closeBrace + optionalEvt;
-
             NonTerminal optionalComponent = new NonTerminal("optionalComponent", "optionalComponent");
             optionalComponent.Rule = Component | Empty;
             Component.Rule = "Component" + Identifier + BasicDefinition + optionalComponent;
 
-            EntityDefinition.Rule = IsPrototype + BasicDefinition + openBrace + optionalComponent + optionalEvt + closeBrace;
+            
 
 
             NonTerminal optionalPrototype = new NonTerminal("optionalPrototype", "optionalPrototype");
@@ -310,6 +306,12 @@ namespace Kinectitude.Core.Language
             Actions.Rule = Condition + optionalActions | Action + optionalActions | Assignment + optionalActions | Loop + optionalActions;
             optionalActions.Rule = Actions | Empty;
 
+            NonTerminal optionalEvt = new NonTerminal("optionalEvt", "optionalEvt");
+            optionalEvt.Rule = Evt | Empty;
+            Evt.Rule = "Event" + Identifier + BasicDefinition + openBrace + optionalActions + closeBrace + optionalEvt;
+
+            EntityDefinition.Rule = IsPrototype + BasicDefinition + openBrace + optionalComponent + optionalEvt + closeBrace;
+
             NonTerminal optionalEntity = new NonTerminal("optionalEntity", "optionalEntity");
             optionalEntity.Rule = Entity | Empty;
 
@@ -319,7 +321,7 @@ namespace Kinectitude.Core.Language
 
             NonTerminal optionalScene = new NonTerminal("optionalScene", "optionalScene");
             optionalScene.Rule = Scene | Empty;
-            Scene.Rule = "Scene" + Identifier + BasicDefinition + openBrace + optionalManager + Entity + closeBrace + optionalScene;
+            Scene.Rule = "Scene" + Identifier + BasicDefinition + openBrace + optionalManager + optionalEntity + closeBrace + optionalScene;
 
             NonTerminal optionalDefinitions = new NonTerminal("optionalDefinitions", "optionalDefinitions");
             optionalDefinitions.Rule = Definitions | Empty;

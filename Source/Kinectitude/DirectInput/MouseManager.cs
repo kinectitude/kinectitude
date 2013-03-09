@@ -18,10 +18,10 @@ namespace Kinectitude.DirectInput
         private static Mouse mouse;
         private static DirectInputService service;
 
-        private readonly List<MouseClickEvent> mouseClickEvens = new List<MouseClickEvent>();
+        private readonly List<MouseClickEvent> mouseClickEvents = new List<MouseClickEvent>();
 
         private bool visibleCursor = true;
-        [PluginProperty("Show Cursor", "")]
+        [PluginProperty("Show Cursor", "", true)]
         public bool VisibleCursor
         {
             get { return visibleCursor; }
@@ -67,7 +67,7 @@ namespace Kinectitude.DirectInput
             for (int i = 0; i < 3 && i < buttonsPressed.Length; i++)
             {
                 if (!buttonsPressed[i]) continue;
-                foreach (MouseClickEvent clickEvent in mouseClickEvens.Where
+                foreach (MouseClickEvent clickEvent in mouseClickEvents.Where
                     (input => (int)input.Button == i || input.Button == Button.Other && i == input.ButtonNumber))
                 {
                     clickEvent.DoActions();
@@ -77,7 +77,7 @@ namespace Kinectitude.DirectInput
             for (int i = 3; i < buttonsPressed.Length; i++)
             {
                 if (!buttonsPressed[i]) continue;
-                foreach (MouseClickEvent clickEvent in mouseClickEvens.Where
+                foreach (MouseClickEvent clickEvent in mouseClickEvents.Where
                     (input => input.Button == Button.Other &&  i == input.ButtonNumber))
                 {
                     clickEvent.DoActions();
@@ -88,12 +88,12 @@ namespace Kinectitude.DirectInput
 
         public void RegisterMouseClick(MouseClickEvent evt)
         {
-            mouseClickEvens.Add(evt);
+            mouseClickEvents.Add(evt);
         }
 
         public void RemoveMouseClick(MouseClickEvent evt)
         {
-            mouseClickEvens.Remove(evt);
+            mouseClickEvents.Remove(evt);
         }
     }
 }

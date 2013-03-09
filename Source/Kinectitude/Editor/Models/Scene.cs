@@ -39,6 +39,7 @@ namespace Kinectitude.Editor.Models
         private string name;
         private int nextAttribute;
         private EntityPlacementMode placementMode;
+        private Attribute selectedAttribute;
         
         public string Name
         {
@@ -69,7 +70,7 @@ namespace Kinectitude.Editor.Models
                 if (null != manager)
                 {
                     var property = manager.GetProperty("Width");
-                    if (null != property)
+                    if (null != property && property.HasOwnValue)
                     {
                         return property.GetDoubleValue();
                     }
@@ -92,7 +93,7 @@ namespace Kinectitude.Editor.Models
                 if (null != manager)
                 {
                     var property = manager.GetProperty("Height");
-                    if (null != property)
+                    if (null != property && property.HasOwnValue)
                     {
                         return property.GetDoubleValue();
                     }
@@ -156,6 +157,19 @@ namespace Kinectitude.Editor.Models
             }
         }
 
+        public Attribute SelectedAttribute
+        {
+            get { return selectedAttribute; }
+            set
+            {
+                if (selectedAttribute != value)
+                {
+                    selectedAttribute = value;
+                    NotifyPropertyChanged("SelectedAttribute");
+                }
+            }
+        }
+
         public IEnumerable<Plugin> Plugins
         {
             get { return Entities.SelectMany(x => x.Plugins).Union(Managers.Select(x => x.Plugin)).Distinct(); }
@@ -208,14 +222,17 @@ namespace Kinectitude.Editor.Models
 
             RemoveAttributeCommand = new DelegateCommand(null, (parameter) =>
             {
-                Attribute attribute = parameter as Attribute;
-                RemoveAttribute(attribute);
+                if (null != selectedAttribute)
+                {
+                    var attribute = selectedAttribute;
+                    RemoveAttribute(attribute);
 
-                Workspace.Instance.CommandHistory.Log(
-                    "remove attribute '" + attribute.Name + "'",
-                    () => RemoveAttribute(attribute),
-                    () => AddAttribute(attribute)
-                );
+                    Workspace.Instance.CommandHistory.Log(
+                        "remove attribute '" + attribute.Name + "'",
+                        () => RemoveAttribute(attribute),
+                        () => AddAttribute(attribute)
+                    );
+                }
             });
 
             AddEntityCommand = new DelegateCommand(null, (parameter) =>

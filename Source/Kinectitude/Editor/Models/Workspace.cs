@@ -147,6 +147,7 @@ namespace Kinectitude.Editor.Models
                     scene.AddManager(manager);
 
                     game.AddScene(scene);
+                    game.FirstScene = scene;
 
                     Project project = new Project();
                     project.Game = game;

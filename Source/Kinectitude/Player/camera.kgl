@@ -7,7 +7,13 @@
     define ImageRenderComponent as Kinectitude.Render.ImageRenderComponent
 }
 
-Game (FirstScene = "game", IsFullScreen = false, Name = "Camera Tests")
+using Kinectitude.DirectInput.dll
+{
+    define KeyEvent as Kinectitude.DirectInput.KeyEvent
+    define MouseClickEvent as Kinectitude.DirectInput.MouseClickEvent
+}
+
+Game (FirstScene = "game", Name = "Camera Tests")
 {
     Prototype text()
     {
@@ -20,25 +26,40 @@ Game (FirstScene = "game", IsFullScreen = false, Name = "Camera Tests")
     {
         Manager RenderManager(CameraX = 50, CameraY = 50, Width = 1600, Height = 1200)
 
-        Entity : text()
+        Entity : text(count = 0)
         {
-            Component Transform(X = 10, Y = 10)
+            Component Transform(X = 10, Y = 10, Width = 32, Height = 32)
             Component TextRenderComponent(Value = "This is some fixed position text", TextAlignment = "Leading", FixedPosition = true)
+
+            Event MouseClickEvent(Button = "Left")
+            {
+                count += 1
+                TextRenderComponent.Value = count
+            }
         }
 
         Entity()
         {
             Component Transform(X = 800, Y = 600, Width = 32, Height = 32)
             Component RenderComponent(FillColor = "LimeGreen")
-
-            Event SceneStarts()
-            {
-                CreateTimer(Name = "Animator", Duration = 0.1, Trigger = "Animate", Recurring = true)
-            }
-
-            Event TriggerOccurs(Trigger = "Animate")
+            
+            Event KeyEvent(Button = "RightArrow", KeyState = "Down")
             {
                 scene.RenderManager.CameraX += 1
+            }
+
+            Event KeyEvent(Button = "LeftArrow", KeyState = "Down")
+            {
+                scene.RenderManager.CameraX -= 1
+            }
+
+            Event KeyEvent(Button = "UpArrow", KeyState = "Down")
+            {
+                scene.RenderManager.CameraY -= 1
+            }
+
+            Event KeyEvent(Button = "DownArrow", KeyState = "Down")
+            {
                 scene.RenderManager.CameraY += 1
             }
         }

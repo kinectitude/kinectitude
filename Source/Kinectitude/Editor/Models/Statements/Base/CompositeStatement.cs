@@ -130,7 +130,17 @@ namespace Kinectitude.Editor.Models.Statements.Base
 
         private bool IsAllowed(AbstractStatement statement)
         {
-            return AllowableStatements.Any(x => x.IsAssignableFrom(statement.GetType()));
+            var type = statement.GetType();
+
+            foreach (var allowable in AllowableStatements)
+            {
+                if (allowable.IsAssignableFrom(type))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void PrivateRemoveStatement(AbstractStatement statement)
@@ -160,8 +170,6 @@ namespace Kinectitude.Editor.Models.Statements.Base
                     UnfollowStatement(sourceStatement);
                 }
             }
-
-            // TODO: Handle rearrange/move
         }
 
         private AbstractStatement FindReadOnly(AbstractStatement sourceStatement)
@@ -175,7 +183,7 @@ namespace Kinectitude.Editor.Models.Statements.Base
             if (null == readonlyStatement)
             {
                 readonlyStatement = sourceStatement.CreateReadOnly();
-                AddStatement(readonlyStatement);
+                PrivateAddStatement(sourceStatement.Index, readonlyStatement);
             }
         }
 

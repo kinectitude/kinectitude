@@ -108,14 +108,11 @@ namespace Kinectitude.Editor.Models.Properties
                     if (result == true)
                     {
                         string fileName = System.IO.Path.GetFileName(pathName);
-                        string localProject = System.IO.Path.Combine(Workspace.Instance.Project.Location, Workspace.Instance.Project.GameRoot);
-                        string targetPath = @localProject;
-                        string destFile = System.IO.Path.Combine(targetPath, fileName);
 
-                        if (!System.IO.File.Exists(destFile))
+                        if (!Workspace.Instance.Project.HasAssetWithFileName(fileName))
                         {
-                            System.IO.File.Copy(pathName, destFile, true);
                             Value = new Value("\"" + fileName + "\"");
+                            Notify(new AssetUsed(pathName));
                         }
                         else
                         {

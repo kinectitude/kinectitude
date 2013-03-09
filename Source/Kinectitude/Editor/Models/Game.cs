@@ -26,6 +26,7 @@ namespace Kinectitude.Editor.Models
         private int nextAttribute;
         private int nextScene;
         private int nextPrototype;
+        private Attribute selectedAttribute;
 
         public string Name
         {
@@ -105,6 +106,19 @@ namespace Kinectitude.Editor.Models
             }
         }
 
+        public Attribute SelectedAttribute
+        {
+            get { return selectedAttribute; }
+            set
+            {
+                if (selectedAttribute != value)
+                {
+                    selectedAttribute = value;
+                    NotifyPropertyChanged("SelectedAttribute");
+                }
+            }
+        }
+
         public ObservableCollection<Using> Usings { get; private set; }
         public ObservableCollection<Service> Services { get; private set; }
         public ObservableCollection<Entity> Prototypes { get; private set; }
@@ -175,8 +189,17 @@ namespace Kinectitude.Editor.Models
 
             RemoveAttributeCommand = new DelegateCommand(null, (parameter) =>
             {
-                Attribute attribute = parameter as Attribute;
-                RemoveAttribute(attribute);
+                if (null != selectedAttribute)
+                {
+                    var attribute = selectedAttribute;
+                    RemoveAttribute(attribute);
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "remove attribute '" + attribute.Name + "'",
+                        () => RemoveAttribute(attribute),
+                        () => AddAttribute(attribute)
+                    );
+                }
             });
 
             RemoveItemCommand = new DelegateCommand(null, (parameter) =>

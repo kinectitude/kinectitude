@@ -12,14 +12,14 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
         private Component transform;
         private Component render;
         
-        [DependsOn("TransformComponent")]
+        [DependsOn("TransformComponent"), DependsOn("Width")]
         public double X
         {
             get { return GetDoubleValue<TransformComponent>("X") - Width / 2.0d; }
             set { SetValue<TransformComponent, double>("X", value + Width / 2.0d); }
         }
 
-        [DependsOn("TransformComponent")]
+        [DependsOn("TransformComponent"), DependsOn("Height")]
         public double Y
         {
             get { return GetDoubleValue<TransformComponent>("Y") - Height / 2.0d; }

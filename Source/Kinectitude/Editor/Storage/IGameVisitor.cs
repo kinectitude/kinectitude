@@ -25,6 +25,7 @@ namespace Kinectitude.Editor.Storage
         void Visit(ExpressionCondition condition);
         void Visit(ForLoop loop);
         void Visit(Game game);
+        void Visit(Project project);
         void Visit(ReadOnlyAction action);
         void Visit(ReadOnlyAssignment assignment);
         void Visit(ReadOnlyBasicCondition condition);

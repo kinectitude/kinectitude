@@ -29,6 +29,7 @@ namespace Kinectitude.Editor.Models
         private string name;
         private bool prototype;
         private int nextAttribute;
+        private Attribute selectedAttribute;
         
         public string Name
         {
@@ -64,7 +65,7 @@ namespace Kinectitude.Editor.Models
             }
         }
 
-        [DependsOn("Name"), DependsOn("Prototypes")]
+        [DependsOn("Name")]
         public string DisplayName
         {
             get
@@ -80,6 +81,19 @@ namespace Kinectitude.Editor.Models
                 }
 
                 return "<Unnamed Entity>";
+            }
+        }
+
+        public Attribute SelectedAttribute
+        {
+            get { return selectedAttribute; }
+            set
+            {
+                if (selectedAttribute != value)
+                {
+                    selectedAttribute = value;
+                    NotifyPropertyChanged("SelectedAttribute");
+                }
             }
         }
 
@@ -131,14 +145,17 @@ namespace Kinectitude.Editor.Models
 
             RemoveAttributeCommand = new DelegateCommand(null, (parameter) =>
             {
-                Attribute attribute = parameter as Attribute;
-                RemoveAttribute(attribute);
+                if (null != selectedAttribute)
+                {
+                    var attribute = selectedAttribute;
+                    RemoveAttribute(attribute);
 
-                Workspace.Instance.CommandHistory.Log(
-                    "remove attribute '" + attribute.Name + "'",
-                    () => RemoveAttribute(attribute),
-                    () => AddAttribute(attribute)
-                );
+                    Workspace.Instance.CommandHistory.Log(
+                        "remove attribute '" + attribute.Name + "'",
+                        () => RemoveAttribute(attribute),
+                        () => AddAttribute(attribute)
+                    );
+                }
             });
 
             AddEventCommand = new DelegateCommand(null, (parameter) =>
@@ -223,6 +240,8 @@ namespace Kinectitude.Editor.Models
                 {
                     InheritEvent(inheritedEvent);
                 }
+
+                NotifyPropertyChanged("DisplayName");
             }
         }
 
@@ -247,6 +266,8 @@ namespace Kinectitude.Editor.Models
             {
                 DisinheritEvent(inheritedEvent);
             }
+
+            NotifyPropertyChanged("DisplayName");
         }
 
         public void ClearPrototypes()

@@ -27,6 +27,11 @@ namespace Kinectitude.Editor.Models.Statements.Base
             get { return !IsReadOnly; }
         }
 
+        public int Index
+        {
+            get { return null != Scope ? Scope.IndexOf(this) : -1; }
+        }
+
         public ICommand InsertBeforeCommand { get; private set; }
 
         public AbstractStatement(AbstractStatement inheritedStatement = null)

@@ -62,6 +62,11 @@
             <StackPanel.Resources>
                 <Style BasedOn="{StaticResource {x:Type Button}}" TargetType="Button">
                     <Setter Property="Background" Value="Transparent" />
+                    <Style.Triggers>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                        </Trigger>
+                    </Style.Triggers>
                 </Style>
                 <Style TargetType="Image">
                     <Style.Triggers>
@@ -182,7 +187,7 @@
                                         <MultiBinding Converter="{StaticResource FolderConverter}" ConverterParameter="Prototypes, Scenes, Assets">
                                             <Binding Path="Prototypes" />
                                             <Binding Path="Scenes" />
-                                            <Binding Path="Assets" />
+                                            <Binding Path="Project.Assets" Source="{x:Static m:Workspace.Instance}" />
                                         </MultiBinding>
                                     </HierarchicalDataTemplate.ItemsSource>
                                     <StackPanel Orientation="Horizontal">
@@ -241,6 +246,18 @@
                                         </StackPanel.ContextMenu>
                                     </StackPanel>
                                 </DataTemplate>
+                                
+                                <DataTemplate DataType="{x:Type m:Asset}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="{StaticResource icoAsset}" />
+                                        <TextBlock Text="{Binding File}" Padding="3" />
+                                        <StackPanel.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Delete" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.RemoveAssetCommand}" CommandParameter="{Binding}" />
+                                            </ContextMenu>
+                                        </StackPanel.ContextMenu>
+                                    </StackPanel>
+                                </DataTemplate>
 
                             </TreeView.Resources>
                             
@@ -275,10 +292,15 @@
                                     </Border>
                                 </Expander.Header>
                                 <Expander.Content>
-                                    <ItemsControl ItemsSource="{Binding Attributes}" HorizontalContentAlignment="Stretch">
-                                        <ItemsControl.ItemTemplate>
+                                    <ListBox Name="lstAttributes"
+                                             ItemsSource="{Binding Attributes}"
+                                             SelectedItem="{Binding SelectedAttribute}"
+                                             HorizontalContentAlignment="Stretch"
+                                             BorderThickness="0"
+                                             Padding="0">
+                                        <ListBox.ItemTemplate>
                                             <DataTemplate>
-                                                <Border Padding="0,0,0,2">
+                                                <Border Padding="0,0,0,2" Margin="16,0,0,0">
                                                     <Grid HorizontalAlignment="Stretch">
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="0.5*" />
@@ -289,8 +311,8 @@
                                                     </Grid>
                                                 </Border>
                                             </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
+                                            </ListBox.ItemTemplate>
+                                    </ListBox>
                                 </Expander.Content>
                             </Expander>
                             <CollectionContainer Collection="{Binding DataContext.Components, Source={x:Reference dockDetails}}" />
@@ -314,7 +336,7 @@
                                                             <ColumnDefinition Width="0.5*" />
                                                             <ColumnDefinition Width="*" />
                                                         </Grid.ColumnDefinitions>
-                                                        <TextBlock Text="{Binding Name}" Grid.Column="0" />
+                                                        <TextBlock Text="{Binding DisplayName}" Grid.Column="0" />
                                                         <Properties:PropertyView DataContext="{Binding}" Grid.Column="1" />
                                                     </Grid>
                                                 </Border>
@@ -341,7 +363,7 @@
                                                             <ColumnDefinition Width="0.5*" />
                                                             <ColumnDefinition Width="*" />
                                                         </Grid.ColumnDefinitions>
-                                                        <TextBlock Text="{Binding Name}" Grid.Column="0" />
+                                                        <TextBlock Text="{Binding DisplayName}" Grid.Column="0" />
                                                         <Properties:PropertyView DataContext="{Binding}" Grid.Column="1" />
                                                     </Grid>
                                                 </Border>
@@ -368,7 +390,7 @@
                                                             <ColumnDefinition Width="0.5*" />
                                                             <ColumnDefinition Width="*" />
                                                         </Grid.ColumnDefinitions>
-                                                        <TextBlock Text="{Binding Name}" Grid.Column="0" />
+                                                        <TextBlock Text="{Binding DisplayName}" Grid.Column="0" />
                                                         <Properties:PropertyView DataContext="{Binding}" Grid.Column="1" />
                                                     </Grid>
                                                 </Border>
@@ -383,7 +405,7 @@
 
                     <Border DockPanel.Dock="Bottom" Padding="0,4,4,0">
                         <StackPanel Orientation="Horizontal">
-                            <Button ToolTip="Delete" Margin="0,0,4,0">
+                            <Button ToolTip="Delete" Margin="0,0,4,0" Command="{Binding RemoveAttributeCommand}">
                                 <Image Source="{StaticResource icoDelete}" Stretch="None" />
                             </Button>
                             <Button ToolTip="Add Attribute" Margin="0,0,4,0" Command="{Binding AddAttributeCommand, Mode=OneWay}">

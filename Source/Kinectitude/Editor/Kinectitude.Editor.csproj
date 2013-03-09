@@ -109,6 +109,7 @@
     <Compile Include="Models\Data\ValueReaders\ManagerValueReader.cs" />
     <Compile Include="Models\Data\ValueReaders\ServiceValueReader.cs" />
     <Compile Include="Models\Data\ValueReaders\ThisComponentValueReader.cs" />
+    <Compile Include="Models\Notifications\AssetUsed.cs" />
     <Compile Include="Models\Notifications\EffectiveValueChanged.cs" />
     <Compile Include="Views\Utils\PlacementModeConverter.cs" />
     <Compile Include="Views\Utils\IDialogService.cs" />
@@ -424,6 +425,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\page_white_error.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\default_image.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
