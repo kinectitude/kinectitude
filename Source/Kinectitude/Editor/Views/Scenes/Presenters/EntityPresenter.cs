@@ -26,6 +26,24 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
         }
     }
 
+    internal sealed class Location
+    {
+        public EntityPresenter Presenter { get; private set; }
+        public double StartX { get; private set; }
+        public double StartY { get; private set; }
+        public double ObservedWidth { get; private set; }
+        public double ObservedHeight { get; private set; }
+
+        public Location(EntityPresenter presenter, double startX, double startY, double observedWidth, double observedHeight)
+        {
+            Presenter = presenter;
+            StartX = startX;
+            StartY = startY;
+            ObservedWidth = observedWidth;
+            ObservedHeight = observedHeight;
+        }
+    }
+
     internal sealed class EntityPresenter : EntityBase
     {
         private EntityVisual visual;
@@ -35,6 +53,8 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
         private double startY;
         private double displayX;
         private double displayY;
+        private double observedWidth;
+        private double observedHeight;
 
         public double StartX
         {
@@ -116,6 +136,32 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
         {
             get { return GetDoubleValue<TransformComponent>("Height"); }
             set { SetValue<TransformComponent, double>("Height", value); }
+        }
+
+        public double ObservedWidth
+        {
+            get { return observedWidth; }
+            set
+            {
+                if (observedWidth != value)
+                {
+                    observedWidth = value;
+                    NotifyPropertyChanged("ObservedWidth");
+                }
+            }
+        }
+
+        public double ObservedHeight
+        {
+            get { return observedHeight; }
+            set
+            {
+                if (observedHeight != value)
+                {
+                    observedHeight = value;
+                    NotifyPropertyChanged("ObservedHeight");
+                }
+            }
         }
 
         [DependsOn("TransformComponent")]
@@ -282,6 +328,11 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
         public Translation GetTranslation()
         {
             return new Translation(this, StartX, StartY, DisplayX, DisplayY);
+        }
+
+        public Location GetLocation()
+        {
+            return new Location(this, DisplayX, DisplayY, ObservedWidth, ObservedHeight);
         }
     }
 }

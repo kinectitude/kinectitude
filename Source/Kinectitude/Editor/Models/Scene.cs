@@ -205,6 +205,13 @@ namespace Kinectitude.Editor.Models
         public ICommand BeginTranslateCommand { get; private set; }
         public ICommand CommitTranslateCommand { get; private set; }
 
+        public ICommand CommitAlignLeftCommand { get; private set; }
+        public ICommand CommitAlignCenterCommand { get; private set; }
+        public ICommand CommitAlignRightCommand { get; private set; }
+        public ICommand CommitAlignTopCommand { get; private set; }
+        public ICommand CommitAlignMiddleCommand { get; private set; }
+        public ICommand CommitAlignBottomCommand { get; private set; }
+
         public Scene(string name)
         {
             this.name = name;
@@ -380,6 +387,226 @@ namespace Kinectitude.Editor.Models
                             {
                                 translation.Presenter.X = translation.StartX;
                                 translation.Presenter.Y = translation.StartY;
+                            }
+                        }
+                    );
+                }
+            });
+
+            CommitAlignLeftCommand = new DelegateCommand(null, p =>
+            {
+                var selected = (IEnumerable)p;
+                if (null != selected)
+                {
+                    var locations = selected.Cast<EntityPresenter>().Select(x => x.GetLocation()).ToArray();
+                    var minLeft = locations.Min(x => x.Presenter.DisplayX);
+
+                    Workspace.Instance.CommandHistory.WithoutLogging(() =>
+                    {
+                        foreach (var location in locations)
+                        {
+                            location.Presenter.X = minLeft;
+                        }
+                    });
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "align left",
+                        () =>
+                        {
+                            foreach (var location in locations)
+                            {
+                                location.Presenter.X = minLeft;
+                            }
+                        },
+                        () =>
+                        {
+                            foreach (var location in locations)
+                            {
+                                location.Presenter.X = location.StartX;
+                            }
+                        }
+                    );
+                }
+            });
+
+            CommitAlignCenterCommand = new DelegateCommand(null, p =>
+            {
+                var selected = (IEnumerable)p;
+                if (null != selected)
+                {
+                    var locations = selected.Cast<EntityPresenter>().Select(x => x.GetLocation()).ToArray();
+                    var maxRight = locations.Max(x => x.Presenter.DisplayX + x.Presenter.ObservedWidth);
+                    var minLeft = locations.Min(x => x.Presenter.DisplayX);
+                    var centerX = (maxRight + minLeft) / 2.0d;
+
+                    Workspace.Instance.CommandHistory.WithoutLogging(() =>
+                    {
+                        foreach (var location in locations)
+                        {
+                            location.Presenter.X = centerX - location.ObservedWidth / 2.0d;
+                        }
+                    });
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "align center",
+                        () =>
+                        {
+                            foreach (var location in locations)
+                            {
+                                location.Presenter.X = centerX - location.ObservedWidth / 2.0d;
+                            }
+                        },
+                        () =>
+                        {
+                            foreach (var location in locations)
+                            {
+                                location.Presenter.X = location.StartX;
+                            }
+                        }
+                    );
+                }
+            });
+
+            CommitAlignRightCommand = new DelegateCommand(null, p =>
+            {
+                var selected = (IEnumerable)p;
+                if (null != selected)
+                {
+                    var locations = selected.Cast<EntityPresenter>().Select(x => x.GetLocation()).ToArray();
+                    var maxRight = locations.Max(x => x.Presenter.DisplayX + x.Presenter.ObservedWidth);
+
+                    Workspace.Instance.CommandHistory.WithoutLogging(() =>
+                    {
+                        foreach (var location in locations)
+                        {
+                            location.Presenter.X = maxRight - location.ObservedWidth;
+                        }
+                    });
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "align right",
+                        () =>
+                        {
+                            foreach (var location in locations)
+                            {
+                                location.Presenter.X = maxRight - location.ObservedWidth;
+                            }
+                        },
+                        () =>
+                        {
+                            foreach (var location in locations)
+                            {
+                                location.Presenter.X = location.StartX;
+                            }
+                        }
+                    );
+                }
+            });
+
+            CommitAlignTopCommand = new DelegateCommand(null, p =>
+            {
+                var selected = (IEnumerable)p;
+                if (null != selected)
+                {
+                    var locations = selected.Cast<EntityPresenter>().Select(x => x.GetLocation()).ToArray();
+                    var minTop = locations.Min(x => x.Presenter.DisplayY);
+
+                    Workspace.Instance.CommandHistory.WithoutLogging(() =>
+                    {
+                        foreach (var location in locations)
+                        {
+                            location.Presenter.Y = minTop;
+                        }
+                    });
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "align top",
+                        () =>
+                        {
+                            foreach (var location in locations)
+                            {
+                                location.Presenter.Y = minTop;
+                            }
+                        },
+                        () =>
+                        {
+                            foreach (var location in locations)
+                            {
+                                location.Presenter.Y = location.StartY;
+                            }
+                        }
+                    );
+                }
+            });
+
+            CommitAlignMiddleCommand = new DelegateCommand(null, p =>
+            {
+                var selected = (IEnumerable)p;
+                if (null != selected)
+                {
+                    var locations = selected.Cast<EntityPresenter>().Select(x => x.GetLocation()).ToArray();
+                    var maxBottom = locations.Max(x => x.Presenter.DisplayY + x.Presenter.ObservedHeight);
+                    var minTop = locations.Min(x => x.Presenter.DisplayY);
+                    var middleY = (maxBottom + minTop) / 2.0d;
+
+                    Workspace.Instance.CommandHistory.WithoutLogging(() =>
+                    {
+                        foreach (var location in locations)
+                        {
+                            location.Presenter.Y = middleY - location.ObservedHeight / 2.0d;
+                        }
+                    });
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "align middle",
+                        () =>
+                        {
+                            foreach (var location in locations)
+                            {
+                                location.Presenter.Y = middleY - location.ObservedHeight / 2.0d;
+                            }
+                        },
+                        () =>
+                        {
+                            foreach (var location in locations)
+                            {
+                                location.Presenter.Y = location.StartY;
+                            }
+                        }
+                    );
+                }
+            });
+
+            CommitAlignBottomCommand = new DelegateCommand(null, p =>
+            {
+                var selected = (IEnumerable)p;
+                if (null != selected)
+                {
+                    var locations = selected.Cast<EntityPresenter>().Select(x => x.GetLocation()).ToArray();
+                    var maxBottom = locations.Max(x => x.Presenter.DisplayY + x.Presenter.ObservedHeight);
+
+                    Workspace.Instance.CommandHistory.WithoutLogging(() =>
+                    {
+                        foreach (var location in locations)
+                        {
+                            location.Presenter.Y = maxBottom - location.ObservedHeight;
+                        }
+                    });
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "align bottom",
+                        () =>
+                        {
+                            foreach (var location in locations)
+                            {
+                                location.Presenter.Y = maxBottom - location.ObservedHeight;
+                            }
+                        },
+                        () =>
+                        {
+                            foreach (var location in locations)
+                            {
+                                location.Presenter.Y = location.StartY;
                             }
                         }
                     );

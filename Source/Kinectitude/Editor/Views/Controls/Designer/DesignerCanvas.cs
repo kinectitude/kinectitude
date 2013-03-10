@@ -1,4 +1,5 @@
-﻿using Kinectitude.Editor.Models;
+﻿using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -58,6 +59,24 @@ namespace Kinectitude.Editor.Views.Controls.Designer
 
         public static DependencyProperty CommitTranslateCommandProperty =
             DependencyProperty.Register("CommitTranslateCommand", typeof(ICommand), typeof(DesignerCanvas));
+
+        public static DependencyProperty CommitAlignLeftCommandProperty =
+            DependencyProperty.Register("CommitAlignLeftCommand", typeof(ICommand), typeof(DesignerCanvas));
+
+        public static DependencyProperty CommitAlignCenterCommandProperty =
+            DependencyProperty.Register("CommitAlignCenterCommand", typeof(ICommand), typeof(DesignerCanvas));
+
+        public static DependencyProperty CommitAlignRightCommandProperty =
+            DependencyProperty.Register("CommitAlignRightCommand", typeof(ICommand), typeof(DesignerCanvas));
+
+        public static DependencyProperty CommitAlignTopCommandProperty =
+            DependencyProperty.Register("CommitAlignTopCommand", typeof(ICommand), typeof(DesignerCanvas));
+
+        public static DependencyProperty CommitAlignMiddleCommandProperty =
+            DependencyProperty.Register("CommitAlignMiddleCommand", typeof(ICommand), typeof(DesignerCanvas));
+
+        public static DependencyProperty CommitAlignBottomCommandProperty =
+            DependencyProperty.Register("CommitAlignBottomCommand", typeof(ICommand), typeof(DesignerCanvas));
 
         public static DependencyProperty CameraLeftProperty =
             DependencyProperty.Register("CameraLeft", typeof(double), typeof(DesignerCanvas));
@@ -157,6 +176,49 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             set { SetValue(CommitTranslateCommandProperty, value); }
         }
 
+        public ICommand AlignLeftCommand { get; private set; }
+        public ICommand AlignCenterCommand { get; private set; }
+        public ICommand AlignRightCommand { get; private set; }
+        public ICommand AlignTopCommand { get; private set; }
+        public ICommand AlignMiddleCommand { get; private set; }
+        public ICommand AlignBottomCommand { get; private set; }
+
+        public ICommand CommitAlignLeftCommand
+        {
+            get { return (ICommand)GetValue(CommitAlignLeftCommandProperty); }
+            set { SetValue(CommitAlignLeftCommandProperty, value); }
+        }
+
+        public ICommand CommitAlignCenterCommand
+        {
+            get { return (ICommand)GetValue(CommitAlignCenterCommandProperty); }
+            set { SetValue(CommitAlignCenterCommandProperty, value); }
+        }
+
+        public ICommand CommitAlignRightCommand
+        {
+            get { return (ICommand)GetValue(CommitAlignRightCommandProperty); }
+            set { SetValue(CommitAlignRightCommandProperty, value); }
+        }
+
+        public ICommand CommitAlignTopCommand
+        {
+            get { return (ICommand)GetValue(CommitAlignTopCommandProperty); }
+            set { SetValue(CommitAlignTopCommandProperty, value); }
+        }
+
+        public ICommand CommitAlignMiddleCommand
+        {
+            get { return (ICommand)GetValue(CommitAlignMiddleCommandProperty); }
+            set { SetValue(CommitAlignMiddleCommandProperty, value); }
+        }
+
+        public ICommand CommitAlignBottomCommand
+        {
+            get { return (ICommand)GetValue(CommitAlignBottomCommandProperty); }
+            set { SetValue(CommitAlignBottomCommandProperty, value); }
+        }
+
         public double CameraLeft
         {
             get { return (double)GetValue(CameraLeftProperty); }
@@ -185,6 +247,61 @@ namespace Kinectitude.Editor.Views.Controls.Designer
         {
             mode = Mode.Selecting;
             selected = new List<DesignerItem>();
+
+            AlignLeftCommand = new DelegateCommand(p => SelectedItems.Count() > 1, p => AlignLeft());
+            AlignCenterCommand = new DelegateCommand(p => SelectedItems.Count() > 1, p => AlignCenter());
+            AlignRightCommand = new DelegateCommand(p => SelectedItems.Count() > 1, p => AlignRight());
+            AlignTopCommand = new DelegateCommand(p => SelectedItems.Count() > 1, p => AlignTop());
+            AlignMiddleCommand = new DelegateCommand(p => SelectedItems.Count() > 1, p => AlignMiddle());
+            AlignBottomCommand = new DelegateCommand(p => SelectedItems.Count() > 1, p => AlignBottom());
+        }
+
+        private void AlignLeft()
+        {
+            if (null != CommitAlignLeftCommand)
+            {
+                CommitAlignLeftCommand.Execute(GetSelectedData());
+            }
+        }
+
+        private void AlignCenter()
+        {
+            if (null != CommitAlignCenterCommand)
+            {
+                CommitAlignCenterCommand.Execute(GetSelectedData());
+            }
+        }
+
+        private void AlignRight()
+        {
+            if (null != CommitAlignRightCommand)
+            {
+                CommitAlignRightCommand.Execute(GetSelectedData());
+            }
+        }
+
+        private void AlignTop()
+        {
+            if (null != CommitAlignTopCommand)
+            {
+                CommitAlignTopCommand.Execute(GetSelectedData());
+            }
+        }
+
+        private void AlignMiddle()
+        {
+            if (null != CommitAlignMiddleCommand)
+            {
+                CommitAlignMiddleCommand.Execute(GetSelectedData());
+            }
+        }
+
+        private void AlignBottom()
+        {
+            if (null != CommitAlignBottomCommand)
+            {
+                CommitAlignBottomCommand.Execute(GetSelectedData());
+            }
         }
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)

@@ -4,6 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:m="clr-namespace:Kinectitude.Editor.Models"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:b="clr-namespace:Kinectitude.Editor.Views.Behaviors"
              xmlns:Utils="clr-namespace:Kinectitude.Editor.Views.Utils"
              xmlns:Presenters="clr-namespace:Kinectitude.Editor.Views.Scenes.Presenters"
              xmlns:Designer="clr-namespace:Kinectitude.Editor.Views.Controls.Designer"
@@ -25,6 +27,10 @@
                         <MenuItem Header="Properties..." Command="{Binding Entity.PropertiesCommand}" />
                     </ContextMenu>
                 </ContentControl.ContextMenu>
+                <i:Interaction.Behaviors>
+                    <b:ObservableSizeBehavior ObservedWidth="{Binding ObservedWidth, Mode=OneWayToSource}"
+                                              ObservedHeight="{Binding ObservedHeight, Mode=OneWayToSource}" />
+                </i:Interaction.Behaviors>
             </ContentControl>
         </DataTemplate>
 
@@ -145,22 +151,22 @@
             <Button ToolTip="Send To Back" Margin="0,0,0,4">
                 <Image Source="{StaticResource icoSendToBack}" Stretch="None" />
             </Button>
-            <Button ToolTip="Align Left" Margin="0,4,0,4">
+            <Button ToolTip="Align Left" Margin="0,4,0,4" Command="{Binding ElementName=canvas, Path=AlignLeftCommand, Mode=OneWay}">
                 <Image Source="{StaticResource icoAlignLeft}" Stretch="None" />
             </Button>
-            <Button ToolTip="Align Center" Margin="0,0,0,4">
+            <Button ToolTip="Align Center" Margin="0,0,0,4" Command="{Binding ElementName=canvas, Path=AlignCenterCommand, Mode=OneWay}">
                 <Image Source="{StaticResource icoAlignCenter}" Stretch="None" />
             </Button>
-            <Button ToolTip="Align Right" Margin="0,0,0,4">
+            <Button ToolTip="Align Right" Margin="0,0,0,4" Command="{Binding ElementName=canvas, Path=AlignRightCommand, Mode=OneWay}">
                 <Image Source="{StaticResource icoAlignRight}" Stretch="None" />
             </Button>
-            <Button ToolTip="Align Top" Margin="0,0,0,4">
+            <Button ToolTip="Align Top" Margin="0,0,0,4" Command="{Binding ElementName=canvas, Path=AlignTopCommand, Mode=OneWay}">
                 <Image Source="{StaticResource icoAlignTop}" Stretch="None" />
             </Button>
-            <Button ToolTip="Align Middle" Margin="0,0,0,4">
+            <Button ToolTip="Align Middle" Margin="0,0,0,4" Command="{Binding ElementName=canvas, Path=AlignMiddleCommand, Mode=OneWay}">
                 <Image Source="{StaticResource icoAlignMiddle}" Stretch="None" />
             </Button>
-            <Button ToolTip="Align Bottom">
+            <Button ToolTip="Align Bottom" Command="{Binding ElementName=canvas, Path=AlignBottomCommand, Mode=OneWay}">
                 <Image Source="{StaticResource icoAlignBottom}" Stretch="None" />
             </Button>
         </StackPanel>
@@ -183,8 +189,13 @@
                                      PointCommand="{Binding AddEntityCommand, Mode=OneWay}"
                                      BeginTranslateCommand="{Binding BeginTranslateCommand, Mode=OneWay}"
                                      CommitTranslateCommand="{Binding CommitTranslateCommand, Mode=OneWay}"
+                                     CommitAlignLeftCommand="{Binding CommitAlignLeftCommand, Mode=OneWay}"
+                                     CommitAlignCenterCommand="{Binding CommitAlignCenterCommand, Mode=OneWay}"
+                                     CommitAlignRightCommand="{Binding CommitAlignRightCommand, Mode=OneWay}"
+                                     CommitAlignTopCommand="{Binding CommitAlignTopCommand, Mode=OneWay}"
+                                     CommitAlignMiddleCommand="{Binding CommitAlignMiddleCommand, Mode=OneWay}"
+                                     CommitAlignBottomCommand="{Binding CommitAlignBottomCommand, Mode=OneWay}"
                                      RequestBringIntoView="OnRequestBringIntoView" />
         </ScrollViewer>
-
     </DockPanel>    
 </UserControl>
