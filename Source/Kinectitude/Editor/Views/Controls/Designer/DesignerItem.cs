@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Kinectitude.Editor.Views.Controls.Designer
 {
@@ -23,6 +24,9 @@ namespace Kinectitude.Editor.Views.Controls.Designer
 
         public static DependencyProperty IsSelectedProperty =
             DependencyProperty.Register("IsSelected", typeof(bool), typeof(DesignerItem));
+
+        public static DependencyProperty DoubleClickCommandProperty =
+            DependencyProperty.Register("DoubleClickCommand", typeof(ICommand), typeof(DesignerItem));
 
         private static void OnDesignChange(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -68,9 +72,23 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             set { SetValue(IsSelectedProperty, value); }
         }
 
+        public ICommand DoubleClickCommand
+        {
+            get { return (ICommand)GetValue(DoubleClickCommandProperty); }
+            set { SetValue(DoubleClickCommandProperty, value); }
+        }
+
         public DesignerItem(DesignerCanvas canvas)
         {
             this.canvas = canvas;
+        }
+
+        protected override void OnPreviewMouseDoubleClick(MouseButtonEventArgs e)
+        {
+            if (null != DoubleClickCommand)
+            {
+                DoubleClickCommand.Execute(null);
+            }
         }
     }
 }

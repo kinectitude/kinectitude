@@ -53,6 +53,12 @@ namespace Kinectitude.Editor.Views.Controls.Designer
         public static DependencyProperty PointCommandProperty =
             DependencyProperty.Register("PointCommand", typeof(ICommand), typeof(DesignerCanvas));
 
+        public static DependencyProperty BeginTranslateCommandProperty =
+            DependencyProperty.Register("BeginTranslateCommand", typeof(ICommand), typeof(DesignerCanvas));
+
+        public static DependencyProperty CommitTranslateCommandProperty =
+            DependencyProperty.Register("CommitTranslateCommand", typeof(ICommand), typeof(DesignerCanvas));
+
         public static DependencyProperty CameraLeftProperty =
             DependencyProperty.Register("CameraLeft", typeof(double), typeof(DesignerCanvas));
 
@@ -137,6 +143,18 @@ namespace Kinectitude.Editor.Views.Controls.Designer
         {
             get { return (ICommand)GetValue(PointCommandProperty); }
             set { SetValue(PointCommandProperty, value); }
+        }
+
+        public ICommand BeginTranslateCommand
+        {
+            get { return (ICommand)GetValue(BeginTranslateCommandProperty); }
+            set { SetValue(BeginTranslateCommandProperty, value); }
+        }
+
+        public ICommand CommitTranslateCommand
+        {
+            get { return (ICommand)GetValue(CommitTranslateCommandProperty); }
+            set { SetValue(CommitTranslateCommandProperty, value); }
         }
 
         public double CameraLeft
@@ -317,6 +335,11 @@ namespace Kinectitude.Editor.Views.Controls.Designer
                 {
                     Select(item);
                     mode = Mode.Translating;
+
+                    if (null != BeginTranslateCommand)
+                    {
+                        BeginTranslateCommand.Execute(GetSelectedData());
+                    }
                 }
                 else
                 {
@@ -328,6 +351,11 @@ namespace Kinectitude.Editor.Views.Controls.Designer
                 var item = FindDesignerItemAt(currentPoint);
                 if (null != item && item.IsSelected)
                 {
+                    if (null != BeginTranslateCommand)
+                    {
+                        BeginTranslateCommand.Execute(GetSelectedData());
+                    }
+                    
                     var delta = currentPoint - previousPoint;
                     TranslateSelection(delta);
                 }
@@ -400,14 +428,9 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             }
             else if (mode == Mode.Translating)
             {
-                foreach (var item in Items)
+                if (null != CommitTranslateCommand)
                 {
-                    var designerItem = (DesignerItem)ItemContainerGenerator.ContainerFromItem(item);
-                    designerItem.GetBindingExpression(DesignerItem.DesignLeftProperty).UpdateSource();
-                    designerItem.GetBindingExpression(DesignerItem.DesignTopProperty).UpdateSource();
-                    designerItem.GetBindingExpression(DesignerItem.DesignWidthProperty).UpdateSource();
-                    designerItem.GetBindingExpression(DesignerItem.DesignHeightProperty).UpdateSource();
-                    designerItem.GetBindingExpression(DesignerItem.DesignRotationProperty).UpdateSource();
+                    CommitTranslateCommand.Execute(GetSelectedData());
                 }
             }
         }

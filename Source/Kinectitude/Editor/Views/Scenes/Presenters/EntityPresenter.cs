@@ -1,17 +1,95 @@
 ﻿using Kinectitude.Core.Components;
+using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models;
 using Kinectitude.Editor.Models.Values;
 using Kinectitude.Render;
 using System.Collections.Specialized;
+using System.Windows.Input;
 
 namespace Kinectitude.Editor.Views.Scenes.Presenters
 {
-    internal class EntityPresenter : EntityBase
+    internal sealed class Translation
+    {
+        public EntityPresenter Presenter { get; private set; }
+        public double StartX { get; private set; }
+        public double StartY { get; private set; }
+        public double EndX { get; private set; }
+        public double EndY { get; private set; }
+
+        public Translation(EntityPresenter presenter, double startX, double startY, double endX, double endY)
+        {
+            Presenter = presenter;
+            StartX = startX;
+            StartY = startY;
+            EndX = endX;
+            EndY = endY;
+        }
+    }
+
+    internal sealed class EntityPresenter : EntityBase
     {
         private EntityVisual visual;
         private Component transform;
         private Component render;
-        
+        private double startX;
+        private double startY;
+        private double displayX;
+        private double displayY;
+
+        public double StartX
+        {
+            get { return startX; }
+            set
+            {
+                if (startX != value)
+                {
+                    startX = value;
+                    NotifyPropertyChanged("StartX");
+                }
+            }
+        }
+
+        public double StartY
+        {
+            get { return startY; }
+            set
+            {
+                if (startY != value)
+                {
+                    startY = value;
+                    NotifyPropertyChanged("StartY");
+                }
+            }
+        }
+
+        [DependsOn("TransformComponent")]
+        public double DisplayX
+        {
+            get { return displayX; }
+            set
+            {
+                if (displayX != value)
+                {
+                    displayX = value;
+                    NotifyPropertyChanged("DisplayX");
+                }
+            }
+        }
+
+        [DependsOn("TransformComponent")]
+        public double DisplayY
+        {
+            get { return displayY; }
+            set
+            {
+                if (displayY != value)
+                {
+                    displayY = value;
+                    NotifyPropertyChanged("DisplayY");
+                }
+            }
+        }
+
         [DependsOn("TransformComponent"), DependsOn("Width")]
         public double X
         {
@@ -146,15 +224,33 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
             }
         }
 
+        public ICommand OpenEntityCommand { get; private set; }
+
         public EntityPresenter(Entity entity) : base(entity)
         {
             Entity.Components.CollectionChanged += OnComponentsChanged;
 
+            DisplayX = X;
+            DisplayY = Y;
+
             UpdateComponents();
+
+            OpenEntityCommand = new DelegateCommand(null, p => Workspace.Instance.Project.OpenItem(Entity));
         }
 
         private void OnPropertyChanged(Component component, PluginProperty property)
         {
+            if (component.Plugin.CoreType == typeof(TransformComponent))
+            {
+                if (property.Name == "X" || property.Name == "Width")
+                {
+                    DisplayX = X;
+                }
+                else if (property.Name == "Y" || property.Name == "Height")
+                {
+                    DisplayY = Y;
+                }
+            }
             NotifyPropertyChanged(property.Name);
         }
 
@@ -181,6 +277,11 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
             {
                 Visual = new DefaultEntityVisual(this, null, Entity);
             }
+        }
+
+        public Translation GetTranslation()
+        {
+            return new Translation(this, StartX, StartY, DisplayX, DisplayY);
         }
     }
 }

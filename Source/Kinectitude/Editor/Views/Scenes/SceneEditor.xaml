@@ -181,6 +181,8 @@
                                      CopyCommand="{Binding CopyCommand, Mode=OneWay}"
                                      DeleteCommand="{Binding DeleteCommand, Mode=OneWay}"
                                      PointCommand="{Binding AddEntityCommand, Mode=OneWay}"
+                                     BeginTranslateCommand="{Binding BeginTranslateCommand, Mode=OneWay}"
+                                     CommitTranslateCommand="{Binding CommitTranslateCommand, Mode=OneWay}"
                                      RequestBringIntoView="OnRequestBringIntoView" />
         </ScrollViewer>
 

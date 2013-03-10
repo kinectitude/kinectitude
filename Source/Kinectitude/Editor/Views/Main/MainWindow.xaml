@@ -18,7 +18,7 @@
 
         <DataTemplate x:Key="TabItemTemplate">
             <DockPanel MinWidth="64">
-                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" />
                 <Button HorizontalAlignment="Right" Margin="8,4,0,2" Command="{Binding Source={x:Static m:Workspace.Instance}, Path=Project.CloseItemCommand}" CommandParameter="{Binding}">
                     <Button.Template>
                         <ControlTemplate>
@@ -288,7 +288,26 @@
                             <Expander IsExpanded="True">
                                 <Expander.Header>
                                     <Border Padding="8">
-                                        <TextBlock FontWeight="Bold">Attributes</TextBlock>
+                                        <TextBlock FontWeight="Bold">General</TextBlock>
+                                    </Border>
+                                </Expander.Header>
+                                <Expander.Content>
+                                    <Border Padding="0,0,0,2">
+                                        <Grid HorizontalAlignment="Stretch">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="0.5*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0">Name</TextBlock>
+                                            <TextBox Text="{Binding Name}" Grid.Column="1" />
+                                        </Grid>
+                                    </Border>
+                                </Expander.Content>
+                            </Expander>
+                            <Expander IsExpanded="True">
+                                <Expander.Header>
+                                    <Border Padding="8">
+                                        <TextBlock FontWeight="Bold">User Attributes</TextBlock>
                                     </Border>
                                 </Expander.Header>
                                 <Expander.Content>

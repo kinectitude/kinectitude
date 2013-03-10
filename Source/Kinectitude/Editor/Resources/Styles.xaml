@@ -39,11 +39,12 @@
     </Style>
 
     <Style x:Key="DesignerItemStyle" TargetType="{x:Type Designer:DesignerItem}">
-        <Setter Property="DesignLeft" Value="{Binding X, Mode=TwoWay, UpdateSourceTrigger=Explicit}" />
-        <Setter Property="DesignTop" Value="{Binding Y, Mode=TwoWay, UpdateSourceTrigger=Explicit}" />
-        <Setter Property="DesignWidth" Value="{Binding Width, Mode=TwoWay, UpdateSourceTrigger=Explicit}" />
-        <Setter Property="DesignHeight" Value="{Binding Height, Mode=TwoWay, UpdateSourceTrigger=Explicit}" />
-        <Setter Property="DesignRotation" Value="{Binding Rotation, Mode=TwoWay, UpdateSourceTrigger=Explicit}" />
+        <Setter Property="DesignLeft" Value="{Binding DisplayX, Mode=TwoWay}" />
+        <Setter Property="DesignTop" Value="{Binding DisplayY, Mode=TwoWay}" />
+        <Setter Property="DesignWidth" Value="{Binding Width, Mode=TwoWay}" />
+        <Setter Property="DesignHeight" Value="{Binding Height, Mode=TwoWay}" />
+        <Setter Property="DesignRotation" Value="{Binding Rotation, Mode=TwoWay}" />
+        <Setter Property="DoubleClickCommand" Value="{Binding OpenEntityCommand, Mode=OneWay}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Designer:DesignerItem}">

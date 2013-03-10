@@ -39,6 +39,10 @@ namespace Kinectitude.Editor.Models
                 if (name != value && !EntityNameExists(value))
                 {
                     string oldName = name;
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        value = null;
+                    }
 
                     Workspace.Instance.CommandHistory.Log(
                         "rename entity",

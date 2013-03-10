@@ -36,6 +36,10 @@ namespace Kinectitude.Editor.Models
                 if (name != value)
                 {
                     string oldName = name;
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        value = null;
+                    }
 
                     Workspace.Instance.CommandHistory.Log(
                         "rename game to '" + value + "'",
@@ -47,6 +51,12 @@ namespace Kinectitude.Editor.Models
                     NotifyPropertyChanged("Name");
                 }
             }
+        }
+
+        [DependsOn("Name")]
+        public string DisplayName
+        {
+            get { return Name; }
         }
 
         public double Width

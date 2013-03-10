@@ -49,6 +49,10 @@ namespace Kinectitude.Editor.Models
                 if (name != value)
                 {
                     string oldName = name;
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        value = null;
+                    }
 
                     Workspace.Instance.CommandHistory.Log(
                         "rename scene to '" + value + "'",
@@ -60,6 +64,12 @@ namespace Kinectitude.Editor.Models
                     NotifyPropertyChanged("Name");
                 }
             }
+        }
+
+        [DependsOn("Name")]
+        public string DisplayName
+        {
+            get { return Name; }
         }
 
         public double Width
@@ -192,6 +202,8 @@ namespace Kinectitude.Editor.Models
         public ICommand CopyCommand { get; private set; }
         public ICommand PasteCommand { get; private set; }
         public ICommand DeleteCommand { get; private set; }
+        public ICommand BeginTranslateCommand { get; private set; }
+        public ICommand CommitTranslateCommand { get; private set; }
 
         public Scene(string name)
         {
@@ -320,6 +332,57 @@ namespace Kinectitude.Editor.Models
                     {
                         RemoveEntity(entity);
                     }
+                }
+            });
+
+            BeginTranslateCommand = new DelegateCommand(null, p =>
+            {
+                var selected = (IEnumerable)p;
+                if (null != selected)
+                {
+                    var presenters = selected.Cast<EntityPresenter>();
+                    foreach (var presenter in presenters)
+                    {
+                        presenter.StartX = presenter.DisplayX;
+                        presenter.StartY = presenter.DisplayY;
+                    }
+                }
+            });
+
+            CommitTranslateCommand = new DelegateCommand(null, p =>
+            {
+                var selected = (IEnumerable)p;
+                if (null != selected)
+                {
+                    var translations = selected.Cast<EntityPresenter>().Select(x => x.GetTranslation()).ToArray();
+                    Workspace.Instance.CommandHistory.WithoutLogging(() =>
+                    {
+                        foreach (var translation in translations)
+                        {
+                            translation.Presenter.X = translation.EndX;
+                            translation.Presenter.Y = translation.EndY;
+                        }
+                    });
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "move entities",
+                        () =>
+                        {
+                            foreach (var translation in translations)
+                            {
+                                translation.Presenter.X = translation.EndX;
+                                translation.Presenter.Y = translation.EndY;
+                            }
+                        },
+                        () =>
+                        {
+                            foreach (var translation in translations)
+                            {
+                                translation.Presenter.X = translation.StartX;
+                                translation.Presenter.Y = translation.StartY;
+                            }
+                        }
+                    );
                 }
             });
 
