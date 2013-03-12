@@ -27,6 +27,8 @@ namespace Kinectitude.Editor.Models
         private int nextScene;
         private int nextPrototype;
         private Attribute selectedAttribute;
+        private Plugin serviceToAdd;
+        private Service selectedService;
 
         public string Name
         {
@@ -129,7 +131,34 @@ namespace Kinectitude.Editor.Models
             }
         }
 
+        public Plugin ServiceToAdd
+        {
+            get { return serviceToAdd; }
+            set
+            {
+                if (serviceToAdd != value)
+                {
+                    serviceToAdd = value;
+                    NotifyPropertyChanged("ServiceToAdd");
+                }
+            }
+        }
+
+        public Service SelectedService
+        {
+            get { return selectedService; }
+            set
+            {
+                if (selectedService != value)
+                {
+                    selectedService = value;
+                    NotifyPropertyChanged("SelectedService");
+                }
+            }
+        }
+
         public ObservableCollection<Using> Usings { get; private set; }
+        public ObservableCollection<Plugin> AvailableServices { get; private set; }
         public ObservableCollection<Service> Services { get; private set; }
         public ObservableCollection<Entity> Prototypes { get; private set; }
         public ObservableCollection<Scene> Scenes { get; private set; }
@@ -141,6 +170,8 @@ namespace Kinectitude.Editor.Models
         public ICommand RemoveAttributeCommand { get; private set; }
         public ICommand AddSceneCommand { get; private set; }
         public ICommand RemoveItemCommand { get; private set; }
+        public ICommand AddServiceCommand { get; private set; }
+        public ICommand RemoveServiceCommand { get; private set; }
 
         public Game(string name)
         {
@@ -151,6 +182,12 @@ namespace Kinectitude.Editor.Models
             Prototypes = new ObservableCollection<Entity>();
             Scenes = new ObservableCollection<Scene>();
             Attributes = new ObservableCollection<Attribute>();
+
+            AvailableServices = new ObservableCollection<Plugin>();
+            foreach (var plugin in Workspace.Instance.Services)
+            {
+                AvailableServices.Add(plugin);
+            }
 
             AddHandler<PluginUsed>(OnPluginUsed);
 
@@ -226,6 +263,36 @@ namespace Kinectitude.Editor.Models
                     {
                         RemoveScene(scene);
                     }
+                }
+            });
+
+            AddServiceCommand = new DelegateCommand(null, p =>
+            {
+                if (null != ServiceToAdd)
+                {
+                    var service = new Service(ServiceToAdd);
+                    AddService(service);
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "add service",
+                        () => AddService(service),
+                        () => RemoveService(service)
+                    );
+                }
+            });
+
+            RemoveServiceCommand = new DelegateCommand(null, p =>
+            {
+                if (null != SelectedService)
+                {
+                    var service = SelectedService;
+                    RemoveService(service);
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "remove service",
+                        () => RemoveService(service),
+                        () => AddService(service)
+                    );
                 }
             });
 
@@ -470,6 +537,11 @@ namespace Kinectitude.Editor.Models
             }
         }
 
+        public bool HasServiceWithType(Plugin type)
+        {
+            return Services.Any(x => x.Plugin == type);
+        }
+
         public Service GetServiceByType(Plugin type)
         {
             return Services.FirstOrDefault(x => x.Plugin == type);
@@ -487,16 +559,23 @@ namespace Kinectitude.Editor.Models
 
         public void AddService(Service service)
         {
-            service.Scope = this;
-            Services.Add(service);
-
-            Notify(new PluginUsed(service.Plugin));
+            if (!HasServiceWithType(service.Plugin))
+            {
+                service.Scope = this;
+                Services.Add(service);
+                AvailableServices.Remove(service.Plugin);
+                Notify(new PluginUsed(service.Plugin));
+            }
         }
 
         public void RemoveService(Service service)
         {
-            service.Scope = null;
-            Services.Remove(service);
+            if (HasServiceWithType(service.Plugin))
+            {
+                service.Scope = null;
+                Services.Remove(service);
+                AvailableServices.Add(service.Plugin);
+            }
         }
 
         #region IEntityScope implementation

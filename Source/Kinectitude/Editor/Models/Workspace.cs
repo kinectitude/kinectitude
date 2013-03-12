@@ -90,6 +90,7 @@ namespace Kinectitude.Editor.Models
         public EntityFactory BlankEntityFactory { get; private set; }
         
         public ObservableCollection<Plugin> Plugins { get; private set; }
+        public ObservableCollection<Plugin> Services { get; private set; }
         public ObservableCollection<Plugin> Managers { get; private set; }
         public ObservableCollection<Plugin> Components { get; private set; }
         public ObservableCollection<StatementFactory> Events { get; private set; }
@@ -105,9 +106,9 @@ namespace Kinectitude.Editor.Models
         {
             Plugins = new ObservableCollection<Plugin>();
 
-            Managers = new FilteredObservableCollection<Plugin>(Plugins, (plugin) => plugin.Type == PluginType.Manager);
-            //Events = new FilteredObservableCollection<Plugin>(Plugins, (plugin) => plugin.Type == PluginType.Event);
-            Components = new FilteredObservableCollection<Plugin>(Plugins, (plugin) => plugin.Type == PluginType.Component);
+            Services = new FilteredObservableCollection<Plugin>(Plugins, p => p.Type == PluginType.Service);
+            Managers = new FilteredObservableCollection<Plugin>(Plugins, p => p.Type == PluginType.Manager);
+            Components = new FilteredObservableCollection<Plugin>(Plugins, p => p.Type == PluginType.Component);
 
             Events = new ObservableCollection<StatementFactory>();
             Actions = new ObservableCollection<StatementFactory>();

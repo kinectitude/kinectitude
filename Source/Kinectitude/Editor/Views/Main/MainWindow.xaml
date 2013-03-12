@@ -60,14 +60,6 @@
 
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="4,4,0,4">
             <StackPanel.Resources>
-                <Style BasedOn="{StaticResource {x:Type Button}}" TargetType="Button">
-                    <Setter Property="Background" Value="Transparent" />
-                    <Style.Triggers>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
                 <Style TargetType="Image">
                     <Style.Triggers>
                         <Trigger Property="IsEnabled" Value="False">
