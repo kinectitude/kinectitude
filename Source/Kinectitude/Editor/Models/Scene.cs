@@ -40,6 +40,8 @@ namespace Kinectitude.Editor.Models
         private int nextAttribute;
         private EntityPlacementMode placementMode;
         private Attribute selectedAttribute;
+        private double cursorX;
+        private double cursorY;
         
         public string Name
         {
@@ -180,6 +182,32 @@ namespace Kinectitude.Editor.Models
             }
         }
 
+        public double CursorX
+        {
+            get { return cursorX; }
+            set
+            {
+                if (cursorX != value)
+                {
+                    cursorX = value;
+                    NotifyPropertyChanged("CursorX");
+                }
+            }
+        }
+
+        public double CursorY
+        {
+            get { return cursorY; }
+            set
+            {
+                if (cursorY != value)
+                {
+                    cursorY = value;
+                    NotifyPropertyChanged("CursorY");
+                }
+            }
+        }
+
         public IEnumerable<Plugin> Plugins
         {
             get { return Entities.SelectMany(x => x.Plugins).Union(Managers.Select(x => x.Plugin)).Distinct(); }
@@ -204,6 +232,7 @@ namespace Kinectitude.Editor.Models
         public ICommand DeleteCommand { get; private set; }
         public ICommand BeginTranslateCommand { get; private set; }
         public ICommand CommitTranslateCommand { get; private set; }
+        public ICommand CreateFromPrototypeCommand { get; private set; }
 
         public ICommand CommitSendForwardCommand { get; private set; }
         public ICommand CommitSendBackwardCommand { get; private set; }
@@ -393,6 +422,25 @@ namespace Kinectitude.Editor.Models
                             }
                         }
                     );
+                }
+            });
+
+            CreateFromPrototypeCommand = new DelegateCommand(null, p =>
+            {
+                var prototype = p as Entity;
+                if (null != prototype)
+                {
+                    var entity = new Entity();
+                    entity.AddPrototype(prototype);
+
+                    var transform = entity.GetComponentByType(typeof(TransformComponent));
+                    if (null != transform)
+                    {
+                        transform.SetProperty("X", new Value(CursorX, true));
+                        transform.SetProperty("Y", new Value(CursorY, true));
+                    }
+
+                    AddEntity(entity);
                 }
             });
 

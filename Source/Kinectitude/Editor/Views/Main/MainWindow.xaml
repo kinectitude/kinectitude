@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:m="clr-namespace:Kinectitude.Editor.Models"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:b="clr-namespace:Kinectitude.Editor.Views.Behaviors"
         xmlns:Main="clr-namespace:Kinectitude.Editor.Views.Main"
         xmlns:Utils="clr-namespace:Kinectitude.Editor.Views.Utils"
         xmlns:Games="clr-namespace:Kinectitude.Editor.Views.Games"
@@ -236,6 +237,9 @@
                                                 <MenuItem Header="Properties..." Command="{Binding PropertiesCommand}" />
                                             </ContextMenu>
                                         </StackPanel.ContextMenu>
+                                        <i:Interaction.Behaviors>
+                                            <b:DragBehavior DragParameter="{Binding}" />
+                                        </i:Interaction.Behaviors>
                                     </StackPanel>
                                 </DataTemplate>
                                 

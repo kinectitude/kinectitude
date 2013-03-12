@@ -199,7 +199,12 @@
                                      CommitAlignTopCommand="{Binding CommitAlignTopCommand, Mode=OneWay}"
                                      CommitAlignMiddleCommand="{Binding CommitAlignMiddleCommand, Mode=OneWay}"
                                      CommitAlignBottomCommand="{Binding CommitAlignBottomCommand, Mode=OneWay}"
-                                     RequestBringIntoView="OnRequestBringIntoView" />
+                                     RequestBringIntoView="OnRequestBringIntoView">
+                <i:Interaction.Behaviors>
+                    <b:TrackMouseBehavior MouseX="{Binding CursorX, Mode=OneWayToSource}" MouseY="{Binding CursorY, Mode=OneWayToSource}" />
+                    <b:DropTargetBehavior DropCommand="{Binding CreateFromPrototypeCommand}" />
+                </i:Interaction.Behaviors>
+            </Designer:DesignerCanvas>
         </ScrollViewer>
     </DockPanel>    
 </UserControl>
