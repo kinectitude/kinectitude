@@ -44,6 +44,18 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
         }
     }
 
+    internal sealed class Depth
+    {
+        public EntityPresenter Presenter { get; private set; }
+        public int StartIndex { get; private set; }
+
+        public Depth(EntityPresenter presenter, int startIndex)
+        {
+            Presenter = presenter;
+            StartIndex = startIndex;
+        }
+    }
+
     internal sealed class EntityPresenter : EntityBase
     {
         private EntityVisual visual;
@@ -55,6 +67,7 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
         private double displayY;
         private double observedWidth;
         private double observedHeight;
+        private bool selected;
 
         public double StartX
         {
@@ -160,6 +173,19 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
                 {
                     observedHeight = value;
                     NotifyPropertyChanged("ObservedHeight");
+                }
+            }
+        }
+
+        public bool IsSelected
+        {
+            get { return selected; }
+            set
+            {
+                if (selected != value)
+                {
+                    selected = value;
+                    NotifyPropertyChanged("IsSelected");
                 }
             }
         }
@@ -333,6 +359,11 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
         public Location GetLocation()
         {
             return new Location(this, DisplayX, DisplayY, ObservedWidth, ObservedHeight);
+        }
+
+        public Depth GetDepth()
+        {
+            return new Depth(this, Entity.Index);
         }
     }
 }

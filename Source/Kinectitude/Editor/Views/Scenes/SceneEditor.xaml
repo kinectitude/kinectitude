@@ -139,16 +139,16 @@
                          ToolTip="New Blank Entity">
                 <Image Source="{StaticResource icoBlankEntity}" Width="16" Height="16" />
             </RadioButton>
-            <Button ToolTip="Send Forward" Margin="0,4,0,4">
+            <Button ToolTip="Send Forward" Margin="0,4,0,4" Command="{Binding ElementName=canvas, Path=SendForwardCommand, Mode=OneWay}">
                 <Image Source="{StaticResource icoSendForward}" Stretch="None" />
             </Button>
-            <Button ToolTip="Send Backward" Margin="0,0,0,4">
+            <Button ToolTip="Send Backward" Margin="0,0,0,4" Command="{Binding ElementName=canvas, Path=SendBackwardCommand, Mode=OneWay}">
                 <Image Source="{StaticResource icoSendBackward}" Stretch="None" />
             </Button>
-            <Button ToolTip="Send To Front" Margin="0,0,0,4">
+            <Button ToolTip="Send To Front" Margin="0,0,0,4" Command="{Binding ElementName=canvas, Path=SendToFrontCommand, Mode=OneWay}">
                 <Image Source="{StaticResource icoSendToFront}" Stretch="None" />
             </Button>
-            <Button ToolTip="Send To Back" Margin="0,0,0,4">
+            <Button ToolTip="Send To Back" Margin="0,0,0,4" Command="{Binding ElementName=canvas, Path=SendToBackCommand, Mode=OneWay}">
                 <Image Source="{StaticResource icoSendToBack}" Stretch="None" />
             </Button>
             <Button ToolTip="Align Left" Margin="0,4,0,4" Command="{Binding ElementName=canvas, Path=AlignLeftCommand, Mode=OneWay}">
@@ -189,6 +189,10 @@
                                      PointCommand="{Binding AddEntityCommand, Mode=OneWay}"
                                      BeginTranslateCommand="{Binding BeginTranslateCommand, Mode=OneWay}"
                                      CommitTranslateCommand="{Binding CommitTranslateCommand, Mode=OneWay}"
+                                     CommitSendForwardCommand="{Binding CommitSendForwardCommand, Mode=OneWay}"
+                                     CommitSendBackwardCommand="{Binding CommitSendBackwardCommand, Mode=OneWay}"
+                                     CommitSendToFrontCommand="{Binding CommitSendToFrontCommand, Mode=OneWay}"
+                                     CommitSendToBackCommand="{Binding CommitSendToBackCommand, Mode=OneWay}"
                                      CommitAlignLeftCommand="{Binding CommitAlignLeftCommand, Mode=OneWay}"
                                      CommitAlignCenterCommand="{Binding CommitAlignCenterCommand, Mode=OneWay}"
                                      CommitAlignRightCommand="{Binding CommitAlignRightCommand, Mode=OneWay}"

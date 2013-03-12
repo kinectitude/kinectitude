@@ -8,5 +8,6 @@ namespace Kinectitude.Editor.Models.Interfaces
         IEnumerable<Entity> Prototypes { get; }
 
         void RemoveEntity(Entity entity);
+        int IndexOf(Entity entity);
     }
 }

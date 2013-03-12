@@ -205,6 +205,11 @@ namespace Kinectitude.Editor.Models
         public ICommand BeginTranslateCommand { get; private set; }
         public ICommand CommitTranslateCommand { get; private set; }
 
+        public ICommand CommitSendForwardCommand { get; private set; }
+        public ICommand CommitSendBackwardCommand { get; private set; }
+        public ICommand CommitSendToFrontCommand { get; private set; }
+        public ICommand CommitSendToBackCommand { get; private set; }
+
         public ICommand CommitAlignLeftCommand { get; private set; }
         public ICommand CommitAlignCenterCommand { get; private set; }
         public ICommand CommitAlignRightCommand { get; private set; }
@@ -219,9 +224,7 @@ namespace Kinectitude.Editor.Models
             Attributes = new ObservableCollection<Attribute>();
             Managers = new ObservableCollection<Manager>();
             Entities = new ObservableCollection<Entity>();
-            EntityPresenters = new ObservableCollection<EntityPresenter>();
-
-            Entities.CollectionChanged += OnEntitiesChanged;
+            EntityPresenters = new TransformedObservableCollection<Entity, EntityPresenter>(Entities, x => x.Presenter);
 
             RenameCommand = new DelegateCommand(null, (parameter) =>
             {
@@ -387,6 +390,194 @@ namespace Kinectitude.Editor.Models
                             {
                                 translation.Presenter.X = translation.StartX;
                                 translation.Presenter.Y = translation.StartY;
+                            }
+                        }
+                    );
+                }
+            });
+
+            CommitSendForwardCommand = new DelegateCommand(null, p =>
+            {
+                var selected = (IEnumerable)p;
+                if (null != selected)
+                {
+                    var depths = selected.Cast<EntityPresenter>().Select(x => x.GetDepth()).ToArray();
+                    var maxIndex = depths.Max(x => x.StartIndex);
+
+                    if (maxIndex < Entities.Count - 1)
+                    {
+                        Workspace.Instance.CommandHistory.WithoutLogging(() =>
+                        {
+                            foreach (var depth in depths)
+                            {
+                                RemoveEntity(depth.Presenter.Entity);
+                                PrivateAddEntity(depth.StartIndex + 1, depth.Presenter.Entity);
+                            }
+                        });
+                        
+                        Workspace.Instance.CommandHistory.Log(
+                            "send forward",
+                            () =>
+                            {
+                                foreach (var depth in depths)
+                                {
+                                    RemoveEntity(depth.Presenter.Entity);
+                                    PrivateAddEntity(depth.StartIndex + 1, depth.Presenter.Entity);
+                                }
+                            },
+                            () =>
+                            {
+                                foreach (var depth in depths.Reverse())
+                                {
+                                    RemoveEntity(depth.Presenter.Entity);
+                                    PrivateAddEntity(depth.StartIndex, depth.Presenter.Entity);
+                                }
+                            }
+                        );
+                    }
+                }
+            });
+
+            CommitSendBackwardCommand = new DelegateCommand(null, p =>
+            {
+                var selected = (IEnumerable)p;
+                if (null != selected)
+                {
+                    var depths = selected.Cast<EntityPresenter>().Select(x => x.GetDepth()).ToArray();
+                    var minIndex = depths.Min(x => x.StartIndex);
+
+                    if (minIndex > 0)
+                    {
+                        Workspace.Instance.CommandHistory.WithoutLogging(() =>
+                        {
+                            foreach (var depth in depths)
+                            {
+                                RemoveEntity(depth.Presenter.Entity);
+                                PrivateAddEntity(depth.StartIndex - 1, depth.Presenter.Entity);
+                            }
+                        });
+
+                        Workspace.Instance.CommandHistory.Log(
+                            "send backward",
+                            () =>
+                            {
+                                foreach (var depth in depths)
+                                {
+                                    RemoveEntity(depth.Presenter.Entity);
+                                    PrivateAddEntity(depth.StartIndex - 1, depth.Presenter.Entity);
+                                }
+                            },
+                            () =>
+                            {
+                                foreach (var depth in depths.Reverse())
+                                {
+                                    RemoveEntity(depth.Presenter.Entity);
+                                    PrivateAddEntity(depth.StartIndex, depth.Presenter.Entity);
+                                }
+                            }
+                        );
+                    }
+                }
+            });
+
+            CommitSendToFrontCommand = new DelegateCommand(null, p =>
+            {
+                var selected = (IEnumerable)p;
+                if (null != selected)
+                {
+                    var depths = selected.Cast<EntityPresenter>().Select(x => x.GetDepth()).ToArray().OrderBy(x => x.StartIndex);
+
+                    Workspace.Instance.CommandHistory.WithoutLogging(() =>
+                    {
+                        foreach (var depth in depths)
+                        {
+                            RemoveEntity(depth.Presenter.Entity);
+                        }
+
+                        foreach (var depth in depths)
+                        {
+                            PrivateAddEntity(Entities.Count, depth.Presenter.Entity);
+                        }
+                    });
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "send to front",
+                        () =>
+                        {
+                            foreach (var depth in depths)
+                            {
+                                RemoveEntity(depth.Presenter.Entity);
+                            }
+
+                            foreach (var depth in depths)
+                            {
+                                PrivateAddEntity(Entities.Count, depth.Presenter.Entity);
+                            }
+                        },
+                        () =>
+                        {
+                            foreach (var depth in depths)
+                            {
+                                RemoveEntity(depth.Presenter.Entity);
+                            }
+
+                            foreach (var depth in depths)
+                            {
+                                PrivateAddEntity(depth.StartIndex, depth.Presenter.Entity);
+                            }
+                        }
+                    );
+                }
+            });
+
+            CommitSendToBackCommand = new DelegateCommand(null, p =>
+            {
+                var selected = (IEnumerable)p;
+                if (null != selected)
+                {
+                    var depths = selected.Cast<EntityPresenter>().Select(x => x.GetDepth()).ToArray().OrderBy(x => x.StartIndex);
+
+                    Workspace.Instance.CommandHistory.WithoutLogging(() =>
+                    {
+                        foreach (var depth in depths)
+                        {
+                            RemoveEntity(depth.Presenter.Entity);
+                        }
+
+                        int i = 0;
+                        foreach (var depth in depths)
+                        {
+                            PrivateAddEntity(0, depth.Presenter.Entity);
+                            i += 1;
+                        }
+                    });
+
+                    Workspace.Instance.CommandHistory.Log(
+                        "send to back",
+                        () =>
+                        {
+                            foreach (var depth in depths)
+                            {
+                                RemoveEntity(depth.Presenter.Entity);
+                            }
+
+                            int i = 0;
+                            foreach (var depth in depths)
+                            {
+                                PrivateAddEntity(0, depth.Presenter.Entity);
+                                i += 1;
+                            }
+                        },
+                        () =>
+                        {
+                            foreach (var depth in depths)
+                            {
+                                RemoveEntity(depth.Presenter.Entity);
+                            }
+
+                            foreach (var depth in depths)
+                            {
+                                PrivateAddEntity(depth.StartIndex, depth.Presenter.Entity);
                             }
                         }
                     );
@@ -645,25 +836,6 @@ namespace Kinectitude.Editor.Models
             return entityFactory;
         }
 
-        private void OnEntitiesChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                foreach (Entity entity in e.NewItems)
-                {
-                    EntityPresenters.Add(new EntityPresenter(entity));
-                }
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Remove)
-            {
-                foreach (Entity entity in e.OldItems)
-                {
-                    var presenter = EntityPresenters.First(x => x.Entity == entity);
-                    EntityPresenters.Remove(presenter);
-                }
-            }
-        }
-
         public Attribute GetAttribute(string name)
         {
             return Attributes.FirstOrDefault(x => x.Name == name);
@@ -717,10 +889,15 @@ namespace Kinectitude.Editor.Models
 
         public void AddEntity(Entity entity)
         {
+            PrivateAddEntity(Entities.Count, entity);
+        }
+
+        public void PrivateAddEntity(int index, Entity entity)
+        {
             if (!EntityNameExists(entity.Name))
             {
                 entity.Scope = this;
-                Entities.Add(entity);
+                Entities.Insert(index, entity);
 
                 entity.Components.CollectionChanged += OnEntityComponentChanged;
                 foreach (Component component in entity.Components)
@@ -829,6 +1006,11 @@ namespace Kinectitude.Editor.Models
         void IEntityScope.RemoveEntity(Entity entity)
         {
             RemoveEntity(entity);
+        }
+
+        int IEntityScope.IndexOf(Entity entity)
+        {
+            return Entities.IndexOf(entity);
         }
 
         #endregion

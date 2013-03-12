@@ -10,6 +10,7 @@ using Kinectitude.Editor.Models.Transactions;
 using Kinectitude.Editor.Models.Values;
 using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.Views.Dialogs;
+using Kinectitude.Editor.Views.Scenes.Presenters;
 using Kinectitude.Editor.Views.Utils;
 using System;
 using System.Collections.Generic;
@@ -105,6 +106,13 @@ namespace Kinectitude.Editor.Models
         {
             get { return Components.Select(x => x.Plugin).Union(Events.SelectMany(x => x.Plugins)).Distinct(); }
         }
+
+        public int Index
+        {
+            get { return null != Scope ? Scope.IndexOf(this) : -1; }
+        }
+
+        public EntityPresenter Presenter { get; private set; }
 
         public ObservableCollection<Entity> Prototypes { get; private set; }
         public ObservableCollection<Attribute> Attributes { get; private set; }
@@ -209,6 +217,8 @@ namespace Kinectitude.Editor.Models
                     () => oldParent.InsertAt(idx, statement)
                 );
             });
+
+            Presenter = new EntityPresenter(this);
         }
 
         public override void Accept(IGameVisitor visitor)

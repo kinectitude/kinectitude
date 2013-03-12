@@ -26,7 +26,12 @@ namespace Kinectitude.Editor.Views.Controls.Designer
 
         public void Update()
         {
-            rect = VisualTreeHelper.GetDescendantBounds(canvas.SelectedItems.First());
+            var first = canvas.SelectedItems.First();
+            //rect = VisualTreeHelper.GetDescendantBounds(canvas.SelectedItems.First());
+            rect.X = first.DesignLeft;
+            rect.Y = first.DesignTop;
+            rect.Width = first.ActualWidth;
+            rect.Height = first.ActualHeight;     
 
             foreach (var item in canvas.SelectedItems.Skip(1))
             {

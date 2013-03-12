@@ -137,6 +137,8 @@ namespace Kinectitude.Core.Language
             #region constants
             Constants.Add("true", ConstantReader.TrueValue);
             Constants.Add("false",ConstantReader.FalseValue);
+            Constants.Add("True", ConstantReader.TrueValue);
+            Constants.Add("False", ConstantReader.FalseValue);
             Constants.Add("Pi", new ConstantReader(Math.PI));
             Constants.Add("E", new ConstantReader(Math.E));
             #endregion

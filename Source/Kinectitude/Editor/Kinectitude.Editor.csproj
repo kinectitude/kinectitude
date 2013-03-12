@@ -94,6 +94,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Base\TransformedObservableCollection.cs" />
     <Compile Include="Models\Data\Changeables\BaseChangeable.cs" />
     <Compile Include="Models\Data\Changeables\ComponentChangeable.cs" />
     <Compile Include="Models\Data\Changeables\ManagerChangeable.cs" />

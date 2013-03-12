@@ -60,6 +60,18 @@ namespace Kinectitude.Editor.Views.Controls.Designer
         public static DependencyProperty CommitTranslateCommandProperty =
             DependencyProperty.Register("CommitTranslateCommand", typeof(ICommand), typeof(DesignerCanvas));
 
+        public static DependencyProperty CommitSendForwardCommandProperty =
+            DependencyProperty.Register("CommitSendForwardCommand", typeof(ICommand), typeof(DesignerCanvas));
+
+        public static DependencyProperty CommitSendBackwardCommandProperty =
+            DependencyProperty.Register("CommitSendBackwardCommand", typeof(ICommand), typeof(DesignerCanvas));
+
+        public static DependencyProperty CommitSendToFrontCommandProperty =
+            DependencyProperty.Register("CommitSendToFrontCommand", typeof(ICommand), typeof(DesignerCanvas));
+
+        public static DependencyProperty CommitSendToBackCommandProperty =
+            DependencyProperty.Register("CommitSendToBackCommand", typeof(ICommand), typeof(DesignerCanvas));
+
         public static DependencyProperty CommitAlignLeftCommandProperty =
             DependencyProperty.Register("CommitAlignLeftCommand", typeof(ICommand), typeof(DesignerCanvas));
 
@@ -99,8 +111,6 @@ namespace Kinectitude.Editor.Views.Controls.Designer
 
         public const double DragThreshold = 0.5;
 
-        private readonly List<DesignerItem> selected;
-
         private Mode mode;
 
         private bool mouseDown;
@@ -113,7 +123,17 @@ namespace Kinectitude.Editor.Views.Controls.Designer
 
         public IEnumerable<DesignerItem> SelectedItems
         {
-            get { return selected; }
+            get
+            {
+                var items = Items;
+                var itemscast = items.Cast<object>();
+                var selected = itemscast.Select(x => (DesignerItem)ItemContainerGenerator.ContainerFromItem(x));
+                var wheres = selected.Where(x => x.IsSelected);
+
+                return wheres;
+
+                //return Items.Cast<object>().Select(x => (DesignerItem)ItemContainerGenerator.ContainerFromItem(x)).Where(x => x.IsSelected);
+            }
         }
 
         public object SelectedItem
@@ -176,12 +196,40 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             set { SetValue(CommitTranslateCommandProperty, value); }
         }
 
+        public ICommand SendForwardCommand { get; private set; }
+        public ICommand SendBackwardCommand { get; private set; }
+        public ICommand SendToFrontCommand { get; private set; }
+        public ICommand SendToBackCommand { get; private set; }
         public ICommand AlignLeftCommand { get; private set; }
         public ICommand AlignCenterCommand { get; private set; }
         public ICommand AlignRightCommand { get; private set; }
         public ICommand AlignTopCommand { get; private set; }
         public ICommand AlignMiddleCommand { get; private set; }
         public ICommand AlignBottomCommand { get; private set; }
+
+        public ICommand CommitSendForwardCommand
+        {
+            get { return (ICommand)GetValue(CommitSendForwardCommandProperty); }
+            set { SetValue(CommitSendForwardCommandProperty, value); }
+        }
+
+        public ICommand CommitSendBackwardCommand
+        {
+            get { return (ICommand)GetValue(CommitSendBackwardCommandProperty); }
+            set { SetValue(CommitSendBackwardCommandProperty, value); }
+        }
+
+        public ICommand CommitSendToFrontCommand
+        {
+            get { return (ICommand)GetValue(CommitSendToFrontCommandProperty); }
+            set { SetValue(CommitSendToFrontCommandProperty, value); }
+        }
+
+        public ICommand CommitSendToBackCommand
+        {
+            get { return (ICommand)GetValue(CommitSendToBackCommandProperty); }
+            set { SetValue(CommitSendToBackCommandProperty, value); }
+        }
 
         public ICommand CommitAlignLeftCommand
         {
@@ -246,14 +294,49 @@ namespace Kinectitude.Editor.Views.Controls.Designer
         public DesignerCanvas()
         {
             mode = Mode.Selecting;
-            selected = new List<DesignerItem>();
 
+            SendForwardCommand = new DelegateCommand(p => SelectedItems.Count() > 0, p => SendForward());
+            SendBackwardCommand = new DelegateCommand(p => SelectedItems.Count() > 0, p => SendBackward());
+            SendToFrontCommand = new DelegateCommand(p => SelectedItems.Count() > 0, p => SendToFront());
+            SendToBackCommand = new DelegateCommand(p => SelectedItems.Count() > 0, p => SendToBack());
             AlignLeftCommand = new DelegateCommand(p => SelectedItems.Count() > 1, p => AlignLeft());
             AlignCenterCommand = new DelegateCommand(p => SelectedItems.Count() > 1, p => AlignCenter());
             AlignRightCommand = new DelegateCommand(p => SelectedItems.Count() > 1, p => AlignRight());
             AlignTopCommand = new DelegateCommand(p => SelectedItems.Count() > 1, p => AlignTop());
             AlignMiddleCommand = new DelegateCommand(p => SelectedItems.Count() > 1, p => AlignMiddle());
             AlignBottomCommand = new DelegateCommand(p => SelectedItems.Count() > 1, p => AlignBottom());
+        }
+
+        private void SendForward()
+        {
+            if (null != CommitSendForwardCommand)
+            {
+                CommitSendForwardCommand.Execute(GetSelectedData());
+            }
+        }
+
+        private void SendBackward()
+        {
+            if (null != CommitSendBackwardCommand)
+            {
+                CommitSendBackwardCommand.Execute(GetSelectedData());
+            }
+        }
+
+        private void SendToFront()
+        {
+            if (null != CommitSendToFrontCommand)
+            {
+                CommitSendToFrontCommand.Execute(GetSelectedData());
+            }
+        }
+
+        private void SendToBack()
+        {
+            if (null != CommitSendToBackCommand)
+            {
+                CommitSendToBackCommand.Execute(GetSelectedData());
+            }
         }
 
         private void AlignLeft()
@@ -366,7 +449,7 @@ namespace Kinectitude.Editor.Views.Controls.Designer
 
             if (delta.X != 0 || delta.Y != 0)
             {
-                if (mode == Mode.Selecting && selected.Count > 0)
+                if (mode == Mode.Selecting && SelectedItems.Count() > 0)
                 {
                     mode = Mode.Translating;
                 }
@@ -650,7 +733,6 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             if (!item.IsSelected)
             {
                 item.IsSelected = true;
-                selected.Add(item);
 
                 if (null == translator)
                 {
@@ -668,9 +750,8 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             if (item.IsSelected)
             {
                 item.IsSelected = false;
-                selected.Remove(item);
 
-                if (selected.Count == 0)
+                if (SelectedItems.Count() == 0)
                 {
                     HideSelection();
                 }
@@ -685,9 +766,9 @@ namespace Kinectitude.Editor.Views.Controls.Designer
 
         private void CheckSelectedItem()
         {
-            if (selected.Count == 1)
+            if (SelectedItems.Count() == 1)
             {
-                var item = selected.Single();
+                var item = SelectedItems.Single();
                 var obj = ItemContainerGenerator.ItemFromContainer(item);
                 SelectedItem = obj;
             }
@@ -710,7 +791,7 @@ namespace Kinectitude.Editor.Views.Controls.Designer
 
         public void DeselectAll()
         {
-            var previouslySelected = selected.ToArray();
+            var previouslySelected = SelectedItems.ToArray();
 
             foreach (var item in previouslySelected)
             {
@@ -724,11 +805,6 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             {
                 translator.Update();
             }
-        }
-
-        public void StartPlacement(EntityFactory factory)
-        {
-
         }
     }
 }

@@ -516,6 +516,11 @@ namespace Kinectitude.Editor.Models
             RemovePrototype(entity);
         }
 
+        int IEntityScope.IndexOf(Entity entity)
+        {
+            return Prototypes.IndexOf(entity);
+        }
+
         #endregion
 
         #region ISceneScope implementation
