@@ -308,6 +308,7 @@ namespace Kinectitude.Editor.Models
         public void SaveProject()
         {
             ProjectStorage.SaveProject(Project);
+            CommandHistory.Save();
         }
 
         private void RegisterPlugins(Assembly assembly)
