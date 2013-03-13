@@ -37,11 +37,21 @@ namespace Kinectitude.Player
 
             Func<Tuple<int, int>> windowOffset = () => new Tuple<int, int>(form.Left, form.Top);
 
-            GameLoader gameLoader = new GameLoader("camera.kgl", new Assembly[] { renderAssembly, directAssembly },
+            GameLoader gameLoader = new GameLoader("game.kgl", new Assembly[] { renderAssembly, directAssembly },
                 96 / dpi.Width, 90 / dpi.Height, windowOffset, die);
 
             game = gameLoader.CreateGame();
             renderService = game.GetService<RenderService>();
+
+            if (renderService.Width == 0)
+            {
+                renderService.Width = 800;
+            }
+
+            if (renderService.Height == 0)
+            {
+                renderService.Height = 600;
+            }
             
             Size size = new Size((int)(renderService.Width * dpi.Width / 96.0f), (int)(renderService.Height * dpi.Height / 96.0f));
 

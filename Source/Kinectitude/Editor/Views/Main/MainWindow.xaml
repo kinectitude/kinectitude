@@ -108,7 +108,7 @@
                 <Image Source="{StaticResource icoRedo}" Stretch="None" />
             </Button>
             <Separator Margin="4,0,4,0" />
-            <Button ToolTip="Play" Margin="0,0,4,0">
+            <Button ToolTip="Play" Margin="0,0,4,0" Command="{Binding Project.PlayCommand, Mode=OneWay}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="{StaticResource icoPlay}" Stretch="None" Margin="0,0,4,0" />
                     <TextBlock VerticalAlignment="Center">Play</TextBlock>

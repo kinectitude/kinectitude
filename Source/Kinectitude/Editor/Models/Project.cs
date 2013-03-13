@@ -7,6 +7,8 @@ using System.IO;
 using Kinectitude.Editor.Storage;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
+using System.Diagnostics;
+using System;
 
 namespace Kinectitude.Editor.Models
 {
@@ -156,6 +158,7 @@ namespace Kinectitude.Editor.Models
         public ICommand CloseItemCommand { get; private set; }
         public ICommand BrowseCommand { get; private set; }
         public ICommand CommitCommand { get; private set; }
+        public ICommand PlayCommand { get; private set; }
 
         public Project()
         {
@@ -202,6 +205,8 @@ namespace Kinectitude.Editor.Models
             InspectItemCommand = new DelegateCommand(null, (parameter) => InspectorItem = parameter as BaseModel);
 
             CloseItemCommand = new DelegateCommand(null, (parameter) => CloseItem(parameter as BaseModel));
+
+            PlayCommand = new DelegateCommand(null, p => Play());
 
             AddHandler<AssetUsed>(OnAssetUsed);
         }
@@ -290,5 +295,95 @@ namespace Kinectitude.Editor.Models
             }
         }
 
+        private void Play()
+        {
+            var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Kinectitude");
+            if (!Directory.Exists(appData))
+            {
+                Directory.CreateDirectory(appData);
+            }
+
+            var play = new DirectoryInfo(Path.Combine(appData, string.Format("Play_{0:yyyy-MM-dd_hh-mm-ss-tt}", DateTime.Now)));
+            play.Create();
+            BuildPlayDirectory(play);
+
+            var process = new Process();
+            process.StartInfo.WorkingDirectory = play.FullName;
+            process.StartInfo.FileName = "Kinectitude.Player.exe";
+            process.EnableRaisingEvents = true;
+            process.Exited += (o, e) => DeleteTempDirectory(play);
+            process.Start();
+        }
+
+        private void BuildPlayDirectory(DirectoryInfo play)
+        {
+            BuildPlayer(play);
+            BuildProject(play);
+        }
+
+        private void BuildPlayer(DirectoryInfo play)
+        {
+            var pluginsDir = new DirectoryInfo("Plugins");
+            
+            var playPlugins = Path.Combine(play.FullName, "Plugins");
+            Directory.CreateDirectory(playPlugins);
+
+            foreach (var file in pluginsDir.GetFiles())
+            {
+                file.CopyTo(Path.Combine(playPlugins, file.Name));
+            }
+
+            var required = new[]
+            {
+                "Kinectitude.Player.exe",
+                "Kinectitude.Player.exe.config",
+                "SlimDX.dll",
+                "Kinectitude.Core.dll",
+                "Kinectitude.Core.dll.config",
+                "Irony.Interpreter.dll",
+                "Irony.dll"
+            };
+
+            foreach (var file in required)
+            {
+                File.Copy(file, Path.Combine(play.FullName, file));
+            }
+        }
+
+        private void BuildProject(DirectoryInfo play)
+        {
+            var dataDir = new DirectoryInfo(Path.Combine(Location, GameRoot));
+            var dataAssets = new DirectoryInfo(Path.Combine(dataDir.FullName, "Assets"));
+
+            var playAssets = Path.Combine(play.FullName, "Assets");
+            Directory.CreateDirectory(playAssets);
+
+            foreach (var file in dataAssets.GetFiles())
+            {
+                file.CopyTo(Path.Combine(playAssets, file.Name));
+            }
+
+            var storage = ProjectStorage.CreateGameStorage(new FileInfo(Path.Combine(play.FullName, "game.kgl")));
+            storage.SaveGame(Game);
+        }
+
+        private void DeleteTempDirectory(DirectoryInfo info)
+        {
+            var files = info.GetFiles();
+            var dirs = info.GetDirectories();
+
+            foreach (var file in files)
+            {
+                file.Attributes = FileAttributes.Normal;
+                file.Delete();
+            }
+
+            foreach (var dir in dirs)
+            {
+                DeleteTempDirectory(dir);
+            }
+
+            info.Delete(false);
+        }
     }
 }
