@@ -39,7 +39,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Test|x64'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Test\</OutputPath>
+    <OutputPath>$(ProjectDir)..\..\..\Build\$(Configuration)\</OutputPath>
     <DefineConstants>TRACE;DEBUG;TEST</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -50,7 +50,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Test|x86'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Test\</OutputPath>
+    <OutputPath>$(ProjectDir)..\..\..\Build\$(Configuration)\</OutputPath>
     <DefineConstants>TRACE;DEBUG;TEST</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -116,26 +116,31 @@
     <ProjectReference Include="..\Core\Kinectitude.Core.csproj">
       <Project>{AEAB17EC-574C-4177-9204-FE48F4C3F429}</Project>
       <Name>Kinectitude.Core</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Editor\Kinectitude.Editor.csproj">
       <Project>{541AF93B-398E-463E-9C11-BC957BE0DB19}</Project>
       <Name>Kinectitude.Editor</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Kinect\Kinectitude.Kinect.csproj">
       <Project>{43dcbee6-f87e-4f59-9146-3e67b1ed3c45}</Project>
       <Name>Kinectitude.Kinect</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Physics\Kinectitude.Physics.csproj">
       <Project>{6b0352b2-eecb-4810-bedc-b80c4417ab1b}</Project>
       <Name>Kinectitude.Physics</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Render\Kinectitude.Render.csproj">
       <Project>{E6DD6F76-999C-4B56-887C-347FAF50DAB3}</Project>
       <Name>Kinectitude.Render</Name>
-      <Private>True</Private>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="Core\actions.kgl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
