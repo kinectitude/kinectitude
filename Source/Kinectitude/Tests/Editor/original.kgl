@@ -18,44 +18,41 @@ using Kinectitude.Render.dll
     define ImageRenderComponent as Kinectitude.Render.ImageRenderComponent
 }
 
-Game(Width = 800, Height = 600, FirstScene = "game", IsFullScreen = false, Name="breakout")
+Game(Name = "breakout", FirstScene = "game")
 {
     Prototype paddle()
     {
         Component KinectFollowComponent(Direction = "X", Player = 1, Joint = "HandRight")
-        Component RenderComponent(FillColor = "Black", Shape="Rectangle")
-        Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution="0", Mass="1", Friction="0", LinearDamping="0", MovesWhenHit=false, FixedRotation=true)
-        Component Transform(Width = 128, Height=24)
+        Component RenderComponent(FillColor = "Black", Shape = "Rectangle")
+        Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = "0", Mass = "1", Friction = "0", LinearDamping = "0", MovesWhenHit = false, FixedRotation = true)
+        Component Transform(Width = 128, Height = 24)
     }
 
     Prototype ball(Value = 0)
     {
         Component RenderComponent(FillColor = "Black", Shape = "Rectangle")
+        Component Transform(X = 400, Y = 550, Width = 24, Height = 24)
+        Component PhysicsComponent(MinimumSpeed = 50, MaximumSpeed = 50, XVelocity = -40, YVelocity = -20, Shape = "Ellipse", Restitution = 1, Mass = 1, Friction = 0, LinearDamping = 0, MovesWhenHit = true, AngularVelocity = 1, FixedRotation = false)
         
-        Component Transform(X = 400, Y = 550, Width = 24, Height=24)
-        
-        Component PhysicsComponent(MinimumSpeed = 50, MaximumSpeed = 50, XVelocity = -40,
-            YVelocity = -20, Shape = "Ellipse", Restitution = 1, Mass = 1, Friction = 0, 
-            LinearDamping = 0, MovesWhenHit = true, AngularVelocity = 1, FixedRotation = false)
         Event TriggerOccurs(Trigger = "gameOver")
         {
             Destroy()
         }
     }
 
-    Prototype primaryBall : ball(ball="primary")
+    Prototype primaryBall : ball(ball = "primary")
     {
         Event Collision(CollidesWith = $bottom_wall)
         {
-            Transform.X  =400
-            Transform.Y  =300
+            Transform.X = 400
+            Transform.Y = 300
             scene.balls -= 1
         }
     }
 
-    Prototype extraBall : ball(ball="extra")
+    Prototype extraBall : ball(ball = "extra")
     {
-        Event Collision(CollidesWith= $bottom_wall)
+        Event Collision(CollidesWith = $bottom_wall)
         { 
             Destroy()
         }
@@ -63,11 +60,8 @@ Game(Width = 800, Height = 600, FirstScene = "game", IsFullScreen = false, Name=
     
     Prototype block()
     {
-        Component RenderComponent(FillColor = "Red", Shape="Rectangle")
-        Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", 
-            Restitution = 0, Mass = 1, Friction = 0, LinearDamping = 0, 
-            MovesWhenHit = false, FixedRotation = true)
-            
+        Component RenderComponent(FillColor = "Red", Shape = "Rectangle")
+        Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, Friction = 0, LinearDamping = 0, MovesWhenHit = false, FixedRotation = true)
         Component Transform(Width = 95, Height = 20)
         
         Event Collision(CollidesWith = $extraBall+$primaryBall)
@@ -79,8 +73,9 @@ Game(Width = 800, Height = 600, FirstScene = "game", IsFullScreen = false, Name=
 
     Prototype spawn1Block : block()
     {
-        Component RenderComponent(FillColor="Orange")
-        Event Collision(CollidesWith = $extraBall+$primaryBall)
+        Component RenderComponent(FillColor = "Orange")
+
+        Event Collision(CollidesWith = $extraBall + $primaryBall)
         {
             CreateEntity(Prototype = "extraBall")
         }
@@ -88,19 +83,20 @@ Game(Width = 800, Height = 600, FirstScene = "game", IsFullScreen = false, Name=
 
     Prototype spawn3Block : block()
     {
-        Component RenderComponent(FillColor="Yellow")
+        Component RenderComponent(FillColor = "Yellow")
+
         Event Collision(CollidesWith = $extraBall+$primaryBall)
         {
             CreateEntity(Prototype = "extraBall")
             CreateEntity(Prototype = "extraBall")
             CreateEntity(Prototype = "extraBall")
-            scene.show  ="A " + ^CollidesWith.ball + " at X " + ^CollidesWith.Transform.X
+            scene.show = "A " + ^CollidesWith.ball + " at X " + ^CollidesWith.Transform.X
         }
     }
 
     Prototype text()
     {
-        Component TextRenderComponent(FontFamily="Arial", FontWeight="Normal", FontStyle="Normal", FontStretch="Normal", FontSize="36", FontColor="Black")
+        Component TextRenderComponent(FontFamily = "Arial", FontWeight = "Normal", FontStyle = "Normal", FontStretch = "Normal", FontSize = "36", FontColor = "Black")
     }
     
     Scene game(balls = 10, blocks = 24)
@@ -112,7 +108,7 @@ Game(Width = 800, Height = 600, FirstScene = "game", IsFullScreen = false, Name=
         
         Entity  : spawn3Block()
         {
-            Component Transform(X = 50,Y = 200)
+            Component Transform(X = 50, Y = 200)
         }
         
         Entity : block()
@@ -150,7 +146,7 @@ Game(Width = 800, Height = 600, FirstScene = "game", IsFullScreen = false, Name=
             Component Transform(X = 750, Y = 200)
         }
         
-        Entity  : block()
+        Entity : block()
         {
             Component Transform(X = 50, Y = 225)
         }
@@ -241,11 +237,13 @@ Game(Width = 800, Height = 600, FirstScene = "game", IsFullScreen = false, Name=
             Component Transform(X = 400, Y = 600, Width = 800, Height = 2)
             Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, MovesWhenHit = false , FixedRotation = true)
         }
+
         Entity left_wall()
         {
             Component Transform(X = 0, Y = 300, Width = 2, Height = 600)
             Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, MovesWhenHit = false, FixedRotation = true)
         }
+
         Entity right_wall()
         {
             Component Transform(X = 800, Y = 300, Width = 2, Height = 600)
@@ -261,24 +259,24 @@ Game(Width = 800, Height = 600, FirstScene = "game", IsFullScreen = false, Name=
         {
             Component Transform(X = 0, Y = 0, Width = 800)
             Component TextRenderComponent(Value = "", FontSize = 20, TextAlignment = "Center")
+            
             Event AttributeChanges(Target = scene.balls + scene.blocks)
             {
-                TextRenderComponent.Value  = "Extra Balls: " + scene.balls + " blocks left " + scene.blocks + ". log of 100 is " + Log(100) + " log of 8, base 2 is " + Log(8, 2)
-                if(scene.blocks == 0)
+                TextRenderComponent.Value = "Extra Balls: " + scene.balls + " blocks left " + scene.blocks + ". log of 100 is " + Log(100) + " log of 8, base 2 is " + Log(8, 2)
+                if (scene.blocks == 0)
                 {
-                    TextRenderComponent.Value  = "YOU WIN!"
-                    FireTrigger(Name="gameOver")
+                    TextRenderComponent.Value = "YOU WIN!"
+                    FireTrigger(Name = "gameOver")
                 }
-                else if(scene.blocks > 5)
+                else if (scene.blocks > 5)
                 {
-                    TextRenderComponent.Value  += " Keep going there!"
+                    TextRenderComponent.Value += " Keep going there!"
                 }
                 else
                 {
-                    TextRenderComponent.Value  += " Keep going almost there!"
+                    TextRenderComponent.Value += " Keep going almost there!"
                 }
-          
-                if(scene.balls < 0)
+                if (scene.balls < 0)
                 {
                     TextRenderComponent.Value  = "GAME OVER"
                     FireTrigger(Name="gameOver")
@@ -289,9 +287,10 @@ Game(Width = 800, Height = 600, FirstScene = "game", IsFullScreen = false, Name=
         {
             Component Transform(X = 0, Y = 100, Width = 800)
             Component TextRenderComponent(Value = "", FontSize = 20, TextAlignment = "Center")
+            
             Event AttributeChanges(Target = scene.show)
             {
-                TextRenderComponent.Value  = "The value of scene.show " + scene.show
+                TextRenderComponent.Value = "The value of scene.show " + scene.show
             }
         }
     }

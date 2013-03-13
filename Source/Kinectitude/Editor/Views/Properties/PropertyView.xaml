@@ -43,7 +43,6 @@
         </Button>
         <ComboBox IsTextSearchEnabled="False"
                   IsEditable="True"
-                  Text="{Binding Value, UpdateSourceTrigger=LostFocus, Converter={StaticResource ValueConverter}}"
                   IsEnabled="{Binding IsEditable}"
                   ItemsSource="{Binding AvailableValues}">
             <ComboBox.Style>
@@ -52,9 +51,19 @@
                         <DataTrigger Binding="{Binding HasOwnValue}" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource DefaultValueBrush}" />
                         </DataTrigger>
+                        <Trigger Property="Validation.HasError" Value="True">
+                            <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}" />
+                        </Trigger>
                     </Style.Triggers>
                 </Style>
             </ComboBox.Style>
+            <ComboBox.Text>
+                <Binding Path="Value" UpdateSourceTrigger="LostFocus" Converter="{StaticResource ValueConverter}">
+                    <Binding.ValidationRules>
+                        <u:ValueValidationRule />
+                    </Binding.ValidationRules>
+                </Binding>
+            </ComboBox.Text>
         </ComboBox>
     </DockPanel>
 </UserControl>

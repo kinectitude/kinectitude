@@ -3,6 +3,7 @@ using Kinectitude.Core.Components;
 using Kinectitude.Core.Data;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Data.DataContainers;
+using Kinectitude.Editor.Models.Exceptions;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Transactions;
@@ -20,6 +21,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 
@@ -50,6 +52,16 @@ namespace Kinectitude.Editor.Models
             {
                 if (name != value)
                 {
+                    if (value.ContainsWhitespace())
+                    {
+                        throw new InvalidSceneNameException(value);
+                    }
+
+                    if (SceneNameExists(value))
+                    {
+                        throw new SceneNameExistsException(value);
+                    }
+
                     string oldName = name;
                     if (string.IsNullOrWhiteSpace(value))
                     {
@@ -942,21 +954,28 @@ namespace Kinectitude.Editor.Models
 
         public void PrivateAddEntity(int index, Entity entity)
         {
-            if (!EntityNameExists(entity.Name))
+            if (EntityNameExists(entity.Name))
             {
-                entity.Scope = this;
-                Entities.Insert(index, entity);
+                throw new EntityNameExistsException(entity.Name);
+            }
 
-                entity.Components.CollectionChanged += OnEntityComponentChanged;
-                foreach (Component component in entity.Components)
-                {
-                    ResolveComponentDependencies(component);
-                }
+            if (HasDefinedName(entity.Name))
+            {
+                throw new NameDefinedException(entity.Name);
+            }
 
-                foreach (Plugin plugin in entity.Plugins)
-                {
-                    Notify(new PluginUsed(plugin));
-                }
+            entity.Scope = this;
+            Entities.Insert(index, entity);
+
+            entity.Components.CollectionChanged += OnEntityComponentChanged;
+            foreach (Component component in entity.Components)
+            {
+                ResolveComponentDependencies(component);
+            }
+
+            foreach (Plugin plugin in entity.Plugins)
+            {
+                Notify(new PluginUsed(plugin));
             }
         }
 
@@ -1039,6 +1058,11 @@ namespace Kinectitude.Editor.Models
             return Managers.Any(x => x.Plugin == type);
         }
 
+        public bool SceneNameExists(string name)
+        {
+            return null != Scope ? Scope.HasSceneWithName(name) : false;
+        }
+
         #region IEntityScope implementation
 
         public IEnumerable<Entity> Prototypes
@@ -1064,6 +1088,11 @@ namespace Kinectitude.Editor.Models
         #endregion
 
         #region IPluginNamespace implementation
+
+        public bool HasDefinedName(string name)
+        {
+            return null != Scope ? Scope.HasDefinedName(name) : false;
+        }
 
         public Plugin GetPlugin(string type)
         {

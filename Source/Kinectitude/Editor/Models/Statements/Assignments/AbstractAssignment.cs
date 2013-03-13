@@ -21,7 +21,7 @@ namespace Kinectitude.Editor.Models.Statements.Assignments
 
     internal abstract class AbstractAssignment : AbstractStatement
     {
-        internal static readonly Dictionary<KinectitudeGrammar.OpCode, AssignmentOperator> assingmentValues =
+        internal static readonly Dictionary<KinectitudeGrammar.OpCode, AssignmentOperator> AssignmentValues =
             new Dictionary<KinectitudeGrammar.OpCode, AssignmentOperator>()
             {
                 {KinectitudeGrammar.OpCode.Becomes, AssignmentOperator.Assign},

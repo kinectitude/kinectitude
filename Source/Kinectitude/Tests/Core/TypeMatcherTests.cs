@@ -7,13 +7,10 @@ namespace Kinectitude.Tests.Core
     [TestClass]
     public class TypeMatcherTests
     {
-        private const string matcherItem = "core/typeMatcher.kgl";
-
         [TestMethod]
-        [DeploymentItem(matcherItem)]
         public void TestTypeMatcher()
         {
-            Game game = Setup.StartGame("typeMatcher.kgl");
+            Game game = Setup.StartGame("Core/typeMatcher.kgl");
             game.OnUpdate(1/60);
             AssertionAction.CheckValue("$run");
             AssertionAction.CheckValue("$p1", 3);

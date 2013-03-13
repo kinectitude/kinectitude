@@ -7,13 +7,10 @@ namespace Kinectitude.Tests.Core
     [TestClass]
     public class Changes
     {
-        private const string gameFile = "core/changes.kgl";
-
         [TestMethod]
-        [DeploymentItem(gameFile)]
         public void ChangeTests()
         {
-            Game game = Setup.StartGame("changes.kgl");
+            Game game = Setup.StartGame("Core/changes.kgl");
             AssertionAction.CheckValue("runTests.val is set");
             AssertionAction.CheckValue("IntVal is set, and attribute equals is run first");
             AssertionAction.CheckValue("scene.x");

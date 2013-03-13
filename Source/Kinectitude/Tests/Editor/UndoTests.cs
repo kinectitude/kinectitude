@@ -60,9 +60,9 @@ namespace Kinectitude.Tests.Editor
         public void Game_FirstScene()
         {
             var game = new Game("Test Game");
-            var scene1 = new Scene("Scene 1");
+            var scene1 = new Scene("Scene1");
             game.FirstScene = scene1;
-            var scene2 = new Scene("Scene 2");
+            var scene2 = new Scene("Scene2");
 
             CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(scene1, game.FirstScene),
@@ -74,12 +74,12 @@ namespace Kinectitude.Tests.Editor
         [TestMethod]
         public void Scene_Name()
         {
-            var scene = new Scene("Test Scene");
+            var scene = new Scene("TestScene");
 
             CommandHelper.TestUndoableCommand(
-                () => Assert.AreEqual("Test Scene", scene.Name),
-                () => scene.Name = "Test Scene 2",
-                () => Assert.AreEqual("Test Scene 2", scene.Name)
+                () => Assert.AreEqual("TestScene", scene.Name),
+                () => scene.Name = "TestScene2",
+                () => Assert.AreEqual("TestScene2", scene.Name)
             );
         }
 

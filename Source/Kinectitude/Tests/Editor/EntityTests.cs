@@ -2,6 +2,7 @@
 using Kinectitude.Editor.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Kinectitude.Editor.Models.Values;
+using Kinectitude.Editor.Models.Exceptions;
 
 namespace Kinectitude.Editor.Tests
 {
@@ -335,7 +336,7 @@ namespace Kinectitude.Editor.Tests
         //    Assert.IsNotNull(child.GetAttribute("test2"));
         //}
 
-        [TestMethod]
+        [TestMethod, ExpectedException(typeof(EntityNameExistsException))]
         public void CannotAddDuplicateNameInSameScope()
         {
             Game game = new Game("Test Game");
@@ -360,7 +361,7 @@ namespace Kinectitude.Editor.Tests
             Assert.AreEqual(2, scene.Entities.Count);
         }
 
-        [TestMethod]
+        [TestMethod, ExpectedException(typeof(EntityNameExistsException))]
         public void CannotRenameToDuplicateNameInSameScope()
         {
             Game game = new Game("Test Game");

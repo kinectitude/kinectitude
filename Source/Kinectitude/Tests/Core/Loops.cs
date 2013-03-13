@@ -7,10 +7,9 @@ namespace Kinectitude.Tests.Core
     public class Loops
     {
         [TestMethod]
-        [DeploymentItem("core/loops.kgl")]
         public void LoopTests()
         {
-            Setup.StartGame("loops.kgl");
+            Setup.StartGame("Core/loops.kgl");
             AssertionAction.CheckValue("basic for", 10);
             AssertionAction.CheckValue("for no first", 10);
             AssertionAction.CheckValue("while", 10);

@@ -18,7 +18,7 @@
             </Grid.ColumnDefinitions>
 
             <Label Grid.Column="0" Grid.Row="0" Margin="8">Name</Label>
-            <TextBox x:Name="txtName" Width="300" Grid.Column="1" Grid.Row="0" Text="{Binding Name}" Margin="0,8,8,8" />
+            <TextBox x:Name="txtName" Width="300" Grid.Column="1" Grid.Row="0" Text="{Binding Name, ValidatesOnExceptions=True}" Margin="0,8,8,8" />
         </Grid>
         <Separator />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">

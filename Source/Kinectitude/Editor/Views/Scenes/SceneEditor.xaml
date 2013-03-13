@@ -6,11 +6,11 @@
              xmlns:m="clr-namespace:Kinectitude.Editor.Models"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:b="clr-namespace:Kinectitude.Editor.Views.Behaviors"
+             xmlns:Scenes="clr-namespace:Kinectitude.Editor.Views.Scenes"
              xmlns:Utils="clr-namespace:Kinectitude.Editor.Views.Utils"
              xmlns:Presenters="clr-namespace:Kinectitude.Editor.Views.Scenes.Presenters"
              xmlns:Designer="clr-namespace:Kinectitude.Editor.Views.Controls.Designer"
-             mc:Ignorable="d"
-             x:Name="self">
+             mc:Ignorable="d">
 
     <UserControl.Resources>
 
@@ -20,9 +20,9 @@
         <DataTemplate DataType="{x:Type Presenters:EntityPresenter}">
             <ContentControl Content="{Binding Visual}" Opacity="{Binding Opacity}">
                 <ContentControl.ContextMenu>
-                    <ContextMenu DataContext="{Binding Entity}">
+                    <ContextMenu>
                         <MenuItem Header="Rename..." Command="{Binding Entity.RenameCommand}" />
-                        <MenuItem Header="Delete" Command="{Binding ElementName=self, Path=DataContext.RemoveEntityCommand, Mode=OneWay}" CommandParameter="{Binding}" />
+                        <MenuItem Header="Delete" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Scenes:SceneEditor}}, Path=DataContext.RemoveEntityCommand}" CommandParameter="{Binding}" />
                         <Separator />
                         <MenuItem Header="Properties..." Command="{Binding Entity.PropertiesCommand}" />
                     </ContextMenu>

@@ -10,7 +10,7 @@ namespace Kinectitude.Editor.Models
 {
     internal delegate void NameChangedEventHandler(string oldName, string newName);
     
-    internal sealed class Attribute : GameModel<IAttributeScope>, IValueScope
+    internal sealed class Attribute : GameModel<IAttributeScope>, IValueScope, INameValue
     {
         public static readonly Value DefaultValue = new Value(null, true);
 
@@ -174,7 +174,14 @@ namespace Kinectitude.Editor.Models
 
         public Attribute DeepCopy()
         {
-            return new Attribute(this.Name) { Value = this.Value };
+            var copy = new Attribute(this.Name);
+            
+            if (HasOwnValue)
+            {
+                copy.Value = this.Value;
+            };
+
+            return copy;
         }
 
         private Value GetInheritedValue()

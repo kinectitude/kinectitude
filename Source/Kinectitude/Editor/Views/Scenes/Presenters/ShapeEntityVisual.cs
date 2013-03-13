@@ -21,7 +21,7 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
                 {
                     return (Brush)BrushConverter.ConvertFromString(GetStringValue<RenderComponent>("FillColor"));
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return Brushes.Black;
                 }
@@ -41,7 +41,7 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
                 {
                     return (Brush)BrushConverter.ConvertFromString(GetStringValue<RenderComponent>("LineColor"));
                 }
-                catch (NotSupportedException e)
+                catch (Exception)
                 {
                     return Brushes.Black;
                 }

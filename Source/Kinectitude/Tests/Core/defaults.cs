@@ -7,10 +7,9 @@ namespace Kinectitude.Tests.Core
     public class Defaults
     {
         [TestMethod]
-        [DeploymentItem("core/defaults.kgl")]
         public void DefaultTest()
         {
-            Setup.StartGame("defaults.kgl");
+            Setup.StartGame("Core/defaults.kgl");
             AssertionAction.CheckValue("Int");
             AssertionAction.CheckValue("Double");
             AssertionAction.CheckValue("Str");

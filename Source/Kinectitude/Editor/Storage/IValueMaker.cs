@@ -9,6 +9,7 @@ namespace Kinectitude.Editor.Storage
 {
     interface IValueMaker
     {
+        bool HasErrors(string value);
         ValueReader CreateValueReader(string value, IScene scene, IDataContainer entity, Event evt = null);
     }
 }

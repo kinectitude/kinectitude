@@ -82,10 +82,11 @@ namespace Kinectitude.Tests.Editor
             var entity = new Entity();
             var attribute = new Attribute("test");
             entity.AddAttribute(attribute);
+            entity.SelectedAttribute = attribute;
 
             CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(1, entity.Attributes.Count),
-                () => entity.RemoveAttributeCommand.Execute(attribute),
+                () => entity.RemoveAttributeCommand.Execute(null),
                 () => Assert.AreEqual(0, entity.Attributes.Count)
             );
         }
@@ -174,10 +175,11 @@ namespace Kinectitude.Tests.Editor
             var game = new Game("Test Game");
             var attribute = new Attribute("test");
             game.AddAttribute(attribute);
+            game.SelectedAttribute = attribute;
 
             CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(1, game.Attributes.Count),
-                () => game.RemoveAttributeCommand.Execute(attribute),
+                () => game.RemoveAttributeCommand.Execute(null),
                 () => Assert.AreEqual(0, game.Attributes.Count)
             );
         }
@@ -324,10 +326,11 @@ namespace Kinectitude.Tests.Editor
             var scene = new Scene("Test Scene");
             var attribute = new Attribute("test");
             scene.AddAttribute(attribute);
+            scene.SelectedAttribute = attribute;
 
             CommandHelper.TestUndoableCommand(
                 () => Assert.AreEqual(1, scene.Attributes.Count),
-                () => scene.RemoveAttributeCommand.Execute(attribute),
+                () => scene.RemoveAttributeCommand.Execute(null),
                 () => Assert.AreEqual(0, scene.Attributes.Count)
             );
         }
@@ -661,21 +664,21 @@ namespace Kinectitude.Tests.Editor
         [TestMethod]
         public void SceneTransaction_Commit()
         {
-            var scene = new Scene("Test Scene");
+            var scene = new Scene("TestScene");
             var transaction = new SceneTransaction(scene);
-            transaction.Name = "Test Scene 2";
+            transaction.Name = "TestScene2";
             transaction.AddManager(transaction.AvailableManagers.First());
 
             CommandHelper.TestUndoableCommand(
                 () =>
                 {
-                    Assert.AreEqual("Test Scene", scene.Name);
+                    Assert.AreEqual("TestScene", scene.Name);
                     Assert.AreEqual(0, scene.Managers.Count);
                 },
                 () => transaction.CommitCommand.Execute(null),
                 () =>
                 {
-                    Assert.AreEqual("Test Scene 2", scene.Name);
+                    Assert.AreEqual("TestScene2", scene.Name);
                     Assert.AreEqual(1, scene.Managers.Count);
                 }
             );

@@ -32,7 +32,18 @@ namespace Kinectitude.Core.Loaders.Kgl
             string src = File.ReadAllText(fileName);
             ParseTree parseTree = parser.Parse(src, fileName);
             //TODO find out what to do here to get the error to show
-            if (parseTree.HasErrors()) Game.CurrentGame.Die("Can't construct game ");
+            if (parseTree.HasErrors())
+            {
+                var builder = new StringBuilder();
+                builder.Append("Can't construct game due to syntax errors:\n\n");
+
+                foreach (var message in parseTree.ParserMessages)
+                {
+                    builder.AppendLine(message.Message);
+                }
+
+                Game.CurrentGame.Die(builder.ToString());
+            }
             Root = parseTree.Root;
         }
 

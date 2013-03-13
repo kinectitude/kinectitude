@@ -60,7 +60,7 @@
                 <DockPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="8">
                         <Label Margin="0,0,8,0">Name</Label>
-                        <TextBox Name="txtPrototypeName" Width="300" Text="{Binding Name}" />
+                        <TextBox Name="txtPrototypeName" Width="300" Text="{Binding Name, ValidatesOnExceptions=True}" />
                     </StackPanel>
                     <Separator DockPanel.Dock="Top" />
                     <Label Margin="8,8,8,0" DockPanel.Dock="Top">Prototypes</Label>

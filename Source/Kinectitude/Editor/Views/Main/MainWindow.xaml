@@ -295,7 +295,7 @@
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Grid.Column="0">Name</TextBlock>
-                                            <TextBox Text="{Binding Name}" Grid.Column="1" />
+                                            <TextBox Text="{Binding Name, ValidatesOnExceptions=True}" Grid.Column="1" />
                                         </Grid>
                                     </Border>
                                 </Expander.Content>

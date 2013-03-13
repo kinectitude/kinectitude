@@ -43,9 +43,10 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
             {
                 try
                 {
-                    return (Brush)BrushConverter.ConvertFromString(GetStringValue<RenderComponent>("FontColor"));
+                    var b = (Brush)BrushConverter.ConvertFromString(GetStringValue<TextRenderComponent>("FontColor"));
+                    return b;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return Brushes.Black;
                 }

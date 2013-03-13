@@ -7,11 +7,9 @@ namespace Kinectitude.Tests.Core
     public class Conditions
     {
         [TestMethod]
-        [DeploymentItem("core/conditions.kgl")]
-        [DeploymentItem("core/conditions.kgl")]
         public void conditionTests()
         {
-            Setup.StartGame("conditions.kgl");
+            Setup.StartGame("Core/conditions.kgl");
             AssertionAction.CheckValue("Should not run", 0);
             AssertionAction.CheckValue("Always run");
             AssertionAction.CheckValue("if ran");

@@ -13,10 +13,9 @@ namespace Kinectitude.Tests.Core
     public class Inheritence
     {
         [TestMethod]
-        [DeploymentItem("core/inheritence.kgl")]
         public void InheritenceAndSet()
         {
-            Setup.RunGame("inheritence.kgl");
+            Setup.RunGame("Core/inheritence.kgl");
             AssertionAction.CheckValue("Prototype1 X");
             AssertionAction.CheckValue("Prototype1 Y");
             AssertionAction.CheckValue("Prototype1 score");

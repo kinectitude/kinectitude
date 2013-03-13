@@ -4,6 +4,7 @@ using Kinectitude.Core.Components;
 using Kinectitude.Editor.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Kinectitude.Editor.Models.Notifications;
+using Kinectitude.Editor.Models.Exceptions;
 
 namespace Kinectitude.Editor.Tests
 {
@@ -284,7 +285,7 @@ namespace Kinectitude.Editor.Tests
             Assert.AreEqual(TransformComponentType, plugin.ClassName);
         }
 
-        [TestMethod]
+        [TestMethod, ExpectedException(typeof(InvalidPrototypeNameException))]
         public void PrototypeMustHaveName()
         {
             bool collectionChanged = false;
@@ -298,7 +299,7 @@ namespace Kinectitude.Editor.Tests
             Assert.AreEqual(0, game.Prototypes.Count);
         }
 
-        [TestMethod]
+        [TestMethod, ExpectedException(typeof(PrototypeExistsException))]
         public void CannotAddDuplicatePrototypeName()
         {
             int eventsFired = 0;

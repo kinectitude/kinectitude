@@ -116,7 +116,7 @@ namespace Kinectitude.Editor.Models.Statements.Conditions
         public sealed override AbstractStatement DeepCopyStatement()
         {
             ConditionGroup copy = new ConditionGroup() { If = this.If.DeepCopyCondition() };
-
+            
             foreach (AbstractStatement statement in Statements)
             {
                 copy.AddStatement(statement.DeepCopyStatement());

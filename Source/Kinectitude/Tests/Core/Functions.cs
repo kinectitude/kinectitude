@@ -8,10 +8,9 @@ namespace Kinectitude.Tests.Core
     public class Functions
     {   
         [TestMethod]
-        [DeploymentItem(@"Core\functions.kgl")]
         public void FunctionTest()
         {
-            Setup.StartGame("functions.kgl");
+            Setup.StartGame("Core/functions.kgl");
             AssertionAction.CheckValue("1");
             AssertionAction.CheckValue("params 0", 2);
             AssertionAction.CheckValue("3");

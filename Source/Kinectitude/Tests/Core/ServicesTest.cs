@@ -11,11 +11,10 @@ namespace Kinectitude.Tests.Core
             ServiceAuto.started = ServiceAuto.stopped = ServiceNoAuto.started = ServiceNoAuto.stopped =
                 ServiceAutoSelfStop.started = ServiceAutoSelfStop.stopped = ServiceAuto.setVal =
                 ServiceAutoSelfStop.setVal = ServiceNoAuto.setVal = 0;
-            Setup.RunGame("ServiceTests.kgl");
+            Setup.RunGame("Core/ServiceTests.kgl");
         }
         
         [TestMethod]
-        [DeploymentItem("core/ServiceTests.kgl")]
         public void ServiceStartingStopping()
         {
             Assert.AreEqual<int>(1, ServiceAuto.started);
@@ -27,7 +26,6 @@ namespace Kinectitude.Tests.Core
         }
 
         [TestMethod]
-        [DeploymentItem("core/ServiceTests.kgl")]
         public void ServiceValueSet()
         {
             AssertionAction.CheckValue("service value");

@@ -2,6 +2,7 @@
 using Kinectitude.Core.Data;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Data.DataContainers;
+using Kinectitude.Editor.Models.Exceptions;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Transactions;
@@ -231,7 +232,13 @@ namespace Kinectitude.Editor.Models
 
             AddAttributeCommand = new DelegateCommand(null, (parameter) =>
             {
-                CreateAttribute();
+                var attribute = CreateAttribute();
+
+                Workspace.Instance.CommandHistory.Log(
+                    "add attribute '" + attribute.Name + "'",
+                    () => AddAttribute(attribute),
+                    () => RemoveAttribute(attribute)
+                );
             });
 
             RemoveAttributeCommand = new DelegateCommand(null, (parameter) =>
@@ -334,23 +341,29 @@ namespace Kinectitude.Editor.Models
 
         public Entity CreatePrototype()
         {
-            return new Entity() { Name = GetNextPrototypeName() };
+            return new Entity() { Name = GetNextPrototypeName(), IsPrototype = true };
         }
 
         public void AddPrototype(Entity prototype)
         {
-            if (null != prototype.Name && !HasPrototypeWithName(prototype.Name))
+            if (null == prototype.Name)
             {
-                prototype.Scope = this;
-
-                foreach (Plugin plugin in prototype.Plugins)
-                {
-                    DefinePlugin(plugin);
-                }
-
-                prototype.IsPrototype = true;
-                Prototypes.Add(prototype);
+                throw new InvalidPrototypeNameException();
             }
+
+            if (HasPrototypeWithName(prototype.Name))
+            {
+                throw new PrototypeExistsException(prototype.Name);
+            }
+
+            prototype.Scope = this;
+
+            foreach (Plugin plugin in prototype.Plugins)
+            {
+                DefinePlugin(plugin);
+            }
+
+            Prototypes.Add(prototype);
         }
 
         public void RemovePrototype(Entity prototype)
@@ -373,6 +386,11 @@ namespace Kinectitude.Editor.Models
 
         public void AddScene(Scene scene)
         {
+            if (HasSceneWithName(scene.Name))
+            {
+                throw new SceneNameExistsException(scene.Name);
+            }
+
             scene.Scope = this;
 
             foreach (Plugin plugin in scene.Plugins)
@@ -425,30 +443,19 @@ namespace Kinectitude.Editor.Models
         {
             attribute.Scope = this;
             Attributes.Add(attribute);
-
-            Workspace.Instance.CommandHistory.Log(
-                "add attribute '" + attribute.Name + "'",
-                () => AddAttribute(attribute),
-                () => RemoveAttribute(attribute)
-            );
         }
 
         public void RemoveAttribute(Attribute attribute)
         {
             attribute.Scope = null;
             Attributes.Remove(attribute);
-
-            Workspace.Instance.CommandHistory.Log(
-                "remove attribute '" + attribute.Name + "'",
-                () => RemoveAttribute(attribute),
-                () => AddAttribute(attribute)
-            );
         }
 
-        public void CreateAttribute()
+        public Attribute CreateAttribute()
         {
             Attribute attribute = new Attribute(GetNextAttributeKey());
             AddAttribute(attribute);
+            return attribute;
         }
 
         private string GetNextAttributeKey()
@@ -609,6 +616,11 @@ namespace Kinectitude.Editor.Models
             get { return Prototypes; }
         }
 
+        public bool HasSceneWithName(string name)
+        {
+            return Scenes.Any(x => x.Name == name);
+        }
+
         #endregion
 
         #region IAttributeScope implementation
@@ -655,6 +667,11 @@ namespace Kinectitude.Editor.Models
         #endregion
 
         #region IPluginNamespace implementation
+
+        public bool HasDefinedName(string name)
+        {
+            return Usings.Any(x => x.Defines.Any(y => y.Name == name));
+        }
 
         public string GetDefinedName(Plugin plugin)
         {

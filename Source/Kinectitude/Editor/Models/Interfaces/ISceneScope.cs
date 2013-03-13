@@ -8,5 +8,7 @@ namespace Kinectitude.Editor.Models.Interfaces
         double Height { get; }
 
         IEnumerable<Entity> Prototypes { get; }
+
+        bool HasSceneWithName(string name);
     }
 }

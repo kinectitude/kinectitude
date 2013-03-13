@@ -45,7 +45,7 @@
     <DockPanel Width="800" Height="600">
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
             <Label Margin="4">Name</Label>
-            <TextBox Name="txtName" Width="300" Text="{Binding Name}" Margin="0,4,4,4" />
+            <TextBox Name="txtName" Width="300" Text="{Binding Name, ValidatesOnExceptions=True}" Margin="0,4,4,4" />
         </StackPanel>
         <Separator DockPanel.Dock="Top" />
         <Label Margin="4" DockPanel.Dock="Top">Managers</Label>

@@ -2,6 +2,7 @@
 using Kinectitude.Core.Components;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Commands;
+using Kinectitude.Editor.Models.Exceptions;
 using Kinectitude.Editor.Models.Statements.Assignments;
 using Kinectitude.Editor.Models.Statements.Base;
 using Kinectitude.Editor.Models.Statements.Conditions;
@@ -37,6 +38,7 @@ namespace Kinectitude.Editor.Models
             public const string Exit = "Exit Application";
             public const string RevertMessage = "This will revert your project to its last saved state and cannot be undone. Are you sure you want to continue?";
             public const string UnsavedMessage = "Do you want to save changes to your project?";
+            public const string FailedToLoad = "Failed to Load";
         }
 
         public static IValueMaker ValueMaker = new KglValueMaker();
@@ -189,7 +191,14 @@ namespace Kinectitude.Editor.Models
                     {
                         if (result == true)
                         {
-                            LoadProject(fileName);
+                            try
+                            {
+                                LoadProject(fileName);
+                            }
+                            catch (EditorException e)
+                            {
+                                DialogService.Warn(Messages.FailedToLoad, e.Message, MessageBoxButton.OK);
+                            }
                         }
                     });
                 }

@@ -234,6 +234,11 @@ namespace Kinectitude.Editor.Models.Statements.Base
             }
         }
 
+        public bool HasDefinedName(string name)
+        {
+            return null != Scope ? Scope.HasDefinedName(name) : false;
+        }
+
         public string GetDefinedName(Plugin plugin)
         {
             return null != Scope ? Scope.GetDefinedName(plugin) : plugin.ClassName;

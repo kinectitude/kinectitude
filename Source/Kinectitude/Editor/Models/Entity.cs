@@ -1,6 +1,7 @@
 ﻿using Kinectitude.Core.Base;
 using Kinectitude.Core.Data;
 using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models.Exceptions;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Properties;
@@ -37,11 +38,31 @@ namespace Kinectitude.Editor.Models
             get { return name; }
             set
             {
-                if (name != value && !EntityNameExists(value))
+                if (name != value)
                 {
+                    if (value.ContainsWhitespace())
+                    {
+                        throw new InvalidEntityNameException(value);
+                    }
+
+                    if (EntityNameExists(value))
+                    {
+                        throw new EntityNameExistsException(value);
+                    }
+
+                    if (IsDefinedName(value))
+                    {
+                        throw new NameDefinedException(value);
+                    }
+
                     string oldName = name;
                     if (string.IsNullOrWhiteSpace(value))
                     {
+                        if (IsPrototype)
+                        {
+                            throw new InvalidPrototypeNameException();
+                        }
+
                         value = null;
                     }
 
@@ -609,6 +630,11 @@ namespace Kinectitude.Editor.Models
             return null != Scope ? Scope.EntityNameExists(name) : false;
         }
 
+        public bool IsDefinedName(string name)
+        {
+            return null != Scope ? Scope.HasDefinedName(name) : false;
+        }
+
         private void OnPrototypeAttributePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (null != InheritedAttributeChanged && e.PropertyName == "Value")
@@ -627,6 +653,11 @@ namespace Kinectitude.Editor.Models
         }
 
         #region IPluginNamespace implementation
+
+        public bool HasDefinedName(string name)
+        {
+            return null != Scope ? Scope.HasDefinedName(name) : false;
+        }
 
         public string GetDefinedName(Plugin plugin)
         {
@@ -815,21 +846,35 @@ namespace Kinectitude.Editor.Models
 
         public Entity DeepCopy()
         {
-            Entity copy = new Entity();
+            Entity copy = new Entity(); // Name is not copied since the copy must have a unique/anonymous name to be pasted in the same scene
+
+            foreach (Entity prototype in this.Prototypes)
+            {
+                copy.AddPrototype(prototype);
+            }
 
             foreach (Attribute attribute in this.Attributes)
             {
-                copy.AddAttribute(attribute.DeepCopy());
+                if (attribute.HasOwnValue)
+                {
+                    copy.AddAttribute(attribute.DeepCopy());
+                }
             }
 
             foreach (Component component in this.Components)
             {
-                copy.AddComponent(component.DeepCopy());
+                if (component.HasOwnValues || component.IsRoot)
+                {
+                    copy.AddComponent(component.DeepCopy());
+                }
             }
 
             foreach (AbstractEvent evt in this.Events)
             {
-                copy.AddEvent(evt.DeepCopy());
+                if (!evt.IsReadOnly)
+                {
+                    copy.AddEvent(evt.DeepCopy());
+                }
             }
 
             return copy;
