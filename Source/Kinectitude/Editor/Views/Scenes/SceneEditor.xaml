@@ -171,7 +171,7 @@
             </Button>
         </StackPanel>
 
-        <ScrollViewer Background="Gray" HorizontalScrollBarVisibility="Visible" CanContentScroll="False">
+        <ScrollViewer Background="Gray" HorizontalScrollBarVisibility="Visible" CanContentScroll="False" PreviewKeyDown="ScrollViewer_PreviewKeyDown">
             <Designer:DesignerCanvas x:Name="canvas"
                                      Margin="32"
                                      Width="{Binding Width}"

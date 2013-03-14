@@ -387,82 +387,6 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             }
         }
 
-        protected override void OnPreviewKeyDown(KeyEventArgs e)
-        {
-            Vector delta = new Vector();
-
-            if (e.Key == Key.Left)
-            {
-                delta.X = -1.0d;
-            }
-            else if (e.Key == Key.Right)
-            {
-                delta.X = 1.0d;
-            }
-            else if (e.Key == Key.Up)
-            {
-                delta.Y = -1.0d;
-            }
-            else if (e.Key == Key.Down)
-            {
-                delta.Y = 1.0d;
-            }
-            else if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
-            {
-                if (e.Key == Key.X)
-                {
-                    if (null != CutCommand)
-                    {
-                        CutCommand.Execute(GetSelectedData());
-                    }
-                }
-                else if (e.Key == Key.C)
-                {
-                    if (null != CopyCommand)
-                    {
-                        CopyCommand.Execute(GetSelectedData());
-                    }
-                }
-                else if (e.Key == Key.V)
-                {
-                    if (null != PasteCommand)
-                    {
-                        PasteCommand.Execute(null);
-                    }
-                }
-                else if (e.Key == Key.D)
-                {
-                    DeselectAll();
-                }
-                else if (e.Key == Key.A)
-                {
-                    SelectAll();
-                }
-            }
-            else if (e.Key == Key.Delete)
-            {
-                if (null != DeleteCommand)
-                {
-                    DeleteCommand.Execute(GetSelectedData());
-                }
-            }
-
-            if (delta.X != 0 || delta.Y != 0)
-            {
-                if (mode == Mode.Selecting && SelectedItems.Count() > 0)
-                {
-                    mode = Mode.Translating;
-                }
-
-                if (mode == Mode.Translating)
-                {
-                    TranslateSelection(delta);
-                }
-            }
-
-            e.Handled = true;
-        }
-
         private IEnumerable GetSelectedData()
         {
             return SelectedItems.Select(x => ItemContainerGenerator.ItemFromContainer(x));
@@ -723,8 +647,11 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             var layer = AdornerLayer.GetAdornerLayer(this);
             if (null != layer)
             {
-                layer.Remove(translator);
-                translator = null;
+                if (null != translator)
+                {
+                    layer.Remove(translator);
+                    translator = null;
+                }
             }
         }
 
@@ -804,6 +731,61 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             if (null != translator)
             {
                 translator.Update();
+            }
+        }
+
+        public void Cut()
+        {
+            if (null != CutCommand)
+            {
+                CutCommand.Execute(GetSelectedData());
+            }
+        }
+
+        public void Copy()
+        {
+            if (null != CopyCommand)
+            {
+                CopyCommand.Execute(GetSelectedData());
+            }
+        }
+
+        public void Paste()
+        {
+            if (null != PasteCommand)
+            {
+                PasteCommand.Execute(null);
+            }
+        }
+
+        public void Delete()
+        {
+            if (null != DeleteCommand)
+            {
+                DeleteCommand.Execute(GetSelectedData());
+            }
+        }
+
+        public void Translate(Vector delta)
+        {
+            if (mode == Mode.Selecting && SelectedItems.Count() > 0)
+            {
+                mode = Mode.Translating;
+            }
+
+            if (mode == Mode.Translating)
+            {
+                if (null != BeginTranslateCommand)
+                {
+                    BeginTranslateCommand.Execute(GetSelectedData());
+                }
+
+                TranslateSelection(delta);
+
+                if (null != CommitTranslateCommand)
+                {
+                    CommitTranslateCommand.Execute(GetSelectedData());
+                }
             }
         }
     }
