@@ -1,6 +1,7 @@
 ﻿using Kinectitude.Core.Components;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models;
+using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Values;
 using Kinectitude.Render;
 using System.Collections.Specialized;
@@ -301,6 +302,7 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
         public EntityPresenter(Entity entity) : base(entity)
         {
             Entity.Components.CollectionChanged += OnComponentsChanged;
+            Entity.AddHandler<EffectiveValueChanged>(OnEffectiveValueChanged);
 
             DisplayX = X;
             DisplayY = Y;
@@ -310,20 +312,31 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
             OpenEntityCommand = new DelegateCommand(null, p => Workspace.Instance.Project.OpenItem(Entity));
         }
 
+        private void OnEffectiveValueChanged(EffectiveValueChanged e)
+        {
+            if (null != TransformComponent && e.Plugin.CoreType == typeof(TransformComponent))
+            {
+                UpdateDisplayForProperty(e.PluginProperty.Name);
+            }
+        }
+
         private void OnPropertyChanged(Component component, PluginProperty property)
         {
-            if (component.Plugin.CoreType == typeof(TransformComponent))
+            UpdateDisplayForProperty(property.Name);
+        }
+
+        private void UpdateDisplayForProperty(string property)
+        {
+            if (property == "X" || property == "Width")
             {
-                if (property.Name == "X" || property.Name == "Width")
-                {
-                    DisplayX = X;
-                }
-                else if (property.Name == "Y" || property.Name == "Height")
-                {
-                    DisplayY = Y;
-                }
+                DisplayX = X;
             }
-            NotifyPropertyChanged(property.Name);
+            else if (property == "Y" || property == "Height")
+            {
+                DisplayY = Y;
+            }
+
+            NotifyPropertyChanged(property);
         }
 
         private void OnComponentsChanged(object sender, NotifyCollectionChangedEventArgs e)

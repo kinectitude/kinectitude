@@ -88,7 +88,7 @@ namespace Kinectitude.Editor.Tests
             Assert.AreEqual(0, entity.Attributes.Where(x => x.Name == "test").Count());
         }
 
-        [TestMethod]
+        [TestMethod, ExpectedException(typeof(AttributeNameExistsException))]
         public void CannotAddDuplicateAttributeKey()
         {
             Entity entity = new Entity();
@@ -137,7 +137,7 @@ namespace Kinectitude.Editor.Tests
             Assert.AreEqual(1, child.Attributes.Count);
         }
 
-        [TestMethod]
+        [TestMethod, ExpectedException(typeof(AttributeNameExistsException))]
         public void CannotSetExistingAttributeKeyToDuplicate()
         {
             Entity entity = new Entity();

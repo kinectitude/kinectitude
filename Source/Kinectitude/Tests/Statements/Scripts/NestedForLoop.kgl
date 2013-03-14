@@ -1,0 +1,33 @@
+﻿using Kinectitude.Tests.dll
+{
+    define Assertion as Kinectitude.Tests.Core.AssertionAction
+}
+
+Game (Name = "Test", FirstScene="Test")
+{
+    Scene Test()
+    {
+        Entity(counter = 0, valid = false, nested = 0)
+        {
+            Event SceneStarts()
+            {
+                flag = true
+
+                if (flag == false)
+                {
+                    for (nested = 7; nested < 9; nested += 1)
+                    {
+                        FireTrigger(Name = "nullo")
+                    }
+                }
+
+                if (nested == 0)
+                {
+                    valid = true
+                }
+
+                Assertion(LS = valid, RS = true, Assertion = "NestedForLoop", OnlyRunIf = true)
+            }
+        }
+    }
+}

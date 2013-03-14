@@ -46,7 +46,7 @@ namespace Kinectitude.Editor.Storage.Kgl
         {
             //TODO add functions here as well later
             Using defaults = new Using();
-            defaults.File = null;//Path.GetFileName(typeof(Kinectitude.Core.Components.TransformComponent).Assembly.Location);
+            defaults.File = null;
             List<string> defaultEvts = new List<string>()
             {
                 "AttributeChanges",
@@ -151,7 +151,7 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         private string BuildErrorMessage(Irony.LogMessageList messages, string file)
         {
-            var builder = new StringBuilder(string.Format("'{0}' is not a valid KGL game file.\n\n", file));
+            var builder = new StringBuilder(string.Format("'{0}' is not a valid KGL game file.", file)).Append(Environment.NewLine).Append(Environment.NewLine);
 
             foreach (var message in messages)
             {
@@ -230,7 +230,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             return action;
         }
 
-        private void createStatement(ParseTreeNode statementNode, Event evt, CompositeStatement compositeStatement = null)
+        private void CreateStatement(ParseTreeNode statementNode, Event evt, CompositeStatement compositeStatement = null)
         {
             AbstractStatement statement = null;
             if (statementNode.Term == grammar.Action)
@@ -241,7 +241,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             {
                 ConditionGroup conditionGroup = new ConditionGroup();
                 conditionGroup.If.Expression = getStrVal(statementNode.ChildNodes.First(child => child.Term == grammar.Expr));
-                foreach (ParseTreeNode child in grammar.GetOfType(statementNode, grammar.Actions)) createStatement(child, evt, conditionGroup.If);
+                foreach (ParseTreeNode child in grammar.GetOfType(statementNode, grammar.Actions)) CreateStatement(child, evt, conditionGroup.If);
                 foreach (ParseTreeNode elseNode in grammar.GetOfType(statementNode, grammar.Else))
                 {
                     string expr = getStrVal(elseNode.ChildNodes.FirstOrDefault(child => child.Term == grammar.Expr));
@@ -258,7 +258,7 @@ namespace Kinectitude.Editor.Storage.Kgl
                         conditionGroup.AddStatement(cond);
                     }
 
-                    foreach (ParseTreeNode child in grammar.GetOfType(elseNode, grammar.Actions)) createStatement(child, evt, cond);
+                    foreach (ParseTreeNode child in grammar.GetOfType(elseNode, grammar.Actions)) CreateStatement(child, evt, cond);
                 }
                 statement = conditionGroup;
             }
@@ -275,32 +275,38 @@ namespace Kinectitude.Editor.Storage.Kgl
             }
             else
             {
-                string expression = grammar.GetOfType(statementNode, grammar.Expr).First().Token.ValueString;
                 CompositeStatement loop = null;
                 switch (statementNode.ChildNodes.Count)
                 {
                     case 2:
                         WhileLoop wl = new WhileLoop();
-                        wl.Expression = expression;
+                        wl.Expression = getStrVal(statementNode.ChildNodes[0]);
                         statement = loop = wl;
                         break;
                     case 3:
                         ForLoop fl = new ForLoop();
-                        fl.Expression = expression;
+                        fl.Expression = getStrVal(statementNode.ChildNodes[0]);
                         //First assignment, expression, assignment, actions
-                        fl.PostExpression = statementNode.ChildNodes[1].Token.ValueString;
+                        fl.PostExpression = getStrVal(statementNode.ChildNodes[1]);
                         statement = loop = fl;
                         break;
                     case 4:
                         ForLoop forLoop = new ForLoop();
-                        forLoop.Expression = expression;
+                        forLoop.Expression = getStrVal(statementNode.ChildNodes[1]);
                         //First assignment, expression, assignment, actions
-                        forLoop.PostExpression = statementNode.ChildNodes[2].Token.ValueString;
-                        forLoop.PreExpression = statementNode.ChildNodes[0].Token.ValueString;
+                        forLoop.PostExpression = getStrVal(statementNode.ChildNodes[2]);
+                        forLoop.PreExpression = getStrVal(statementNode.ChildNodes[0]);
                         statement = loop = forLoop;
                         break;
                 }
-                foreach (ParseTreeNode child in grammar.GetOfType(statementNode, grammar.Actions)) createStatement(child, evt, loop);
+                foreach (ParseTreeNode child in grammar.GetOfType(statementNode, grammar.Actions))
+                {
+                    // TODO: This is a hack to skip the Actions found in the first line of the for() statement.
+                    if (!statementNode.ChildNodes.Contains(child))
+                    {
+                        CreateStatement(child, evt, loop);
+                    }
+                }
             }
             if (compositeStatement == null) evt.AddStatement(statement);
             else compositeStatement.AddStatement(statement);
@@ -314,7 +320,7 @@ namespace Kinectitude.Editor.Storage.Kgl
                 ParseTreeNode propertyNode = (ParseTreeNode)property.Item2;
                 evt.SetProperty(property.Item1, new Value(getStrVal(propertyNode)));
             }
-            foreach (ParseTreeNode actionNode in grammar.GetOfType(node, grammar.Actions)) createStatement(actionNode, evt, null);
+            foreach (ParseTreeNode actionNode in grammar.GetOfType(node, grammar.Actions)) CreateStatement(actionNode, evt, null);
             return evt;
         }
 

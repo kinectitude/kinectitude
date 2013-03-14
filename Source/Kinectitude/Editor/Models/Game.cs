@@ -441,6 +441,11 @@ namespace Kinectitude.Editor.Models
 
         public void AddAttribute(Attribute attribute)
         {
+            if (HasLocalAttribute(attribute.Name))
+            {
+                throw new AttributeNameExistsException(attribute.Name);
+            }
+
             attribute.Scope = this;
             Attributes.Add(attribute);
         }

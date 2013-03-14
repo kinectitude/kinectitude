@@ -13,6 +13,8 @@ using Kinectitude.Physics.dll
 
 using Kinectitude.Render.dll
 {
+    define RenderService as Kinectitude.Render.RenderService
+    define RenderManager as Kinectitude.Render.RenderManager
     define RenderComponent as Kinectitude.Render.RenderComponent
     define TextRenderComponent as Kinectitude.Render.TextRenderComponent
     define ImageRenderComponent as Kinectitude.Render.ImageRenderComponent
@@ -22,24 +24,24 @@ Game(Name = "breakout", FirstScene = "game")
 {
     Prototype paddle()
     {
-        Component KinectFollowComponent(Direction = "X", Player = 1, Joint = "HandRight")
-        Component RenderComponent(FillColor = "Black", Shape = "Rectangle")
-        Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = "0", Mass = "1", Friction = "0", LinearDamping = "0", MovesWhenHit = false, FixedRotation = true)
         Component Transform(Width = 128, Height = 24)
+        Component KinectFollowComponent(Joint = "HandRight", Player = 1, Direction = "X")
+        Component RenderComponent(Shape = "Rectangle", FillColor = "Black")
+        Component PhysicsComponent(Shape = "Rectangle", Restitution = "0", Mass = "1", Friction = "0", LinearDamping = "0", XVelocity = 0, YVelocity = 0, MovesWhenHit = false, FixedRotation = true)
     }
-
+    
     Prototype ball(Value = 0)
     {
-        Component RenderComponent(FillColor = "Black", Shape = "Rectangle")
         Component Transform(X = 400, Y = 550, Width = 24, Height = 24)
-        Component PhysicsComponent(MinimumSpeed = 50, MaximumSpeed = 50, XVelocity = -40, YVelocity = -20, Shape = "Ellipse", Restitution = 1, Mass = 1, Friction = 0, LinearDamping = 0, MovesWhenHit = true, AngularVelocity = 1, FixedRotation = false)
+        Component RenderComponent(Shape = "Rectangle", FillColor = "Black")
+        Component PhysicsComponent(Shape = "Ellipse", Restitution = 1, Mass = 1, Friction = 0, LinearDamping = 0, MaximumSpeed = 50, MinimumSpeed = 50, XVelocity = -40, YVelocity = -20, AngularVelocity = 1, MovesWhenHit = true, FixedRotation = false)
         
         Event TriggerOccurs(Trigger = "gameOver")
         {
             Destroy()
         }
     }
-
+    
     Prototype primaryBall : ball(ball = "primary")
     {
         Event Collision(CollidesWith = $bottom_wall)
@@ -49,43 +51,43 @@ Game(Name = "breakout", FirstScene = "game")
             scene.balls -= 1
         }
     }
-
+    
     Prototype extraBall : ball(ball = "extra")
     {
         Event Collision(CollidesWith = $bottom_wall)
-        { 
+        {
             Destroy()
         }
     }
     
     Prototype block()
     {
-        Component RenderComponent(FillColor = "Red", Shape = "Rectangle")
-        Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, Friction = 0, LinearDamping = 0, MovesWhenHit = false, FixedRotation = true)
         Component Transform(Width = 95, Height = 20)
+        Component RenderComponent(Shape = "Rectangle", FillColor = "Red")
+        Component PhysicsComponent(Shape = "Rectangle", Restitution = 0, Mass = 1, Friction = 0, LinearDamping = 0, XVelocity = 0, YVelocity = 0, MovesWhenHit = false, FixedRotation = true)
         
-        Event Collision(CollidesWith = $extraBall+$primaryBall)
+        Event Collision(CollidesWith = $extraBall + $primaryBall)
         {
             scene.blocks -= 1
             Destroy()
         }
     }
-
+    
     Prototype spawn1Block : block()
     {
         Component RenderComponent(FillColor = "Orange")
-
+        
         Event Collision(CollidesWith = $extraBall + $primaryBall)
         {
             CreateEntity(Prototype = "extraBall")
         }
     }
-
+    
     Prototype spawn3Block : block()
     {
         Component RenderComponent(FillColor = "Yellow")
-
-        Event Collision(CollidesWith = $extraBall+$primaryBall)
+        
+        Event Collision(CollidesWith = $extraBall + $primaryBall)
         {
             CreateEntity(Prototype = "extraBall")
             CreateEntity(Prototype = "extraBall")
@@ -93,20 +95,25 @@ Game(Name = "breakout", FirstScene = "game")
             scene.show = "A " + ^CollidesWith.ball + " at X " + ^CollidesWith.Transform.X
         }
     }
-
+    
     Prototype text()
     {
+        Component Transform()
         Component TextRenderComponent(FontFamily = "Arial", FontWeight = "Normal", FontStyle = "Normal", FontStretch = "Normal", FontSize = "36", FontColor = "Black")
     }
     
+    Service RenderService(Width = 800, Height = 600)
+    
     Scene game(balls = 10, blocks = 24)
     {
+        Manager RenderManager(Width = 1000, Height = 800, CameraX = 20, CameraY = 20)
+        
         Entity player : paddle()
         {
             Component Transform(X = 400, Y = 560)
         }
         
-        Entity  : spawn3Block()
+        Entity : spawn3Block()
         {
             Component Transform(X = 50, Y = 200)
         }
@@ -118,7 +125,7 @@ Game(Name = "breakout", FirstScene = "game")
         
         Entity : block()
         {
-           Component Transform(X = 250, Y = 200)
+            Component Transform(X = 250, Y = 200)
         }
         
         Entity : block()
@@ -229,25 +236,25 @@ Game(Name = "breakout", FirstScene = "game")
         Entity top_wall()
         {
             Component Transform(X = 400, Y = 0, Width = 800, Height = 2)
-            Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, MovesWhenHit = false, FixedRotation = true)
+            Component PhysicsComponent(Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, XVelocity = 0, YVelocity = 0, MovesWhenHit = false, FixedRotation = true)
         }
         
         Entity bottom_wall()
         {
             Component Transform(X = 400, Y = 600, Width = 800, Height = 2)
-            Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, MovesWhenHit = false , FixedRotation = true)
+            Component PhysicsComponent(Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, XVelocity = 0, YVelocity = 0, MovesWhenHit = false, FixedRotation = true)
         }
-
+        
         Entity left_wall()
         {
             Component Transform(X = 0, Y = 300, Width = 2, Height = 600)
-            Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, MovesWhenHit = false, FixedRotation = true)
+            Component PhysicsComponent(Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, XVelocity = 0, YVelocity = 0, MovesWhenHit = false, FixedRotation = true)
         }
-
+        
         Entity right_wall()
         {
             Component Transform(X = 800, Y = 300, Width = 2, Height = 600)
-            Component PhysicsComponent(XVelocity = 0, YVelocity = 0, Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, MovesWhenHit = false, FixedRotation = true)
+            Component PhysicsComponent(Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, XVelocity = 0, YVelocity = 0, MovesWhenHit = false, FixedRotation = true)
         }
         
         Entity : primaryBall()
@@ -278,11 +285,12 @@ Game(Name = "breakout", FirstScene = "game")
                 }
                 if (scene.balls < 0)
                 {
-                    TextRenderComponent.Value  = "GAME OVER"
-                    FireTrigger(Name="gameOver")
+                    TextRenderComponent.Value = "GAME OVER"
+                    FireTrigger(Name = "gameOver")
                 }
             }
         }
+        
         Entity : text()
         {
             Component Transform(X = 0, Y = 100, Width = 800)
@@ -291,6 +299,42 @@ Game(Name = "breakout", FirstScene = "game")
             Event AttributeChanges(Target = scene.show)
             {
                 TextRenderComponent.Value = "The value of scene.show " + scene.show
+                if (game.cond == true)
+                {
+                    if (game.nested > 5)
+                    {
+                        FireTrigger(Name = "TriggerNestedIf")
+                        while (game.nested > 0)
+                        {
+                            game.nested -= 1
+                            for (game.x = 0; game.x < 9; game.x += 1)
+                            {
+                                FireTrigger(Name = "TriggerForLoop")
+                            }
+                        }
+                    }
+                    else if (game.nested < 7)
+                    {
+                        FireTrigger(Name = "TriggerNestedElseIf")
+                    }
+                    else if (game.nested == 2)
+                    {
+                        FireTrigger(Name = "TriggerSecondElse")
+                    }
+                    else
+                    {
+                        FireTrigger(Name = "TriggerNestedElse")
+                    }
+                    FireTrigger(Name = "TriggerIf")
+                }
+                else if (game.cond > 5)
+                {
+                    FireTrigger(Name = "TriggerElseIf")
+                }
+                else
+                {
+                    FireTrigger(Name = "TriggerElse")
+                }
             }
         }
     }

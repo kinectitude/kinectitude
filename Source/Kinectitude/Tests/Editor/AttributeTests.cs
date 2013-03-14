@@ -14,7 +14,7 @@ namespace Kinectitude.Editor.Tests
             bool propertyChanged = false;
 
             Attribute attribute = new Attribute("test");
-            attribute.PropertyChanged += (o, e) => propertyChanged = (e.PropertyName == "Key");
+            attribute.PropertyChanged += (o, e) => propertyChanged = (e.PropertyName == "Name");
 
             attribute.Name = "test2";
 

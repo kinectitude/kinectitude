@@ -26,15 +26,56 @@ Game (FirstScene = "game", Name = "Camera Tests")
     {
         Manager RenderManager(CameraX = 50, CameraY = 50, Width = 1600, Height = 1200)
 
-        Entity : text(count = 0)
+        Entity : text(clicks = 0, nested = 0, counter = 0, flag = true)
         {
             Component Transform(X = 10, Y = 10, Width = 32, Height = 32)
             Component TextRenderComponent(Value = "This is some fixed position text", TextAlignment = "Leading", FixedPosition = true)
 
             Event MouseClickEvent(Button = "Left")
             {
-                count += 1
-                TextRenderComponent.Value = count
+                clicks += 1
+                TextRenderComponent.Value = clicks
+            }
+
+            Event SceneStarts()
+            {
+                for (counter = 0; counter < 5; counter += 1)
+	            {
+		            FireTrigger(Name = "nullo")
+	            }
+                if (counter == 1)
+                {
+	                TextRenderComponent.Value = "Fail"
+                }
+                else if (counter == 5)
+                {
+	                TextRenderComponent.Value = "Pass"
+                }
+                else
+                {
+	                TextRenderComponent.Value = "I dunno what's going on..."
+                }
+
+                if (flag == false)
+                {
+                    for (nested = 7; nested < 9; nested += 1)
+                    {
+                        FireTrigger(Name = "nullo")
+                    }
+                }
+
+                if (nested == 7 || nested == 8)
+                {
+                    TextRenderComponent.Value += " and Fail"
+                }
+                else if (nested == 0)
+                {
+                    TextRenderComponent.Value += " and Pass"
+                }
+                else
+                {
+                    TextRenderComponent.Value += " and idunno " + nested
+                }
             }
         }
 

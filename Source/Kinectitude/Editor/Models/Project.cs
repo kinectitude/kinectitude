@@ -355,12 +355,15 @@ namespace Kinectitude.Editor.Models
             var dataDir = new DirectoryInfo(Path.Combine(Location, GameRoot));
             var dataAssets = new DirectoryInfo(Path.Combine(dataDir.FullName, "Assets"));
 
-            var playAssets = Path.Combine(play.FullName, "Assets");
-            Directory.CreateDirectory(playAssets);
-
-            foreach (var file in dataAssets.GetFiles())
+            if (dataAssets.Exists)
             {
-                file.CopyTo(Path.Combine(playAssets, file.Name));
+                var playAssets = Path.Combine(play.FullName, "Assets");
+                Directory.CreateDirectory(playAssets);
+
+                foreach (var file in dataAssets.GetFiles())
+                {
+                    file.CopyTo(Path.Combine(playAssets, file.Name));
+                }
             }
 
             var storage = ProjectStorage.CreateGameStorage(new FileInfo(Path.Combine(play.FullName, "game.kgl")));

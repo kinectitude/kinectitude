@@ -119,7 +119,14 @@ namespace Kinectitude.Core.Language
 
         private void getOfTypeHelper(ParseTreeNode node, HashSet<NonTerminal> type, List<ParseTreeNode> nodes)
         {
-            IEnumerable<ParseTreeNode> correctTypedNodes = node.ChildNodes.Where(child => type.Contains(child.Term));
+            Func<ParseTreeNode, bool> predicate = (child => type.Contains(child.Term));
+
+            if (node.Term == Loop)
+            {
+                predicate = (child => child.Term != Assignment && type.Contains(child.Term));
+            }
+
+            IEnumerable<ParseTreeNode> correctTypedNodes = node.ChildNodes.Where(predicate);
             nodes.AddRange(correctTypedNodes);
             foreach (ParseTreeNode child in correctTypedNodes) getOfTypeHelper(child, type, nodes);
         }
@@ -291,8 +298,8 @@ namespace Kinectitude.Core.Language
                  "else" + openBrace + Actions + closeBrace + Else |
                  "else" + openBrace + Actions + closeBrace;
 
-            Condition.Rule = "if" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace |
-                "if" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace + Else;
+            Condition.Rule = "if" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace + Else |
+                "if" + openBrac + Expr + closeBrac + openBrace + Actions + closeBrace;
 
             NonTerminal optionalAssignment = new NonTerminal("optionalAssignment", "optionalAssignment");
             optionalAssignment.Rule = Assignment | Empty;

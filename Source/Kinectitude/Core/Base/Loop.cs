@@ -8,16 +8,23 @@ namespace Kinectitude.Core.Base
 {
     internal sealed class Loop : Action
     {
+        private readonly Action Before;
         private readonly List<Action> Actions = new List<Action>();
         private readonly ValueReader Expression;
 
-        internal Loop(ValueReader expr)
+        internal Loop(ValueReader expr, Action before)
         {
-            Expression = expr; 
+            Before = before;
+            Expression = expr;
         }
 
         public override void Run()
         {
+            if (null != Before)
+            {
+                Before.Run();
+            }
+
             while (Expression)
             {
                 foreach (Action a in Actions) a.Run();

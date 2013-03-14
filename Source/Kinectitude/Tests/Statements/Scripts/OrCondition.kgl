@@ -1,0 +1,23 @@
+﻿using Kinectitude.Tests.dll
+{
+    define Assertion as Kinectitude.Tests.Core.AssertionAction
+}
+
+Game (Name = "Test", FirstScene="Test")
+{
+    Scene Test()
+    {
+        Entity(valid = false, a = 2)
+        {
+            Event SceneStarts()
+            {
+                if ((a == 1) || (a == 2))
+                {
+                    valid = true
+                }
+
+                Assertion(LS = valid, RS = true, Assertion = "OrCondition", OnlyRunIf = true)
+            }
+        }
+    }
+}

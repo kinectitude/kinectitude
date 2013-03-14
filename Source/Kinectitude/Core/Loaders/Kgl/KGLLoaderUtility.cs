@@ -34,8 +34,7 @@ namespace Kinectitude.Core.Loaders.Kgl
             //TODO find out what to do here to get the error to show
             if (parseTree.HasErrors())
             {
-                var builder = new StringBuilder();
-                builder.Append("Can't construct game due to syntax errors:\n\n");
+                var builder = new StringBuilder("Can't construct game due to syntax errors:" + Environment.NewLine + Environment.NewLine);
 
                 foreach (var message in parseTree.ParserMessages)
                 {

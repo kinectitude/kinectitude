@@ -1,5 +1,6 @@
 ﻿using Kinectitude.Core.Data;
 using Kinectitude.Editor.Base;
+using Kinectitude.Editor.Models.Exceptions;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Values;
@@ -25,8 +26,18 @@ namespace Kinectitude.Editor.Models
             get { return name; }
             set
             {
-                if (IsLocal && name != value && !KeyExists(value))
+                if (IsLocal && name != value)
                 {
+                    if (value.ContainsWhitespace())
+                    {
+                        throw new InvalidAttributeNameException(value);
+                    }
+                    
+                    if (KeyExists(value))
+                    {
+                        throw new AttributeNameExistsException(value);
+                    }
+
                     string oldKey = name;
                     
                     Workspace.Instance.CommandHistory.Log(
@@ -42,7 +53,7 @@ namespace Kinectitude.Editor.Models
                         NameChanged(oldKey, name);
                     }
 
-                    NotifyPropertyChanged("Key");
+                    NotifyPropertyChanged("Name");
                 }
             }
         }

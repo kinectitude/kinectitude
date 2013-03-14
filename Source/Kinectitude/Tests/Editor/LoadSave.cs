@@ -16,8 +16,30 @@ namespace Kinectitude.Tests.Editor.loadSave
 
             Game game = storage.LoadGame();
             storage.SaveGame(game);
+
             string after = File.ReadAllText("Editor/read.kgl");
             string shouldBe = File.ReadAllText("Editor/original.kgl");
+
+            int line = 1;
+            int col = 1;
+            for (int i = 0; i < shouldBe.Length; i++)
+            {
+                char ch = shouldBe[i];
+
+                if (ch == '\n')
+                {
+                    line++;
+                    col = 1;
+                }
+
+                if (after[i] != shouldBe[i])
+                {
+                    Assert.Fail("Files do not match at line " + line + " column " + col);
+                }
+
+                col++;
+            }
+
             Assert.AreEqual(shouldBe, after);
         }
     }

@@ -64,7 +64,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>$(ProjectDir)..\..\..\Build\$(Configuration)\Plugins\</OutputPath>
+    <OutputPath>$(ProjectDir)..\..\..\Build\$(Configuration)\</OutputPath>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -166,6 +166,8 @@
     <Compile Include="Models\Data\ValueReaders\ThisComponentValueReader.cs" />
     <Compile Include="Models\Exceptions\EditorException.cs" />
     <Compile Include="Models\Exceptions\EntityNameExistsException.cs" />
+    <Compile Include="Models\Exceptions\AttributeNameExistsException.cs" />
+    <Compile Include="Models\Exceptions\InvalidAttributeNameException.cs" />
     <Compile Include="Models\Exceptions\InvalidEntityNameException.cs" />
     <Compile Include="Models\Exceptions\InvalidExpressionException.cs" />
     <Compile Include="Models\Exceptions\InvalidPrototypeNameException.cs" />

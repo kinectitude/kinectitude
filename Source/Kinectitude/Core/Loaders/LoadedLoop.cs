@@ -10,10 +10,12 @@ namespace Kinectitude.Core.Loaders
 {
     internal sealed class LoadedLoop : LoadedActionable
     {
+        private readonly LoadedBaseAction Before;
         private readonly LoadedBaseAction After;
 
-        internal LoadedLoop(object whileVal, LoaderUtility loader, LoadedBaseAction after) : base(whileVal, loader)
+        internal LoadedLoop(object whileVal, LoaderUtility loader, LoadedBaseAction before, LoadedBaseAction after) : base(whileVal, loader)
         {
+            Before = before;
             After = after;
         }
 
@@ -26,8 +28,14 @@ namespace Kinectitude.Core.Loaders
         internal override Action Create(Event evt)
         {
             ValueReader reader = LoaderUtil.MakeAssignable(ConditianlExpression, evt.Entity.Scene, evt.Entity, evt) as ValueReader;
+            Action beforeAction = null;
 
-            Loop loop = new Loop(reader);
+            if (null != Before)
+            {
+                beforeAction = Before.Create(evt);
+            }
+
+            Loop loop = new Loop(reader, beforeAction);
             loop.Event = evt;
 
             foreach (LoadedBaseAction loadedAction in Actions)

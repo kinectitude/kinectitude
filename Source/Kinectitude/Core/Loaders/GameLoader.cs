@@ -71,6 +71,7 @@ namespace Kinectitude.Core.Loaders
                 Scenes[sceneName] = sceneLoader.LoadedScene;
             }
 
+            Game.Name = Game["Name"].GetStrValue();
             return Game;
         }
 
@@ -192,21 +193,25 @@ namespace Kinectitude.Core.Loaders
 
         private LoadedLoop createLoadedLoop(Game game, LoadedEvent e, object loop)
         {
-            object beforeAction = loaderUtility.GetBeforeAction(loop);
-            if (beforeAction != null)
+            object before = loaderUtility.GetBeforeAction(loop);
+            LoadedBaseAction beforeAction = null;
+
+            if (before != null)
             {
-                object before = loaderUtility.GetBeforeAction(loop);
                 Tuple<object, object, object> assignment = loaderUtility.GetAssignment(before);
-                e.AddAction(new LoadedAssignment(assignment.Item1, assignment.Item2, assignment.Item3, loaderUtility));
+                beforeAction = new LoadedAssignment(assignment.Item1, assignment.Item2, assignment.Item3, loaderUtility);
             }
 
             object after = loaderUtility.GetAfterAction(loop);
             LoadedBaseAction afterAction = null;
-            if(after != null){
+
+            if(after != null)
+            {
                 Tuple<object, object, object> assignment = loaderUtility.GetAssignment(after);
                 afterAction = new LoadedAssignment(assignment.Item1, assignment.Item2, assignment.Item3, loaderUtility);
             }
-            LoadedLoop ll = new LoadedLoop(loaderUtility.GetCondition(loop), loaderUtility, afterAction);;
+
+            LoadedLoop ll = new LoadedLoop(loaderUtility.GetCondition(loop), loaderUtility, beforeAction, afterAction);
             addActions(game, loop, e, ll);
             return ll;
         }

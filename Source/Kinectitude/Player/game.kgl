@@ -96,7 +96,7 @@ Game (FirstScene = "game", IsFullScreen = false, Name="breakout"){
     
     Scene game(balls = 10, blocks = 24){
 
-        Manager RenderManager(CameraX = 5, CameraY = 5)
+        Manager RenderManager(Width = 1000, Height = 800, CameraX = 0, CameraY = 0)
 
         Entity player : paddle(){
             Component Transform(X = 400, Y = 560)

@@ -36,12 +36,12 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         public void Visit(Action action)
         {
-            result = tabs() + action.Type + ApplyToProperties(action.Properties);
+            result = Tabs() + action.Type + ApplyToProperties(action.Properties);
         }
 
         public void Visit(Assignment assignment)
         {
-            StringBuilder sb = new StringBuilder(tabs()).Append(assignment.Key).Append(" ");
+            StringBuilder sb = new StringBuilder(Tabs()).Append(assignment.Key).Append(" ");
 
             switch (assignment.Operator)
             {
@@ -88,7 +88,7 @@ namespace Kinectitude.Editor.Storage.Kgl
         public void Visit(Component component)
         {
             //Three tabs, game, scene, entity then component
-            result = new StringBuilder(tabs()).Append("Component ")
+            result = new StringBuilder(Tabs()).Append("Component ")
                 .Append(component.Type).Append(ApplyToProperties(component.Properties)).ToString();
         }
 
@@ -104,21 +104,37 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         public void Visit(ConditionGroup group)
         {
-            string tabStr = tabs();
-            StringBuilder stmt = new StringBuilder(tabStr).Append("if (").Append(group.If.Expression).Append(')')
-                .Append(Apply(group.If));
+            string tabStr = Tabs();
+            StringBuilder builder = new StringBuilder(tabStr).Append("if (")
+                .Append(group.If.Expression).Append(')').Append(Apply(group.If));
 
-            foreach (var elseif in group.Statements)
+            if (group.Statements.Count != 0 || group.Else != null)
             {
-                stmt.Append(tabStr).Append("else if (").Append(group.If.Expression).Append(')');
-                stmt.Append(Apply(elseif));
+                builder.AppendLine();
             }
+
+            int i = 0;
+            foreach (var stmt in group.Statements)
+            {
+                var condition = (ExpressionCondition)stmt;
+                builder.Append(tabStr).Append("else if (").Append(condition.Expression).Append(')');
+                builder.Append(Apply(stmt));
+
+                if (i < group.Statements.Count - 1 || group.Else != null)
+                {
+                    builder.AppendLine();
+                }
+
+                i++;
+            }
+            
             if (group.Else != null)
             {
-                stmt.Append(tabStr).Append("else");
-                stmt.Append(Apply(group.Else));
+                builder.Append(tabStr).Append("else");
+                builder.Append(Apply(group.Else));
             }
-            result = stmt.ToString();
+            
+            result = builder.ToString();
         }
 
         public void Visit(Define define)
@@ -131,37 +147,59 @@ namespace Kinectitude.Editor.Storage.Kgl
         {
             //tab from game and scene for entity and game for prototype.
             string tabstr = entity.IsPrototype ? "    " : "        ";
-            StringBuilder entityBuilder = new StringBuilder(tabstr)
-                .Append(entity.IsPrototype? "Prototype " :  "Entity ").Append(entity.Name ?? "");
+            StringBuilder entityBuilder = new StringBuilder(tabstr).Append(entity.IsPrototype ? "Prototype " : "Entity ");
+            
+            if (!string.IsNullOrWhiteSpace(entity.Name))
+            {
+                entityBuilder.Append(entity.Name);
 
-            if(entity.Prototypes.Count != 0){
-                entityBuilder.Append(" : ").Append(string.Join(", ", entity.Prototypes.Select(p => p.Name)));
+                if (entity.Prototypes.Count != 0)
+                {
+                    entityBuilder.Append(' ');
+                }
             }
 
-            entityBuilder.Append(ApplyToAttributes(entity.Attributes)).Append(openDef());
+            if(entity.Prototypes.Count != 0)
+            {
+                entityBuilder.Append(": ").Append(string.Join(", ", entity.Prototypes.Select(p => p.Name)));
+            }
 
-            if(entity.Components.Count != 0) entityBuilder.Append(ApplyToAll<Component>(entity.Components, "\n", ValidComponent)).Append('\n');
-            if (entity.Events.Count != 0) entityBuilder.Append(ApplyToAll<AbstractEvent>(entity.Events, "\n", ValidEvent)).Append('\n');
+            entityBuilder.Append(ApplyToAttributes(entity.Attributes)).Append(OpenDef());
 
-            result = entityBuilder.Append(closeDef()).ToString();
+            if (Enumerable.Any(entity.Components, x => ValidComponent(x)))
+            {
+                entityBuilder.Append(ApplyToAll<Component>(entity.Components, Environment.NewLine, ValidComponent)).AppendLine();
+
+                if (Enumerable.Any(entity.Events, x => ValidEvent(x)))
+                {
+                    entityBuilder.Append(Tabs()).AppendLine();
+                }
+            }
+
+            if (Enumerable.Any(entity.Events, x => ValidEvent(x)))
+            {
+                entityBuilder.Append(ApplyToAll<AbstractEvent>(entity.Events, Environment.NewLine, ValidEvent));
+            }
+
+            result = entityBuilder.Append(CloseDefLine()).ToString();
         }
 
         public void Visit(Event evt)
         {
-            result = new StringBuilder("            Event ").Append(evt.Type)
-                .Append(ApplyToProperties(evt.Properties)).Append(openDef())
-                .Append(ApplyToAll<AbstractStatement>(evt.Statements, "\n", AllValid)).Append("            ").Append(closeDef()).ToString();
+            result = new StringBuilder(Tabs()).Append("Event ").Append(evt.Type)
+                .Append(ApplyToProperties(evt.Properties)).Append(OpenDef())
+                .Append(ApplyToAll<AbstractStatement>(evt.Statements, Environment.NewLine, AllValid)).AppendLine().Append(CloseDefLine()).ToString();
         }
 
         public void Visit(ForLoop loop)
         {
-            string tabin = tabs();
+            string tabin = Tabs();
             StringBuilder sb = new StringBuilder(tabin).Append("for (").Append(loop.PreExpression).Append("; ")
-                .Append(loop.Expression).Append("; ").Append(loop.PostExpression).Append(")").Append(openDef());
+                .Append(loop.Expression).Append("; ").Append(loop.PostExpression).Append(")").Append(OpenDef());
 
-            sb.Append(ApplyToAll<AbstractStatement>(loop.Statements, "\n", AllValid));
+            sb.Append(ApplyToAll<AbstractStatement>(loop.Statements, Environment.NewLine, AllValid));
 
-            sb.Append("\n").Append(tabin).Append(closeDef());
+            sb.AppendLine().Append(CloseDef());
             result = sb.ToString();
         }
 
@@ -176,11 +214,21 @@ namespace Kinectitude.Editor.Storage.Kgl
                 game.Attributes
             );
 
-            result = new StringBuilder(ApplyToAll<Using>(game.Usings, "", AllValid))
-                .Append("Game").Append(ApplyToAttributes(pairs))
-                .Append(openDef()).Append(ApplyToAll<Entity>(game.Prototypes, "", AllValid))
-                .Append(ApplyToAll<Service>(game.Services, "", AllValid))
-                .Append(ApplyToAll<Scene>(game.Scenes, "", AllValid)).Append(closeDef()).ToString();
+            var builder = new StringBuilder(ApplyToAll<Using>(game.Usings, "", AllValid))
+                .Append("Game").Append(ApplyToAttributes(pairs)).Append(OpenDef());
+            
+            if (game.Prototypes.Count > 0)
+            {
+                builder.Append(ApplyToAll<Entity>(game.Prototypes, Tabs() + Environment.NewLine, AllValid)).Append(Tabs()).AppendLine();
+            }
+             
+            if (game.Services.Count > 0)
+            {
+                builder.Append(ApplyToAll<Service>(game.Services, Tabs() + Environment.NewLine, AllValid)).AppendLine().Append(Tabs()).AppendLine();
+            }
+
+            builder.Append(ApplyToAll<Scene>(game.Scenes, Tabs() + Environment.NewLine, AllValid)).Append(CloseDef());
+            result = builder.ToString();
         }
 
         public void Visit(Project project)
@@ -248,26 +296,33 @@ namespace Kinectitude.Editor.Storage.Kgl
         public void Visit(Scene scene)
         {
             //tab from game
-            StringBuilder sceneBuilder = new StringBuilder("    Scene ").Append(scene.Name).Append(ApplyToAttributes(scene.Attributes)).Append(openDef());
+            StringBuilder sceneBuilder = new StringBuilder("    Scene ").Append(scene.Name).Append(ApplyToAttributes(scene.Attributes)).Append(OpenDef());
 
             if (scene.Managers.Count != 0)
-                sceneBuilder.Append(ApplyToAll<Manager>(scene.Managers, "\n", AllValid)).Append('\n');
+            {
+                sceneBuilder.Append(ApplyToAll<Manager>(scene.Managers, Tabs() + Environment.NewLine, AllValid)).Append(Environment.NewLine);
 
-            sceneBuilder.Append(ApplyToAll<Entity>(scene.Entities, "", AllValid)).Append(closeDef());
+                if (scene.Entities.Count != 0)
+                {
+                    sceneBuilder.Append(Tabs()).AppendLine();
+                }
+            }
+
+            sceneBuilder.Append(ApplyToAll<Entity>(scene.Entities, Tabs() + Environment.NewLine, AllValid)).Append(CloseDefLine());
             result = sceneBuilder.ToString();
         }
 
         public void Visit(Service service)
         {
-            result = new StringBuilder("        Service ")
+            result = new StringBuilder("    Service ")
                 .Append(service.Type).Append(ApplyToProperties(service.Properties)).ToString();
         }
 
         public void Visit(Using use)
         {
             if (use.File == null) return;
-            result = new StringBuilder("using ").Append(use.File).Append(openDef())
-                .Append(ApplyToAll<Define>(use.Defines, "\n", AllValid)).Append(closeDef()).Append("\n").ToString();
+            result = new StringBuilder("using ").Append(use.File).Append(OpenDef())
+                .Append(ApplyToAll<Define>(use.Defines, Environment.NewLine, AllValid)).AppendLine().Append(CloseDefLine()).AppendLine().ToString();
         }
 
         public void Visit(Value val)
@@ -277,17 +332,19 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         public void Visit(WhileLoop loop)
         {
-            StringBuilder sb = new StringBuilder(tabs()).Append("while (").Append(loop.Expression).Append(")")
-                .Append(openDef()).Append(ApplyToAll<AbstractStatement>(loop.Statements, "\n", AllValid)).Append(closeDef());
+            StringBuilder sb = new StringBuilder(Tabs()).Append("while (").Append(loop.Expression).Append(")")
+                .Append(OpenDef()).Append(ApplyToAll<AbstractStatement>(loop.Statements, Environment.NewLine, AllValid))
+                .AppendLine().Append(CloseDef());
 
             result = sb.ToString();
         }
 
         private void VisitCondition(AbstractCondition condition)
         {
-            StringBuilder conditionBuilder = new StringBuilder(openDef());
-            conditionBuilder.Append(ApplyToAll<AbstractStatement>(condition.Statements, "\n", AllValid));
-            conditionBuilder.Append(closeDef());
+            StringBuilder conditionBuilder = new StringBuilder(OpenDef())
+                .Append(ApplyToAll<AbstractStatement>(condition.Statements, Environment.NewLine, AllValid))
+                .AppendLine().Append(CloseDef());
+
             result = conditionBuilder.ToString();
         }
 
@@ -312,25 +369,30 @@ namespace Kinectitude.Editor.Storage.Kgl
         }
         
         //Used for items where tabs can't be determined by what the item is.
-        private string tabs()
+        private string Tabs()
         {
             StringBuilder tabBuilder = new StringBuilder();
             for (int i = 0; i < numTabs; i++) tabBuilder.Append("    ");
             return tabBuilder.ToString();
         }
 
-        private string openDef()
+        private string OpenDef()
         {
-            string ret = "\n" + tabs() + "{\n";
+            string ret = Environment.NewLine + Tabs() + "{" + Environment.NewLine;
             numTabs++;
             return ret;
         }
 
-        private string closeDef()
+        private string CloseDefLine()
         {
             numTabs--;
-            return "\n" + tabs() + "}\n" ;
+            return Tabs() + "}" + Environment.NewLine;
         }
 
+        private string CloseDef()
+        {
+            numTabs--;
+            return Tabs() + "}";
+        }
     }
 }

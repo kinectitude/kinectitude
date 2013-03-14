@@ -9,6 +9,20 @@ namespace Kinectitude.Render
     [Plugin("Render Manager", "")]
     public class RenderManager : Manager<IRender>
     {
+        private static float Clip(float input, float min, float max)
+        {
+            if (input > max)
+            {
+                return max;
+            }
+            else if (input < min)
+            {
+                return min;
+            }
+
+            return input;
+        }
+
         private RenderService renderService;
         private Matrix3x2 cameraTransform;
         private float cameraX;
@@ -19,36 +33,6 @@ namespace Kinectitude.Render
         public SlimDX.DirectWrite.Factory DirectWriteFactory
         {
             get { return renderService.DirectWriteFactory; }
-        }
-
-        [PluginProperty("Camera X", "", 0)]
-        public float CameraX
-        {
-            get { return cameraX; }
-            set
-            {
-                if (cameraX != value)
-                {
-                    cameraX = Math.Min(Width - renderService.Width, Math.Max(0, value));
-                    UpdateCameraTransform();
-                    Change("CameraX");
-                }
-            }
-        }
-
-        [PluginProperty("Camera Y", "", 0)]
-        public float CameraY
-        {
-            get { return cameraY; }
-            set
-            {
-                if (cameraY != value)
-                {
-                    cameraY = Math.Min(Height - renderService.Height, Math.Max(0, value));
-                    UpdateCameraTransform();
-                    Change("CameraY");
-                }
-            }
         }
 
         [PluginProperty("Scene Width", "", 0)]
@@ -75,6 +59,36 @@ namespace Kinectitude.Render
                 {
                     height = value;
                     Change("Height");
+                }
+            }
+        }
+
+        [PluginProperty("Camera X", "", 0)]
+        public float CameraX
+        {
+            get { return cameraX; }
+            set
+            {
+                if (cameraX != value)
+                {
+                    cameraX = Clip(value, 0, Width - renderService.Width);
+                    UpdateCameraTransform();
+                    Change("CameraX");
+                }
+            }
+        }
+
+        [PluginProperty("Camera Y", "", 0)]
+        public float CameraY
+        {
+            get { return cameraY; }
+            set
+            {
+                if (cameraY != value)
+                {
+                    cameraY = Clip(value, 0, Height - renderService.Height);
+                    UpdateCameraTransform();
+                    Change("CameraY");
                 }
             }
         }

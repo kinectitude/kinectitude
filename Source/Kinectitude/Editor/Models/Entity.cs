@@ -428,10 +428,12 @@ namespace Kinectitude.Editor.Models
 
         public void AddAttribute(Attribute attribute)
         {
-            if (!HasLocalAttribute(attribute.Name))
+            if (HasLocalAttribute(attribute.Name) || HasInheritedAttribute(attribute.Name))
             {
-                PrivateAddAttribute(attribute);
+                throw new AttributeNameExistsException(attribute.Name);
             }
+
+            PrivateAddAttribute(attribute);
         }
 
         private void PrivateRemoveAttribute(Attribute attribute)
