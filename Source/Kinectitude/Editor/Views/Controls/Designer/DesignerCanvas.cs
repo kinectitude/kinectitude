@@ -119,21 +119,11 @@ namespace Kinectitude.Editor.Views.Controls.Designer
         private Point previousPoint;
 
         private ElasticBandAdorner elasticBand;
-        private TranslateAdorner translator;
+        //private TranslateAdorner translator;
 
         public IEnumerable<DesignerItem> SelectedItems
         {
-            get
-            {
-                var items = Items;
-                var itemscast = items.Cast<object>();
-                var selected = itemscast.Select(x => (DesignerItem)ItemContainerGenerator.ContainerFromItem(x));
-                var wheres = selected.Where(x => x.IsSelected);
-
-                return wheres;
-
-                //return Items.Cast<object>().Select(x => (DesignerItem)ItemContainerGenerator.ContainerFromItem(x)).Where(x => x.IsSelected);
-            }
+            get { return Items.Cast<object>().Select(x => (DesignerItem)ItemContainerGenerator.ContainerFromItem(x)).Where(x => x.IsSelected); }
         }
 
         public object SelectedItem
@@ -499,13 +489,13 @@ namespace Kinectitude.Editor.Views.Controls.Designer
                 item.DesignTop += delta.Y;
             }
 
-            translator.Update();
+            //translator.Update();
 
-            var layer = AdornerLayer.GetAdornerLayer(this);
-            if (null != layer)
-            {
-                layer.Update();
-            }
+            //var layer = AdornerLayer.GetAdornerLayer(this);
+            //if (null != layer)
+            //{
+            //    layer.Update();
+            //}
         }
 
         private void ShowElasticBand()
@@ -631,29 +621,29 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             return item;
         }
 
-        private void ShowSelection()
-        {
-            translator = new TranslateAdorner(this);
+        //private void ShowSelection()
+        //{
+        //    translator = new TranslateAdorner(this);
 
-            var layer = AdornerLayer.GetAdornerLayer(this);
-            if (null != layer)
-            {
-                layer.Add(translator);
-            }
-        }
+        //    var layer = AdornerLayer.GetAdornerLayer(this);
+        //    if (null != layer)
+        //    {
+        //        layer.Add(translator);
+        //    }
+        //}
 
-        private void HideSelection()
-        {
-            var layer = AdornerLayer.GetAdornerLayer(this);
-            if (null != layer)
-            {
-                if (null != translator)
-                {
-                    layer.Remove(translator);
-                    translator = null;
-                }
-            }
-        }
+        //private void HideSelection()
+        //{
+        //    var layer = AdornerLayer.GetAdornerLayer(this);
+        //    if (null != layer)
+        //    {
+        //        if (null != translator)
+        //        {
+        //            layer.Remove(translator);
+        //            translator = null;
+        //        }
+        //    }
+        //}
 
         public void Select(DesignerItem item)
         {
@@ -661,12 +651,12 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             {
                 item.IsSelected = true;
 
-                if (null == translator)
-                {
-                    ShowSelection();
-                }
+                //if (null == translator)
+                //{
+                //    ShowSelection();
+                //}
 
-                translator.Update();
+                //translator.Update();
 
                 CheckSelectedItem();
             }
@@ -678,14 +668,14 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             {
                 item.IsSelected = false;
 
-                if (SelectedItems.Count() == 0)
-                {
-                    HideSelection();
-                }
-                else
-                {
-                    translator.Update();
-                }
+                //if (SelectedItems.Count() == 0)
+                //{
+                //    HideSelection();
+                //}
+                //else
+                //{
+                //    translator.Update();
+                //}
 
                 CheckSelectedItem();
             }
@@ -726,13 +716,13 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             }
         }
 
-        public void Update()
-        {
-            if (null != translator)
-            {
-                translator.Update();
-            }
-        }
+        //public void Update()
+        //{
+        //    if (null != translator)
+        //    {
+        //        translator.Update();
+        //    }
+        //}
 
         public void Cut()
         {

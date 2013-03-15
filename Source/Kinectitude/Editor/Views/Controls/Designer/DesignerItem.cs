@@ -8,19 +8,19 @@ namespace Kinectitude.Editor.Views.Controls.Designer
     internal sealed class DesignerItem : ContentControl
     {
         public static DependencyProperty DesignLeftProperty =
-            DependencyProperty.Register("DesignLeft", typeof(double), typeof(DesignerItem), new FrameworkPropertyMetadata(OnDesignChange));
+            DependencyProperty.Register("DesignLeft", typeof(double), typeof(DesignerItem));
 
         public static DependencyProperty DesignTopProperty =
-            DependencyProperty.Register("DesignTop", typeof(double), typeof(DesignerItem), new FrameworkPropertyMetadata(OnDesignChange));
+            DependencyProperty.Register("DesignTop", typeof(double), typeof(DesignerItem));
 
         public static DependencyProperty DesignWidthProperty =
-            DependencyProperty.Register("DesignWidth", typeof(double), typeof(DesignerItem), new FrameworkPropertyMetadata(OnDesignChange));
+            DependencyProperty.Register("DesignWidth", typeof(double), typeof(DesignerItem));
 
         public static DependencyProperty DesignHeightProperty =
-            DependencyProperty.Register("DesignHeight", typeof(double), typeof(DesignerItem), new FrameworkPropertyMetadata(OnDesignChange));
+            DependencyProperty.Register("DesignHeight", typeof(double), typeof(DesignerItem));
 
         public static DependencyProperty DesignRotationProperty =
-            DependencyProperty.Register("DesignRotation", typeof(double), typeof(DesignerItem), new FrameworkPropertyMetadata(OnDesignChange));
+            DependencyProperty.Register("DesignRotation", typeof(double), typeof(DesignerItem));
 
         public static DependencyProperty IsSelectedProperty =
             DependencyProperty.Register("IsSelected", typeof(bool), typeof(DesignerItem));
@@ -28,11 +28,11 @@ namespace Kinectitude.Editor.Views.Controls.Designer
         public static DependencyProperty DoubleClickCommandProperty =
             DependencyProperty.Register("DoubleClickCommand", typeof(ICommand), typeof(DesignerItem));
 
-        private static void OnDesignChange(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var item = d as DesignerItem;
-            item.canvas.Dispatcher.BeginInvoke(new Action(() => item.canvas.Update()), null);
-        }
+        //private static void OnDesignChange(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        //{
+        //    var item = d as DesignerItem;
+        //    item.canvas.Dispatcher.BeginInvoke(new Action(() => item.canvas.Update()), null);
+        //}
 
         private readonly DesignerCanvas canvas;
 

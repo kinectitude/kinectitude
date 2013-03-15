@@ -2,42 +2,73 @@
 using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Base;
 using Microsoft.Xna.Framework;
+using System;
 
 namespace Kinectitude.Physics
 {
     [Plugin("Physics Manager", "")]
     public class PhysicsManager : Manager<PhysicsComponent>
     {
+        private const float DistanceRatio = 1f / 100f;
+        private const float VelocityRatio = 1f / 10f;
 
-        private float yGravity;
+        public static float ConvertDistanceToFarseer(float value)
+        {
+            return value * DistanceRatio;
+        }
+
+        public static float ConvertDistanceToGame(float value)
+        {
+            return value / DistanceRatio;
+        }
+        
+        public static float ConvertVelocityToFarseer(float velocity)
+        {
+            return velocity * VelocityRatio;
+        }
+
+        public static float ConvertVelocityToGame(float velocity)
+        {
+            return velocity / VelocityRatio;
+        }
+
+        public static float DegreesToRadians(float degrees)
+        {
+            return degrees * (float)Math.PI / 180.0f;
+        }
+
+        public static float RadiansToDegrees(float radians)
+        {
+            return radians * 180.0f / (float)Math.PI;
+        }
+
         [PluginProperty("Y Gravity", "How fast things are pulled down")]
         public float YGravity 
         {
-            get { return yGravity; }
+            get { return PhysicsWorld.Gravity.Y; }
             set
             {
-                if (yGravity != value)
+                if (PhysicsWorld.Gravity.Y != value)
                 {
-                    yGravity = value;
+                    PhysicsWorld.Gravity = new Vector2(PhysicsWorld.Gravity.X, value);
+                    PhysicsWorld.ClearForces();
                     Change("YGravity");
                 }
-                PhysicsWorld.Gravity = new Vector2(xGravity, yGravity);
             }
         }
 
-        private float xGravity;
         [PluginProperty("X Gravity", "How fast things are pulled to the left")]
         public float XGravity 
         {
-            get { return xGravity; }
+            get { return PhysicsWorld.Gravity.X; }
             set
             {
-                if (xGravity != value)
+                if (PhysicsWorld.Gravity.X != value)
                 {
-                    xGravity = value;
+                    PhysicsWorld.Gravity = new Vector2(value, PhysicsWorld.Gravity.Y);
+                    PhysicsWorld.ClearForces();
                     Change("XGravity");
                 }
-                PhysicsWorld.Gravity = new Vector2(xGravity, yGravity);
             }
         }
 
@@ -51,11 +82,6 @@ namespace Kinectitude.Physics
 
         public override void OnUpdate(float t)
         {
-			foreach (PhysicsComponent pc in Children)
-            {
-                pc.SetPosition();
-            }
-		
             PhysicsWorld.Step(t);
 			
             foreach (PhysicsComponent pc in Children)

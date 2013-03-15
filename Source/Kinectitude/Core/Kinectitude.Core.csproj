@@ -162,10 +162,11 @@
     <Compile Include="Base\Scene.cs" />
     <Compile Include="Base\Timer.cs" />
     <Compile Include="Base\TimerEvt.cs" />
-    <Compile Include="ComponentInterfaces\ISoundComponent.cs" />
-    <Compile Include="ComponentInterfaces\IPhysicsComponent.cs" />
+    <Compile Include="ComponentInterfaces\ISound.cs" />
+    <Compile Include="ComponentInterfaces\IPhysics.cs" />
     <Compile Include="Base\IUpdateable.cs" />
     <Compile Include="Base\Manager.cs" />
+    <Compile Include="ComponentInterfaces\ITransform.cs" />
     <Compile Include="Components\TransformComponent.cs" />
     <Compile Include="Data\BasicFunctionReader.cs" />
     <Compile Include="Data\IDataContainer.cs" />

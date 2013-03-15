@@ -27,14 +27,14 @@ Game(Name = "breakout", FirstScene = "game")
         Component Transform(Width = 128, Height = 24)
         Component KinectFollowComponent(Joint = "HandRight", Player = 1, Direction = "X")
         Component RenderComponent(Shape = "Rectangle", FillColor = "Black")
-        Component PhysicsComponent(Shape = "Rectangle", Restitution = "0", Mass = "1", Friction = "0", LinearDamping = "0", XVelocity = 0, YVelocity = 0, MovesWhenHit = false, FixedRotation = true)
+        Component PhysicsComponent(Shape = "Rectangle", Restitution = "0", Mass = "1", Friction = "0", LinearDamping = "0", XVelocity = 0, YVelocity = 0, BodyType = "Kinematic", FixedRotation = true)
     }
     
     Prototype ball(Value = 0)
     {
         Component Transform(X = 400, Y = 550, Width = 24, Height = 24)
         Component RenderComponent(Shape = "Rectangle", FillColor = "Black")
-        Component PhysicsComponent(Shape = "Ellipse", Restitution = 1, Mass = 1, Friction = 0, LinearDamping = 0, MaximumSpeed = 50, MinimumSpeed = 50, XVelocity = -40, YVelocity = -20, AngularVelocity = 1, MovesWhenHit = true, FixedRotation = false)
+        Component PhysicsComponent(Shape = "Ellipse", Restitution = 1, Mass = 1, Friction = 0, LinearDamping = 0, XVelocity = -40, YVelocity = -20, AngularVelocity = 1, BodyType = "Dynamic", FixedRotation = false)
         
         Event TriggerOccurs(Trigger = "gameOver")
         {
@@ -64,7 +64,7 @@ Game(Name = "breakout", FirstScene = "game")
     {
         Component Transform(Width = 95, Height = 20)
         Component RenderComponent(Shape = "Rectangle", FillColor = "Red")
-        Component PhysicsComponent(Shape = "Rectangle", Restitution = 0, Mass = 1, Friction = 0, LinearDamping = 0, XVelocity = 0, YVelocity = 0, MovesWhenHit = false, FixedRotation = true)
+        Component PhysicsComponent(Shape = "Rectangle", Restitution = 0, Mass = 1, Friction = 0, LinearDamping = 0, XVelocity = 0, YVelocity = 0, BodyType = "Static", FixedRotation = true)
         
         Event Collision(CollidesWith = $extraBall + $primaryBall)
         {
@@ -236,25 +236,25 @@ Game(Name = "breakout", FirstScene = "game")
         Entity top_wall()
         {
             Component Transform(X = 400, Y = 0, Width = 800, Height = 2)
-            Component PhysicsComponent(Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, XVelocity = 0, YVelocity = 0, MovesWhenHit = false, FixedRotation = true)
+            Component PhysicsComponent(Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, XVelocity = 0, YVelocity = 0, BodyType = "Static", FixedRotation = true)
         }
         
         Entity bottom_wall()
         {
             Component Transform(X = 400, Y = 600, Width = 800, Height = 2)
-            Component PhysicsComponent(Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, XVelocity = 0, YVelocity = 0, MovesWhenHit = false, FixedRotation = true)
+            Component PhysicsComponent(Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, XVelocity = 0, YVelocity = 0, BodyType = "Static", FixedRotation = true)
         }
         
         Entity left_wall()
         {
             Component Transform(X = 0, Y = 300, Width = 2, Height = 600)
-            Component PhysicsComponent(Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, XVelocity = 0, YVelocity = 0, MovesWhenHit = false, FixedRotation = true)
+            Component PhysicsComponent(Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, XVelocity = 0, YVelocity = 0, BodyType = "Static", FixedRotation = true)
         }
         
         Entity right_wall()
         {
             Component Transform(X = 800, Y = 300, Width = 2, Height = 600)
-            Component PhysicsComponent(Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, XVelocity = 0, YVelocity = 0, MovesWhenHit = false, FixedRotation = true)
+            Component PhysicsComponent(Shape = "Rectangle", Restitution = 0, Mass = 1, LinearDamping = 0, XVelocity = 0, YVelocity = 0, BodyType = "Static", FixedRotation = true)
         }
         
         Entity : primaryBall()

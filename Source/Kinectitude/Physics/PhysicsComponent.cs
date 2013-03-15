@@ -14,262 +14,359 @@ using Kinectitude.Core.Data;
 namespace Kinectitude.Physics
 {
 
-    [Plugin("Physics Component", "")]
-    [Provides(typeof(IPhysics))]
-    [Requires(typeof(TransformComponent))]
+    [Plugin("Physics Component", ""), Provides(typeof(IPhysics)), Requires(typeof(TransformComponent))]
     public class PhysicsComponent : Component, IPhysics
     {
-        private const float sizeRatio = 1f / 100f;
-        private const float speedRatio = 1f / 10f;
-        private List<CrossesLineEvent> crossesLineEvents = new List<CrossesLineEvent>();
-        private List<CollisionEvent> collisionEvents = new List<CollisionEvent>();
-        private Body body;
-        private PhysicsManager pm;
-        private TransformComponent tc;
-
-        private string shape = "rectangle";
-        [Preset("Bouncy Ball", "circle")]
-        [Preset("Collision Event Line", "rectangle")]
-        [Preset("Wall", "rectangle")]
-        [PluginProperty("Shape", "")]
-        public string Shape 
+        private sealed class PhysicsTransform : ITransform
         {
-            get { return shape; }
-            set
+            private readonly ITransform lastTransform;
+            private float prevX;
+            private float prevY;
+            private float prevRotation;
+            private Body body;
+
+            public float PreviousX
             {
-                if (shape != value)
+                get { return prevX; }
+            }
+
+            public float PreviousY
+            {
+                get { return prevY; }
+            }
+
+            public float X
+            {
+                get { return PhysicsManager.ConvertDistanceToGame(body.Position.X); }
+                set
                 {
-                    shape = value;
-                    Change("Shape");
+                    value = PhysicsManager.ConvertDistanceToFarseer(value);
+                    if (body.Position.X != value)
+                    {
+                        body.Position = new Vector2(value, body.Position.Y);
+                        Change("X");
+                    }
+                }
+            }
+
+            public float Y
+            {
+                get { return PhysicsManager.ConvertDistanceToGame(body.Position.Y); }
+                set
+                {
+                    value = PhysicsManager.ConvertDistanceToFarseer(value);
+                    if (body.Position.Y != value)
+                    {
+                        body.Position = new Vector2(body.Position.X, value);
+                        Change("Y");
+                    }
+                }
+            }
+
+            public float Width { get; set; }
+
+            public float Height { get; set; }
+
+            public float Rotation
+            {
+                get { return PhysicsManager.RadiansToDegrees(body.Rotation); }
+                set
+                {
+                    value = PhysicsManager.DegreesToRadians(value);
+                    if (body.Rotation != value)
+                    {
+                        body.Rotation = value;
+                        Change("Rotation");
+                    }
+                }
+            }
+
+            public Body Body
+            {
+                set
+                {
+                    if (null == body)
+                    {
+                        body = value;
+
+                        X = lastTransform.X;
+                        Y = lastTransform.Y;
+                        Rotation = lastTransform.Rotation;
+                    }
+                }
+            }
+
+            public event ChangeEventHandler Changed;
+
+            public PhysicsTransform(ITransform lastTransform)
+            {
+                this.lastTransform = lastTransform;
+
+                Width = lastTransform.Width;
+                Height = lastTransform.Height;
+            }
+
+            private void Change(string property)
+            {
+                if (null != Changed)
+                {
+                    Changed(property);
+                }
+            }
+
+            public void Update()
+            {
+                if (body.Awake)
+                {
+                    if (X != prevX)
+                    {
+                        Change("X");
+                    }
+
+                    if (Y != prevY)
+                    {
+                        Change("Y");
+                    }
+
+                    if (Rotation != prevRotation)
+                    {
+                        Change("Rotation");
+                    }
+
+                    prevX = X;
+                    prevY = Y;
+                    prevRotation = Rotation;
                 }
             }
         }
 
-        private float restitution = 0;
-        [Preset("Bouncy Ball", 1.0)]
-        [Preset("Collision Event Line", 0.0)]
-        [Preset("Wall", 0.0)]
+        public enum ShapeType { Rectangle, Ellipse }
+
+        private struct BodyDefinition
+        {
+            public ShapeType Shape;
+            public float Restitution;
+            public float Mass;
+            public float Friction;
+            public float LinearDamping;
+            public float XVelocity;
+            public float YVelocity;
+            public float AngularVelocity;
+            public Kinectitude.Core.ComponentInterfaces.BodyType BodyType;
+            public bool FixedRotation;
+            public TypeMatcher IgnoreCollisionsWith;
+        }
+
+        private FarseerPhysics.Dynamics.BodyType ConvertBodyTypeToFarseer(Kinectitude.Core.ComponentInterfaces.BodyType type)
+        {
+            switch (type)
+            {
+                case Core.ComponentInterfaces.BodyType.Dynamic: return FarseerPhysics.Dynamics.BodyType.Dynamic;
+                case Core.ComponentInterfaces.BodyType.Kinematic: return FarseerPhysics.Dynamics.BodyType.Kinematic;
+                case Core.ComponentInterfaces.BodyType.Static: return FarseerPhysics.Dynamics.BodyType.Static;
+            }
+
+            return default(FarseerPhysics.Dynamics.BodyType);
+        }
+
+        private Kinectitude.Core.ComponentInterfaces.BodyType ConvertBodyTypeToGame(FarseerPhysics.Dynamics.BodyType type)
+        {
+            switch (type)
+            {
+                case FarseerPhysics.Dynamics.BodyType.Dynamic: return Core.ComponentInterfaces.BodyType.Dynamic;
+                case FarseerPhysics.Dynamics.BodyType.Kinematic: return Core.ComponentInterfaces.BodyType.Kinematic;
+                case FarseerPhysics.Dynamics.BodyType.Static: return Core.ComponentInterfaces.BodyType.Static;
+            }
+
+            return default(Kinectitude.Core.ComponentInterfaces.BodyType);
+        }
+
+        private readonly List<CrossesLineEvent> crossesLineEvents = new List<CrossesLineEvent>();
+        private readonly List<CollisionEvent> collisionEvents = new List<CollisionEvent>();
+        
+        private Body body;
+        private PhysicsManager manager;
+        private PhysicsTransform transform;
+        private BodyDefinition def;
+
+        [PluginProperty("Shape", "", ShapeType.Rectangle)]
+        public ShapeType Shape 
+        {
+            get { return def.Shape; }
+            set
+            {
+                if (def.Shape != value)
+                {
+                    def.Shape = value;
+                    Change("Shape");
+                }
+            }
+        }
+        
         [PluginProperty("Restitution", "", 0)]
         public float Restitution
         {
-            get { return restitution; }
+            get { return def.Restitution; }
             set
             {
-                if (restitution != value && value > 0)
+                if (def.Restitution != value)
                 {
-                    restitution = value;
+                    def.Restitution = value;
+                    if (null != body) body.Restitution = value;
                     Change("Restitution");
                 }
             }
         }
 
-
-        private float mass = 1;
-        [Preset("Bouncy Ball", 1.0)]
-        [Preset("Collision Event Line", 1.0)]
-        [Preset("Wall", 1.0)]
         [PluginProperty("Mass", "", 1.0f)]
         public float Mass
         {
-            get { return mass; }
+            get { return def.Mass; }
             set
             {
-                if (mass != value && value > 0)
+                if (def.Mass != value)
                 {
-                    mass = value;
+                    def.Mass = value;
+                    if (null != body) body.Mass = value;
                     Change("Mass");
                 }
             }
         }
 
-
-        private float friction = 0;
-        [Preset("Bouncy Ball", 0.0)]
-        [Preset("Collision Event Line", 0.0)]
-        [Preset("Wall", 0.0)]
         [PluginProperty("Friction", "", 0.0f)]
         public float Friction
         {
-            get { return friction; }
+            get { return def.Friction; }
             set
             {
-                if (friction != value && value > 0)
+                if (def.Friction != value)
                 {
-                    friction = value;
+                    def.Friction = value;
+                    if (null != body) body.Friction = value;
                     Change("Friction");
                 }
             }
         }
 
-
-        private float linearDamping = 0;
-        [Preset("Bouncy Ball", 0.0)]
-        [Preset("Collision Event Line", 0.0)]
-        [Preset("Wall", 0.0)]
         [PluginProperty("Linear Damping", "", 0.0f)]
         public float LinearDamping
         {
-            get { return linearDamping; }
+            get { return def.LinearDamping; }
             set
             {
-                if (linearDamping != value && value > 0)
+                if (def.LinearDamping != value)
                 {
-                    linearDamping = value;
+                    def.LinearDamping = value;
+                    if (null != body) body.LinearDamping = value;
                     Change("LinearDamping");
                 }
             }
         }
 
-        private float maximumSpeed = float.PositiveInfinity;
-        [PluginProperty("Maximum Speed", "", float.PositiveInfinity)]
-        public float MaximumSpeed
-        {
-            get { return maximumSpeed; }
-            set
-            {
-                if (value != maximumSpeed && value > 0)
-                {
-                    maximumSpeed = value;
-                    Change("MaximumSpeed");
-                }
-            }
-        }
-
-        private float minimumSpeed = 0f;
-        [PluginProperty("Minimum Speed", "", 0)]
-        public float MinimumSpeed
-        {
-            get { return minimumSpeed; }
-            set
-            {
-                if (value != minimumSpeed && value > 0)
-                {
-                    minimumSpeed = value;
-                    Change("MinimumSpeed");
-                }
-            }
-        }
-
-        private void setBodyVelocity(float velocity)
-        {
-            hasVelocity |= velocity != 0;
-            if (null != body)
-            {
-                if (velocity != 0 && body.BodyType == BodyType.Static) createBody();
-                body.LinearVelocity = new Vector2(XVelocity * speedRatio, YVelocity * speedRatio);
-                clampVelocity();
-                body.AngularVelocity = AngularVelocity;
-            }
-        }
-
-        private float xVelocity = 0;
         [PluginProperty("X Velocity", "", 0.0f)]
         public float XVelocity
         {
-            get { return xVelocity; }
+            get
+            {
+                float velocity = def.XVelocity;
+                if (null != body) velocity = body.LinearVelocity.X;
+                return PhysicsManager.ConvertVelocityToGame(velocity);
+            }
             set 
             {
-                if (value != xVelocity)
+                value = PhysicsManager.ConvertVelocityToFarseer(value);
+                if (null == body || value != body.LinearVelocity.X)
                 {
-                    xVelocity = value;
-                    setBodyVelocity(value);
+                    def.XVelocity = value;
+                    if (null != body) body.LinearVelocity = new Vector2(value, body.LinearVelocity.Y);
                     Change("XVelocity");
                 }
             }
         }
 
-        private float yVelocity = 0;
         [PluginProperty("Y Velocity", "", 0.0f)]
         public float YVelocity
         {
-            get { return yVelocity; }
+            get
+            {
+                float velocity = def.YVelocity;
+                if (null != body) velocity = body.LinearVelocity.Y;
+                return PhysicsManager.ConvertVelocityToGame(velocity);
+            }
             set
             {
-                if (value != yVelocity)
+                value = PhysicsManager.ConvertVelocityToFarseer(value);
+                if (null == body || value != body.LinearVelocity.Y)
                 {
-                    yVelocity = value;
-                    setBodyVelocity(value);
+                    def.YVelocity = value;
+                    if (null != body) body.LinearVelocity = new Vector2(body.LinearVelocity.X, value);
                     Change("YVelocity");
                 }
             }
         }
 
-        private float angularVelocity = 0;
         [PluginProperty("Angular Velocity", "", 0.0f)]
         public float AngularVelocity
         {
-            get { return angularVelocity; }
+            get { return null != body ? body.AngularVelocity : def.AngularVelocity; }
             set
             {
-                if (value != angularVelocity)
+                if (null == body || value != body.AngularVelocity)
                 {
-                    angularVelocity = value;
-                    setBodyVelocity(value);
+                    def.AngularVelocity = value;
+                    if (null != body) body.AngularVelocity = value;
                     Change("AngularVelocity");
                 }
             }
         }
 
-        private bool movesWhenHit = true;
-        [Preset("Bouncy Ball", true)]
-        [Preset("Collision Event Line", false)]
-        [Preset("Wall", false)]
-        [PluginProperty("Stationary", "Object moves when hit")]
-        public bool MovesWhenHit {
-            get { return movesWhenHit; }
+        [PluginProperty("Body Type", "Object moves when hit", Kinectitude.Core.ComponentInterfaces.BodyType.Dynamic)]
+        public Kinectitude.Core.ComponentInterfaces.BodyType BodyType
+        {
+            get { return def.BodyType; }
             set
             {
-                if (value != movesWhenHit)
+                if (value != def.BodyType)
                 {
-                    movesWhenHit = value;
-                    if (body != null && movesWhenHit && body.BodyType != BodyType.Dynamic) createBody();
-                    Change("MovesWhenHit");
+                    def.BodyType = value;
+                    if (null != body) body.BodyType = ConvertBodyTypeToFarseer(value);
+                    Change("BodyType");
                 }
             }
  
         }
 
-        private bool fixedRotation = false;
-        [Preset("Bouncy Ball", true)]
-        [Preset("Collision Event Line", false)]
-        [Preset("Wall", false)]
-        [PluginProperty("Can Rotate", "Object can rotate as it moves", false)]
+        [PluginProperty("Fixed Rotation", "Object can rotate as it moves", false)]
         public bool FixedRotation
         {
-            get { return fixedRotation; }
+            get { return def.FixedRotation; }
             set
             {
-                if (value != fixedRotation)
+                if (value != def.FixedRotation)
                 {
-                    fixedRotation = value;
+                    def.FixedRotation = value;
+                    if (null != body) body.FixedRotation = value;
                     Change("FixedRotation");
                 }
             }
         }
 
-        private TypeMatcher ignoreCollisionsWith = null;
-
         [PluginProperty("Ignores Collisions", "Any entities that match this type matcher will pass through this object")]
         public TypeMatcher IgnoreCollisionsWith
         {
-            get { return ignoreCollisionsWith; }
+            get { return def.IgnoreCollisionsWith; }
             set
             {
-                if (ignoreCollisionsWith != value)
+                if (def.IgnoreCollisionsWith != value)
                 {
                     //TODO override = operator for TypeMatcher
-                    ignoreCollisionsWith = value;
+                    def.IgnoreCollisionsWith = value;
                     Change("IgnoreCollisionsWith");
                 }
             }
         }
 
-        private bool hasCollisions = false;
-        private bool hasVelocity = false;
-        private float prevX;
-        private float prevY;
-
-        private void checkCrossesLine(float x, float y)
+        private void CheckCrossesLine()
         {
             //TODO make this done in farseer somehow
             if (crossesLineEvents.Count != 0)
@@ -293,13 +390,13 @@ namespace Kinectitude.Physics
                     double next;
                     if (CrossesLineEvent.LineType.X == evt.Line)
                     {
-                        prev = prevX;
-                        next = x;
+                        prev = transform.PreviousX;
+                        next = transform.X;
                     }
                     else
                     {
-                        prev = prevY;
-                        next = y;
+                        prev = transform.PreviousY;
+                        next = transform.Y;
                     }
                     if (pos && 0 < next - prev && cross < next && cross >= prev)
                     {
@@ -313,50 +410,14 @@ namespace Kinectitude.Physics
             }
         }
 
-        private void setVelocity()
-        {
-            tc.Rotation = body.Rotation;
-
-            clampVelocity();
-
-            //no need to use the setters here, they will add extra overhead to things that don't need to be checked
-            xVelocity = body.LinearVelocity.X / speedRatio;
-            yVelocity = body.LinearVelocity.Y / speedRatio;
-            angularVelocity = body.AngularVelocity;
-        }
-
-        private void clampVelocity()
-        {
-            float speed = body.LinearVelocity.Length() / speedRatio;
-
-            if (maximumSpeed == 0 || speed == 0)
-            {
-                body.LinearVelocity = new Vector2(0f, 0f);
-            }
-            else
-            {
-                if (speed > maximumSpeed) body.LinearVelocity = body.LinearVelocity / speed * maximumSpeed;
-
-                if (speed < minimumSpeed)
-                {
-                    //TODO decide what is good to do here
-                    if (0 == speed) body.LinearVelocity = new Vector2(minimumSpeed, 0);
-                    else body.LinearVelocity = body.LinearVelocity / speed * minimumSpeed;
-                }
-            }
-        }
-
         public override void OnUpdate(float t)
         {
-            if (prevX == tc.X && prevY == tc.Y)
+            if (body.Awake)
             {
-                float x = body.Position.X / sizeRatio;
-                float y = body.Position.Y / sizeRatio;
-                tc.X = x;
-                tc.Y = y;
-                checkCrossesLine(x, y);
+                CheckCrossesLine();
             }
-            setVelocity();
+            
+            transform.Update();
         }
 
         public void AddCrossLineEvent(CrossesLineEvent evt)
@@ -366,87 +427,56 @@ namespace Kinectitude.Physics
 
         public void AddCollisionEvent(CollisionEvent evt)
         {
-            hasCollisions = true;
             collisionEvents.Add(evt);
-        }
-
-        public void SetPosition(bool forceUpdate = false)
-        {
-            if (prevX != tc.X || prevY != tc.Y || body.Rotation != tc.Rotation || forceUpdate)
-            {
-                //body.Awake = true;
-                prevX = tc.X;
-                prevY = tc.Y;
-                body.Position = new Vector2(prevX * sizeRatio, prevY * sizeRatio);
-                body.Rotation = tc.Rotation;
-            }
-        }
-
-        public void SetSize()
-        {
-            createBody();
         }
 
         public override void Ready()
         {
-            pm = GetManager<PhysicsManager>();
-            pm.Add(this);
+            manager = GetManager<PhysicsManager>();
+            manager.Add(this);
 
-            tc = GetComponent<TransformComponent>();
+            var transformComponent = GetComponent<TransformComponent>();
+            transform = new PhysicsTransform(transformComponent.Transform);
+            transformComponent.Transform = transform;
 
-            createBody();
+            CreateBody();
+            transform.Body = body;
         }
 
-        private void createBody()
+        private void CreateBody()
         {
-            if (null != body) pm.PhysicsWorld.RemoveBody(body);
-
-            if ("Ellipse" == Shape)
+            if (ShapeType.Ellipse == Shape)
             {
-                float xRadius = ((float)tc.Width / 2.0f) * sizeRatio;
-                float yRadius = ((float)tc.Height / 2.0f) * sizeRatio;
+                float xRadius = PhysicsManager.ConvertDistanceToFarseer(transform.Width / 2.0f);
+                float yRadius = PhysicsManager.ConvertDistanceToFarseer(transform.Height / 2.0f);
 
                 if (xRadius != yRadius)
                 {
-                    body = BodyFactory.CreateEllipse(pm.PhysicsWorld, xRadius, yRadius, 12, 1f);
+                    body = BodyFactory.CreateEllipse(manager.PhysicsWorld, xRadius, yRadius, 12, 1f);
                 }
                 else
                 {
-                    body = BodyFactory.CreateCircle(pm.PhysicsWorld, xRadius, 1f);
+                    body = BodyFactory.CreateCircle(manager.PhysicsWorld, xRadius, 1f);
                 }
             }
             else
             {
-                float width = (float)tc.Width * sizeRatio;
-                float height = (float)tc.Height * sizeRatio;
-                body = BodyFactory.CreateRectangle(pm.PhysicsWorld, width, height, 1f);
+                float width = PhysicsManager.ConvertDistanceToFarseer(transform.Width);
+                float height = PhysicsManager.ConvertDistanceToFarseer(transform.Height);
+                body = BodyFactory.CreateRectangle(manager.PhysicsWorld, width, height, 1f);
             }
 
-            if (hasCollisions)
-            {
-                body.BodyType = BodyType.Dynamic;
-                body.Mass = MovesWhenHit ? body.Mass = Mass : (float)int.MaxValue;
-            }
-            else if (hasVelocity)
-            {
-                body.BodyType = BodyType.Kinematic;
-            }
-            else
-            {
-                body.BodyType = BodyType.Static;
-            }
-
-            body.FixedRotation = FixedRotation;
-            body.AngularVelocity = AngularVelocity;
-            body.Restitution = Restitution;
-            body.Friction = Friction;
-            body.LinearDamping = LinearDamping;
+            body.BodyType = ConvertBodyTypeToFarseer(def.BodyType);
+            body.FixedRotation = def.FixedRotation;
+            body.AngularVelocity = def.AngularVelocity;
+            body.Restitution = def.Restitution;
+            body.Friction = def.Friction;
+            body.LinearDamping = def.LinearDamping;
+            body.LinearVelocity = new Vector2(def.XVelocity, def.YVelocity);
             body.UserData = this;
+
             //Add a listener for collisions
             body.OnCollision += OnCollision;
-
-            SetPosition(true);
-            body.LinearVelocity = new Vector2(xVelocity * speedRatio, yVelocity * speedRatio);
         }
 
         private bool OnCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
@@ -470,13 +500,7 @@ namespace Kinectitude.Physics
                 }
             }
 
-            if (ignoreCollisionsWith != null && ignoreCollisionsWith.MatchAndSet(collidedWith)) return false;
-
-            if (pcA.movesWhenHit == false && pcB.movesWhenHit == false &&
-                bodyA.BodyType == BodyType.Dynamic && bodyB.BodyType == BodyType.Dynamic)
-            {
-                return false;
-            }
+            if (IgnoreCollisionsWith != null && IgnoreCollisionsWith.MatchAndSet(collidedWith)) return false;
 
             //Allow the collison to occur
             return true;
@@ -484,8 +508,8 @@ namespace Kinectitude.Physics
 
         public override void Destroy()
         {
-            pm.Remove(this);
-            pm.PhysicsWorld.RemoveBody(body);
+            manager.Remove(this);
+            manager.PhysicsWorld.RemoveBody(body);
         }
     }
 }

@@ -116,7 +116,7 @@ namespace Kinectitude.Render
         {
             Row = 1;
             bitmap = renderManager.GetBitmap(Image);
-            totalFrames = bitmap.PixelSize.Width / transformComponent.Width;
+            totalFrames = bitmap.PixelSize.Width / (int)transformComponent.Width;
             scaleX = bitmap.DotsPerInch.Width / 96.0f;
             scaleY = bitmap.DotsPerInch.Height / 96.0f;
         }
