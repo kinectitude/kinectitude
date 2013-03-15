@@ -33,20 +33,10 @@ namespace Kinectitude.Kinect
             
             foreach (KinectFollowComponent kfc in Children)
             {
-                Joint? joint = null;
-
-                if (1 == kfc.Player)
+                if (latestSkeletons.Length >= kfc.Player)
                 {
-                    joint = latestSkeletons[0].Joints[kfc.Joint];
-                }
-                else if (latestSkeletons.Length > 1 && 2 == kfc.Player)
-                {
-                    joint = latestSkeletons[1].Joints[kfc.Joint];
-                }
-
-                if (joint.HasValue)
-                {
-                    var point = kinectService.KinectSensor.CoordinateMapper.MapSkeletonPointToColorPoint(joint.Value.Position, ColorImageFormat.RgbResolution640x480Fps30);
+                    Joint joint = latestSkeletons[kfc.Player - 1].Joints[kfc.Joint];
+                    var point = kinectService.KinectSensor.CoordinateMapper.MapSkeletonPointToColorPoint(joint.Position, ColorImageFormat.RgbResolution640x480Fps30);
                     float scaleX = windowSize.Item1 / 640.0f;
                     float scaleY = windowSize.Item2 / 480.0f;
 

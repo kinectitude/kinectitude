@@ -29,9 +29,9 @@ namespace Kinectitude.Kinect
                     frame.CopySkeletonDataTo(skeletons);
                 }
 
-                if (null != SkeletonsReady)
+                if (null != skeletons && null != SkeletonsReady)
                 {
-                    SkeletonsReady(skeletons);
+                    SkeletonsReady(skeletons.Where(x => x.TrackingState != SkeletonTrackingState.NotTracked).ToArray());
                 }
             }
         }

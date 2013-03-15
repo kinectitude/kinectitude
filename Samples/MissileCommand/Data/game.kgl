@@ -21,7 +21,7 @@ using Kinectitude.DirectInput.dll
     define MouseFollowComponent as Kinectitude.DirectInput.MouseFollowComponent
 }
 
-Game(Name = "Missile Command", FirstScene = "Menu")
+Game(Name = "Missile Command", FirstScene = "Kinect")
 {
     Prototype Joint()
     {

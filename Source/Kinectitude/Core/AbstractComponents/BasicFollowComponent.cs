@@ -9,15 +9,15 @@ using Kinectitude.Core.Components;
 
 namespace Kinectitude.Core.AbstractComponents
 {
-    public enum FollowType { X, Y, Both };
-
     [Requires(typeof(TransformComponent))]
     public abstract class BasicFollowComponent : Component
     {
+        public enum FollowType { X, Y, Both };
+
         private float nextDx = 0;
         private float nextDy = 0;
         private TransformComponent transform;
-        private IPhysics physics = null;
+        private IPhysics physics;
 
         private bool exactMove = false;
 
