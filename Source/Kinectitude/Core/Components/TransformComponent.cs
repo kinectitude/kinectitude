@@ -62,7 +62,7 @@ namespace Kinectitude.Core.Components
                     if (height != value)
                     {
                         height = value;
-                        Change("Heiht");
+                        Change("Height");
                     }
                 }
             }
