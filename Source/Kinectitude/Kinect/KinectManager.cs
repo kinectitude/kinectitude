@@ -10,26 +10,20 @@ namespace Kinectitude.Kinect
     [Plugin("Kinect Manager", "")]
     public class KinectManager : Manager<KinectFollowComponent>
     {
-        private static KinectService service;
-        private Skeleton[] latestSkeletons = null;
+        private const int NumPlayers = 2;
+        private static readonly int NumJoints = Enum.GetValues(typeof(JointType)).Length;
 
-        private const int numPlayers = 2;
-        private static readonly int numJoints = Enum.GetValues(typeof(JointType)).Length;
-        private readonly List<GestureEvent>[][] events = new List<GestureEvent>[numPlayers][];
-
+        private readonly List<GestureEvent>[][] events = new List<GestureEvent>[NumPlayers][];
+        private KinectService kinectService;
         private Tuple<int, int> windowSize;
-
-        private void update(Skeleton[] skeletons)
-        {
-            latestSkeletons = skeletons;
-        }
+        private Skeleton[] latestSkeletons;
 
         public KinectManager()
         {
-            for (int i = 0; i < numPlayers; i++)
+            for (int i = 0; i < NumPlayers; i++)
             {
-                events[i] = new List<GestureEvent>[numJoints];
-                for (int j = 0; j < numJoints; j++) events[i][j] = new List<GestureEvent>();
+                events[i] = new List<GestureEvent>[NumJoints];
+                for (int j = 0; j < NumJoints; j++) events[i][j] = new List<GestureEvent>();
             }
         }
 
@@ -39,41 +33,36 @@ namespace Kinectitude.Kinect
             
             foreach (KinectFollowComponent kfc in Children)
             {
-                float scaleValue = 0.5f;  // Experimentally determined value that we may need to calibrate upon startup based on the lowest hand position we want
-                float x = -1f, y = -1f;
+                Joint? joint = null;
 
                 if (1 == kfc.Player)
                 {
-                    x = latestSkeletons[0].Joints[kfc.Joint].Position.X;
-                    y = latestSkeletons[0].Joints[kfc.Joint].Position.Y;
+                    joint = latestSkeletons[0].Joints[kfc.Joint];
                 }
                 else if (latestSkeletons.Length > 1 && 2 == kfc.Player)
                 {
-                    x = latestSkeletons[1].Joints[kfc.Joint].Position.X;
-                    y = latestSkeletons[1].Joints[kfc.Joint].Position.Y;
+                    joint = latestSkeletons[1].Joints[kfc.Joint];
                 }
 
-                if (x != -1 && y != -1)
+                if (joint.HasValue)
                 {
-                    y = (float)((1 - (y + 1) / 2) / scaleValue);
-                    if (y > 1) y = 1;
-                    if (y < 0) y = 0;
+                    var point = kinectService.KinectSensor.CoordinateMapper.MapSkeletonPointToColorPoint(joint.Value.Position, ColorImageFormat.RgbResolution640x480Fps30);
+                    float scaleX = windowSize.Item1 / 640.0f;
+                    float scaleY = windowSize.Item2 / 480.0f;
+
+                    kfc.UpdatePosition(point.X * scaleX, point.Y * scaleY);
+                    kfc.OnUpdate(frameDelta);
                 }
-
-                //Tuple<int, int> windowSize = renderService.//GetWindowSize();
-
-                kfc.UpdatePosition(x * windowSize.Item1, y * windowSize.Item2);
-                kfc.OnUpdate(frameDelta);
             }
 
-            for (int i = 0; i < numPlayers && latestSkeletons.Length > i; i++)
+            for (int i = 0; i < NumPlayers && latestSkeletons.Length > i; i++)
             {
-                for (int j = 0; j < numJoints; j++)
+                for (int j = 0; j < NumJoints; j++)
                 {
                     foreach (GestureEvent gestureEvent in events[i][j])
                     {
                         gestureEvent.GestureDetector.Add
-                            (latestSkeletons[i].Joints[gestureEvent.Joint].Position, KinectService.KinectDriver);
+                            (latestSkeletons[i].Joints[gestureEvent.Joint].Position, kinectService.KinectSensor);
                     }
                 }
             }
@@ -81,19 +70,15 @@ namespace Kinectitude.Kinect
             latestSkeletons = null;
         }
 
-        private void said(string what)
+        private void OnSkeletonsReady(Skeleton[] skeletons)
         {
-
+            latestSkeletons = skeletons;
         }
 
         protected override void OnStart()
         {
-            if (null == service)
-            {
-                service = GetService<KinectService>();
-            }
-            service.Callback = update;
-            service.SpeechCallback = said;
+            kinectService = GetService<KinectService>();
+            kinectService.SkeletonsReady = OnSkeletonsReady;
             
             RenderService renderService = GetService<RenderService>();
             windowSize = Tuple.Create((int)renderService.Width, (int)renderService.Height);
@@ -101,8 +86,7 @@ namespace Kinectitude.Kinect
 
         protected override void OnStop()
         {
-            service.Callback = null;
-            service.SpeechCallback = null;
+            kinectService.SkeletonsReady -= OnSkeletonsReady;
         }
 
         public void AddGestureEvent(GestureEvent gestureEvent)
@@ -110,10 +94,9 @@ namespace Kinectitude.Kinect
             events[gestureEvent.Player - 1][(int)gestureEvent.Joint].Add(gestureEvent);
         }
 
-        public void RemoevGestureEvent(GestureEvent gestureEvent)
+        public void RemoveGestureEvent(GestureEvent gestureEvent)
         {
             events[gestureEvent.Player - 1][(int)gestureEvent.Joint].Remove(gestureEvent); 
         }
-
     }
 }

@@ -3,29 +3,53 @@ using System.Linq;
 using Kinectitude.Core.Base;
 using Microsoft.Kinect;
 using Microsoft.Speech.Recognition;
+using System.IO;
 
 namespace Kinectitude.Kinect
 {
     public class KinectService : Service
     {
+        public KinectSensor KinectSensor { get; private set; }
 
-        private const int scount = 6;
-        private static Skeleton[] allSkeletons = new Skeleton[scount];
+        public Action<Skeleton[]> SkeletonsReady { get; set; }
 
-        public static KinectSensor KinectDriver { get; private set; }
-
-        public Action<Skeleton[]> Callback { get; set; }
-
-        public Action<string> SpeechCallback { get; set; }
+        //public Action<string> SpeechCallback { get; set; }
 
         //private readonly SpeechRecognitionEngine speechRecognitionEngine;
 
-        private void enable()
+        private void OnSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
-            if (0 != KinectSensor.KinectSensors.Count)
+            Skeleton[] skeletons = null;
+
+            using (SkeletonFrame frame = e.OpenSkeletonFrame())
             {
-                KinectDriver = KinectSensor.KinectSensors.First();
-                KinectDriver.SkeletonStream.Enable(new TransformSmoothParameters()
+                if (null != frame)
+                {
+                    skeletons = new Skeleton[frame.SkeletonArrayLength];
+                    frame.CopySkeletonDataTo(skeletons);
+                }
+
+                if (null != SkeletonsReady)
+                {
+                    SkeletonsReady(skeletons);
+                }
+            }
+        }
+
+        public override void OnStart()
+        {
+            foreach (var potentialSensor in KinectSensor.KinectSensors)
+            {
+                if (potentialSensor.Status == KinectStatus.Connected)
+                {
+                    KinectSensor = potentialSensor;
+                    break;
+                }
+            }
+
+            if (null != KinectSensor)
+            {
+                KinectSensor.SkeletonStream.Enable(new TransformSmoothParameters()
                 {
                     Smoothing = 0.5f,
                     Correction = 0.5f,
@@ -33,62 +57,26 @@ namespace Kinectitude.Kinect
                     JitterRadius = 0.05f,
                     MaxDeviationRadius = 0.04f
                 });
-                KinectDriver.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
-                KinectDriver.Start();
-                if (null != KinectDriver)
+                KinectSensor.SkeletonFrameReady += OnSkeletonFrameReady;
+
+                try
                 {
-                    KinectDriver.AllFramesReady += sensorReady;
+                    KinectSensor.Start();
+                }
+                catch (IOException)
+                {
+                    KinectSensor = null;
                 }
             }
-        }
-
-        private Skeleton[] getSkeletons(AllFramesReadyEventArgs e)
-        {
-            using (SkeletonFrame frame = e.OpenSkeletonFrame())
-            {
-                if (null == frame)
-                {
-                    return null;
-                }
-                frame.CopySkeletonDataTo(allSkeletons);
-                Skeleton[] skeletons = (from s in allSkeletons
-                                        where s.TrackingState != SkeletonTrackingState.NotTracked
-                                        select s).ToArray();
-                return skeletons;
-            }
-        }
-
-        private void sensorReady(object sender, AllFramesReadyEventArgs e)
-        {
-            if (!Running)
-            {
-                return;
-            }
-            Skeleton[] skeletons = getSkeletons(e);
-            if (null != skeletons && 0 != skeletons.Length)
-            {
-                using (DepthImageFrame depth = e.OpenDepthImageFrame())
-                {
-                    if (null == depth)
-                    {
-                        return;
-                    }
-                    if (null != Callback)
-                    {
-                        Callback(skeletons);
-                    }
-                }
-            }
-        }
-
-        public override void OnStart()
-        {
-            enable();
         }
 
         public override void OnStop()
         {
-            KinectDriver.Dispose();
+            if (KinectSensor != null)
+            {
+                KinectSensor.SkeletonFrameReady -= OnSkeletonFrameReady;
+                KinectSensor.Stop();
+            }
         }
 
         public override bool AutoStart()

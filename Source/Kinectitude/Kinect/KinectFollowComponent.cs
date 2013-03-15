@@ -12,8 +12,8 @@ namespace Kinectitude.Kinect
         private KinectManager manager;
 
         private JointType joint;
-        [PluginProperty("Joint", "")]
-        public JointType Joint 
+        [PluginProperty("Joint", "", JointType.HandRight)]
+        public JointType Joint
         {
             get { return joint; }
             set
@@ -27,7 +27,7 @@ namespace Kinectitude.Kinect
         }
 
         private int player;
-        [PluginProperty("Player", "")]
+        [PluginProperty("Player", "", 1)]
         public int Player
         {
             get { return player; }

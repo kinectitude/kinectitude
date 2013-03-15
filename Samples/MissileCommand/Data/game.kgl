@@ -21,8 +21,15 @@ using Kinectitude.DirectInput.dll
     define MouseFollowComponent as Kinectitude.DirectInput.MouseFollowComponent
 }
 
-Game(Name = "Missile Command", FirstScene = "Menu")
+Game(Name = "Missile Command", FirstScene = "Kinect")
 {
+    Prototype Joint()
+    {
+        Component Transform(Width = 72, Height = 72)
+        Component RenderComponent(Shape = "Ellipse", FillColor = "Blue")
+        Component KinectFollowComponent(Player = 1)
+    }
+    
     Service RenderService(Width = 800, Height = 600)
     
     Scene Menu()
@@ -78,6 +85,44 @@ Game(Name = "Missile Command", FirstScene = "Menu")
             Component RenderComponent(Shape = "Ellipse", FillColor = "Red", Opacity = 0.5)
             Component PhysicsComponent(Shape = "Ellipse", BodyType = "Kinematic")
             Component MouseFollowComponent()
+        }
+    }
+    
+    Scene Kinect()
+    {
+        Entity : Joint()
+        {
+            Component Transform(X = 279, Y = 77)
+            Component KinectFollowComponent(Joint = "Head")
+        }
+        
+        Entity : Joint()
+        {
+            Component Transform(X = 131, Y = 297)
+            Component KinectFollowComponent(Joint = "HandLeft")
+        }
+        
+        Entity : Joint()
+        {
+            Component Transform(X = 474, Y = 294)
+            Component KinectFollowComponent(Joint = "HandRight")
+        }
+        
+        Entity : Joint()
+        {
+            Component Transform(X = 300, Y = 300)
+        }
+        
+        Entity : Joint()
+        {
+            Component Transform(X = 378, Y = 511)
+            Component KinectFollowComponent(Joint = "FootRight")
+        }
+        
+        Entity : Joint()
+        {
+            Component Transform(X = 217, Y = 510)
+            Component KinectFollowComponent(Joint = "FootLeft")
         }
     }
 }

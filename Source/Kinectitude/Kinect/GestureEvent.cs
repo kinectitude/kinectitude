@@ -25,7 +25,7 @@ namespace Kinectitude.Kinect
         [PluginProperty("Joint", "Joint to detect gesture on")]
         public JointType Joint { get; set; }
 
-        [PluginProperty("Player", "player to detect gesture from")]
+        [PluginProperty("Player", "player to detect gesture from", 1)]
         public int Player { get; set; }
 
         public override void OnInitialize()
@@ -46,7 +46,7 @@ namespace Kinectitude.Kinect
 
         public override void Destroy()
         {
-            manager.RemoevGestureEvent(this);
+            manager.RemoveGestureEvent(this);
             GestureDetector.OnGestureDetected -= detectedGesture;
         }
     }
