@@ -3,6 +3,8 @@ using Kinectitude.Render.dll
     define RenderService as Kinectitude.Render.RenderService
     define RenderManager as Kinectitude.Render.RenderManager
     define RenderComponent as Kinectitude.Render.RenderComponent
+    define ImageRenderComponent as Kinectitude.Render.ImageRenderComponent
+    define TextRenderComponent as Kinectitude.Render.TextRenderComponent
 }
 
 using Kinectitude.Kinect.dll
@@ -21,7 +23,7 @@ using Kinectitude.DirectInput.dll
     define MouseFollowComponent as Kinectitude.DirectInput.MouseFollowComponent
 }
 
-Game(Name = "Missile Command", FirstScene = "Kinect")
+Game(Name = "Missile Command", FirstScene = "Menu")
 {
     Prototype Joint()
     {
@@ -30,9 +32,9 @@ Game(Name = "Missile Command", FirstScene = "Kinect")
         Component KinectFollowComponent(Player = 1)
     }
     
-    Service RenderService(Width = 800, Height = 600)
+    Service RenderService(Width = 1280, Height = 720)
     
-    Scene Menu()
+    Scene Physics()
     {
         Manager RenderManager()        
         Manager PhysicsManager(YGravity = 2)
@@ -123,6 +125,38 @@ Game(Name = "Missile Command", FirstScene = "Kinect")
         {
             Component Transform(X = 217, Y = 510)
             Component KinectFollowComponent(Joint = "FootLeft")
+        }
+    }
+    
+    Scene Menu()
+    {
+        Manager RenderManager(Width = 1280, Height = 720)
+        
+        Entity ()
+        {
+            Component Transform(X = 640, Y = 360, Width = 1280, Height = 720)
+            Component ImageRenderComponent(Image = "starfield.png")
+        }
+    }
+    
+    Scene Placement()
+    {
+        Entity ()
+        {
+            Component Transform(X = 390, Y = 133, Width = 48, Height = 48)
+            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
+        }
+        
+        Entity ()
+        {
+            Component Transform(X = 312, Y = 107, Width = 48, Height = 48)
+            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
+        }
+        
+        Entity ()
+        {
+            Component Transform(X = 397, Y = 127)
+            Component TextRenderComponent(Value = "Your Text Here", FontSize = 36, FontColor = "Black")
         }
     }
 }

@@ -220,6 +220,12 @@ namespace Kinectitude.Editor.Models
             }
         }
 
+        [DependsOn("PlacementMode")]
+        public bool IsPlacing
+        {
+            get { return PlacementMode != EntityPlacementMode.None; }
+        }
+
         public IEnumerable<Plugin> Plugins
         {
             get { return Entities.SelectMany(x => x.Plugins).Union(Managers.Select(x => x.Plugin)).Distinct(); }

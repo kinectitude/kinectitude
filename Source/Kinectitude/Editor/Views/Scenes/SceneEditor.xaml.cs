@@ -71,7 +71,7 @@ namespace Kinectitude.Editor.Views.Scenes
 
             if (delta.X != 0 || delta.Y != 0)
             {
-                canvas.Translate(delta);
+                canvas.PrecisionTranslate(delta);
             }
 
             e.Handled = true;

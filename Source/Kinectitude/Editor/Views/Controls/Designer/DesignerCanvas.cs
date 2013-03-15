@@ -30,88 +30,82 @@ namespace Kinectitude.Editor.Views.Controls.Designer
 
     internal sealed class DesignerCanvas : ItemsControl
     {
-        public static DependencyProperty SelectedItemProperty =
+        public static readonly DependencyProperty IsPlacingProperty =
+            DependencyProperty.Register("IsPlacing", typeof(bool), typeof(DesignerCanvas));
+
+        public static readonly DependencyProperty SelectedItemProperty =
             DependencyProperty.Register("SelectedItem", typeof(object), typeof(DesignerCanvas));
 
-        public static DependencyProperty IsSnapEnabledProperty =
+        public static readonly DependencyProperty IsSnapEnabledProperty =
             DependencyProperty.Register("IsSnapEnabled", typeof(bool), typeof(DesignerCanvas));
 
-        public static DependencyProperty SnapDistanceProperty =
+        public static readonly DependencyProperty SnapDistanceProperty =
             DependencyProperty.Register("SnapDistance", typeof(double), typeof(DesignerCanvas));
 
-        public static DependencyProperty DeleteCommandProperty =
+        public static readonly DependencyProperty DeleteCommandProperty =
             DependencyProperty.Register("DeleteCommand", typeof(ICommand), typeof(DesignerCanvas));
 
-        public static DependencyProperty CutCommandProperty =
+        public static readonly DependencyProperty CutCommandProperty =
             DependencyProperty.Register("CutCommand", typeof(ICommand), typeof(DesignerCanvas));
 
-        public static DependencyProperty CopyCommandProperty =
+        public static readonly DependencyProperty CopyCommandProperty =
             DependencyProperty.Register("CopyCommand", typeof(ICommand), typeof(DesignerCanvas));
 
-        public static DependencyProperty PasteCommandProperty =
+        public static readonly DependencyProperty PasteCommandProperty =
             DependencyProperty.Register("PasteCommand", typeof(ICommand), typeof(DesignerCanvas));
 
-        public static DependencyProperty PointCommandProperty =
+        public static readonly DependencyProperty PointCommandProperty =
             DependencyProperty.Register("PointCommand", typeof(ICommand), typeof(DesignerCanvas));
 
-        public static DependencyProperty BeginTranslateCommandProperty =
+        public static readonly DependencyProperty BeginTranslateCommandProperty =
             DependencyProperty.Register("BeginTranslateCommand", typeof(ICommand), typeof(DesignerCanvas));
 
-        public static DependencyProperty CommitTranslateCommandProperty =
+        public static readonly DependencyProperty CommitTranslateCommandProperty =
             DependencyProperty.Register("CommitTranslateCommand", typeof(ICommand), typeof(DesignerCanvas));
 
-        public static DependencyProperty CommitSendForwardCommandProperty =
+        public static readonly DependencyProperty CommitSendForwardCommandProperty =
             DependencyProperty.Register("CommitSendForwardCommand", typeof(ICommand), typeof(DesignerCanvas));
 
-        public static DependencyProperty CommitSendBackwardCommandProperty =
+        public static readonly DependencyProperty CommitSendBackwardCommandProperty =
             DependencyProperty.Register("CommitSendBackwardCommand", typeof(ICommand), typeof(DesignerCanvas));
 
-        public static DependencyProperty CommitSendToFrontCommandProperty =
+        public static readonly DependencyProperty CommitSendToFrontCommandProperty =
             DependencyProperty.Register("CommitSendToFrontCommand", typeof(ICommand), typeof(DesignerCanvas));
 
-        public static DependencyProperty CommitSendToBackCommandProperty =
+        public static readonly DependencyProperty CommitSendToBackCommandProperty =
             DependencyProperty.Register("CommitSendToBackCommand", typeof(ICommand), typeof(DesignerCanvas));
 
-        public static DependencyProperty CommitAlignLeftCommandProperty =
+        public static readonly DependencyProperty CommitAlignLeftCommandProperty =
             DependencyProperty.Register("CommitAlignLeftCommand", typeof(ICommand), typeof(DesignerCanvas));
 
-        public static DependencyProperty CommitAlignCenterCommandProperty =
+        public static readonly DependencyProperty CommitAlignCenterCommandProperty =
             DependencyProperty.Register("CommitAlignCenterCommand", typeof(ICommand), typeof(DesignerCanvas));
 
-        public static DependencyProperty CommitAlignRightCommandProperty =
+        public static readonly DependencyProperty CommitAlignRightCommandProperty =
             DependencyProperty.Register("CommitAlignRightCommand", typeof(ICommand), typeof(DesignerCanvas));
 
-        public static DependencyProperty CommitAlignTopCommandProperty =
+        public static readonly DependencyProperty CommitAlignTopCommandProperty =
             DependencyProperty.Register("CommitAlignTopCommand", typeof(ICommand), typeof(DesignerCanvas));
 
-        public static DependencyProperty CommitAlignMiddleCommandProperty =
+        public static readonly DependencyProperty CommitAlignMiddleCommandProperty =
             DependencyProperty.Register("CommitAlignMiddleCommand", typeof(ICommand), typeof(DesignerCanvas));
 
-        public static DependencyProperty CommitAlignBottomCommandProperty =
+        public static readonly DependencyProperty CommitAlignBottomCommandProperty =
             DependencyProperty.Register("CommitAlignBottomCommand", typeof(ICommand), typeof(DesignerCanvas));
 
-        public static DependencyProperty CameraLeftProperty =
+        public static readonly DependencyProperty CameraLeftProperty =
             DependencyProperty.Register("CameraLeft", typeof(double), typeof(DesignerCanvas));
 
-        public static DependencyProperty CameraTopProperty =
+        public static readonly DependencyProperty CameraTopProperty =
             DependencyProperty.Register("CameraTop", typeof(double), typeof(DesignerCanvas));
 
-        public static DependencyProperty CameraWidthProperty =
+        public static readonly DependencyProperty CameraWidthProperty =
             DependencyProperty.Register("CameraWidth", typeof(double), typeof(DesignerCanvas));
 
-        public static DependencyProperty CameraHeightProperty =
+        public static readonly DependencyProperty CameraHeightProperty =
             DependencyProperty.Register("CameraHeight", typeof(double), typeof(DesignerCanvas));
 
-        private enum Mode
-        {
-            Selecting,
-            Translating,
-            ScalingRotating
-        }
-
         public const double DragThreshold = 0.5;
-
-        private Mode mode;
 
         private bool mouseDown;
         private bool dragging;
@@ -124,6 +118,12 @@ namespace Kinectitude.Editor.Views.Controls.Designer
         public IEnumerable<DesignerItem> SelectedItems
         {
             get { return Items.Cast<object>().Select(x => (DesignerItem)ItemContainerGenerator.ContainerFromItem(x)).Where(x => x.IsSelected); }
+        }
+
+        public bool IsPlacing
+        {
+            get { return (bool)GetValue(IsPlacingProperty); }
+            set { SetValue(IsPlacingProperty, value); }
         }
 
         public object SelectedItem
@@ -283,8 +283,6 @@ namespace Kinectitude.Editor.Views.Controls.Designer
 
         public DesignerCanvas()
         {
-            mode = Mode.Selecting;
-
             SendForwardCommand = new DelegateCommand(p => SelectedItems.Count() > 0, p => SendForward());
             SendBackwardCommand = new DelegateCommand(p => SelectedItems.Count() > 0, p => SendBackward());
             SendToFrontCommand = new DelegateCommand(p => SelectedItems.Count() > 0, p => SendToFront());
@@ -440,43 +438,24 @@ namespace Kinectitude.Editor.Views.Controls.Designer
 
         private void OnDragStart(MouseEventArgs e)
         {
-            var currentPoint = e.GetPosition(this);
-
-            if (mode == Mode.Selecting)
+            if (!IsPlacing)
             {
+                var currentPoint = e.GetPosition(this);
                 var item = FindDesignerItemAt(currentPoint);
-                if (null != item)
-                {
-                    Select(item);
-                    mode = Mode.Translating;
 
-                    if (null != BeginTranslateCommand)
+                if (null == item || !item.IsSelected)
+                {
+                    if (null == elasticBand)
                     {
-                        BeginTranslateCommand.Execute(GetSelectedData());
+                        ShowElasticBand();
                     }
                 }
-                else
-                {
-                    ShowElasticBand();
-                }
-            }
-            else if (mode == Mode.Translating)
-            {
-                var item = FindDesignerItemAt(currentPoint);
-                if (null != item && item.IsSelected)
+                else if (null != item)
                 {
                     if (null != BeginTranslateCommand)
                     {
                         BeginTranslateCommand.Execute(GetSelectedData());
                     }
-                    
-                    var delta = currentPoint - previousPoint;
-                    TranslateSelection(delta);
-                }
-                else
-                {
-                    mode = Mode.Selecting;
-                    ShowElasticBand();
                 }
             }
         }
@@ -521,26 +500,27 @@ namespace Kinectitude.Editor.Views.Controls.Designer
 
         private void OnDrag(MouseEventArgs e)
         {
-            if (mode == Mode.Selecting)
-            {
-                elasticBand.Update(e.GetPosition(this));
-            }
-            else if (mode == Mode.Translating)
-            {
-                var currentPoint = e.GetPosition(this);
-                var delta = currentPoint - previousPoint;
+            var currentPoint = e.GetPosition(this);
 
+            if (null != elasticBand)
+            {
+                elasticBand.Update(currentPoint);
+            }
+            else if (SelectedItems.Any())
+            {
+                var delta = currentPoint - previousPoint;
                 TranslateSelection(delta);
             }
         }
 
         private void OnDragStop(MouseEventArgs e)
         {
-            if (mode == Mode.Selecting)
+            if (null != elasticBand)
             {
                 HideElasticBand();
             }
-            else if (mode == Mode.Translating)
+
+            if (SelectedItems.Any())
             {
                 if (null != CommitTranslateCommand)
                 {
@@ -553,7 +533,7 @@ namespace Kinectitude.Editor.Views.Controls.Designer
         {
             var currentPoint = e.GetPosition(this);
 
-            if (mode == Mode.Selecting)
+            if (!IsPlacing)
             {
                 if ((Keyboard.Modifiers & ModifierKeys.Shift) != ModifierKeys.Shift)
                 {
@@ -563,36 +543,17 @@ namespace Kinectitude.Editor.Views.Controls.Designer
                 DesignerItem item = FindDesignerItemAt(currentPoint);
                 if (null != item)
                 {
-                    if (item.IsSelected)
-                    {
-                        Deselect(item);
-                    }
-                    else
-                    {
-                        Select(item);
-                    }
-                }
-                else if (null != PointCommand)
-                {
-                    PointCommand.Execute(currentPoint);
-                }
-            }
-            else if (mode == Mode.Translating)
-            {
-                DesignerItem item = FindDesignerItemAt(currentPoint);
-                if (null != item)
-                {
                     if (!item.IsSelected)
                     {
-                        mode = Mode.Selecting;
-                        DeselectAll();
                         Select(item);
                     }
                 }
-                else
+            }
+            else
+            {
+                if (null != PointCommand)
                 {
-                    mode = Mode.Selecting;
-                    DeselectAll();
+                    PointCommand.Execute(currentPoint);
                 }
             }
         }
@@ -756,14 +717,9 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             }
         }
 
-        public void Translate(Vector delta)
+        public void PrecisionTranslate(Vector delta)
         {
-            if (mode == Mode.Selecting && SelectedItems.Count() > 0)
-            {
-                mode = Mode.Translating;
-            }
-
-            if (mode == Mode.Translating)
+            if (!IsPlacing)
             {
                 if (null != BeginTranslateCommand)
                 {
