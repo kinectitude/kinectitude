@@ -18,9 +18,11 @@ using Kinectitude.Physics.dll
     define PhysicsManager as Kinectitude.Physics.PhysicsManager
 }
 
-using Kinectitude.DirectInput.dll
+using Kinectitude.Input.dll
 {
-    define MouseFollowComponent as Kinectitude.DirectInput.MouseFollowComponent
+    define MouseFollowComponent as Kinectitude.Input.MouseFollowComponent
+    define MouseClickEvent as Kinectitude.Input.MouseClickEvent
+    define KeyEvent as Kinectitude.Input.KeyEvent
 }
 
 Game(Name = "Missile Command", FirstScene = "Menu")
@@ -46,100 +48,6 @@ Game(Name = "Missile Command", FirstScene = "Menu")
     
     Service RenderService(Width = 1280, Height = 720)
     
-    Scene Physics()
-    {
-        Manager RenderManager()        
-        Manager PhysicsManager(YGravity = 2)
-        
-        Entity ()
-        {
-            Component Transform(X = 387, Y = 249, Width = 200, Height = 48, Rotation = 30)
-            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
-            Component PhysicsComponent(Shape = "Rectangle", Restitution = 1, Mass = 3, Friction = 0, LinearDamping = 3)
-        }
-        
-        Entity ()
-        {
-            Component Transform(X = 399, Y = 559, Width = 750, Height = 48)
-            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
-            Component PhysicsComponent(BodyType = "Static")
-        }
-        
-        Entity ()
-        {
-            Component Transform(X = 398, Y = 43, Width = 750, Height = 48)
-            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
-            Component PhysicsComponent(BodyType = "Static")
-        }
-        
-        Entity ()
-        {
-            Component Transform(X = 43, Y = 298, Width = 48, Height = 500)
-            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
-            Component PhysicsComponent(BodyType = "Static")
-        }
-        
-        Entity ()
-        {
-            Component Transform(X = 753, Y = 297, Width = 48, Height = 500)
-            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
-            Component PhysicsComponent(BodyType = "Static")
-        }
-        
-        Entity ()
-        {
-            Component Transform(X = 588, Y = 153, Width = 48, Height = 48)
-            Component RenderComponent(Shape = "Ellipse", FillColor = "Blue")
-            Component PhysicsComponent(Shape = "Ellipse", Restitution = 1, LinearDamping = 1, XVelocity = -15, YVelocity = 2)
-        }
-        
-        Entity ()
-        {
-            Component Transform(X = 189, Y = 173, Width = 100, Height = 100)
-            Component RenderComponent(Shape = "Ellipse", FillColor = "Red", Opacity = 0.5)
-            Component PhysicsComponent(Shape = "Ellipse", BodyType = "Kinematic")
-            Component MouseFollowComponent()
-        }
-    }
-    
-    Scene Kinect()
-    {
-        Entity : joint()
-        {
-            Component Transform(X = 279, Y = 77)
-            Component KinectFollowComponent(Joint = "Head")
-        }
-        
-        Entity : joint()
-        {
-            Component Transform(X = 131, Y = 297)
-            Component KinectFollowComponent(Joint = "HandLeft")
-        }
-        
-        Entity : joint()
-        {
-            Component Transform(X = 474, Y = 294)
-            Component KinectFollowComponent(Joint = "HandRight")
-        }
-        
-        Entity : joint()
-        {
-            Component Transform(X = 300, Y = 300)
-        }
-        
-        Entity : joint()
-        {
-            Component Transform(X = 378, Y = 511)
-            Component KinectFollowComponent(Joint = "FootRight")
-        }
-        
-        Entity : joint()
-        {
-            Component Transform(X = 217, Y = 510)
-            Component KinectFollowComponent(Joint = "FootLeft")
-        }
-    }
-    
     Scene Menu()
     {
         Manager RenderManager(Width = 1280, Height = 720)
@@ -154,6 +62,7 @@ Game(Name = "Missile Command", FirstScene = "Menu")
         {
             Component Transform(X = 308, Y = 192, Width = 48, Height = 48)
             Component ImageRenderComponent(Image = "target.png")
+            Component MouseFollowComponent(IgnoresPhysics = True)
         }
         
         Entity title()
@@ -176,6 +85,29 @@ Game(Name = "Missile Command", FirstScene = "Menu")
         {
             Component Transform(X = 914, Y = 252)
             Component PhysicsComponent(AngularVelocity = 1)
+        }
+        
+        Entity ()
+        {
+            Component Transform(X = 173, Y = 277)
+            Component TextRenderComponent(Value = "Your Text Here", FontSize = 36, FontColor = "White")
+            
+            Event AttributeChanges(Target = cursor.Transform.X + cursor.Transform.Y)
+            {
+                TextRenderComponent.Value = "Location: " + cursor.Transform.X + ", " + cursor.Transform.Y
+            }
+
+            Event MouseClickEvent(Button = "Left")
+            {
+                clicks += 1
+                TextRenderComponent.Value = clicks
+            }
+
+            Event KeyEvent(KeyState = "Down", Key = "Tab")
+            {
+                tabs += 4
+                TextRenderComponent.Value = "Tabs: " + tabs
+            }
         }
     }
 }

@@ -36,6 +36,8 @@ namespace Kinectitude.Render
         [PluginProperty("Window Height", "", 600)]
         public float Height { get; set; }
 
+        public SizeF Dpi { get; set; }
+
         public RenderTarget RenderTarget
         {
             get { return renderTarget; }
@@ -82,6 +84,16 @@ namespace Kinectitude.Render
         public override bool AutoStart()
         {
             return false;
+        }
+
+        public PointF ConvertPixelsToDips(PointF pixels)
+        {
+            return new PointF(pixels.X * 96.0f / Dpi.Width, pixels.Y * 96.0f / Dpi.Height);
+        }
+
+        public PointF ConvertDipsToPixels(PointF dips)
+        {
+            return new PointF(dips.X * Dpi.Width / 96.0f, dips.Y * Dpi.Height / 96.0f);
         }
 
         public SolidColorBrush GetSolidColorBrush(Color4 color, float opacity)

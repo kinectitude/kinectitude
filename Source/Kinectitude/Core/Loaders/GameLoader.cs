@@ -75,11 +75,10 @@ namespace Kinectitude.Core.Loaders
             return Game;
         }
 
-        public GameLoader
-            (string fileName, Assembly [] preloads, float scaleX, float scaleY, Func<Tuple<int, int>> windowOffset, Action<string> die)
+        public GameLoader(string fileName, Assembly [] preloads, Action<string> die)
         {
 
-            Game = new Game(this, scaleX, scaleY, windowOffset, die);
+            Game = new Game(this, die);
             string extention = null;
             try
             {

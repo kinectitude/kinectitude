@@ -161,9 +161,9 @@
       <Name>Kinectitude.Core</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\DirectInput\Kinectitude.DirectInput.csproj">
+    <ProjectReference Include="..\DirectInput\Kinectitude.Input.csproj">
       <Project>{6F23FA79-3A6F-4D54-A099-336F90A719E7}</Project>
-      <Name>Kinectitude.DirectInput</Name>
+      <Name>Kinectitude.Input</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Render\Kinectitude.Render.csproj">

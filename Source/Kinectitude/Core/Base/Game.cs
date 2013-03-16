@@ -17,20 +17,10 @@ namespace Kinectitude.Core.Base
         
         private readonly Dictionary<Type, Service> services = new Dictionary<Type, Service>();
 
-        private readonly Func<Tuple<int, int>> WindowOffset;
-        
-        internal float ScaleX { get; private set; }
-        internal float ScaleY { get; private set; }
-
-        internal Tuple<int, int> GetWidowOffset() { return WindowOffset(); }
-
-        internal Game(GameLoader gameLoader, float scaleX, float scaleY, Func<Tuple<int, int>> windowOffset, Action<string> die) : base(-2)
+        internal Game(GameLoader gameLoader, Action<string> die) : base(-2)
         {
             this.GameLoader = gameLoader;
             CurrentGame = this;
-            ScaleX = scaleX;
-            ScaleY = scaleY;
-            WindowOffset = windowOffset;
             Running = true;
             Die = die;
         }

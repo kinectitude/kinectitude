@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Kinectitude.Core.Base;
-using SlimDX.DirectInput;
-using SlimDX;
 using System.Windows.Forms;
 using Kinectitude.Core.Attributes;
+using Kinectitude.Render;
+using System.Drawing;
 
-namespace Kinectitude.DirectInput
+namespace Kinectitude.Input
 {
-    public enum Button {Left = 0, Right, Scroll, Other};
-
     [Plugin("Mouse Manager", "")]
     public class MouseManager : Manager<MouseFollowComponent>
     {
-        private static Mouse mouse;
-        private static DirectInputService service;
+        //private static Mouse mouse;
+        private RenderService renderService;
+        private InputService inputService;
+        private PointF currentPoint;
 
         private readonly List<MouseClickEvent> mouseClickEvents = new List<MouseClickEvent>();
 
@@ -39,11 +39,45 @@ namespace Kinectitude.DirectInput
 
         public MouseManager()
         {
-            if (mouse == null)
+            //if (mouse == null)
+            //{
+            //    service = GetService<InputService>();
+            //    mouse = new Mouse(service.DirectInput);
+            //    service.InitDevice<Mouse>(mouse);
+            //}
+        }
+
+        protected override void OnStart()
+        {
+            if (null == renderService)
             {
-                service = GetService<DirectInputService>();
-                mouse = new Mouse(service.DirectInput);
-                service.InitDevice<Mouse>(mouse);
+                renderService = GetService<RenderService>();
+            }
+
+            if (null == inputService)
+            {
+                inputService = GetService<InputService>();
+                inputService.MouseMove += OnMouseMove;
+                inputService.MouseClick += OnMouseClick;
+            }
+        }
+
+        protected override void OnStop()
+        {
+            inputService.MouseMove -= OnMouseMove;
+            inputService.MouseClick -= OnMouseClick;
+        }
+
+        private void OnMouseMove(MouseButtons button, float x, float y)
+        {
+            currentPoint = renderService.ConvertPixelsToDips(new PointF(x, y));
+        }
+
+        private void OnMouseClick(MouseButtons button, float x, float y)
+        {
+            foreach (var evt in mouseClickEvents.Where(e => e.Button == button))
+            {
+                evt.DoActions();
             }
         }
 
@@ -52,38 +86,40 @@ namespace Kinectitude.DirectInput
             foreach (MouseFollowComponent mfc in Children)
             {
                 //mfc.UpdateDelta(state.X, state.Y);
-                int x = Cursor.Position.X;
-                int y = Cursor.Position.Y;
-                OffsetByWindow(ref x, ref y);
-                mfc.UpdatePosition(ScaleX(x), ScaleY(y));
+                //int x = Cursor.Position.X;
+                //int y = Cursor.Position.Y;
+                //OffsetByWindow(ref x, ref y);
+                //mfc.UpdatePosition(ScaleX(x), ScaleY(y));
+                //mfc.OnUpdate(frameDelta);
+
+                mfc.UpdatePosition(currentPoint.X, currentPoint.Y);
                 mfc.OnUpdate(frameDelta);
             }
 
-            if (mouse.Acquire().IsFailure || mouse.Poll().IsFailure) return;
-            MouseState state = mouse.GetCurrentState();
-            if (Result.Last.IsFailure) return;
+            //if (mouse.Acquire().IsFailure || mouse.Poll().IsFailure) return;
+            //MouseState state = mouse.GetCurrentState();
+            //if (Result.Last.IsFailure) return;
 
-            bool [] buttonsPressed = state.GetButtons();
-            for (int i = 0; i < 3 && i < buttonsPressed.Length; i++)
-            {
-                if (!buttonsPressed[i]) continue;
-                foreach (MouseClickEvent clickEvent in mouseClickEvents.Where
-                    (input => (int)input.Button == i || input.Button == Button.Other && i == input.ButtonNumber))
-                {
-                    clickEvent.DoActions();
-                }
-            }
+            //bool [] buttonsPressed = state.GetButtons();
+            //for (int i = 0; i < 3 && i < buttonsPressed.Length; i++)
+            //{
+            //    if (!buttonsPressed[i]) continue;
+            //    //foreach (MouseClickEvent clickEvent in mouseClickEvents.Where
+            //    //    (input => (int)input.Button == i || input.Button == Button.Other && i == input.ButtonNumber))
+            //    //{
+            //    //    clickEvent.DoActions();
+            //    //}
+            //}
 
-            for (int i = 3; i < buttonsPressed.Length; i++)
-            {
-                if (!buttonsPressed[i]) continue;
-                foreach (MouseClickEvent clickEvent in mouseClickEvents.Where
-                    (input => input.Button == Button.Other &&  i == input.ButtonNumber))
-                {
-                    clickEvent.DoActions();
-                }
-            }
-
+            //for (int i = 3; i < buttonsPressed.Length; i++)
+            //{
+            //    if (!buttonsPressed[i]) continue;
+            //    foreach (MouseClickEvent clickEvent in mouseClickEvents.Where
+            //        (input => input.Button == Button.Other &&  i == input.ButtonNumber))
+            //    {
+            //        clickEvent.DoActions();
+            //    }
+            //}
         }
 
         public void RegisterMouseClick(MouseClickEvent evt)

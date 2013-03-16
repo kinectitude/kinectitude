@@ -4,19 +4,17 @@ using System.Linq;
 using System.Text;
 using Kinectitude.Core.Base;
 using Kinectitude.Core.Attributes;
+using System.Windows.Forms;
 
-namespace Kinectitude.DirectInput
+namespace Kinectitude.Input
 {
-    [Plugin("when mouse button is clicked: (Button: {Button}, Button Number: {ButtonNumber})", "Mouse Event")]
+    [Plugin("when mouse button {Button} is clicked", "Mouse Event")]
     public class MouseClickEvent : Event
     {
         private MouseManager mouseManager;
 
-        [PluginProperty("Button", "Standard button to check")]
-        public Button Button { get; set; }
-
-        [PluginProperty("Button Number", "Button number for other buttons. If button type is other, the button with id ButtonNumber is used")]
-        public int ButtonNumber { get; set; }
+        [PluginProperty("Button", "Standard button to check", MouseButtons.Left)]
+        public MouseButtons Button { get; set; }
 
         public override void OnInitialize()
         {

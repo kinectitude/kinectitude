@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using SlimDX.DirectInput;
+using System.Windows.Forms;
 
-namespace Kinectitude.DirectInput
+namespace Kinectitude.Input
 {
     public class KeyChangeCallback : IKeyChange
     {
         public KeyState KeyState { get; private set; }
-        public Key Button { get; set; }
+        public Keys Key { get; set; }
 
         private readonly Action Call;
 

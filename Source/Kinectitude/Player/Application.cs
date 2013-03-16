@@ -8,7 +8,7 @@ using Kinectitude.Render;
 using SlimDX.Direct2D;
 using SlimDX.Windows;
 using Factory = SlimDX.Direct2D.Factory;
-using Kinectitude.DirectInput;
+using Kinectitude.Input;
 
 namespace Kinectitude.Player
 {
@@ -19,7 +19,7 @@ namespace Kinectitude.Player
         private readonly RenderService renderService;
         private readonly RenderForm form;
         private readonly Game game;
-        private readonly DirectInputService directInputService;
+        private readonly InputService inputService;
 
         private void die(string message)
         {
@@ -30,18 +30,16 @@ namespace Kinectitude.Player
         public Application()
         {
             Assembly renderAssembly = Assembly.GetAssembly(typeof(RenderService));
-            Assembly directAssembly = Assembly.GetAssembly(typeof(DirectInputService));
+            Assembly inputAssembly = Assembly.GetAssembly(typeof(InputService));
 
             Factory drawFactory = new SlimDX.Direct2D.Factory();
-            SizeF dpi = drawFactory.DesktopDpi;
 
-            Func<Tuple<int, int>> windowOffset = () => new Tuple<int, int>(form.Left, form.Top);
-
-            GameLoader gameLoader = new GameLoader("game.kgl", new Assembly[] { renderAssembly, directAssembly },
-                96 / dpi.Width, 90 / dpi.Height, windowOffset, die);
+            GameLoader gameLoader = new GameLoader("game.kgl", new Assembly[] { renderAssembly, inputAssembly }, die);
 
             game = gameLoader.CreateGame();
+            
             renderService = game.GetService<RenderService>();
+            renderService.Dpi = drawFactory.DesktopDpi;
 
             if (renderService.Width == 0)
             {
@@ -52,8 +50,9 @@ namespace Kinectitude.Player
             {
                 renderService.Height = 600;
             }
-            
-            Size size = new Size((int)(renderService.Width * dpi.Width / 96.0f), (int)(renderService.Height * dpi.Height / 96.0f));
+
+            PointF pixelSize = renderService.ConvertDipsToPixels(new PointF(renderService.Width, renderService.Height));
+            Size size = new Size((int)pixelSize.X, (int)pixelSize.Y);
 
             form = new RenderForm(game.Name)
             {
@@ -68,11 +67,16 @@ namespace Kinectitude.Player
                 PixelSize = size
             });
 
-            directInputService = game.GetService<DirectInputService>();
-            directInputService.Control = form;
-            int y = (int)((SystemInformation.VirtualScreen.Height - renderService.Height * dpi.Height / 96.0) / 2);
+            inputService = game.GetService<InputService>();
+            inputService.Form = form;
+
+            //directInputService.Control = form;
+            
+
+
+            int y = (int)((SystemInformation.VirtualScreen.Height - renderService.Height * renderService.Dpi.Height / 96.0) / 2);
             if (y < 0) y = 0;
-            int x = (int)((SystemInformation.VirtualScreen.Width - renderService.Width * dpi.Width / 96.0) / 2);
+            int x = (int)((SystemInformation.VirtualScreen.Width - renderService.Width * renderService.Dpi.Width / 96.0) / 2);
             if (x < 0) x = 0;
             form.SetDesktopLocation(x, y);
         }

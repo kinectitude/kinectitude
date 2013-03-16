@@ -5,7 +5,7 @@ using System.Text;
 using Kinectitude.Core.AbstractComponents;
 using Kinectitude.Core.Attributes;
 
-namespace Kinectitude.DirectInput
+namespace Kinectitude.Input
 {
     [Plugin("Mouse Motion Component", "")]
     [Provides(typeof(BasicFollowComponent))]
