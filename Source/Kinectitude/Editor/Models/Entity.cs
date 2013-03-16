@@ -32,6 +32,7 @@ namespace Kinectitude.Editor.Models
         private bool prototype;
         private int nextAttribute;
         private Attribute selectedAttribute;
+        private bool shouldCopyStatement;
         
         public string Name
         {
@@ -131,6 +132,19 @@ namespace Kinectitude.Editor.Models
         public int Index
         {
             get { return null != Scope ? Scope.IndexOf(this) : -1; }
+        }
+
+        public bool ShouldCopyStatement
+        {
+            get { return shouldCopyStatement; }
+            set
+            {
+                if (shouldCopyStatement != value)
+                {
+                    shouldCopyStatement = value;
+                    NotifyPropertyChanged("ShouldCopyStatement");
+                }
+            }
         }
 
         public EntityPresenter Presenter { get; private set; }

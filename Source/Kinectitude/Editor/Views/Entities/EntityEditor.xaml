@@ -509,6 +509,10 @@
                     </ContentControl>
                 </StackPanel>
             </ScrollViewer>
+            <i:Interaction.Behaviors>
+                <b:TrackKeyBehavior Key="LeftShift" IsKeyDown="{Binding ShouldCopyStatement, Mode=OneWayToSource}" />
+                <b:TrackKeyBehavior Key="RightShift" IsKeyDown="{Binding ShouldCopyStatement, Mode=OneWayToSource}" />
+            </i:Interaction.Behaviors>
         </DockPanel>
 
     </Grid>

@@ -33,6 +33,11 @@ namespace Kinectitude.Editor.Models.Statements.Base
             get { return null != Scope ? Scope.IndexOf(this) : -1; }
         }
 
+        public bool ShouldCopyStatement
+        {
+            get { return null != Scope ? Scope.ShouldCopyStatement : false; }
+        }
+
         public ICommand InsertBeforeCommand { get; private set; }
 
         public AbstractStatement(AbstractStatement inheritedStatement = null)
@@ -57,6 +62,11 @@ namespace Kinectitude.Editor.Models.Statements.Base
                         {
                             toInsert = factory.CreateStatement();
                         }
+                    }
+
+                    if (null != toInsert && ShouldCopyStatement)
+                    {
+                        toInsert = toInsert.DeepCopyStatement();
                     }
 
                     if (null != toInsert && toInsert.IsEditable && null != Scope)

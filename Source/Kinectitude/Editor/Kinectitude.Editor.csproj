@@ -180,6 +180,7 @@
     <Compile Include="Models\Notifications\AssetUsed.cs" />
     <Compile Include="Models\Notifications\EffectiveValueChanged.cs" />
     <Compile Include="Views\Behaviors\ObservableSizeBehavior.cs" />
+    <Compile Include="Views\Behaviors\TrackKeyBehavior.cs" />
     <Compile Include="Views\Behaviors\TrackMouseBehavior.cs" />
     <Compile Include="Views\Utils\PlacementModeConverter.cs" />
     <Compile Include="Views\Utils\IDialogService.cs" />

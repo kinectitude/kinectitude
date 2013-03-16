@@ -74,6 +74,11 @@ namespace Kinectitude.Editor.Models.Statements.Base
                         }
                     }
 
+                    if (null != statement && ShouldCopyStatement)
+                    {
+                        statement = statement.DeepCopyStatement();
+                    }
+
                     if (null != statement)
                     {
                         if (IsAllowed(statement))
