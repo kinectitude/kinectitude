@@ -16,7 +16,7 @@ namespace Kinectitude.Editor.Storage.Kgl
 
         public KglValueMaker()
         {
-            grammar.Root = grammar.Expr;
+            grammar.Root = grammar.value;
             parser = new Parser(grammar);
         }
 
@@ -29,7 +29,19 @@ namespace Kinectitude.Editor.Storage.Kgl
         public ValueReader CreateValueReader(string value, IScene scene, IDataContainer entity, Event evt = null)
         {
             ParseTree tree = parser.Parse(value);   // Should always be valid since UI calls HasErrors first
-            return MakeAssignable(tree.Root, scene, entity, evt) as ValueReader;
+            var assignable = MakeAssignable(tree.Root, scene, entity, evt);
+
+            var reader = assignable as ValueReader;
+            if (null == reader)
+            {
+                var typeMatcher = assignable as TypeMatcher;
+                if (null != typeMatcher)
+                {
+                    reader = ConstantReader.NullValue;
+                }
+            }
+
+            return reader;
         }
     }
 }

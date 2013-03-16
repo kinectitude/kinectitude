@@ -16,6 +16,7 @@ using Kinectitude.Physics.dll
 {
     define PhysicsComponent as Kinectitude.Physics.PhysicsComponent
     define PhysicsManager as Kinectitude.Physics.PhysicsManager
+    define CollisionEvent as Kinectitude.Physics.CollisionEvent
 }
 
 using Kinectitude.Input.dll
@@ -39,14 +40,40 @@ Game(Name = "Missile Command", FirstScene = "Menu")
     {
         Component Transform(Width = 64, Height = 48)
         Component ImageRenderComponent(Image = "explosion.png", Animated = True, Duration = 3, Stretched = False)
+        
+        Event OnCreate()
+        {
+            myId = scene.nextExplosionId
+            scene.nextExplosionId += 1
+            Transform.X = cursor.Transform.X
+            Transform.Y = cursor.Transform.Y
+            CreateTimer(Name = "explosionTimer" + myId, Duration = 3, Trigger = "destroyExplosion", Recurring = False)
+        }
+
+        Event TriggerOccurs(Trigger = "destroyExplosion")
+        {
+            if (myId < scene.nextExplosionId)
+            {
+                events.TextRenderComponent.Value = "Explosion"
+                Destroy()
+            }
+        }
     }
     
     Prototype asteroid()
     {
         Component Transform(Width = 64, Height = 64)
         Component ImageRenderComponent(Image = "asteroid.png")
+        Component PhysicsComponent(Shape = "Ellipse", Mass = 10, AngularVelocity = 1)
         
-        Event TriggerOccurs(Trigger = "proto")
+        Event OnCreate()
+        {
+            Transform.X = Random(0, 1280)
+            Transform.Y = 100
+            PhysicsComponent.YVelocity = 10
+        }
+
+        Event CollisionEvent(CollidesWith = $explosion)
         {
 
         }
@@ -57,7 +84,8 @@ Game(Name = "Missile Command", FirstScene = "Menu")
     Scene Menu()
     {
         Manager RenderManager(Width = 1280, Height = 720)        
-        Manager MouseManager(VisibleCursor = False)
+        Manager MouseManager()        
+        Manager PhysicsManager()
         
         Entity stars()
         {
@@ -68,28 +96,7 @@ Game(Name = "Missile Command", FirstScene = "Menu")
         Entity title()
         {
             Component Transform(X = 640, Y = 120, Width = 278, Height = 150)
-            Component ImageRenderComponent(Image = "title.png")
-        }
-        
-        Entity : explosion()
-        {
-            Component Transform(X = 620, Y = 255)
-        }
-        
-        Entity : asteroid()
-        {
-            Component Transform(X = 556, Y = 315)
-            
-            Event TriggerOccurs(Trigger = "test")
-            {
-
-            }
-        }
-        
-        Entity : asteroid()
-        {
-            Component Transform(X = 914, Y = 252)
-            Component PhysicsComponent(AngularVelocity = 1)
+            Component ImageRenderComponent(Image = "title.png", Opacity = 0)
         }
         
         Entity cursor()
@@ -97,33 +104,33 @@ Game(Name = "Missile Command", FirstScene = "Menu")
             Component Transform(X = 308, Y = 192, Width = 48, Height = 48)
             Component ImageRenderComponent(Image = "target.png")
             Component MouseFollowComponent(IgnoresPhysics = True)
+            
+            Event MouseClickEvent()
+            {
+                CreateEntity(Prototype = "explosion")
+            }
         }
         
-        Entity ()
+        Entity events()
         {
             Component Transform(X = 20, Y = 13)
             Component TextRenderComponent(Value = "Your Text Here", FontSize = 36, FontColor = "White")
             
-            Event AttributeChanges(Target = cursor.Transform.X + cursor.Transform.Y)
+            Event SceneStarts()
             {
-                TextRenderComponent.Value = "Location: " + cursor.Transform.X + ", " + cursor.Transform.Y
+                CreateTimer(Name = "asteroidTimer", Duration = 1, Trigger = "makeAsteroid")
             }
 
-            Event KeyEvent(KeyState = "Down", Key = "Tab")
+            Event TriggerOccurs(Trigger = "makeAsteroid")
             {
-                tabs += 4
-                TextRenderComponent.Value = "Tabs: " + tabs
-            }
-
-            Event MouseClickEvent(Button = "Left")
-            {
-                clicks += 1
-                TextRenderComponent.Value = clicks
+                asteroids += 1
+                TextRenderComponent.Value = asteroids
+                CreateEntity(Prototype = "asteroid")
             }
 
             Event KeyEvent(Key = "Escape")
             {
-
+                Quit()
             }
         }
     }

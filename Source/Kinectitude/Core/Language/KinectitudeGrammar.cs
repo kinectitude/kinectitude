@@ -58,6 +58,7 @@ namespace Kinectitude.Core.Language
         #endregion
 
         #region expressions
+        internal readonly NonTerminal value = new NonTerminal("value", "value");
         internal readonly NonTerminal Expr = new NonTerminal("Expr", "Expr");
         internal readonly NonTerminal BinOp = new NonTerminal("BinOp", "BinOp");
         internal readonly NonTerminal UniOp = new NonTerminal("UniOp", "UniOp");
@@ -212,7 +213,7 @@ namespace Kinectitude.Core.Language
             #endregion
 
             #region values
-            NonTerminal value = new NonTerminal("value");
+            //NonTerminal value = new NonTerminal("value");
             NonTerminal exactValue = new NonTerminal("exactValue", "exactValue");
             #endregion
 
