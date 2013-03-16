@@ -111,8 +111,8 @@ namespace Kinectitude.Editor.Models.Properties
 
                         if (!Workspace.Instance.Project.HasAssetWithFileName(fileName))
                         {
-                            Value = new Value("\"" + fileName + "\"");
                             Notify(new AssetUsed(pathName));
+                            Value = new Value("\"" + fileName + "\"");
                         }
                         else
                         {
