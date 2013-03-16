@@ -44,6 +44,11 @@ Game(Name = "Missile Command", FirstScene = "Menu")
     {
         Component Transform(Width = 64, Height = 64)
         Component ImageRenderComponent(Image = "asteroid.png")
+        
+        Event TriggerOccurs(Trigger = "proto")
+        {
+
+        }
     }
     
     Service RenderService(Width = 1280, Height = 720)
@@ -79,6 +84,11 @@ Game(Name = "Missile Command", FirstScene = "Menu")
         Entity : asteroid()
         {
             Component Transform(X = 556, Y = 315)
+            
+            Event TriggerOccurs(Trigger = "test")
+            {
+
+            }
         }
         
         Entity : asteroid()
@@ -97,16 +107,16 @@ Game(Name = "Missile Command", FirstScene = "Menu")
                 TextRenderComponent.Value = "Location: " + cursor.Transform.X + ", " + cursor.Transform.Y
             }
 
-            Event MouseClickEvent(Button = "Left")
-            {
-                clicks += 1
-                TextRenderComponent.Value = clicks
-            }
-
             Event KeyEvent(KeyState = "Down", Key = "Tab")
             {
                 tabs += 4
                 TextRenderComponent.Value = "Tabs: " + tabs
+            }
+
+            Event MouseClickEvent(Button = "Left")
+            {
+                clicks += 1
+                TextRenderComponent.Value = clicks
             }
         }
     }

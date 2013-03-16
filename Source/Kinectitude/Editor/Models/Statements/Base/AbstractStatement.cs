@@ -1,5 +1,6 @@
 ﻿using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
+using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Models.Statements.Actions;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -43,48 +44,49 @@ namespace Kinectitude.Editor.Models.Statements.Base
                 inheritedStatement.PropertyChanged += OnInheritedPropertyChanged;
             }
 
-            InsertBeforeCommand = new DelegateCommand(
-                (parameter) => IsEditable,
-                (parameter) =>
+            InsertBeforeCommand = new DelegateCommand((parameter) => IsEditable,
+            (parameter) =>
+            {
+                if (IsEditable)
                 {
-                    if (IsEditable)
+                    var toInsert = parameter as AbstractStatement;
+                    if (null == toInsert)
                     {
-                        var toInsert = parameter as AbstractStatement;
-                        if (null == toInsert)
+                        var factory = parameter as StatementFactory;
+                        if (null != factory)
                         {
-                            var factory = parameter as StatementFactory;
-                            if (null != factory)
-                            {
-                                toInsert = factory.CreateStatement();
-                            }
-                        }
-
-                        if (null != toInsert && toInsert.IsEditable && null != Scope)
-                        {
-                            int oldIdx = -1;
-                            var oldParent = toInsert.Scope;
-                            if (null != oldParent)
-                            {
-                                oldIdx = oldParent.IndexOf(toInsert);
-                            }
-
-                            Scope.InsertBefore(this, toInsert);
-
-                            Workspace.Instance.CommandHistory.Log(
-                                "insert/move statement",
-                                () => Scope.InsertBefore(this, toInsert),
-                                () =>
-                                {
-                                    toInsert.RemoveFromParent();
-                                    if (null != oldParent)
-                                    {
-                                        oldParent.InsertAt(oldIdx, toInsert);
-                                    }
-                                }
-                            );
+                            toInsert = factory.CreateStatement();
                         }
                     }
-                });
+
+                    if (null != toInsert && toInsert.IsEditable && null != Scope)
+                    {
+                        int oldIdx = -1;
+                        var oldParent = toInsert.Scope;
+                        if (null != oldParent)
+                        {
+                            oldIdx = oldParent.IndexOf(toInsert);
+                        }
+
+                        Scope.InsertBefore(this, toInsert);
+
+                        Workspace.Instance.CommandHistory.Log(
+                            "insert/move statement",
+                            () => Scope.InsertBefore(this, toInsert),
+                            () =>
+                            {
+                                toInsert.RemoveFromParent();
+                                if (null != oldParent)
+                                {
+                                    oldParent.InsertAt(oldIdx, toInsert);
+                                }
+                            }
+                        );
+                    }
+                }
+            });
+
+            AddDependency<ScopeChanged>("Index");
         }
 
         public bool InheritsFrom(AbstractStatement statement)

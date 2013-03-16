@@ -101,6 +101,7 @@
         <CollectionViewSource x:Key="Events" Source="{Binding ElementName=self, Path=DataContext.Events}">
             <CollectionViewSource.SortDescriptions>
                 <scm:SortDescription PropertyName="IsReadOnly" Direction="Descending" />
+                <scm:SortDescription PropertyName="Index" Direction="Ascending" />
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
 
