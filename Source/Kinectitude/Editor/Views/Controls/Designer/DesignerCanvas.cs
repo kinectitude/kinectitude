@@ -57,11 +57,11 @@ namespace Kinectitude.Editor.Views.Controls.Designer
         public static readonly DependencyProperty PointCommandProperty =
             DependencyProperty.Register("PointCommand", typeof(ICommand), typeof(DesignerCanvas));
 
-        public static readonly DependencyProperty BeginTranslateCommandProperty =
-            DependencyProperty.Register("BeginTranslateCommand", typeof(ICommand), typeof(DesignerCanvas));
+        public static readonly DependencyProperty BeginDragCommandProperty =
+            DependencyProperty.Register("BeginDragCommand", typeof(ICommand), typeof(DesignerCanvas));
 
-        public static readonly DependencyProperty CommitTranslateCommandProperty =
-            DependencyProperty.Register("CommitTranslateCommand", typeof(ICommand), typeof(DesignerCanvas));
+        public static readonly DependencyProperty CommitDragCommandProperty =
+            DependencyProperty.Register("CommitDragCommand", typeof(ICommand), typeof(DesignerCanvas));
 
         public static readonly DependencyProperty CommitSendForwardCommandProperty =
             DependencyProperty.Register("CommitSendForwardCommand", typeof(ICommand), typeof(DesignerCanvas));
@@ -113,6 +113,7 @@ namespace Kinectitude.Editor.Views.Controls.Designer
         private Point previousPoint;
 
         private ElasticBandAdorner elasticBand;
+        private PlacementAdorner placementOutline;
         //private TranslateAdorner translator;
 
         public IEnumerable<DesignerItem> SelectedItems
@@ -174,16 +175,16 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             set { SetValue(PointCommandProperty, value); }
         }
 
-        public ICommand BeginTranslateCommand
+        public ICommand BeginDragCommand
         {
-            get { return (ICommand)GetValue(BeginTranslateCommandProperty); }
-            set { SetValue(BeginTranslateCommandProperty, value); }
+            get { return (ICommand)GetValue(BeginDragCommandProperty); }
+            set { SetValue(BeginDragCommandProperty, value); }
         }
 
-        public ICommand CommitTranslateCommand
+        public ICommand CommitDragCommand
         {
-            get { return (ICommand)GetValue(CommitTranslateCommandProperty); }
-            set { SetValue(CommitTranslateCommandProperty, value); }
+            get { return (ICommand)GetValue(CommitDragCommandProperty); }
+            set { SetValue(CommitDragCommandProperty, value); }
         }
 
         public ICommand SendForwardCommand { get; private set; }
@@ -452,10 +453,22 @@ namespace Kinectitude.Editor.Views.Controls.Designer
                 }
                 else if (null != item)
                 {
-                    if (null != BeginTranslateCommand)
+                    if (null != BeginDragCommand)
                     {
-                        BeginTranslateCommand.Execute(GetSelectedData());
+                        BeginDragCommand.Execute(GetSelectedData());
                     }
+                }
+            }
+            else
+            {
+                if (null == placementOutline)
+                {
+                    ShowPlacementOutline();
+                }
+
+                if (null != BeginDragCommand)
+                {
+                    BeginDragCommand.Execute(null);
                 }
             }
         }
@@ -481,7 +494,7 @@ namespace Kinectitude.Editor.Views.Controls.Designer
         {
             elasticBand = new ElasticBandAdorner(this, startPoint);
 
-            AdornerLayer layer = AdornerLayer.GetAdornerLayer(this);
+            var layer = AdornerLayer.GetAdornerLayer(this);
             if (null != layer)
             {
                 layer.Add(elasticBand);
@@ -498,15 +511,41 @@ namespace Kinectitude.Editor.Views.Controls.Designer
             }
         }
 
+        private void ShowPlacementOutline()
+        {
+            placementOutline = new PlacementAdorner(this, startPoint);
+
+            var layer = AdornerLayer.GetAdornerLayer(this);
+            if (null != layer)
+            {
+                layer.Add(placementOutline);
+            }
+        }
+
+        private void HidePlacementOutline()
+        {
+            var layer = AdornerLayer.GetAdornerLayer(this);
+            if (null != layer)
+            {
+                layer.Remove(placementOutline);
+                placementOutline = null;
+            }
+        }
+
         private void OnDrag(MouseEventArgs e)
         {
             var currentPoint = e.GetPosition(this);
+
+            if (null != placementOutline)
+            {
+                placementOutline.Update(currentPoint);
+            }
 
             if (null != elasticBand)
             {
                 elasticBand.Update(currentPoint);
             }
-            else if (SelectedItems.Any())
+            else if (!IsPlacing)
             {
                 var delta = currentPoint - previousPoint;
                 TranslateSelection(delta);
@@ -520,11 +559,23 @@ namespace Kinectitude.Editor.Views.Controls.Designer
                 HideElasticBand();
             }
 
-            if (SelectedItems.Any())
+            if (null != placementOutline)
             {
-                if (null != CommitTranslateCommand)
+                HidePlacementOutline();
+            }
+
+            if (!IsPlacing)
+            {
+                if (null != CommitDragCommand)
                 {
-                    CommitTranslateCommand.Execute(GetSelectedData());
+                    CommitDragCommand.Execute(GetSelectedData());
+                }
+            }
+            else
+            {
+                if (null != CommitDragCommand)
+                {
+                    CommitDragCommand.Execute(null);
                 }
             }
         }
@@ -725,16 +776,16 @@ namespace Kinectitude.Editor.Views.Controls.Designer
         {
             if (!IsPlacing)
             {
-                if (null != BeginTranslateCommand)
+                if (null != BeginDragCommand)
                 {
-                    BeginTranslateCommand.Execute(GetSelectedData());
+                    BeginDragCommand.Execute(GetSelectedData());
                 }
 
                 TranslateSelection(delta);
 
-                if (null != CommitTranslateCommand)
+                if (null != CommitDragCommand)
                 {
-                    CommitTranslateCommand.Execute(GetSelectedData());
+                    CommitDragCommand.Execute(GetSelectedData());
                 }
             }
         }

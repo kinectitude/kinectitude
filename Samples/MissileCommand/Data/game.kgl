@@ -23,6 +23,7 @@ using Kinectitude.Input.dll
     define MouseFollowComponent as Kinectitude.Input.MouseFollowComponent
     define MouseClickEvent as Kinectitude.Input.MouseClickEvent
     define KeyEvent as Kinectitude.Input.KeyEvent
+    define MouseManager as Kinectitude.Input.MouseManager
 }
 
 Game(Name = "Missile Command", FirstScene = "Menu")
@@ -55,19 +56,13 @@ Game(Name = "Missile Command", FirstScene = "Menu")
     
     Scene Menu()
     {
-        Manager RenderManager(Width = 1280, Height = 720)
+        Manager RenderManager(Width = 1280, Height = 720)        
+        Manager MouseManager(VisibleCursor = False)
         
         Entity stars()
         {
             Component Transform(X = 640, Y = 360, Width = 1280, Height = 720)
             Component ImageRenderComponent(Image = "starfield.png")
-        }
-        
-        Entity cursor()
-        {
-            Component Transform(X = 308, Y = 192, Width = 48, Height = 48)
-            Component ImageRenderComponent(Image = "target.png")
-            Component MouseFollowComponent(IgnoresPhysics = True)
         }
         
         Entity title()
@@ -95,6 +90,13 @@ Game(Name = "Missile Command", FirstScene = "Menu")
         {
             Component Transform(X = 914, Y = 252)
             Component PhysicsComponent(AngularVelocity = 1)
+        }
+        
+        Entity cursor()
+        {
+            Component Transform(X = 308, Y = 192, Width = 48, Height = 48)
+            Component ImageRenderComponent(Image = "target.png")
+            Component MouseFollowComponent(IgnoresPhysics = True)
         }
         
         Entity ()

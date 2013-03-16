@@ -182,6 +182,7 @@
     <Compile Include="Views\Behaviors\ObservableSizeBehavior.cs" />
     <Compile Include="Views\Behaviors\TrackKeyBehavior.cs" />
     <Compile Include="Views\Behaviors\TrackMouseBehavior.cs" />
+    <Compile Include="Views\Controls\Designer\PlacementAdorner.cs" />
     <Compile Include="Views\Utils\PlacementModeConverter.cs" />
     <Compile Include="Views\Utils\IDialogService.cs" />
     <Compile Include="Models\Interfaces\IServiceScope.cs" />

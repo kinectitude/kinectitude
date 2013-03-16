@@ -32,6 +32,9 @@ namespace Kinectitude.Player
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Stop
                     );
+#if DEBUG
+                    System.Diagnostics.Debugger.Launch();
+#endif
                 }
             }
             finally

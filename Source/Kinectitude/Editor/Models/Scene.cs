@@ -44,6 +44,8 @@ namespace Kinectitude.Editor.Models
         private Attribute selectedAttribute;
         private double cursorX;
         private double cursorY;
+        private double placeLeft;
+        private double placeTop;
         
         public string Name
         {
@@ -248,8 +250,8 @@ namespace Kinectitude.Editor.Models
         public ICommand CopyCommand { get; private set; }
         public ICommand PasteCommand { get; private set; }
         public ICommand DeleteCommand { get; private set; }
-        public ICommand BeginTranslateCommand { get; private set; }
-        public ICommand CommitTranslateCommand { get; private set; }
+        public ICommand BeginDragCommand { get; private set; }
+        public ICommand CommitDragCommand { get; private set; }
         public ICommand CreateFromPrototypeCommand { get; private set; }
 
         public ICommand CommitSendForwardCommand { get; private set; }
@@ -323,10 +325,10 @@ namespace Kinectitude.Editor.Models
                     PlacementMode = EntityPlacementMode.None;
 
                     Workspace.Instance.CommandHistory.Log(
-                    "add entity",
-                    () => AddEntity(entity),
-                    () => RemoveEntity(entity)
-                );
+                        "add entity",
+                        () => AddEntity(entity),
+                        () => RemoveEntity(entity)
+                    );
                 }
             });
 
@@ -392,54 +394,93 @@ namespace Kinectitude.Editor.Models
                 }
             });
 
-            BeginTranslateCommand = new DelegateCommand(null, p =>
+            BeginDragCommand = new DelegateCommand(null, p =>
             {
-                var selected = (IEnumerable)p;
-                if (null != selected)
+                if (IsPlacing)
                 {
-                    var presenters = selected.Cast<EntityPresenter>();
-                    foreach (var presenter in presenters)
+                    placeLeft = CursorX;
+                    placeTop = CursorY;
+                }
+                else
+                {
+                    var selected = (IEnumerable)p;
+                    if (null != selected)
                     {
-                        presenter.StartX = presenter.DisplayX;
-                        presenter.StartY = presenter.DisplayY;
+                        var presenters = selected.Cast<EntityPresenter>();
+                        foreach (var presenter in presenters)
+                        {
+                            presenter.StartX = presenter.DisplayX;
+                            presenter.StartY = presenter.DisplayY;
+                        }
                     }
                 }
             });
 
-            CommitTranslateCommand = new DelegateCommand(null, p =>
+            CommitDragCommand = new DelegateCommand(null, p =>
             {
-                var selected = (IEnumerable)p;
-                if (null != selected)
+                if (IsPlacing)
                 {
-                    var translations = selected.Cast<EntityPresenter>().Select(x => x.GetTranslation()).ToArray();
-                    Workspace.Instance.CommandHistory.WithoutLogging(() =>
-                    {
-                        foreach (var translation in translations)
-                        {
-                            translation.Presenter.X = translation.EndX;
-                            translation.Presenter.Y = translation.EndY;
-                        }
-                    });
+                    var point1 = new Point(placeLeft, placeTop);
+                    var point2 = new Point(CursorX, CursorY);
+                    var rect = new Rect(point1, point2);
 
-                    Workspace.Instance.CommandHistory.Log(
-                        "move entities",
-                        () =>
+                    var entityFactory = EntityFactoryForPlacementMode();
+                    if (null != entityFactory)
+                    {
+                        var entity = entityFactory();
+                        if (entity.HasComponentOfType(typeof(TransformComponent)))
+                        {
+                            entity.Presenter.Width = rect.Width;
+                            entity.Presenter.Height = rect.Height;
+                            entity.Presenter.X = rect.X;
+                            entity.Presenter.Y = rect.Y;
+                        }
+
+                        AddEntity(entity);
+                        PlacementMode = EntityPlacementMode.None;
+
+                        Workspace.Instance.CommandHistory.Log(
+                            "add entity",
+                            () => AddEntity(entity),
+                            () => RemoveEntity(entity)
+                        );
+                    }
+                }
+                else
+                {
+                    var selected = (IEnumerable)p;
+                    if (null != selected)
+                    {
+                        var translations = selected.Cast<EntityPresenter>().Select(x => x.GetTranslation()).ToArray();
+                        Workspace.Instance.CommandHistory.WithoutLogging(() =>
                         {
                             foreach (var translation in translations)
                             {
                                 translation.Presenter.X = translation.EndX;
                                 translation.Presenter.Y = translation.EndY;
                             }
-                        },
-                        () =>
-                        {
-                            foreach (var translation in translations)
+                        });
+
+                        Workspace.Instance.CommandHistory.Log(
+                            "move entities",
+                            () =>
                             {
-                                translation.Presenter.X = translation.StartX;
-                                translation.Presenter.Y = translation.StartY;
+                                foreach (var translation in translations)
+                                {
+                                    translation.Presenter.X = translation.EndX;
+                                    translation.Presenter.Y = translation.EndY;
+                                }
+                            },
+                            () =>
+                            {
+                                foreach (var translation in translations)
+                                {
+                                    translation.Presenter.X = translation.StartX;
+                                    translation.Presenter.Y = translation.StartY;
+                                }
                             }
-                        }
-                    );
+                        );
+                    }
                 }
             });
 
