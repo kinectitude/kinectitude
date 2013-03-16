@@ -101,7 +101,7 @@ Game(Name = "Missile Command", FirstScene = "Menu")
         
         Entity ()
         {
-            Component Transform(X = 173, Y = 277)
+            Component Transform(X = 20, Y = 13)
             Component TextRenderComponent(Value = "Your Text Here", FontSize = 36, FontColor = "White")
             
             Event AttributeChanges(Target = cursor.Transform.X + cursor.Transform.Y)
@@ -119,6 +119,11 @@ Game(Name = "Missile Command", FirstScene = "Menu")
             {
                 clicks += 1
                 TextRenderComponent.Value = clicks
+            }
+
+            Event KeyEvent(Key = "Escape")
+            {
+
             }
         }
     }
