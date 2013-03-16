@@ -547,6 +547,10 @@ namespace Kinectitude.Editor.Views.Controls.Designer
                     {
                         Select(item);
                     }
+                    else
+                    {
+                        Deselect(item);
+                    }
                 }
             }
             else

@@ -25,11 +25,23 @@ using Kinectitude.DirectInput.dll
 
 Game(Name = "Missile Command", FirstScene = "Menu")
 {
-    Prototype Joint()
+    Prototype joint()
     {
         Component Transform(Width = 72, Height = 72)
         Component RenderComponent(Shape = "Ellipse", FillColor = "Blue")
         Component KinectFollowComponent(Player = 1)
+    }
+    
+    Prototype explosion()
+    {
+        Component Transform(Width = 64, Height = 48)
+        Component ImageRenderComponent(Image = "explosion.png", Animated = True, Duration = 3, Stretched = False)
+    }
+    
+    Prototype asteroid()
+    {
+        Component Transform(Width = 64, Height = 64)
+        Component ImageRenderComponent(Image = "asteroid.png")
     }
     
     Service RenderService(Width = 1280, Height = 720)
@@ -92,36 +104,36 @@ Game(Name = "Missile Command", FirstScene = "Menu")
     
     Scene Kinect()
     {
-        Entity : Joint()
+        Entity : joint()
         {
             Component Transform(X = 279, Y = 77)
             Component KinectFollowComponent(Joint = "Head")
         }
         
-        Entity : Joint()
+        Entity : joint()
         {
             Component Transform(X = 131, Y = 297)
             Component KinectFollowComponent(Joint = "HandLeft")
         }
         
-        Entity : Joint()
+        Entity : joint()
         {
             Component Transform(X = 474, Y = 294)
             Component KinectFollowComponent(Joint = "HandRight")
         }
         
-        Entity : Joint()
+        Entity : joint()
         {
             Component Transform(X = 300, Y = 300)
         }
         
-        Entity : Joint()
+        Entity : joint()
         {
             Component Transform(X = 378, Y = 511)
             Component KinectFollowComponent(Joint = "FootRight")
         }
         
-        Entity : Joint()
+        Entity : joint()
         {
             Component Transform(X = 217, Y = 510)
             Component KinectFollowComponent(Joint = "FootLeft")
@@ -132,31 +144,38 @@ Game(Name = "Missile Command", FirstScene = "Menu")
     {
         Manager RenderManager(Width = 1280, Height = 720)
         
-        Entity ()
+        Entity stars()
         {
             Component Transform(X = 640, Y = 360, Width = 1280, Height = 720)
             Component ImageRenderComponent(Image = "starfield.png")
         }
-    }
-    
-    Scene Placement()
-    {
-        Entity ()
+        
+        Entity cursor()
         {
-            Component Transform(X = 390, Y = 133, Width = 48, Height = 48)
-            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
+            Component Transform(X = 308, Y = 192, Width = 48, Height = 48)
+            Component ImageRenderComponent(Image = "target.png")
         }
         
-        Entity ()
+        Entity title()
         {
-            Component Transform(X = 312, Y = 107, Width = 48, Height = 48)
-            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
+            Component Transform(X = 640, Y = 120, Width = 278, Height = 150)
+            Component ImageRenderComponent(Image = "title.png")
         }
         
-        Entity ()
+        Entity : explosion()
         {
-            Component Transform(X = 397, Y = 127)
-            Component TextRenderComponent(Value = "Your Text Here", FontSize = 36, FontColor = "Black")
+            Component Transform(X = 620, Y = 255)
+        }
+        
+        Entity : asteroid()
+        {
+            Component Transform(X = 556, Y = 315)
+        }
+        
+        Entity : asteroid()
+        {
+            Component Transform(X = 914, Y = 252)
+            Component PhysicsComponent(AngularVelocity = 1)
         }
     }
 }

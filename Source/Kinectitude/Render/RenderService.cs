@@ -109,7 +109,7 @@ namespace Kinectitude.Render
                     System.Drawing.Imaging.BitmapData sourceData = source.LockBits(
                         new Rectangle(0, 0, source.Width, source.Height),
                         System.Drawing.Imaging.ImageLockMode.ReadOnly,
-                        System.Drawing.Imaging.PixelFormat.Format32bppArgb
+                        System.Drawing.Imaging.PixelFormat.Format32bppPArgb
                     );
 
                     using (DataStream dataStream = new DataStream(sourceData.Scan0, sourceData.Stride * sourceData.Height, true, false))

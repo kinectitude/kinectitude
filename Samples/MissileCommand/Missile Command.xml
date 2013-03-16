@@ -1,4 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project GameRoot="Data/" GameFile="game.kgl">
   <Asset File="starfield.png" />
+  <Asset File="target.png" />
+  <Asset File="title.png" />
+  <Asset File="explosion.png" />
+  <Asset File="asteroid.png" />
 </Project>
