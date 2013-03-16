@@ -71,6 +71,7 @@ namespace Kinectitude.Core.Base
             RegisterType("ResumeTimers", typeof(ResumeTimersAction));
             RegisterType("OnCreate", typeof(OnCreateEvent));
             RegisterType("Quit", typeof(QuitAction));
+            RegisterType("PointTowards", typeof(PointTowardsAction));
             foreach(MethodInfo mi in typeof(Math).GetMethods().Where(mi => Attribute.IsDefined(mi, typeof(PluginAttribute))))
                 FunctionHolder.AddFunction(mi.Name, mi);
             foreach (MethodInfo mi in typeof(Conversions).GetMethods().Where(mi => Attribute.IsDefined(mi, typeof(PluginAttribute))))

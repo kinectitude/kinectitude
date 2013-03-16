@@ -5,4 +5,5 @@
   <Asset File="title.png" />
   <Asset File="explosion.png" />
   <Asset File="asteroid.png" />
+  <Asset File="missile.png" />
 </Project>

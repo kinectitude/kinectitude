@@ -72,7 +72,8 @@ namespace Kinectitude.Editor.Storage.Kgl
                 "CreateTimer",
                 "PauseTimers",
                 "ResumeTimers",
-                "Quit"
+                "Quit",
+                "PointTowards"
             };
             addDefaults(defaults, defaultActions, "Action");
             

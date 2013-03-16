@@ -40,14 +40,14 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
     {
         Component Transform(Width = 64, Height = 48)
         Component ImageRenderComponent(Image = "explosion.png", Animated = True, Duration = 3, Stretched = False)
-        Component PhysicsComponent(Shape = "Ellipse", BodyType = "Static")
+        Component PhysicsComponent(Shape = "Ellipse", BodyType = "Static", IgnoreCollisionsWith = $missile + $missileTarget)
         
         Event OnCreate()
         {
             myId = scene.nextExplosionId
             scene.nextExplosionId += 1
-            Transform.X = cursor.Transform.X
-            Transform.Y = cursor.Transform.Y
+            Transform.X = scene.lastMissileX
+            Transform.Y = scene.lastMissileY - 30
             CreateTimer(Name = "explosionTimer" + myId, Duration = 3, Trigger = "destroyExplosion", Recurring = False)
         }
 
@@ -55,7 +55,6 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
         {
             if (myId < scene.nextExplosionId)
             {
-                events.TextRenderComponent.Value = "Explosion"
                 Destroy()
             }
         }
@@ -65,16 +64,21 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
     {
         Component Transform(Width = 64, Height = 64)
         Component ImageRenderComponent(Image = "asteroid.png")
-        Component PhysicsComponent(Shape = "Ellipse", Mass = 10, AngularVelocity = 1)
+        Component PhysicsComponent(Shape = "Ellipse", Mass = 10, AngularVelocity = 1, IgnoreCollisionsWith = $missile + $missileTarget)
         
         Event OnCreate()
         {
             Transform.X = Random(0, 1280)
             Transform.Y = 100
-            PhysicsComponent.YVelocity = 10
+            PhysicsComponent.YVelocity = 5
         }
 
         Event CollisionEvent(CollidesWith = $explosion)
+        {
+            Destroy()
+        }
+
+        Event CollisionEvent(CollidesWith = $earthTarget)
         {
             Destroy()
         }
@@ -83,11 +87,51 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
     Prototype earthTarget()
     {
         Component Transform()
-        Component PhysicsComponent()
+        Component PhysicsComponent(BodyType = "Static")
         
         Event CollisionEvent(CollidesWith = $asteroid)
         {
-            scene.health -= 
+            scene.health -= 0.01
+        }
+    }
+    
+    Prototype missileTarget()
+    {
+        Component Transform(Width = 32, Height = 32)
+        Component PhysicsComponent(Shape = "Ellipse", BodyType = "Static", IgnoreCollisionsWith = $asteroid + $explosion)
+        
+        Event OnCreate()
+        {
+            Transform.X = scene.currentTargetX
+            Transform.Y = scene.currentTargetY
+        }
+
+        Event CollisionEvent(CollidesWith = $missile)
+        {
+            Destroy()
+        }
+    }
+    
+    Prototype missile()
+    {
+        Component Transform(Width = 60, Height = 5)
+        Component ImageRenderComponent(Image = "missile.png")
+        Component PhysicsComponent(IgnoreCollisionsWith = $earthTarget + $asteroid + $explosion)
+        
+        Event OnCreate()
+        {
+            Transform.X = scene.launchX
+            Transform.Y = 750
+            PointTowards(X = scene.currentTargetX, Y = scene.currentTargetY)
+            PhysicsComponent.Speed = 15
+        }
+
+        Event CollisionEvent(CollidesWith = $missileTarget)
+        {
+            scene.lastMissileX = Transform.X
+            scene.lastMissileY = Transform.Y
+            CreateEntity(Prototype = "explosion")
+            Destroy()
         }
     }
     
@@ -119,14 +163,28 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
             
             Event MouseClickEvent()
             {
-                CreateEntity(Prototype = "explosion")
+                scene.currentTargetX = Transform.X
+                scene.currentTargetY = Transform.Y
+                if (scene.currentTargetX < 426)
+                {
+                    scene.launchX = 213
+                }
+                else if (scene.currentTargetX < 852)
+                {
+                    scene.launchX = 639
+                }
+                else
+                {
+                    scene.launchX = 1065
+                }
+                CreateEntity(Prototype = "missileTarget")
+                CreateEntity(Prototype = "missile")
             }
         }
         
         Entity events()
         {
-            Component Transform(X = 20, Y = 13)
-            Component TextRenderComponent(Value = "Your Text Here", FontSize = 36, FontColor = "White")
+            Component Transform(X = 48, Y = 48, Width = 48, Height = 48)
             
             Event SceneStarts()
             {
@@ -136,7 +194,6 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
             Event TriggerOccurs(Trigger = "makeAsteroid")
             {
                 asteroids += 1
-                TextRenderComponent.Value = asteroids
                 CreateEntity(Prototype = "asteroid")
             }
 
@@ -171,6 +228,17 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
             Event CollisionEvent(CollidesWith = $asteroid)
             {
                 scene.health -= 0.01
+            }
+        }
+        
+        Entity healthText()
+        {
+            Component Transform(X = 344, Y = 17)
+            Component TextRenderComponent(Value = "Health: 100", FontFamily = "Impact", FontWeight = "Normal", FontSize = 24, FontColor = "White")
+            
+            Event AttributeChanges(Target = scene.health)
+            {
+                TextRenderComponent.Value = "Health: " + scene.health * 100
             }
         }
     }

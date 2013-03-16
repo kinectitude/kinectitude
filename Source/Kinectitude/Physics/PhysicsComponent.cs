@@ -151,6 +151,7 @@ namespace Kinectitude.Physics
             public float LinearDamping;
             public float XVelocity;
             public float YVelocity;
+            public float Speed;
             public float AngularVelocity;
             public Kinectitude.Core.ComponentInterfaces.BodyType BodyType;
             public bool FixedRotation;
@@ -301,6 +302,37 @@ namespace Kinectitude.Physics
                     def.YVelocity = value;
                     if (null != body) body.LinearVelocity = new Vector2(body.LinearVelocity.X, value);
                     Change("YVelocity");
+                }
+            }
+        }
+
+        [PluginProperty("Speed", "Automatically set X and Y velocity based on desired speed", 0.0f)]
+        public float Speed
+        {
+            get
+            {
+                float speed = def.Speed;
+                if (null != body)
+                {
+                    speed = (float)Math.Sqrt(Math.Pow((double)body.LinearVelocity.X, 2) + Math.Pow((double)body.LinearVelocity.Y, 2));
+                }
+                return PhysicsManager.ConvertVelocityToGame(speed);
+            }
+            set
+            {
+                value = PhysicsManager.ConvertVelocityToFarseer(value);
+                def.Speed = value;
+                if (null != body)
+                {
+                    float velocityX = (float)Math.Cos(PhysicsManager.DegreesToRadians(transform.Rotation)) * value;
+                    float velocityY = (float)Math.Sin(PhysicsManager.DegreesToRadians(transform.Rotation)) * value;
+
+                    if (transform.Rotation > 180.0f)
+                    {
+                        velocityY = -velocityY;
+                    }
+
+                    body.LinearVelocity = new Vector2(velocityX, velocityY);
                 }
             }
         }

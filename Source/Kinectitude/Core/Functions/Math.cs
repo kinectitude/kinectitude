@@ -50,8 +50,8 @@ namespace Kinectitude.Core.Functions
         [Plugin("ATan", "Returns the angle with the tan of the {value}")]
         public static double ATan(ValueReader value) { return System.Math.Atan(value.GetDoubleValue()); }
 
-        [Plugin("ATan", "Returns the angle whose tangent is the quotient of {x} an {y}")]
-        public static double ATan2(ValueReader x, ValueReader y) { return System.Math.Atan2(x.GetDoubleValue(), y.GetDoubleValue()); }
+        [Plugin("ATan", "Returns the angle whose tangent is the quotient of {y} an {x}")]
+        public static double ATan2(ValueReader y, ValueReader x) { return System.Math.Atan2(y.GetDoubleValue(), x.GetDoubleValue()); }
 
         [Plugin("Ceiling", "Returns the smallest whole number that is bigger or equal to {value}")]
         public static long Ceiling(ValueReader value) { return (long)System.Math.Ceiling(value.GetDoubleValue()); }
