@@ -36,9 +36,9 @@
 
         <DataTemplate DataType="{x:Type Presenters:EntityVisual}">
             <Grid>
-                <Rectangle Opacity="0.7" Fill="Black" Width="48" Height="48" />
-                <Line Stroke="White" X1="0" Y1="0" X2="48" Y2="48" />
-                <Line Stroke="White" X1="48" Y1="0" X2="0" Y2="48" />
+                <Rectangle Opacity="0.7" Fill="Black" Width="{Binding Presenter.Width}" Height="{Binding Presenter.Height}" />
+                <Line Stroke="White" X1="0" Y1="0" X2="{Binding Presenter.Width}" Y2="{Binding Presenter.Height}" />
+                <Line Stroke="White" X1="{Binding Presenter.Width}" Y1="0" X2="0" Y2="{Binding Presenter.Height}" />
             </Grid>
         </DataTemplate>
 

@@ -27,7 +27,7 @@ using Kinectitude.Input.dll
     define MouseManager as Kinectitude.Input.MouseManager
 }
 
-Game(Name = "Missile Command", FirstScene = "Menu")
+Game(Name = "Missile Command", FirstScene = "Gameplay")
 {
     Prototype joint()
     {
@@ -40,6 +40,7 @@ Game(Name = "Missile Command", FirstScene = "Menu")
     {
         Component Transform(Width = 64, Height = 48)
         Component ImageRenderComponent(Image = "explosion.png", Animated = True, Duration = 3, Stretched = False)
+        Component PhysicsComponent(Shape = "Ellipse", BodyType = "Static")
         
         Event OnCreate()
         {
@@ -75,13 +76,24 @@ Game(Name = "Missile Command", FirstScene = "Menu")
 
         Event CollisionEvent(CollidesWith = $explosion)
         {
-
+            Destroy()
+        }
+    }
+    
+    Prototype earthTarget()
+    {
+        Component Transform()
+        Component PhysicsComponent()
+        
+        Event CollisionEvent(CollidesWith = $asteroid)
+        {
+            scene.health -= 
         }
     }
     
     Service RenderService(Width = 1280, Height = 720)
     
-    Scene Menu()
+    Scene Gameplay(health = 1)
     {
         Manager RenderManager(Width = 1280, Height = 720)        
         Manager MouseManager()        
@@ -131,6 +143,34 @@ Game(Name = "Missile Command", FirstScene = "Menu")
             Event KeyEvent(Key = "Escape")
             {
                 Quit()
+            }
+        }
+        
+        Entity healthBackground()
+        {
+            Component Transform(X = 640, Y = 32, Width = 600, Height = 32)
+            Component RenderComponent(Shape = "Rectangle", FillColor = "DarkGray")
+        }
+        
+        Entity healthCounter()
+        {
+            Component Transform(X = 640, Y = 32, Width = 600, Height = 32)
+            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
+            
+            Event AttributeChanges(Target = scene.health)
+            {
+                Transform.Width = scene.health * 600
+                Transform.X -= 3
+            }
+        }
+        
+        Entity : earthTarget()
+        {
+            Component Transform(X = 640, Y = 615, Width = 1280, Height = 128)
+            
+            Event CollisionEvent(CollidesWith = $asteroid)
+            {
+                scene.health -= 0.01
             }
         }
     }
