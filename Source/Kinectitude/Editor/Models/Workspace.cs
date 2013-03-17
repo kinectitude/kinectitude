@@ -1,5 +1,7 @@
 ﻿using Kinectitude.Core.Attributes;
 using Kinectitude.Core.Components;
+using Kinectitude.Core.Data;
+using Kinectitude.Core.Functions;
 using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Commands;
 using Kinectitude.Editor.Models.Exceptions;
@@ -293,6 +295,16 @@ namespace Kinectitude.Editor.Models
             Statements.Add(new StatementFactory("While Loop", StatementType.WhileLoop, () => new WhileLoop()));
             Statements.Add(new StatementFactory("For Loop", StatementType.ForLoop, () => new ForLoop()));
             Statements.Add(new StatementFactory("Change a Value", StatementType.Assignment, () => new Assignment()));
+
+            foreach (MethodInfo mi in typeof(Kinectitude.Core.Functions.Math).GetMethods().Where(mi => System.Attribute.IsDefined(mi, typeof(PluginAttribute))))
+            {
+                FunctionHolder.AddFunction(mi.Name, mi);
+            }
+
+            foreach (MethodInfo mi in typeof(Conversions).GetMethods().Where(mi => System.Attribute.IsDefined(mi, typeof(PluginAttribute))))
+            {
+                FunctionHolder.AddFunction(mi.Name, mi);
+            }
         }
 
         public void RevertProject()

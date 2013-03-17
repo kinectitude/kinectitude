@@ -64,17 +64,31 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
     {
         Component Transform(Width = 64, Height = 64)
         Component ImageRenderComponent(Image = "asteroid.png")
-        Component PhysicsComponent(Shape = "Ellipse", Mass = 10, AngularVelocity = 1, IgnoreCollisionsWith = $missile + $missileTarget)
+        Component PhysicsComponent(Shape = "Ellipse", Mass = 10, AngularVelocity = 1, IgnoreCollisionsWith = $missile + $missileTarget + $asteroid)
         
         Event OnCreate()
         {
             Transform.X = Random(0, 1280)
-            Transform.Y = 100
-            PhysicsComponent.YVelocity = 5
+            Transform.Y = -50
+            PointTowards(X = Random(0, 1280), Y = 720)
+            speedRand = Random(0, 100)
+            if (speedRand < 70)
+            {
+                PhysicsComponent.Speed = 7
+            }
+            else if (speedRand < 90)
+            {
+                PhysicsComponent.Speed = 14
+            }
+            else
+            {
+                PhysicsComponent.Speed = 21
+            }
         }
 
         Event CollisionEvent(CollidesWith = $explosion)
         {
+            scene.destroyed += 1
             Destroy()
         }
 
@@ -114,7 +128,7 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
     
     Prototype missile()
     {
-        Component Transform(Width = 60, Height = 5)
+        Component Transform(Width = 60, Height = 13)
         Component ImageRenderComponent(Image = "missile.png")
         Component PhysicsComponent(IgnoreCollisionsWith = $earthTarget + $asteroid + $explosion)
         
@@ -123,7 +137,7 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
             Transform.X = scene.launchX
             Transform.Y = 750
             PointTowards(X = scene.currentTargetX, Y = scene.currentTargetY)
-            PhysicsComponent.Speed = 15
+            PhysicsComponent.Speed = 80
         }
 
         Event CollisionEvent(CollidesWith = $missileTarget)
@@ -133,6 +147,10 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
             CreateEntity(Prototype = "explosion")
             Destroy()
         }
+    }
+    
+    Prototype missileTargetIndicator()
+    {
     }
     
     Service RenderService(Width = 1280, Height = 720)
@@ -147,12 +165,6 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
         {
             Component Transform(X = 640, Y = 360, Width = 1280, Height = 720)
             Component ImageRenderComponent(Image = "starfield.png")
-        }
-        
-        Entity title()
-        {
-            Component Transform(X = 640, Y = 120, Width = 278, Height = 150)
-            Component ImageRenderComponent(Image = "title.png", Opacity = 0)
         }
         
         Entity cursor()
@@ -184,11 +196,11 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
         
         Entity events()
         {
-            Component Transform(X = 48, Y = 48, Width = 48, Height = 48)
+            Component Transform(X = 54, Y = 142, Width = 48, Height = 48)
             
             Event SceneStarts()
             {
-                CreateTimer(Name = "asteroidTimer", Duration = 1, Trigger = "makeAsteroid")
+                CreateTimer(Name = "asteroidTimer", Duration = 2.2, Trigger = "makeAsteroid")
             }
 
             Event TriggerOccurs(Trigger = "makeAsteroid")
@@ -231,15 +243,24 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
             }
         }
         
-        Entity healthText()
+        Entity destroyed()
         {
-            Component Transform(X = 344, Y = 17)
-            Component TextRenderComponent(Value = "Health: 100", FontFamily = "Impact", FontWeight = "Normal", FontSize = 24, FontColor = "White")
+            Component Transform(X = 18, Y = 18)
+            Component TextRenderComponent(Value = "DESTROYED: 0", FontWeight = "Bold", FontSize = 24, FontColor = "#ffffff")
             
-            Event AttributeChanges(Target = scene.health)
+            Event AttributeChanges(Target = scene.destroyed)
             {
-                TextRenderComponent.Value = "Health: " + scene.health * 100
+                TextRenderComponent.Value = "DESTROYED: " + scene.destroyed
             }
+        }
+    }
+    
+    Scene Menu()
+    {
+        Entity title()
+        {
+            Component Transform(X = 640, Y = 120, Width = 278, Height = 150)
+            Component ImageRenderComponent(Image = "title.png", Opacity = 1)
         }
     }
 }
