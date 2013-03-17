@@ -116,8 +116,8 @@ namespace Kinectitude.Physics
 
             public void Update()
             {
-                if (body.Awake)
-                {
+                //if (body.Awake)
+                //{
                     if (X != prevX)
                     {
                         Change("X");
@@ -136,7 +136,7 @@ namespace Kinectitude.Physics
                     prevX = X;
                     prevY = Y;
                     prevRotation = Rotation;
-                }
+                //}
             }
         }
 

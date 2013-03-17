@@ -18,6 +18,16 @@ namespace Kinectitude.Kinect
         private Tuple<int, int> windowSize;
         private Skeleton[] latestSkeletons;
 
+        public CoordinateMapper CoordinateMapper
+        {
+            get { return kinectService.KinectSensor.CoordinateMapper; }
+        }
+
+        public Tuple<int, int> WindowSize
+        {
+            get { return windowSize; }
+        }
+
         public KinectManager()
         {
             for (int i = 0; i < NumPlayers; i++)
@@ -36,11 +46,12 @@ namespace Kinectitude.Kinect
                 if (latestSkeletons.Length >= kfc.Player)
                 {
                     Joint joint = latestSkeletons[kfc.Player - 1].Joints[kfc.Joint];
-                    var point = kinectService.KinectSensor.CoordinateMapper.MapSkeletonPointToColorPoint(joint.Position, ColorImageFormat.RgbResolution640x480Fps30);
-                    float scaleX = windowSize.Item1 / 640.0f;
-                    float scaleY = windowSize.Item2 / 480.0f;
+                    //var point = kinectService.KinectSensor.CoordinateMapper.MapSkeletonPointToColorPoint(joint.Position, ColorImageFormat.RgbResolution640x480Fps30);
+                    //float scaleX = windowSize.Item1 / 640.0f;
+                    //float scaleY = windowSize.Item2 / 480.0f;
 
-                    kfc.UpdatePosition(point.X * scaleX, point.Y * scaleY);
+                    kfc.UpdateJoint(joint);
+                    //kfc.UpdatePosition(point.X * scaleX, point.Y * scaleY);
                     kfc.OnUpdate(frameDelta);
                 }
             }

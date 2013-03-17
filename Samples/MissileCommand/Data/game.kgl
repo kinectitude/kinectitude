@@ -17,6 +17,7 @@ using Kinectitude.Physics.dll
     define PhysicsComponent as Kinectitude.Physics.PhysicsComponent
     define PhysicsManager as Kinectitude.Physics.PhysicsManager
     define CollisionEvent as Kinectitude.Physics.CollisionEvent
+    define CrossesLineEvent as Kinectitude.Physics.CrossesLineEvent
 }
 
 using Kinectitude.Input.dll
@@ -29,13 +30,6 @@ using Kinectitude.Input.dll
 
 Game(Name = "Missile Command", FirstScene = "Gameplay")
 {
-    Prototype joint()
-    {
-        Component Transform(Width = 72, Height = 72)
-        Component RenderComponent(Shape = "Ellipse", FillColor = "Blue")
-        Component KinectFollowComponent(Player = 1)
-    }
-    
     Prototype explosion()
     {
         Component Transform(Width = 64, Height = 48)
@@ -64,7 +58,7 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
     {
         Component Transform(Width = 64, Height = 64)
         Component ImageRenderComponent(Image = "asteroid.png")
-        Component PhysicsComponent(Shape = "Ellipse", Mass = 10, AngularVelocity = 1, IgnoreCollisionsWith = $missile + $missileTarget + $asteroid)
+        Component PhysicsComponent(Shape = "Ellipse", Mass = 10, AngularVelocity = 1, IgnoreCollisionsWith = $missile + $missileTarget + $asteroid + $launcher)
         
         Event OnCreate()
         {
@@ -130,7 +124,7 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
     {
         Component Transform(Width = 60, Height = 13)
         Component ImageRenderComponent(Image = "missile.png")
-        Component PhysicsComponent(IgnoreCollisionsWith = $earthTarget + $asteroid + $explosion)
+        Component PhysicsComponent(IgnoreCollisionsWith = $earthTarget + $asteroid + $explosion + $launcher)
         
         Event OnCreate()
         {
@@ -171,9 +165,14 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
         {
             Component Transform(X = 308, Y = 192, Width = 48, Height = 48)
             Component ImageRenderComponent(Image = "target.png")
-            Component MouseFollowComponent(IgnoresPhysics = True)
+            Component KinectFollowComponent(ScaleWidth = 1280, ScaleHeight = 720, SkeletonMaxX = 0.2, SkeletonMaxY = 0.2, IgnoresPhysics = True)
             
             Event MouseClickEvent()
+            {
+
+            }
+
+            Event TriggerOccurs(Trigger = "launch")
             {
                 scene.currentTargetX = Transform.X
                 scene.currentTargetY = Transform.Y
@@ -251,6 +250,34 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
             Event AttributeChanges(Target = scene.destroyed)
             {
                 TextRenderComponent.Value = "DESTROYED: " + scene.destroyed
+            }
+        }
+        
+        Entity launcher()
+        {
+            Component Transform(X = 138, Y = 326, Width = 48, Height = 48)
+            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
+            Component KinectFollowComponent(Joint = "HandLeft", ScaleWidth = 1280, ScaleHeight = 720, SkeletonMaxX = 0.2, SkeletonMaxY = 0.2, IgnoresPhysics = True)
+            Component PhysicsComponent(BodyType = "Kinematic", IgnoreCollisionsWith = $asteroid + $missile)
+            
+            Event AttributeChanges(Target = Transform.Y)
+            {
+                if ((Transform.Y < 360) && (prevY >= 360))
+                {
+                    FireTrigger(Name = "launch")
+                }
+                prevY = Transform.Y
+            }
+        }
+        
+        Entity ()
+        {
+            Component Transform(X = 165, Y = 129)
+            Component TextRenderComponent(Value = "Position: ", FontSize = 36, FontColor = "White")
+            
+            Event AttributeChanges(Target = launcher.Transform.Y)
+            {
+                TextRenderComponent.Value = launcher.Transform.Y
             }
         }
     }
