@@ -29,7 +29,7 @@ using Kinectitude.Input.dll
     define KeyboardFollowComponent as Kinectitude.Input.KeyboardFollowComponent
 }
 
-Game(Name = "Asteroid Defense", FirstScene = "Test")
+Game(Name = "Asteroid Defense", FirstScene = "Gameplay")
 {
     Prototype explosion()
     {
@@ -48,7 +48,7 @@ Game(Name = "Asteroid Defense", FirstScene = "Test")
 
         Event TriggerOccurs(Trigger = "destroyExplosion")
         {
-            if (myId < scene.nextExplosionId)
+            if ((myId < scene.nextExplosionId))
             {
                 Destroy()
             }
@@ -67,7 +67,7 @@ Game(Name = "Asteroid Defense", FirstScene = "Test")
             Transform.Y = -50
             PointTowards(X = Random(0, 1280), Y = 720)
             speedRand = Random(0, 100)
-            if (speedRand < 70)
+            if ((speedRand < 70))
             {
                 PhysicsComponent.Speed = 7
             }
@@ -180,7 +180,7 @@ Game(Name = "Asteroid Defense", FirstScene = "Test")
             {
                 scene.currentTargetX = Transform.X
                 scene.currentTargetY = Transform.Y
-                if (scene.currentTargetX < 426)
+                if ((scene.currentTargetX < 426))
                 {
                     scene.launchX = 213
                 }
@@ -265,9 +265,12 @@ Game(Name = "Asteroid Defense", FirstScene = "Test")
             
             Event AttributeChanges(Target = Transform.Y)
             {
-                if ((Transform.Y < 360) && (prevY >= 360))
+                if (Transform.Y < 360)
                 {
-                    FireTrigger(Name = "launch")
+					if (prevY >= 360)
+					{
+						FireTrigger(Name = "launch")
+					}
                 }
                 prevY = Transform.Y
             }

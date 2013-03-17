@@ -156,7 +156,7 @@ namespace Kinectitude.Editor.Storage.Kgl
 
             foreach (var message in messages)
             {
-                builder.AppendLine(message.Message);
+                builder.AppendLine(message.Message + " at line " + message.Location.Line + " column " + message.Location.Column);
             }
 
             return builder.ToString();
@@ -241,7 +241,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             else if (statementNode.Term == grammar.Condition)
             {
                 ConditionGroup conditionGroup = new ConditionGroup();
-                conditionGroup.If.Expression = getStrVal(statementNode.ChildNodes.First(child => child.Term == grammar.Expr));
+                conditionGroup.If.Expression = "(" + getStrVal(statementNode.ChildNodes.First(child => child.Term == grammar.Expr)) + ")";
                 foreach (ParseTreeNode child in grammar.GetOfType(statementNode, grammar.Actions)) CreateStatement(child, evt, conditionGroup.If);
                 foreach (ParseTreeNode elseNode in grammar.GetOfType(statementNode, grammar.Else))
                 {
@@ -378,7 +378,8 @@ namespace Kinectitude.Editor.Storage.Kgl
             if (node == null) return null;
             int pos = node.Span.Location.Position;
             int length = node.Span.Length;
-            return src.Substring(pos, length);
+            var ret = src.Substring(pos, length);
+            return ret;
         }
     }
 }
