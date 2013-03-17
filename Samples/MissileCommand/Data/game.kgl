@@ -97,11 +97,6 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
     {
         Component Transform()
         Component PhysicsComponent(BodyType = "Static")
-        
-        Event CollisionEvent(CollidesWith = $asteroid)
-        {
-            scene.health -= 0.01
-        }
     }
     
     Prototype missileTarget()
@@ -235,35 +230,17 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
             }
         }
         
-        Entity healthBackground()
-        {
-            Component Transform(X = 640, Y = 32, Width = 600, Height = 32)
-            Component RenderComponent(Shape = "Rectangle", FillColor = "DarkGray")
-        }
-        
-        Entity healthCounter()
-        {
-            Component Transform(X = 640, Y = 32, Width = 600, Height = 32)
-            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
-            
-            Event AttributeChanges(Target = scene.health)
-            {
-                Transform.Width = scene.health * 600
-                Transform.X -= 3
-            }
-        }
-        
         Entity : earthTarget()
         {
             Component Transform(X = 640, Y = 562, Width = 1280, Height = 16)
             
             Event CollisionEvent(CollidesWith = $asteroid)
             {
-                scene.health -= 0.01
+                scene.missed += 1
             }
         }
         
-        Entity destroyed()
+        Entity destroyedText()
         {
             Component Transform(X = 18, Y = 18)
             Component TextRenderComponent(Value = "DESTROYED: 0", FontWeight = "Bold", FontSize = 24, FontColor = "#ffffff")
@@ -278,11 +255,37 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
         {
             Component Transform(X = 138, Y = 326)
         }
+        
+        Entity missedText()
+        {
+            Component Transform(X = 1262, Y = 18)
+            Component TextRenderComponent(Value = "MISSED: 0", FontWeight = "Bold", FontSize = 24, FontColor = "#ffffff", TextAlignment = "Trailing")
+            
+            Event AttributeChanges(Target = scene.missed)
+            {
+                TextRenderComponent.Value = "MISSED: " + scene.missed
+            }
+        }
+        
+        Entity accuracyText()
+        {
+            Component Transform(X = 640, Y = 18)
+            Component TextRenderComponent(Value = "ACCURACY: 100%", FontWeight = "Bold", FontSize = 36, FontColor = "#ffffff", TextAlignment = "Center")
+            
+            Event AttributeChanges(Target = scene.destroyed + scene.missed)
+            {
+                if (scene.missed + scene.destroyed > 0)
+                {
+                    accuracy = scene.destroyed * 100 / (scene.destroyed + scene.missed)
+                    TextRenderComponent.Value = "ACCURACY: " + accuracy + "%"
+                }
+            }
+        }
     }
     
     Scene Menu()
     {
-        Entity ()
+        Entity background()
         {
             Component Transform(X = 640, Y = 360, Width = 1280, Height = 720)
             Component ImageRenderComponent(Image = "starfield.png")
@@ -379,13 +382,13 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
             }
         }
         
-        Entity ()
+        Entity quitText()
         {
             Component Transform(X = 880, Y = 410)
             Component TextRenderComponent(Value = "QUIT", FontSize = 36, FontColor = "#fff")
         }
         
-        Entity ()
+        Entity playText()
         {
             Component Transform(X = 263, Y = 410)
             Component TextRenderComponent(Value = "PLAY GAME", FontSize = 36, FontColor = "#fff")
@@ -397,7 +400,7 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
             Component RenderComponent(Opacity = 0.3)
         }
         
-        Entity ()
+        Entity team()
         {
             Component Transform(X = 531, Y = 197)
             Component TextRenderComponent(Value = "By Team Kinectitude", FontSize = 24, FontColor = "White")
