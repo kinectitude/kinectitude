@@ -26,9 +26,10 @@ using Kinectitude.Input.dll
     define MouseClickEvent as Kinectitude.Input.MouseClickEvent
     define KeyEvent as Kinectitude.Input.KeyEvent
     define MouseManager as Kinectitude.Input.MouseManager
+    define KeyboardFollowComponent as Kinectitude.Input.KeyboardFollowComponent
 }
 
-Game(Name = "Missile Command", FirstScene = "Gameplay")
+Game(Name = "Asteroid Defense", FirstScene = "Test")
 {
     Prototype explosion()
     {
@@ -143,8 +144,18 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
         }
     }
     
-    Prototype missileTargetIndicator()
+    Prototype generalCursor()
     {
+        Component Transform(Width = 48, Height = 48)
+        Component ImageRenderComponent(Image = "target.png", Animated = False)
+        Component KinectFollowComponent(ScaleWidth = 1280, ScaleHeight = 720, SkeletonMaxX = 0.2, SkeletonMaxY = 0.2, IgnoresPhysics = True)
+    }
+    
+    Prototype paddle()
+    {
+        Component Transform(Width = 32, Height = 128)
+        Component RenderComponent(FillColor = "Blue")
+        Component KeyboardFollowComponent(Up = "Up", Down = "Down", Speed = 5)
     }
     
     Service RenderService(Width = 1280, Height = 720)
@@ -161,17 +172,10 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
             Component ImageRenderComponent(Image = "starfield.png")
         }
         
-        Entity cursor()
+        Entity cursor : generalCursor()
         {
-            Component Transform(X = 308, Y = 192, Width = 48, Height = 48)
-            Component ImageRenderComponent(Image = "target.png")
-            Component KinectFollowComponent(ScaleWidth = 1280, ScaleHeight = 720, SkeletonMaxX = 0.2, SkeletonMaxY = 0.2, IgnoresPhysics = True)
+            Component Transform(X = 308, Y = 192)
             
-            Event MouseClickEvent()
-            {
-
-            }
-
             Event TriggerOccurs(Trigger = "launch")
             {
                 scene.currentTargetX = Transform.X
@@ -195,7 +199,7 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
         
         Entity events()
         {
-            Component Transform(X = 54, Y = 142, Width = 48, Height = 48)
+            Component Transform(X = 595, Y = 617, Width = 48, Height = 48)
             
             Event SceneStarts()
             {
@@ -234,7 +238,7 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
         
         Entity : earthTarget()
         {
-            Component Transform(X = 640, Y = 615, Width = 1280, Height = 128)
+            Component Transform(X = 640, Y = 562, Width = 1280, Height = 16)
             
             Event CollisionEvent(CollidesWith = $asteroid)
             {
@@ -256,7 +260,6 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
         Entity launcher()
         {
             Component Transform(X = 138, Y = 326, Width = 48, Height = 48)
-            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
             Component KinectFollowComponent(Joint = "HandLeft", ScaleWidth = 1280, ScaleHeight = 720, SkeletonMaxX = 0.2, SkeletonMaxY = 0.2, IgnoresPhysics = True)
             Component PhysicsComponent(BodyType = "Kinematic", IgnoreCollisionsWith = $asteroid + $missile)
             
@@ -269,25 +272,33 @@ Game(Name = "Missile Command", FirstScene = "Gameplay")
                 prevY = Transform.Y
             }
         }
-        
-        Entity ()
-        {
-            Component Transform(X = 165, Y = 129)
-            Component TextRenderComponent(Value = "Position: ", FontSize = 36, FontColor = "White")
-            
-            Event AttributeChanges(Target = launcher.Transform.Y)
-            {
-                TextRenderComponent.Value = launcher.Transform.Y
-            }
-        }
     }
     
     Scene Menu()
     {
+        Entity ()
+        {
+            Component Transform(X = 640, Y = 360, Width = 1280, Height = 720)
+            Component ImageRenderComponent(Image = "starfield.png")
+        }
+        
         Entity title()
         {
             Component Transform(X = 640, Y = 120, Width = 278, Height = 150)
             Component ImageRenderComponent(Image = "title.png", Opacity = 1)
+        }
+        
+        Entity cursor : generalCursor()
+        {
+            Component Transform(X = 560, Y = 295)
+        }
+    }
+    
+    Scene Test()
+    {
+        Entity : paddle()
+        {
+            Component Transform(X = 239, Y = 306)
         }
     }
 }
