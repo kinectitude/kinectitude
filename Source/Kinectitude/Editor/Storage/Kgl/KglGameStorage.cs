@@ -241,7 +241,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             else if (statementNode.Term == grammar.Condition)
             {
                 ConditionGroup conditionGroup = new ConditionGroup();
-                conditionGroup.If.Expression = "(" + getStrVal(statementNode.ChildNodes.First(child => child.Term == grammar.Expr)) + ")";
+                conditionGroup.If.Expression = getStrVal(statementNode.ChildNodes.First(child => child.Term == grammar.Expr));
                 foreach (ParseTreeNode child in grammar.GetOfType(statementNode, grammar.Actions)) CreateStatement(child, evt, conditionGroup.If);
                 foreach (ParseTreeNode elseNode in grammar.GetOfType(statementNode, grammar.Else))
                 {

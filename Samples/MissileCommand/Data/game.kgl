@@ -29,7 +29,7 @@ using Kinectitude.Input.dll
     define KeyboardFollowComponent as Kinectitude.Input.KeyboardFollowComponent
 }
 
-Game(Name = "Asteroid Defense", FirstScene = "Gameplay")
+Game(Name = "Asteroid Defense", FirstScene = "Menu")
 {
     Prototype explosion()
     {
@@ -48,7 +48,7 @@ Game(Name = "Asteroid Defense", FirstScene = "Gameplay")
 
         Event TriggerOccurs(Trigger = "destroyExplosion")
         {
-            if ((myId < scene.nextExplosionId))
+            if (myId < scene.nextExplosionId)
             {
                 Destroy()
             }
@@ -59,7 +59,7 @@ Game(Name = "Asteroid Defense", FirstScene = "Gameplay")
     {
         Component Transform(Width = 64, Height = 64)
         Component ImageRenderComponent(Image = "asteroid.png")
-        Component PhysicsComponent(Shape = "Ellipse", Mass = 10, AngularVelocity = 1, IgnoreCollisionsWith = $missile + $missileTarget + $asteroid + $launcher)
+        Component PhysicsComponent(Shape = "Ellipse", Mass = 10, AngularVelocity = 1, IgnoreCollisionsWith = $missile + $missileTarget + $asteroid + $generalClicker)
         
         Event OnCreate()
         {
@@ -67,7 +67,7 @@ Game(Name = "Asteroid Defense", FirstScene = "Gameplay")
             Transform.Y = -50
             PointTowards(X = Random(0, 1280), Y = 720)
             speedRand = Random(0, 100)
-            if ((speedRand < 70))
+            if (speedRand < 70)
             {
                 PhysicsComponent.Speed = 7
             }
@@ -125,7 +125,7 @@ Game(Name = "Asteroid Defense", FirstScene = "Gameplay")
     {
         Component Transform(Width = 60, Height = 13)
         Component ImageRenderComponent(Image = "missile.png")
-        Component PhysicsComponent(IgnoreCollisionsWith = $earthTarget + $asteroid + $explosion + $launcher)
+        Component PhysicsComponent(IgnoreCollisionsWith = $earthTarget + $asteroid + $explosion + $generalClicker)
         
         Event OnCreate()
         {
@@ -151,11 +151,28 @@ Game(Name = "Asteroid Defense", FirstScene = "Gameplay")
         Component KinectFollowComponent(ScaleWidth = 1280, ScaleHeight = 720, SkeletonMaxX = 0.2, SkeletonMaxY = 0.2, IgnoresPhysics = True)
     }
     
-    Prototype paddle()
+    Prototype generalClicker()
     {
-        Component Transform(Width = 32, Height = 128)
-        Component RenderComponent(FillColor = "Blue")
-        Component KeyboardFollowComponent(Up = "Up", Down = "Down", Speed = 5)
+        Component Transform(Width = 64, Height = 64)
+        Component KinectFollowComponent(Joint = "HandLeft", ScaleWidth = 1280, ScaleHeight = 800, SkeletonMaxX = 0.2, SkeletonMaxY = 0.2, IgnoresPhysics = True)
+        Component RenderComponent(Shape = "Ellipse", FillColor = "#f00", Opacity = 0.4)
+        
+        Event SceneStarts()
+        {
+            prevY = Transform.Y
+        }
+
+        Event AttributeChanges(Target = Transform.Y)
+        {
+            if (Transform.Y < 360)
+            {
+                if (prevY >= 360)
+                {
+                    FireTrigger(Name = "click")
+                }
+            }
+            prevY = Transform.Y
+        }
     }
     
     Service RenderService(Width = 1280, Height = 720)
@@ -176,11 +193,11 @@ Game(Name = "Asteroid Defense", FirstScene = "Gameplay")
         {
             Component Transform(X = 308, Y = 192)
             
-            Event TriggerOccurs(Trigger = "launch")
+            Event TriggerOccurs(Trigger = "click")
             {
                 scene.currentTargetX = Transform.X
                 scene.currentTargetY = Transform.Y
-                if ((scene.currentTargetX < 426))
+                if (scene.currentTargetX < 426)
                 {
                     scene.launchX = 213
                 }
@@ -257,23 +274,9 @@ Game(Name = "Asteroid Defense", FirstScene = "Gameplay")
             }
         }
         
-        Entity launcher()
+        Entity launcher : generalClicker()
         {
-            Component Transform(X = 138, Y = 326, Width = 48, Height = 48)
-            Component KinectFollowComponent(Joint = "HandLeft", ScaleWidth = 1280, ScaleHeight = 720, SkeletonMaxX = 0.2, SkeletonMaxY = 0.2, IgnoresPhysics = True)
-            Component PhysicsComponent(BodyType = "Kinematic", IgnoreCollisionsWith = $asteroid + $missile)
-            
-            Event AttributeChanges(Target = Transform.Y)
-            {
-                if (Transform.Y < 360)
-                {
-					if (prevY >= 360)
-					{
-						FireTrigger(Name = "launch")
-					}
-                }
-                prevY = Transform.Y
-            }
+            Component Transform(X = 138, Y = 326)
         }
     }
     
@@ -295,13 +298,109 @@ Game(Name = "Asteroid Defense", FirstScene = "Gameplay")
         {
             Component Transform(X = 560, Y = 295)
         }
-    }
-    
-    Scene Test()
-    {
-        Entity : paddle()
+        
+        Entity playButton()
         {
-            Component Transform(X = 239, Y = 306)
+            Component Transform(X = 360, Y = 432, Width = 496, Height = 144)
+            Component RenderComponent(Shape = "Rectangle", FillColor = "#0f0", Opacity = 0.15)
+            
+            Event AttributeChanges(Target = cursor.Transform.X + cursor.Transform.Y)
+            {
+                hovering = false
+                if (cursor.Transform.X > Transform.X - Transform.Width / 2)
+                {
+                    if (cursor.Transform.X < Transform.X + Transform.Width / 2)
+                    {
+                        if (cursor.Transform.Y > Transform.Y - Transform.Height / 2)
+                        {
+                            if (cursor.Transform.Y < Transform.Y + Transform.Height / 2)
+                            {
+                                hovering = true
+                            }
+                        }
+                    }
+                }
+                if (hovering)
+                {
+                    RenderComponent.Opacity = 0.4
+                }
+                else
+                {
+                    RenderComponent.Opacity = 0.15
+                }
+            }
+
+            Event TriggerOccurs(Trigger = "click")
+            {
+                if (hovering)
+                {
+                    PushScene(Target = "Gameplay")
+                }
+            }
+        }
+        
+        Entity quitButton()
+        {
+            Component Transform(X = 920, Y = 432, Width = 496, Height = 144)
+            Component RenderComponent(Shape = "Rectangle", FillColor = "#f00", Opacity = 0.15)
+            
+            Event AttributeChanges(Target = cursor.Transform.X + cursor.Transform.Y)
+            {
+                hovering = false
+                if (cursor.Transform.X > Transform.X - Transform.Width / 2)
+                {
+                    if (cursor.Transform.X < Transform.X + Transform.Width / 2)
+                    {
+                        if (cursor.Transform.Y > Transform.Y - Transform.Height / 2)
+                        {
+                            if (cursor.Transform.Y < Transform.Y + Transform.Height / 2)
+                            {
+                                hovering = true
+                            }
+                        }
+                    }
+                }
+                if (hovering)
+                {
+                    RenderComponent.Opacity = 0.4
+                }
+                else
+                {
+                    RenderComponent.Opacity = 0.15
+                }
+            }
+
+            Event TriggerOccurs(Trigger = "click")
+            {
+                if (hovering)
+                {
+                    Quit()
+                }
+            }
+        }
+        
+        Entity ()
+        {
+            Component Transform(X = 880, Y = 410)
+            Component TextRenderComponent(Value = "QUIT", FontSize = 36, FontColor = "#fff")
+        }
+        
+        Entity ()
+        {
+            Component Transform(X = 263, Y = 410)
+            Component TextRenderComponent(Value = "PLAY GAME", FontSize = 36, FontColor = "#fff")
+        }
+        
+        Entity : generalClicker()
+        {
+            Component Transform(X = 479, Y = 291)
+            Component RenderComponent(Opacity = 0.3)
+        }
+        
+        Entity ()
+        {
+            Component Transform(X = 531, Y = 197)
+            Component TextRenderComponent(Value = "By Team Kinectitude", FontSize = 24, FontColor = "White")
         }
     }
 }
