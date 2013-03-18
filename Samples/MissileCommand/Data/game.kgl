@@ -144,13 +144,14 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
         Component Transform(Width = 48, Height = 48)
         Component ImageRenderComponent(Image = "target.png", Animated = False)
         Component KinectFollowComponent(ScaleWidth = 1280, ScaleHeight = 720, SkeletonMaxX = 0.2, SkeletonMaxY = 0.2, IgnoresPhysics = True)
+        Component MouseFollowComponent()
     }
     
     Prototype generalClicker()
     {
         Component Transform(Width = 64, Height = 64)
         Component KinectFollowComponent(Joint = "HandLeft", ScaleWidth = 1280, ScaleHeight = 800, SkeletonMaxX = 0.2, SkeletonMaxY = 0.2, IgnoresPhysics = True)
-        Component RenderComponent(Shape = "Ellipse", FillColor = "#f00", Opacity = 0.4)
+        Component RenderComponent(Shape = "Ellipse", FillColor = "#f00", Opacity = 0)
         
         Event SceneStarts()
         {
@@ -167,6 +168,11 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
                 }
             }
             prevY = Transform.Y
+        }
+
+        Event MouseClickEvent()
+        {
+            FireTrigger(Name = "click")
         }
     }
     
@@ -276,7 +282,7 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
             {
                 if (scene.missed + scene.destroyed > 0)
                 {
-                    accuracy = scene.destroyed * 100 / (scene.destroyed + scene.missed)
+                    accuracy = scene.destroyed / Number(scene.destroyed + scene.missed) * 100
                     TextRenderComponent.Value = "ACCURACY: " + accuracy + "%"
                 }
             }
@@ -397,7 +403,6 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
         Entity : generalClicker()
         {
             Component Transform(X = 479, Y = 291)
-            Component RenderComponent(Opacity = 0.3)
         }
         
         Entity team()
