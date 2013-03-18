@@ -282,8 +282,8 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
             {
                 if (scene.missed + scene.destroyed > 0)
                 {
-                    accuracy = scene.destroyed / Number(scene.destroyed + scene.missed) * 100
-                    TextRenderComponent.Value = "ACCURACY: " + accuracy + "%"
+                    accuracy = Number(scene.destroyed) * 100 / Number(scene.destroyed + scene.missed) * 1
+                    TextRenderComponent.Value = "ACCURACY: " + Format(accuracy, "#.##") + "%"
                 }
             }
         }

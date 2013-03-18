@@ -17,5 +17,8 @@ namespace Kinectitude.Core.Functions
 
         [Plugin("String", "Returns the string value of {value}")]
         public static string String(ValueReader value) { return value.GetStrValue(); }
+
+        [Plugin("Format", "Returns the numeric value {value} formatted as a string.")]
+        public static string Format(ValueReader value, ValueReader format) { return value.GetDoubleValue().ToString(format.GetStrValue()); }
     }
 }

@@ -17,9 +17,9 @@ namespace Kinectitude.Player
         private const float TimeStep = 1.0f / 60.0f;
 
         private readonly RenderService renderService;
+        private readonly InputService inputService;
         private readonly RenderForm form;
         private readonly Game game;
-        private readonly InputService inputService;
 
         private void die(string message)
         {
@@ -69,10 +69,6 @@ namespace Kinectitude.Player
 
             inputService = game.GetService<InputService>();
             inputService.Form = form;
-
-            //directInputService.Control = form;
-            
-
 
             int y = (int)((SystemInformation.VirtualScreen.Height - renderService.Height * renderService.Dpi.Height / 96.0) / 2);
             if (y < 0) y = 0;
