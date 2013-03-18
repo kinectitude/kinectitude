@@ -152,13 +152,15 @@ namespace Kinectitude.Physics
             public float XVelocity;
             public float YVelocity;
             public float Speed;
+            public float MinSpeed;
+            public float MaxSpeed;
             public float AngularVelocity;
             public Kinectitude.Core.ComponentInterfaces.BodyType BodyType;
             public bool FixedRotation;
             public TypeMatcher IgnoreCollisionsWith;
         }
 
-        private FarseerPhysics.Dynamics.BodyType ConvertBodyTypeToFarseer(Kinectitude.Core.ComponentInterfaces.BodyType type)
+        private static FarseerPhysics.Dynamics.BodyType ConvertBodyTypeToFarseer(Kinectitude.Core.ComponentInterfaces.BodyType type)
         {
             switch (type)
             {
@@ -170,7 +172,7 @@ namespace Kinectitude.Physics
             return default(FarseerPhysics.Dynamics.BodyType);
         }
 
-        private Kinectitude.Core.ComponentInterfaces.BodyType ConvertBodyTypeToGame(FarseerPhysics.Dynamics.BodyType type)
+        private static Kinectitude.Core.ComponentInterfaces.BodyType ConvertBodyTypeToGame(FarseerPhysics.Dynamics.BodyType type)
         {
             switch (type)
             {
@@ -338,6 +340,34 @@ namespace Kinectitude.Physics
             }
         }
 
+        [PluginProperty("Minimum Speed", "Minimum magnitude of speed. Negative value indicates no limit.", -1.0f)]
+        public float MinSpeed
+        {
+            get { return def.MinSpeed; }
+            set
+            {
+                if (def.MinSpeed != value)
+                {
+                    def.MinSpeed = value;
+                    Change("MinSpeed");
+                }
+            }
+        }
+
+        [PluginProperty("Maximum Speed", "Maximum magnitude of speed. Negative value indicates no limit.", -1.0f)]
+        public float MaxSpeed
+        {
+            get { return def.MaxSpeed; }
+            set
+            {
+                if (def.MaxSpeed != value)
+                {
+                    def.MaxSpeed = value;
+                    Change("MaxSpeed");
+                }
+            }
+        }
+
         [PluginProperty("Angular Velocity", "", 0.0f)]
         public float AngularVelocity
         {
@@ -451,6 +481,22 @@ namespace Kinectitude.Physics
             }
             
             transform.Update();
+
+            if (MinSpeed >= 0)
+            {
+                if (Speed < MinSpeed)
+                {
+                    Speed = MinSpeed;
+                }
+            }
+
+            if (MaxSpeed >= 0)
+            {
+                if (Speed > MaxSpeed)
+                {
+                    Speed = MaxSpeed;
+                }
+            }
         }
 
         public void AddCrossLineEvent(CrossesLineEvent evt)

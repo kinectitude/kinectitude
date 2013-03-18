@@ -48,9 +48,9 @@ Game(Name = "Untitled Game", FirstScene = "Scene1")
         
         Entity ()
         {
-            Component Transform(X = 218.5, Y = 192.5, Width = 49, Height = 47)
-            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
-            Component PhysicsComponent(Restitution = 1, Speed = 30)
+            Component Transform(X = 218.5, Y = 192.5, Width = 48, Height = 48, Rotation = 45)
+            Component RenderComponent(Shape = "Ellipse", FillColor = "Blue")
+            Component PhysicsComponent(Shape = "Ellipse", Restitution = 1, MinSpeed = 30, MaxSpeed = 30)
         }
     }
 }
