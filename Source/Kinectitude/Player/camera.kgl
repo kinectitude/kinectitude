@@ -3,106 +3,54 @@
     define RenderService as Kinectitude.Render.RenderService
     define RenderManager as Kinectitude.Render.RenderManager
     define RenderComponent as Kinectitude.Render.RenderComponent
-    define TextRenderComponent as Kinectitude.Render.TextRenderComponent
-    define ImageRenderComponent as Kinectitude.Render.ImageRenderComponent
 }
 
-using Kinectitude.DirectInput.dll
+using Kinectitude.Physics.dll
 {
-    define KeyEvent as Kinectitude.DirectInput.KeyEvent
-    define MouseClickEvent as Kinectitude.DirectInput.MouseClickEvent
+    define PhysicsComponent as Kinectitude.Physics.PhysicsComponent
 }
 
-Game (FirstScene = "game", Name = "Camera Tests")
+Game(Name = "Untitled Game", FirstScene = "Scene1")
 {
-    Prototype text()
-    {
-        Component TextRenderComponent(FontFamily="Arial", FontWeight="Normal", FontStyle="Normal", FontStretch="Normal",  FontSize="36", FontColor="Black")
-    }
-	
-	Service RenderService(Width = 800, Height = 600)
+    Service RenderService(Width = 800, Height = 600)
     
-    Scene game()
+    Scene Scene1()
     {
-        Manager RenderManager(CameraX = 50, CameraY = 50, Width = 1600, Height = 1200)
-
-        Entity : text(clicks = 0, nested = 0, counter = 0, flag = true)
+        Manager RenderManager()
+        
+        Entity wall()
         {
-            Component Transform(X = 10, Y = 10, Width = 32, Height = 32)
-            Component TextRenderComponent(Value = "This is some fixed position text", TextAlignment = "Leading", FixedPosition = true)
-
-            Event MouseClickEvent(Button = "Left")
-            {
-                clicks += 1
-                TextRenderComponent.Value = clicks
-            }
-
-            Event SceneStarts()
-            {
-                for (counter = 0; counter < 5; counter += 1)
-	            {
-		            FireTrigger(Name = "nullo")
-	            }
-                if (counter == 1)
-                {
-	                TextRenderComponent.Value = "Fail"
-                }
-                else if (counter == 5)
-                {
-	                TextRenderComponent.Value = "Pass"
-                }
-                else
-                {
-	                TextRenderComponent.Value = "I dunno what's going on..."
-                }
-
-                if (flag == false)
-                {
-                    for (nested = 7; nested < 9; nested += 1)
-                    {
-                        FireTrigger(Name = "nullo")
-                    }
-                }
-
-                if (nested == 7 || nested == 8)
-                {
-                    TextRenderComponent.Value += " and Fail"
-                }
-                else if (nested == 0)
-                {
-                    TextRenderComponent.Value += " and Pass"
-                }
-                else
-                {
-                    TextRenderComponent.Value += " and idunno " + nested
-                }
-            }
+            Component Transform(X = 400, Y = 55, Width = 734, Height = 38)
+            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
+            Component PhysicsComponent(BodyType = "Static")
         }
-
-        Entity()
+        
+        Entity ()
         {
-            Component Transform(X = 800, Y = 600, Width = 32, Height = 32)
-            Component RenderComponent(FillColor = "LimeGreen")
-            
-            Event KeyEvent(Button = "RightArrow", KeyState = "Down")
-            {
-                scene.RenderManager.CameraX += 1
-            }
-
-            Event KeyEvent(Button = "LeftArrow", KeyState = "Down")
-            {
-                scene.RenderManager.CameraX -= 1
-            }
-
-            Event KeyEvent(Button = "UpArrow", KeyState = "Down")
-            {
-                scene.RenderManager.CameraY -= 1
-            }
-
-            Event KeyEvent(Button = "DownArrow", KeyState = "Down")
-            {
-                scene.RenderManager.CameraY += 1
-            }
+            Component Transform(X = 402, Y = 542, Width = 734, Height = 38)
+            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
+            Component PhysicsComponent(BodyType = "Static")
+        }
+        
+        Entity ()
+        {
+            Component Transform(X = 36, Y = 297, Width = 38, Height = 500)
+            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
+            Component PhysicsComponent(BodyType = "Static")
+        }
+        
+        Entity ()
+        {
+            Component Transform(X = 762, Y = 296, Width = 38, Height = 500)
+            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
+            Component PhysicsComponent(BodyType = "Static")
+        }
+        
+        Entity ()
+        {
+            Component Transform(X = 218.5, Y = 192.5, Width = 49, Height = 47)
+            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
+            Component PhysicsComponent(Restitution = 1, Speed = 30)
         }
     }
 }

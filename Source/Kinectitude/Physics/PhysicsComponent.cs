@@ -189,6 +189,7 @@ namespace Kinectitude.Physics
         private PhysicsManager manager;
         private PhysicsTransform transform;
         private BodyDefinition def;
+        private TransformComponent transformComponent;
 
         [PluginProperty("Shape", "", ShapeType.Rectangle)]
         public ShapeType Shape 
@@ -326,7 +327,7 @@ namespace Kinectitude.Physics
                 {
                     float velocityX = (float)Math.Cos(PhysicsManager.DegreesToRadians(transform.Rotation)) * value;
                     float velocityY = (float)Math.Sin(PhysicsManager.DegreesToRadians(transform.Rotation)) * value;
-
+                    
                     if (transform.Rotation > 180.0f)
                     {
                         velocityY = -velocityY;
@@ -467,12 +468,20 @@ namespace Kinectitude.Physics
             manager = GetManager<PhysicsManager>();
             manager.Add(this);
 
-            var transformComponent = GetComponent<TransformComponent>();
+            transformComponent = GetComponent<TransformComponent>();
             transform = new PhysicsTransform(transformComponent.Transform);
             transformComponent.Transform = transform;
 
             CreateBody();
             transform.Body = body;
+
+            if (def.Speed != 0)
+            {
+                float velocityX = (float)Math.Cos(PhysicsManager.DegreesToRadians(transform.Rotation)) * def.Speed;
+                float velocityY = (float)Math.Sin(PhysicsManager.DegreesToRadians(transform.Rotation)) * def.Speed;
+
+                body.LinearVelocity = new Vector2(velocityX, velocityY);
+            }
         }
 
         private void CreateBody()
