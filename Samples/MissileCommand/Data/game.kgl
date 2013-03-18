@@ -144,7 +144,6 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
         Component Transform(Width = 48, Height = 48)
         Component ImageRenderComponent(Image = "target.png", Animated = False)
         Component KinectFollowComponent(ScaleWidth = 1280, ScaleHeight = 720, SkeletonMaxX = 0.2, SkeletonMaxY = 0.2, IgnoresPhysics = True)
-        Component MouseFollowComponent()
     }
     
     Prototype generalClicker()
@@ -171,6 +170,16 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
         }
 
         Event MouseClickEvent()
+        {
+            FireTrigger(Name = "click")
+        }
+
+        Event KeyEvent(Key = "Escape")
+        {
+            Quit()
+        }
+
+        Event KeyEvent(Key = "Space")
         {
             FireTrigger(Name = "click")
         }
@@ -228,11 +237,6 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
             {
                 asteroids += 1
                 CreateEntity(Prototype = "asteroid")
-            }
-
-            Event KeyEvent(Key = "Escape")
-            {
-                Quit()
             }
         }
         
