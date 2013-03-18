@@ -24,25 +24,7 @@ namespace Kinectitude.Editor.Storage.Kgl
 {
     internal sealed class KglGameStorage : KGLBase, IGameStorage
     {
-        private readonly FileInfo FileName;
-        private readonly KglGameVisitor Visitor = new KglGameVisitor();
-
-        private Game game;
-        private ParseTreeNode root;
-        string src;
-
-        internal KglGameStorage(FileInfo fileName)
-        {
-            FileName = fileName;
-        }
-
-        private void addDefaults(Using uses, List<string> defaults, string type)
-        {
-            foreach (string defaultName in defaults) 
-                uses.AddDefine(new Define(defaultName, "Kinectitude.Core." + type + "s." + defaultName + type));
-        }
-
-        private void initLangDefaults()
+        public static void AddDefaultUsings(Game game)
         {
             //TODO add functions here as well later
             Using defaults = new Using();
@@ -76,7 +58,7 @@ namespace Kinectitude.Editor.Storage.Kgl
                 "PointTowards"
             };
             addDefaults(defaults, defaultActions, "Action");
-            
+
             List<string> defaultManagers = new List<string>()
             {
                 "Time"
@@ -84,6 +66,24 @@ namespace Kinectitude.Editor.Storage.Kgl
 
             addDefaults(defaults, defaultManagers, "Manager");
             game.AddUsing(defaults);
+        }
+
+        private static void addDefaults(Using uses, List<string> defaults, string type)
+        {
+            foreach (string defaultName in defaults)
+                uses.AddDefine(new Define(defaultName, "Kinectitude.Core." + type + "s." + defaultName + type));
+        }
+
+        private readonly FileInfo FileName;
+        private readonly KglGameVisitor Visitor = new KglGameVisitor();
+
+        private Game game;
+        private ParseTreeNode root;
+        string src;
+
+        internal KglGameStorage(FileInfo fileName)
+        {
+            FileName = fileName;
         }
 
         public Game LoadGame()
@@ -101,7 +101,7 @@ namespace Kinectitude.Editor.Storage.Kgl
             var nameProperty = GetProperties(root).First(x => x.Item1 == "Name");
             var name = getStrVal((ParseTreeNode)nameProperty.Item2);
             game = new Game(new Value(name).GetStringValue());
-            initLangDefaults();
+            AddDefaultUsings(game);
             IEnumerable<ParseTreeNode> usings = grammar.GetOfType(root, grammar.Uses);
 
             foreach(ParseTreeNode node in usings)

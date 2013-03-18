@@ -38,7 +38,7 @@ namespace Kinectitude.Core.Loaders.Kgl
 
                 foreach (var message in parseTree.ParserMessages)
                 {
-                    builder.AppendLine(message.Message);
+                    builder.AppendLine(message.Message + " at line " + message.Location.Line + " column " + message.Location.Column);
                 }
 
                 Game.CurrentGame.Die(builder.ToString());

@@ -140,6 +140,7 @@ namespace Kinectitude.Editor.Models
                 if (create)
                 {
                     Game game = new Game("Untitled Game");
+                    KglGameStorage.AddDefaultUsings(game);
 
                     var service = new Service(GetPlugin(typeof(RenderService)));
                     service.SetProperty("Width", new Value(800, true));
