@@ -1,0 +1,67 @@
+using Kinectitude.Render.dll
+{
+    define RenderService as Kinectitude.Render.RenderService
+    define RenderManager as Kinectitude.Render.RenderManager
+    define RenderComponent as Kinectitude.Render.RenderComponent
+}
+
+using Kinectitude.Physics.dll
+{
+    define PhysicsComponent as Kinectitude.Physics.PhysicsComponent
+    define PhysicsManager as Kinectitude.Physics.PhysicsManager
+}
+
+Game(Name = "Physics Demo", FirstScene = "Scene1")
+{
+    Prototype floor()
+    {
+        Component Transform(Width = 533, Height = 24)
+        Component PhysicsComponent(BodyType = "Static")
+        Component RenderComponent(FillColor = "Blue")
+    }
+    
+    Service RenderService(Width = 800, Height = 600)
+    
+    Scene Scene1()
+    {
+        Manager RenderManager()        
+        Manager PhysicsManager(YGravity = 5)
+        
+        Entity ball()
+        {
+            Component Transform(X = 125, Y = 40.5, Width = 48, Height = 48)
+            Component RenderComponent(Shape = "Ellipse", FillColor = "#666")
+            Component PhysicsComponent()
+        }
+        
+        Entity : floor()
+        {
+            Component Transform(X = 289, Y = 116, Rotation = 3)
+        }
+        
+        Entity : floor()
+        {
+            Component Transform(X = 504, Y = 222, Rotation = -3)
+        }
+        
+        Entity : floor()
+        {
+            Component Transform(X = 765, Y = 289, Rotation = 90)
+        }
+        
+        Entity : floor()
+        {
+            Component Transform(X = 31, Y = 289, Rotation = 90)
+        }
+        
+        Entity : floor()
+        {
+            Component Transform(X = 289, Y = 351, Rotation = 3)
+        }
+        
+        Entity : floor()
+        {
+            Component Transform(X = 504, Y = 469, Rotation = -3)
+        }
+    }
+}
