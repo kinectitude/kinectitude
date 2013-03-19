@@ -176,6 +176,7 @@
     <Compile Include="Models\Exceptions\PrototypeExistsException.cs" />
     <Compile Include="Models\Exceptions\SceneNameExistsException.cs" />
     <Compile Include="Models\Exceptions\StorageException.cs" />
+    <Compile Include="Models\Exceptions\UnavailablePluginException.cs" />
     <Compile Include="Models\Extensions.cs" />
     <Compile Include="Models\Notifications\AssetUsed.cs" />
     <Compile Include="Models\Notifications\EffectiveValueChanged.cs" />

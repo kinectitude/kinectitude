@@ -373,7 +373,14 @@ namespace Kinectitude.Editor.Models
 
         public Plugin GetPlugin(string name)
         {
-            return Plugins.FirstOrDefault(x => x.ClassName == name);
+            var plugin = Plugins.FirstOrDefault(x => x.ClassName == name);
+
+            if (null == plugin)
+            {
+                throw new UnavailablePluginException(name);
+            }
+
+            return plugin;
         }
 
         public Plugin GetPlugin(Type type)

@@ -39,7 +39,9 @@ namespace Kinectitude.Core.Base
                     if (!started)
                     {
                         started = true;
-                        foreach (SceneStartsEvent e in OnStart)
+
+                        var evts = OnStart.ToArray();
+                        foreach (SceneStartsEvent e in evts)
                         {
                             e.DoActions();
                         }

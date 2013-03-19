@@ -143,10 +143,15 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
     {
         Component Transform(Width = 48, Height = 48)
         Component ImageRenderComponent(Image = "target.png", Animated = False)
-        Component KinectFollowComponent(ScaleWidth = 1280, ScaleHeight = 720, SkeletonMaxX = 0.2, SkeletonMaxY = 0.2, IgnoresPhysics = True)
+        
+        Event AttributeChanges(Target = Transform.X + Transform.Y)
+        {
+            game.cursorX = Transform.X
+            game.cursorY = Transform.Y
+        }
     }
     
-    Prototype generalClicker()
+    Prototype kinectClicker()
     {
         Component Transform(Width = 64, Height = 64)
         Component KinectFollowComponent(Joint = "HandLeft", ScaleWidth = 1280, ScaleHeight = 800, SkeletonMaxX = 0.2, SkeletonMaxY = 0.2, IgnoresPhysics = True)
@@ -169,11 +174,6 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
             prevY = Transform.Y
         }
 
-        Event MouseClickEvent()
-        {
-            FireTrigger(Name = "click")
-        }
-
         Event KeyEvent(Key = "Escape")
         {
             Quit()
@@ -183,6 +183,50 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
         {
             FireTrigger(Name = "click")
         }
+    }
+    
+    Prototype button()
+    {
+        Event AttributeChanges(Target = game.cursorX + game.cursorY)
+        {
+            hovering = false
+            if (game.cursorX > Transform.X - Transform.Width / 2)
+            {
+                if (game.cursorX < Transform.X + Transform.Width / 2)
+                {
+                    if (game.cursorY > Transform.Y - Transform.Height / 2)
+                    {
+                        if (game.cursorY < Transform.Y + Transform.Height / 2)
+                        {
+                            hovering = true
+                        }
+                    }
+                }
+            }
+            if (hovering)
+            {
+                RenderComponent.Opacity = 0.4
+            }
+            else
+            {
+                RenderComponent.Opacity = 0.15
+            }
+        }
+    }
+    
+    Prototype mouseCursor : generalCursor()
+    {
+        Component MouseFollowComponent(IgnoresPhysics = True)
+        
+        Event MouseClickEvent()
+        {
+            FireTrigger(Name = "click")
+        }
+    }
+    
+    Prototype kinectCursor : generalCursor()
+    {
+        Component KinectFollowComponent(Joint = "HandRight", Player = 1, ScaleWidth = 1280, ScaleHeight = 720, SkeletonMaxX = 0.2, SkeletonMaxY = 0.2, IgnoresPhysics = True)
     }
     
     Service RenderService(Width = 1280, Height = 720)
@@ -199,14 +243,34 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
             Component ImageRenderComponent(Image = "starfield.png")
         }
         
-        Entity cursor : generalCursor()
+        Entity events()
         {
-            Component Transform(X = 308, Y = 192)
+            Component Transform(X = 595, Y = 617, Width = 48, Height = 48)
             
+            Event SceneStarts()
+            {
+                if (game.useKinect)
+                {
+                    CreateEntity(Prototype = "kinectCursor")
+                    CreateEntity(Prototype = "kinectClicker")
+                }
+                else
+                {
+                    CreateEntity(Prototype = "mouseCursor")
+                }
+                CreateTimer(Name = "asteroidTimer", Duration = 2.2, Trigger = "makeAsteroid")
+            }
+
+            Event TriggerOccurs(Trigger = "makeAsteroid")
+            {
+                asteroids += 1
+                CreateEntity(Prototype = "asteroid")
+            }
+
             Event TriggerOccurs(Trigger = "click")
             {
-                scene.currentTargetX = Transform.X
-                scene.currentTargetY = Transform.Y
+                scene.currentTargetX = game.cursorX
+                scene.currentTargetY = game.cursorY
                 if (scene.currentTargetX < 426)
                 {
                     scene.launchX = 213
@@ -221,22 +285,6 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
                 }
                 CreateEntity(Prototype = "missileTarget")
                 CreateEntity(Prototype = "missile")
-            }
-        }
-        
-        Entity events()
-        {
-            Component Transform(X = 595, Y = 617, Width = 48, Height = 48)
-            
-            Event SceneStarts()
-            {
-                CreateTimer(Name = "asteroidTimer", Duration = 2.2, Trigger = "makeAsteroid")
-            }
-
-            Event TriggerOccurs(Trigger = "makeAsteroid")
-            {
-                asteroids += 1
-                CreateEntity(Prototype = "asteroid")
             }
         }
         
@@ -259,11 +307,6 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
             {
                 TextRenderComponent.Value = "DESTROYED: " + scene.destroyed
             }
-        }
-        
-        Entity launcher : generalClicker()
-        {
-            Component Transform(X = 138, Y = 326)
         }
         
         Entity missedText()
@@ -307,82 +350,26 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
             Component ImageRenderComponent(Image = "title.png", Opacity = 1)
         }
         
-        Entity cursor : generalCursor()
+        Entity playKinectButton : button()
         {
-            Component Transform(X = 560, Y = 295)
-        }
-        
-        Entity playButton()
-        {
-            Component Transform(X = 360, Y = 432, Width = 496, Height = 144)
+            Component Transform(X = 304, Y = 432, Width = 300, Height = 144)
             Component RenderComponent(Shape = "Rectangle", FillColor = "#0f0", Opacity = 0.15)
             
-            Event AttributeChanges(Target = cursor.Transform.X + cursor.Transform.Y)
-            {
-                hovering = false
-                if (cursor.Transform.X > Transform.X - Transform.Width / 2)
-                {
-                    if (cursor.Transform.X < Transform.X + Transform.Width / 2)
-                    {
-                        if (cursor.Transform.Y > Transform.Y - Transform.Height / 2)
-                        {
-                            if (cursor.Transform.Y < Transform.Y + Transform.Height / 2)
-                            {
-                                hovering = true
-                            }
-                        }
-                    }
-                }
-                if (hovering)
-                {
-                    RenderComponent.Opacity = 0.4
-                }
-                else
-                {
-                    RenderComponent.Opacity = 0.15
-                }
-            }
-
             Event TriggerOccurs(Trigger = "click")
             {
                 if (hovering)
                 {
+                    game.useKinect = true
                     PushScene(Target = "Gameplay")
                 }
             }
         }
         
-        Entity quitButton()
+        Entity quitButton : button()
         {
-            Component Transform(X = 920, Y = 432, Width = 496, Height = 144)
+            Component Transform(X = 976, Y = 432, Width = 300, Height = 144)
             Component RenderComponent(Shape = "Rectangle", FillColor = "#f00", Opacity = 0.15)
             
-            Event AttributeChanges(Target = cursor.Transform.X + cursor.Transform.Y)
-            {
-                hovering = false
-                if (cursor.Transform.X > Transform.X - Transform.Width / 2)
-                {
-                    if (cursor.Transform.X < Transform.X + Transform.Width / 2)
-                    {
-                        if (cursor.Transform.Y > Transform.Y - Transform.Height / 2)
-                        {
-                            if (cursor.Transform.Y < Transform.Y + Transform.Height / 2)
-                            {
-                                hovering = true
-                            }
-                        }
-                    }
-                }
-                if (hovering)
-                {
-                    RenderComponent.Opacity = 0.4
-                }
-                else
-                {
-                    RenderComponent.Opacity = 0.15
-                }
-            }
-
             Event TriggerOccurs(Trigger = "click")
             {
                 if (hovering)
@@ -394,25 +381,46 @@ Game(Name = "Asteroid Defense", FirstScene = "Menu")
         
         Entity quitText()
         {
-            Component Transform(X = 880, Y = 410)
+            Component Transform(X = 936, Y = 410)
             Component TextRenderComponent(Value = "QUIT", FontSize = 36, FontColor = "#fff")
+        }
+        
+        Entity playMouseButton : button()
+        {
+            Component Transform(X = 640, Y = 432, Width = 300, Height = 144)
+            Component RenderComponent(Shape = "Rectangle", FillColor = "#0f0", Opacity = 0.15)
+            
+            Event TriggerOccurs(Trigger = "click")
+            {
+                if (hovering)
+                {
+                    game.useKinect = false
+                    PushScene(Target = "Gameplay")
+                }
+            }
         }
         
         Entity playText()
         {
-            Component Transform(X = 263, Y = 410)
-            Component TextRenderComponent(Value = "PLAY GAME", FontSize = 36, FontColor = "#fff")
-        }
-        
-        Entity : generalClicker()
-        {
-            Component Transform(X = 479, Y = 291)
+            Component Transform(X = 524, Y = 411)
+            Component TextRenderComponent(Value = "MOUSE PLAY", FontSize = 36, FontColor = "#fff")
         }
         
         Entity team()
         {
             Component Transform(X = 531, Y = 197)
             Component TextRenderComponent(Value = "By Team Kinectitude", FontSize = 24, FontColor = "White")
+        }
+        
+        Entity ()
+        {
+            Component Transform(X = 191, Y = 410)
+            Component TextRenderComponent(Value = "KINECT PLAY", FontSize = 36, FontColor = "#fff")
+        }
+        
+        Entity cursor : mouseCursor()
+        {
+            Component Transform(X = 507, Y = 278)
         }
     }
 }
