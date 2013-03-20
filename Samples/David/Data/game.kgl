@@ -4,6 +4,7 @@ using Kinectitude.Render.dll
     define RenderManager as Kinectitude.Render.RenderManager
     define RenderComponent as Kinectitude.Render.RenderComponent
     define ImageRenderComponent as Kinectitude.Render.ImageRenderComponent
+    define TextRenderComponent as Kinectitude.Render.TextRenderComponent
 }
 
 using Kinectitude.Input.dll
@@ -35,66 +36,102 @@ Game(Name = "Shark Feast", FirstScene = "Game")
     {
         Component Transform(Width = 90, Height = 88)
         Component ImageRenderComponent(Image = "urchin.png")
-        Component PhysicsComponent(Mass = 0, BodyType = "Kinematic", FixedRotation = True)
+        Component PhysicsComponent(Shape = "Ellipse", Mass = 1, AngularVelocity = 1, BodyType = "Dynamic", FixedRotation = False, IgnoreCollisionsWith = $Fish + $Urchin)
         
         Event OnCreate()
         {
-            Transform.X = 1000
+            Transform.X = 1400
             Transform.Y = Random(20, 720)
-            PointTowards(X = 0, Y = -1)
+            PointTowards(X = -9999999999, Y = Transform.Y)
             rand = Random(0, 100)
             if (rand < 70)
             {
-                PhysicsComponent.Speed = 7
+                PhysicsComponent.Speed = 40
             }
             else if (rand < 90)
             {
-                PhysicsComponent.Speed = 14
+                PhysicsComponent.Speed = 50
             }
             else
             {
-                PhysicsComponent.Speed = 20
+                PhysicsComponent.Speed = 65
             }
+        }
+
+        Event CollisionEvent(CollidesWith = $Shark)
+        {
+            Destroy()
+            scene.Score -= 3
+        }
+
+        Event CollisionEvent(CollidesWith = $Hitbox)
+        {
+            Destroy()
         }
     }
     
     Prototype Fish()
     {
-        Component Transform()
-        Component ImageRenderComponent()
-        Component PhysicsComponent()
+        Component Transform(Width = 58, Height = 58, Rotation = 0)
+        Component ImageRenderComponent(Image = "fish.bmp", Animated = True, Duration = 1, Stretched = False, FixedPosition = True)
+        Component PhysicsComponent(FixedRotation = True, IgnoreCollisionsWith = $Urchin + $Fish)
+        
+        Event OnCreate()
+        {
+            Transform.X = 1400
+            Transform.Y = Random(20, 720)
+            PointTowards(X = -9999999999, Y = Transform.Y)
+            rand = Random(0, 100)
+            if (rand < 70)
+            {
+                PhysicsComponent.Speed = 40
+            }
+            else if (rand < 90)
+            {
+                PhysicsComponent.Speed = 50
+            }
+            else
+            {
+                PhysicsComponent.Speed = 65
+            }
+        }
+
+        Event CollisionEvent(CollidesWith = $Shark)
+        {
+            Destroy()
+            scene.Score += 1
+        }
+
+        Event CollisionEvent(CollidesWith = $Hitbox)
+        {
+            Destroy()
+        }
+    }
+    
+    Prototype Shark()
+    {
+        Component Transform(X = 85, Y = 417, Width = 95, Height = 145)
+        Component MouseFollowComponent(Direction = "Y", MinYFollow = 40, MaxYFollow = 700)
+        Component PhysicsComponent(Mass = 1, BodyType = "Kinematic")
+        Component ImageRenderComponent(Image = "angry_fish.bmp", Animated = True, Duration = 0.6, Stretched = False)
+    }
+    
+    Prototype Hitbox()
+    {
+        Component Transform(X = 175, Y = 392, Width = 15, Height = 800)
+        Component PhysicsComponent(BodyType = "Static")
+        Component RenderComponent(FillColor = "Black")
     }
     
     Service RenderService(Width = 1024, Height = 768)
     
-    Scene Game(enemiesSeen = 0)
+    Scene Game(enemiesSeen = 0, score = 0)
     {
         Manager RenderManager(Width = 1024, Height = 768)
         
         Entity : Background()
         {
             Component Transform(X = 512, Y = 384)
-        }
-        
-        Entity Shark()
-        {
-            Component Transform(X = 85, Y = 417, Width = 259, Height = 194)
-            Component ImageRenderComponent(Image = "angry_fish.bmp", Animated = True, Duration = 0.6, Stretched = False, FixedPosition = False)
-            Component MouseFollowComponent(Direction = "Y", MinYFollow = 40, MaxYFollow = 700, IgnoresPhysics = True)
-            Component PhysicsComponent(Mass = 0, BodyType = "Kinematic")
-        }
-        
-        Entity SharkHitbox()
-        {
-            Component Transform(X = 175, Y = 392, Width = 15, Height = 800)
-            Component MouseFollowComponent(Direction = "Y")
-            Component RenderComponent(FillColor = "Black")
-            Component PhysicsComponent(Mass = 0, BodyType = "Static")
-            
-            Event CollisionEvent()
-            {
-
-            }
         }
         
         Entity Events()
@@ -104,6 +141,7 @@ Game(Name = "Shark Feast", FirstScene = "Game")
             Event OnCreate()
             {
                 CreateTimer(Name = enemyTimer, Duration = 5, Trigger = makeEnemy)
+                CreateTimer(Name = fishTimer, Duration = 1, Trigger = makeFish)
             }
 
             Event TriggerOccurs(Trigger = makeEnemy)
@@ -119,6 +157,32 @@ Game(Name = "Shark Feast", FirstScene = "Game")
                     CreateTimer(Name = enemyTimer3, Duration = 9.5, Trigger = makeEnemy)
                 }
             }
+
+            Event TriggerOccurs(Trigger = makeFish)
+            {
+                CreateEntity(Prototype = "Fish")
+            }
+        }
+        
+        Entity : Shark()
+        {
+            Component Transform(X = 95, Y = 319, Width = 145)
+        }
+        
+        Entity Score()
+        {
+            Component Transform(X = 478, Y = 48, Width = 180, Height = 74)
+            Component TextRenderComponent(Value = "Score: 0", FontSize = 24, FontColor = "Black")
+            
+            Event AttributeChanges(Target = scene.Score)
+            {
+                TextRenderComponent.Value = "Score:" + scene.Score
+            }
+        }
+        
+        Entity : Hitbox()
+        {
+            Component Transform(X = -150, Y = 388)
         }
     }
     
