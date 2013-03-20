@@ -3,6 +3,7 @@ using Kinectitude.Render.dll
     define RenderService as Kinectitude.Render.RenderService
     define RenderManager as Kinectitude.Render.RenderManager
     define RenderComponent as Kinectitude.Render.RenderComponent
+    define ImageRenderComponent as Kinectitude.Render.ImageRenderComponent
 }
 
 using Kinectitude.Physics.dll
@@ -11,7 +12,13 @@ using Kinectitude.Physics.dll
     define PhysicsManager as Kinectitude.Physics.PhysicsManager
 }
 
-Game(Name = "Physics Demo", FirstScene = "Scene1")
+using Kinectitude.Input.dll
+{
+    define KeyboardFollowComponent as Kinectitude.Input.KeyboardFollowComponent
+    define KeyEvent as Kinectitude.Input.KeyEvent
+}
+
+Game(Name = "Physics Demo", FirstScene = "Scene0")
 {
     Prototype floor()
     {
@@ -62,6 +69,21 @@ Game(Name = "Physics Demo", FirstScene = "Scene1")
         Entity : floor()
         {
             Component Transform(X = 504, Y = 469, Rotation = -3)
+        }
+    }
+    
+    Scene Scene0()
+    {
+        Entity ()
+        {
+            Component Transform(X = 208.5, Y = 177.5, Width = 59, Height = 59)
+            Component RenderComponent(Shape = "Rectangle", FillColor = "Blue")
+            Component KeyboardFollowComponent()
+            
+            Event KeyEvent(KeyState = "Released")
+            {
+                Quit()
+            }
         }
     }
 }

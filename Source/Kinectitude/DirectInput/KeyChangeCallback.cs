@@ -8,7 +8,10 @@ namespace Kinectitude.Input
 {
     public class KeyChangeCallback : IKeyChange
     {
-        public KeyState KeyState { get; private set; }
+        public KeyState KeyState
+        {
+            get { return KeyState.Down; }
+        }
         public Keys Key { get; set; }
 
         private readonly Action Call;
@@ -16,7 +19,6 @@ namespace Kinectitude.Input
         public KeyChangeCallback(Action call) 
         { 
             Call = call;
-            KeyState = KeyState.Down;
         }
 
         public void DoActions() { Call(); }

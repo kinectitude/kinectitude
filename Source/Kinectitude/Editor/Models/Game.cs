@@ -478,7 +478,7 @@ namespace Kinectitude.Editor.Models
 
         private string GetNextSceneName()
         {
-            string ret = "Scene " + nextScene;
+            string ret = "Scene" + nextScene;
 
             while (Scenes.Any(x => x.Name == ret))
             {

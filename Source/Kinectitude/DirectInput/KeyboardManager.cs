@@ -12,30 +12,13 @@ namespace Kinectitude.Input
     public class KeyboardManager : Manager<Component>
     {
         private static readonly Array KeyValues = Enum.GetValues(typeof(Keys));
-        //private static Keyboard keyboard = null;
 
-        //private bool[] keysDown = new bool[Enum.GetNames(typeof(Key)).Length];
-
-        private bool[] keysDown = new bool[KeyValues.Length];
-
-        private readonly List<IKeyChange> KeyPressed = new List<IKeyChange>();
-        private readonly List<IKeyChange> KeyReleased = new List<IKeyChange>();
-        private readonly List<IKeyChange> KeyDown = new List<IKeyChange>();
+        private readonly List<IKeyChange> keyPressed = new List<IKeyChange>();
+        private readonly List<IKeyChange> keyReleased = new List<IKeyChange>();
+        private readonly List<IKeyChange> keyDown = new List<IKeyChange>();
+        //private readonly bool[] keysDown = new bool[255];
+        private readonly Dictionary<Keys, bool> keyStates = new Dictionary<Keys, bool>();
         private InputService inputService;
-
-        public KeyboardManager()
-        {
-            //if (keyboard == null)
-            //{
-            //    InputService service = GetService<InputService>();
-            //    keyboard = new Keyboard(service.DirectInput);
-            //    service.InitDevice<Keyboard>(keyboard);
-            //}
-            //for (int i = 0; i < keysDown.Length; i++)
-            //{
-            //    keysDown[i] = false;
-            //}
-        }
 
         protected override void OnStart()
         {
@@ -55,50 +38,45 @@ namespace Kinectitude.Input
 
         private void OnKeyDown(Keys key, int code)
         {
-            foreach (var evt in KeyDown.Where(x => x.Key == key))
+            foreach (var evt in keyPressed.Where(x => x.Key == key))
             {
                 evt.DoActions();
             }
 
-            keysDown[code] = true;
+            keyStates[key] = true;
         }
 
         private void OnKeyUp(Keys key, int code)
         {
-            foreach (var evt in KeyReleased.Where(x => x.Key == key))
+            foreach (var evt in keyReleased.Where(x => x.Key == key))
             {
                 evt.DoActions();
             }
 
-            keysDown[code] = false;
+            keyStates[key] = false;
         }
 
         public override void OnUpdate(float frameDelta)
         {
-            //if (keyboard.Acquire().IsFailure || keyboard.Poll().IsFailure) return;
-            //KeyboardState state = keyboard.GetCurrentState();
-            //if (Result.Last.IsFailure) return;
-
-            //foreach (Key key in state.PressedKeys)
-            //{
-            //    foreach (IKeyChange evt in KeyDown.Where(input => input.Button == key)) evt.DoActions();
-            //    if (keysDown[(int)key]) continue;
-            //    foreach (IKeyChange evt in KeyPressed.Where(input => input.Button == key)) evt.DoActions();
-            //    keysDown[(int)key] = true;
-            //}
-
-            //foreach (Key key in state.ReleasedKeys)
-            //{
-            //    if (!keysDown[(int)key]) continue;
-            //    foreach (IKeyChange evt in KeyReleased.Where(input => input.Button == key)) evt.DoActions();
-            //    keysDown[(int)key] = false;
-            //}
-
-            //foreach (Component child in Children){child.OnUpdate(frameDelta);}
-
-            foreach (Keys value in KeyValues)
+            foreach (Component child in Children)
             {
-                foreach (var evt in KeyPressed.Where(x => x.Key == value))
+                child.OnUpdate(frameDelta);
+            }
+
+            //foreach (Keys value in KeyValues)
+            //{
+            //    if (keysDown[(int)value])
+            //    {
+            //        foreach (var evt in keyDown.Where(x => x.Key == value))
+            //        {
+            //            evt.DoActions();
+            //        }
+            //    }
+            //}
+
+            foreach (var state in keyStates.Where(x => x.Value == true))
+            {
+                foreach (var evt in keyDown.Where(x => x.Key == state.Key))
                 {
                     evt.DoActions();
                 }
@@ -110,13 +88,13 @@ namespace Kinectitude.Input
             switch (keyEvent.KeyState)
             {
                 case KeyState.Pressed:
-                    KeyPressed.Add(keyEvent);
+                    keyPressed.Add(keyEvent);
                     break;
                 case KeyState.Down:
-                    KeyDown.Add(keyEvent);
+                    keyDown.Add(keyEvent);
                     break;
                 case KeyState.Released:
-                    KeyReleased.Add(keyEvent);
+                    keyReleased.Add(keyEvent);
                     break;
             }
         }
@@ -126,13 +104,13 @@ namespace Kinectitude.Input
             switch (keyEvent.KeyState)
             {
                 case KeyState.Pressed:
-                    KeyPressed.Remove(keyEvent);
+                    keyPressed.Remove(keyEvent);
                     break;
                 case KeyState.Down:
-                    KeyDown.Remove(keyEvent);
+                    keyDown.Remove(keyEvent);
                     break;
                 case KeyState.Released:
-                    KeyReleased.Remove(keyEvent);
+                    keyReleased.Remove(keyEvent);
                     break;
             }
         }

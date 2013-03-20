@@ -12,16 +12,12 @@ namespace Kinectitude.Input
     [Provides(typeof(BasicFollowComponent))]
     public class KeyboardFollowComponent : BasicFollowComponent
     {
-
-        private enum MoveDirection : int { Up = 0, Down = 1, Left = 2, Right = 3};
-        private bool [] keysDown = {false, false, false, false};
-        //used to see if defaults are needed
-        private bool[] needsDefault = {true, true, true, true};
+        private enum MoveDirection : int { Up = 0, Down = 1, Left = 2, Right = 3 };
+        private bool [] keysDown = { false, false, false, false };
         private KeyboardManager manager;
          
         private KeyChangeCallback moveUp;
-        [Preset("default", Keys.Up)]
-        [PluginProperty("Up Key", "Up key to move with. Defaults to UpArrow")]
+        [PluginProperty("Up Key", "Up key to move with. Defaults to UpArrow", Keys.Up)]
         public Keys Up
         {
             get { return moveUp.Key; }
@@ -29,8 +25,7 @@ namespace Kinectitude.Input
         }
 
         private KeyChangeCallback moveDown;
-        [Preset("default", Keys.Down)]
-        [PluginProperty("Down Key", "Down key to move with. Defaults to DownArrow")]
+        [PluginProperty("Down Key", "Down key to move with. Defaults to DownArrow", Keys.Down)]
         public Keys Down
         {
             get { return moveDown.Key; }
@@ -38,8 +33,7 @@ namespace Kinectitude.Input
         }
 
         private KeyChangeCallback moveRight;
-        [Preset("default", Keys.Right)]
-        [PluginProperty("Right Key", "Right key to move with. Defaults to RightArrow")]
+        [PluginProperty("Right Key", "Right key to move with. Defaults to RightArrow", Keys.Right)]
         public Keys Right
         {
             get { return moveRight.Key; }
@@ -47,8 +41,7 @@ namespace Kinectitude.Input
         }
 
         private KeyChangeCallback moveLeft;
-        [Preset("default", Keys.Left)]
-        [PluginProperty("Left Key", "Left key to move with. Defaults to LeftArrow")]
+        [PluginProperty("Left Key", "Left key to move with. Defaults to LeftArrow", Keys.Left)]
         public Keys Left
         {
             get { return moveLeft.Key; }
@@ -56,8 +49,7 @@ namespace Kinectitude.Input
         }
 
         private float speed = 1;
-        [Preset("default", 1)]
-        [PluginProperty("Speed", "Speed to move at. Defaults to 1")]
+        [PluginProperty("Speed", "Speed to move at. Defaults to 1", 1.0f)]
         public float Speed
         {
             get { return speed; }
@@ -71,14 +63,28 @@ namespace Kinectitude.Input
             }
         }
 
+        public KeyboardFollowComponent()
+        {
+            moveUp = new KeyChangeCallback(() => setKeyDown((int)MoveDirection.Up));
+            moveDown = new KeyChangeCallback(() => setKeyDown((int)MoveDirection.Down));
+            moveLeft = new KeyChangeCallback(() => setKeyDown((int)MoveDirection.Left));
+            moveRight = new KeyChangeCallback(() => setKeyDown((int)MoveDirection.Right));
+
+            //Up = Keys.Up;
+            //Down = Keys.Down;
+            //Left = Keys.Left;
+            //Right = Keys.Right;
+
+            //Speed = 1.0f;
+        }
+
         private void setKey(string change, KeyChangeCallback keyChangeCallback, Keys value, int who)
         {
             if (value != keyChangeCallback.Key)
             {
-                if(manager != null) manager.RemoveIKeyChange(keyChangeCallback);
+                if (manager != null) manager.RemoveIKeyChange(keyChangeCallback);
                 keyChangeCallback.Key = value;
-                if(manager != null) manager.RegisterIKeyChange(keyChangeCallback);
-                needsDefault[who] = false;
+                if (manager != null) manager.RegisterIKeyChange(keyChangeCallback);
                 Change(change);
             }
         }
@@ -107,21 +113,15 @@ namespace Kinectitude.Input
         {
             base.Ready();
             manager = GetManager<KeyboardManager>();
+            
+            moveUp.Key = Up;
+            moveDown.Key = Down;
+            moveLeft.Key = Left;
+            moveRight.Key = Right;
 
-            moveUp = new KeyChangeCallback(() => setKeyDown((int)MoveDirection.Up));
-            if(needsDefault[(int)MoveDirection.Up]) moveUp.Key = Keys.Up;
             manager.RegisterIKeyChange(moveUp);
-
-            moveDown = new KeyChangeCallback(() => setKeyDown((int)MoveDirection.Down));
-            if(needsDefault[(int)MoveDirection.Down]) moveDown.Key = Keys.Down;
             manager.RegisterIKeyChange(moveDown);
-
-            moveLeft = new KeyChangeCallback(() => setKeyDown((int)MoveDirection.Left));
-            if (needsDefault[(int)MoveDirection.Left]) moveLeft.Key = Keys.Left;
             manager.RegisterIKeyChange(moveLeft);
-
-            moveRight = new KeyChangeCallback(() => setKeyDown((int)MoveDirection.Right));
-            if (needsDefault[(int)MoveDirection.Right]) moveRight.Key = Keys.Right;
             manager.RegisterIKeyChange(moveRight);
 
             manager.Add(this);
