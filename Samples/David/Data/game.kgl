@@ -24,6 +24,11 @@ using Kinectitude.Sound.dll
     define StopSoundAction as Kinectitude.Sound.StopSoundAction
 }
 
+using Kinectitude.Kinect.dll
+{
+    define KinectFollowComponent as Kinectitude.Kinect.KinectFollowComponent
+}
+
 Game(Name = "Shark Feast", FirstScene = "Game")
 {
     Prototype Background()
@@ -114,6 +119,7 @@ Game(Name = "Shark Feast", FirstScene = "Game")
         Component MouseFollowComponent(Direction = "Y", MinYFollow = 40, MaxYFollow = 700)
         Component PhysicsComponent(Mass = 1, BodyType = "Kinematic")
         Component ImageRenderComponent(Image = "angry_fish.bmp", Animated = True, Duration = 0.6, Stretched = False)
+        Component KinectFollowComponent(Direction = "Y", MinYFollow = 40, MaxYFollow = 700)
     }
     
     Prototype Hitbox()
