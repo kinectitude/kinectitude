@@ -4,7 +4,7 @@ using Action = Kinectitude.Core.Base.Action;
 
 namespace Kinectitude.Sound
 {
-    [Plugin("play sound {Filename}, loop audio? {Looping}, volume: {Volume}", "")]
+    [Plugin("play sound {Filename}, loop audio? {Looping}, volume: {Volume}", "Play a sound")]
     public class PlaySoundAction : Action
     {
         [PluginProperty("File Name", "File name of sound to play", 
