@@ -15,7 +15,7 @@ namespace Kinectitude.Tests.Core
         internal static Game StartGame(string testFile, Action<string> die = null)
         {
             if (die == null) die = new Action<string>(str => Assert.Fail(str));
-            GameLoader gameLoader = new GameLoader(testFile, new Assembly[] { typeof(Setup).Assembly }, 1, 1, null, die);
+            GameLoader gameLoader = new GameLoader(testFile, new Assembly[] { typeof(Setup).Assembly }, die);
             Game game = gameLoader.CreateGame();
             game.Start();
             return game;
@@ -24,7 +24,7 @@ namespace Kinectitude.Tests.Core
         public static void RunGame(string testFile, Action<string> die = null)
         {
             if (die == null) die = new Action<string>(str => Assert.Fail(str));
-            GameLoader gameLoader = new GameLoader(testFile, new Assembly[] { typeof(Setup).Assembly }, 1, 1, null, die);
+            GameLoader gameLoader = new GameLoader(testFile, new Assembly[] { typeof(Setup).Assembly }, die);
             Game game = gameLoader.CreateGame();
             game.Start();
             while (game.Running) game.OnUpdate(1 / 60f);
