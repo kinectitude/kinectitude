@@ -4,12 +4,14 @@ using Kinectitude.Editor.Models;
 using Kinectitude.Render;
 using System.Windows.Media;
 using System;
+using System.Collections.Generic;
 
 namespace Kinectitude.Editor.Views.Scenes.Presenters
 {
     internal class SpriteEntityVisual : EntityVisual
     {
         private static readonly ImageSourceConverter Converter = new ImageSourceConverter();
+        private static readonly Dictionary<string, BitmapImage> Images = new Dictionary<string, BitmapImage>();
         private static readonly BitmapImage DefaultImage;
 
         static SpriteEntityVisual()
@@ -33,7 +35,20 @@ namespace Kinectitude.Editor.Views.Scenes.Presenters
 
                 if (File.Exists(path))
                 {
-                    return (ImageSource)Converter.ConvertFromString(path);
+                    BitmapImage image;
+                    Images.TryGetValue(path, out image);
+
+                    if (null == image)
+                    {
+                        image = new BitmapImage();
+                        image.BeginInit();
+                        image.CacheOption = BitmapCacheOption.OnLoad;
+                        image.UriSource = new Uri(path);
+                        image.EndInit();
+                        Images[path] = image;
+                    }
+
+                    return image;
                 }
 
                 return DefaultImage;
