@@ -116,7 +116,6 @@ Game(Name = "Shark Feast", FirstScene = "Game")
     Prototype Shark()
     {
         Component Transform(X = 85, Y = 417, Width = 95, Height = 145)
-        Component MouseFollowComponent(Direction = "Y", MinYFollow = 40, MaxYFollow = 700)
         Component PhysicsComponent(Mass = 1, BodyType = "Kinematic")
         Component ImageRenderComponent(Image = "angry_fish.bmp", Animated = True, Duration = 0.6, Stretched = False)
         Component KinectFollowComponent(Direction = "Y", MinYFollow = 40, MaxYFollow = 700)
@@ -173,12 +172,13 @@ Game(Name = "Shark Feast", FirstScene = "Game")
         Entity : Shark()
         {
             Component Transform(X = 95, Y = 319, Width = 145)
+            Component KinectFollowComponent(ScaleWidth = 1024, ScaleHeight = 768, SkeletonMaxX = 0.5, SkeletonMaxY = 0.5)
         }
         
         Entity Score()
         {
             Component Transform(X = 478, Y = 48, Width = 180, Height = 74)
-            Component TextRenderComponent(Value = "Score: 0", FontSize = 24, FontColor = "Black")
+            Component TextRenderComponent(Value = "Score: 0", FontWeight = "Bold", FontSize = 40, FontColor = "Black")
             
             Event AttributeChanges(Target = scene.Score)
             {
@@ -189,6 +189,13 @@ Game(Name = "Shark Feast", FirstScene = "Game")
         Entity : Hitbox()
         {
             Component Transform(X = -150, Y = 388)
+        }
+        
+        Entity : Shark()
+        {
+            Component Transform(X = 109, Y = 455, Width = 145)
+            Component ImageRenderComponent(Image = "angry_fish_2.png", Stretched = False)
+            Component KinectFollowComponent(Player = 2, ScaleWidth = 1024, ScaleHeight = 768, SkeletonMaxX = 0.5, SkeletonMaxY = 0.5)
         }
     }
     
