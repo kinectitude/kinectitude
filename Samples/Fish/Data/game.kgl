@@ -1,0 +1,205 @@
+using Kinectitude.Render.dll
+{
+    define RenderService as Kinectitude.Render.RenderService
+    define RenderManager as Kinectitude.Render.RenderManager
+    define RenderComponent as Kinectitude.Render.RenderComponent
+    define ImageRenderComponent as Kinectitude.Render.ImageRenderComponent
+    define TextRenderComponent as Kinectitude.Render.TextRenderComponent
+}
+
+using Kinectitude.Input.dll
+{
+    define MouseFollowComponent as Kinectitude.Input.MouseFollowComponent
+}
+
+using Kinectitude.Physics.dll
+{
+    define PhysicsComponent as Kinectitude.Physics.PhysicsComponent
+    define CollisionEvent as Kinectitude.Physics.CollisionEvent
+}
+
+using Kinectitude.Sound.dll
+{
+    define PlaySoundAction as Kinectitude.Sound.PlaySoundAction
+    define StopSoundAction as Kinectitude.Sound.StopSoundAction
+}
+
+using Kinectitude.Kinect.dll
+{
+    define KinectFollowComponent as Kinectitude.Kinect.KinectFollowComponent
+}
+
+Game(Name = "Shark Feast", FirstScene = "Game")
+{
+    Prototype Background()
+    {
+        Component Transform(X = 512, Y = 334, Width = 1024, Height = 768)
+        Component ImageRenderComponent(Image = "underwater.jpg", Stretched = True)
+    }
+    
+    Prototype Urchin()
+    {
+        Component Transform(Width = 90, Height = 88)
+        Component ImageRenderComponent(Image = "urchin.png")
+        Component PhysicsComponent(Shape = "Ellipse", Mass = 1, AngularVelocity = 1, BodyType = "Dynamic", FixedRotation = False, IgnoreCollisionsWith = $Fish + $Urchin)
+        
+        Event OnCreate()
+        {
+            Transform.X = 1400
+            Transform.Y = Random(20, 720)
+            PointTowards(X = -9999999999, Y = Transform.Y)
+            rand = Random(0, 100)
+            if (rand < 70)
+            {
+                PhysicsComponent.Speed = 40
+            }
+            else if (rand < 90)
+            {
+                PhysicsComponent.Speed = 50
+            }
+            else
+            {
+                PhysicsComponent.Speed = 65
+            }
+        }
+
+        Event CollisionEvent(CollidesWith = $Shark)
+        {
+            Destroy()
+            scene.Score -= 3
+        }
+
+        Event CollisionEvent(CollidesWith = $Hitbox)
+        {
+            Destroy()
+        }
+    }
+    
+    Prototype Fish()
+    {
+        Component Transform(Width = 58, Height = 58, Rotation = 0)
+        Component ImageRenderComponent(Image = "fish.bmp", Animated = True, Duration = 1, Stretched = False, FixedPosition = True)
+        Component PhysicsComponent(FixedRotation = True, IgnoreCollisionsWith = $Urchin + $Fish)
+        
+        Event OnCreate()
+        {
+            Transform.X = 1400
+            Transform.Y = Random(20, 720)
+            PointTowards(X = -9999999999, Y = Transform.Y)
+            rand = Random(0, 100)
+            if (rand < 70)
+            {
+                PhysicsComponent.Speed = 40
+            }
+            else if (rand < 90)
+            {
+                PhysicsComponent.Speed = 50
+            }
+            else
+            {
+                PhysicsComponent.Speed = 65
+            }
+        }
+
+        Event CollisionEvent(CollidesWith = $Shark)
+        {
+            Destroy()
+            scene.Score += 1
+        }
+
+        Event CollisionEvent(CollidesWith = $Hitbox)
+        {
+            Destroy()
+        }
+    }
+    
+    Prototype Shark()
+    {
+        Component Transform(X = 85, Y = 417, Width = 95, Height = 145)
+        Component PhysicsComponent(Mass = 1, BodyType = "Kinematic")
+        Component ImageRenderComponent(Image = "angry_fish.bmp", Animated = True, Duration = 0.6, Stretched = False)
+        Component KinectFollowComponent(Direction = "Y", MinYFollow = 40, MaxYFollow = 700)
+    }
+    
+    Prototype Hitbox()
+    {
+        Component Transform(X = 175, Y = 392, Width = 15, Height = 800)
+        Component PhysicsComponent(BodyType = "Static")
+        Component RenderComponent(FillColor = "Black")
+    }
+    
+    Service RenderService(Width = 1024, Height = 768)
+    
+    Scene Game(enemiesSeen = 0, score = 0)
+    {
+        Manager RenderManager(Width = 1024, Height = 768)
+        
+        Entity : Background()
+        {
+            Component Transform(X = 512, Y = 384)
+        }
+        
+        Entity Events()
+        {
+            Component Transform(X = 28, Y = 28, Width = 48, Height = 48)
+            
+            Event OnCreate()
+            {
+                CreateTimer(Name = enemyTimer, Duration = 5, Trigger = makeEnemy)
+                CreateTimer(Name = fishTimer, Duration = 1, Trigger = makeFish)
+            }
+
+            Event TriggerOccurs(Trigger = makeEnemy)
+            {
+                CreateEntity(Prototype = "Urchin")
+                scene.enemiesSeen += 1
+                if (scene.enemiesSeen == 12)
+                {
+                    CreateTimer(Name = enemyTimer2, Duration = 7.5, Trigger = makeEnemy)
+                }
+                else if (scene.enemiesSeen == 35)
+                {
+                    CreateTimer(Name = enemyTimer3, Duration = 9.5, Trigger = makeEnemy)
+                }
+            }
+
+            Event TriggerOccurs(Trigger = makeFish)
+            {
+                CreateEntity(Prototype = "Fish")
+            }
+        }
+        
+        Entity : Shark()
+        {
+            Component Transform(X = 95, Y = 319, Width = 145)
+            Component KinectFollowComponent(ScaleWidth = 1024, ScaleHeight = 768, SkeletonMaxX = 0.5, SkeletonMaxY = 0.5)
+        }
+        
+        Entity Score()
+        {
+            Component Transform(X = 478, Y = 48, Width = 180, Height = 74)
+            Component TextRenderComponent(Value = "Score: 0", FontWeight = "Bold", FontSize = 40, FontColor = "Black")
+            
+            Event AttributeChanges(Target = scene.Score)
+            {
+                TextRenderComponent.Value = "Score:" + scene.Score
+            }
+        }
+        
+        Entity : Hitbox()
+        {
+            Component Transform(X = -150, Y = 388)
+        }
+        
+        Entity : Shark()
+        {
+            Component Transform(X = 109, Y = 455, Width = 145)
+            Component ImageRenderComponent(Image = "angry_fish_2.png", Stretched = False)
+            Component KinectFollowComponent(Player = 2, ScaleWidth = 1024, ScaleHeight = 768, SkeletonMaxX = 0.5, SkeletonMaxY = 0.5)
+        }
+    }
+    
+    Scene Menu()
+    {
+    }
+}

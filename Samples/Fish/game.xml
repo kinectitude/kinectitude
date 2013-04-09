@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project GameRoot="Data/" GameFile="game.kgl">
+  <Asset File="underwater.jpg" />
+  <Asset File="urchin.png" />
+  <Asset File="angry_fish.bmp" />
+  <Asset File="fish.bmp" />
+  <Asset File="angry_fish_2.png" />
+</Project>

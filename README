@@ -1,7 +1,5 @@
 Kinectitude
 
-Build/          Target directory for builds
-Experiments/    Prototypes, samples, and throw-away code to try ideas out before using them in the project source
 Libraries/      Contains third-party dependencies
 Source/         All projects and source code, organized by namespace
 

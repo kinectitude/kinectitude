@@ -1,5 +1,0 @@
-Name	Avg	Sdev			
-"normal funciton, no varaible"	126.2827933	1.04343335	1.151084543	65.43289679	66.6475599
-"normal funciton, with varaible"	127.4838733	7.516269209	8.92381377	9.092437321	
-"yeild funciton, with varaible"	194.55766	1.299421871	0.975372224		
-"yeild funciton, no varaible"	195.82508	4.528296113			
