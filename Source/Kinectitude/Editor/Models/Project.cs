@@ -1,4 +1,13 @@
-﻿using Kinectitude.Editor.Base;
+//-----------------------------------------------------------------------
+// <copyright file="Project.cs" company="Kinectitude">
+//   Copyright (c) 2013, Kinectitude.
+//   This software is released under the Microsoft Reciprocal License (Ms-RL).
+//   The license and further copyright text can be found in the file
+//   LICENSE at the root directory of this distribution.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Views.Utils;
 using System.Collections.ObjectModel;
 using System.Windows.Input;

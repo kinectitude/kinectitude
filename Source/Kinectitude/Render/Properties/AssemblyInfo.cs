@@ -1,4 +1,13 @@
-﻿using System.Reflection;
+//-----------------------------------------------------------------------
+// <copyright file="AssemblyInfo.cs" company="Kinectitude">
+//   Copyright (c) 2013, Kinectitude.
+//   This software is released under the Microsoft Reciprocal License (Ms-RL).
+//   The license and further copyright text can be found in the file
+//   LICENSE at the root directory of this distribution.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -10,7 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Render")]
-[assembly: AssemblyCopyright("Copyright ©  2012")]
+[assembly: AssemblyCopyright("Copyright �  2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

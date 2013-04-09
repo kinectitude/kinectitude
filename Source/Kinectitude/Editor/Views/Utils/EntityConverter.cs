@@ -1,4 +1,13 @@
-﻿using Kinectitude.Editor.Views.Scenes.Presenters;
+//-----------------------------------------------------------------------
+// <copyright file="EntityConverter.cs" company="Kinectitude">
+//   Copyright (c) 2013, Kinectitude.
+//   This software is released under the Microsoft Reciprocal License (Ms-RL).
+//   The license and further copyright text can be found in the file
+//   LICENSE at the root directory of this distribution.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using Kinectitude.Editor.Views.Scenes.Presenters;
 using System;
 using System.Windows.Data;
 

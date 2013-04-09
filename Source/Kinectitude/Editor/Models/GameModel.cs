@@ -1,4 +1,13 @@
-﻿using Kinectitude.Editor.Base;
+//-----------------------------------------------------------------------
+// <copyright file="GameModel.cs" company="Kinectitude">
+//   Copyright (c) 2013, Kinectitude.
+//   This software is released under the Microsoft Reciprocal License (Ms-RL).
+//   The license and further copyright text can be found in the file
+//   LICENSE at the root directory of this distribution.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using Kinectitude.Editor.Base;
 using Kinectitude.Editor.Models.Interfaces;
 using Kinectitude.Editor.Models.Notifications;
 using Kinectitude.Editor.Storage;
