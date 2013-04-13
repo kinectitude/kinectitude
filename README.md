@@ -35,4 +35,4 @@ The first solution contains the Kinectitude Interpreter (the "Core") project, th
 Step 3: Run the Tests
 ---------------------
 
-The test solution can be found in Source/Kinectitude.Tests.sln. Open in up in Visual Studio, and ensure the build configuration is set to Test. To start the unit tests, choose Test > Run Tests > Run All Tests from the menu. Visual Studio will build the test project and run all of the unit tests. 
+The test solution can be found in Source/Kinectitude.Tests.sln. Open it up in Visual Studio, and ensure the build configuration is set to Test. To start the unit tests, choose Test > Run Tests > Run All Tests from the menu. Visual Studio will build the test project and run all of the unit tests. 
