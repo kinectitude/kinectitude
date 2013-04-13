@@ -102,7 +102,7 @@ namespace Kinectitude.Editor.Models.Properties
 
         public override ICommand ClearValueCommand { get; protected set; }
 
-        public ICommand DisplayFileChooserCommand { get; protected set; }
+        public ICommand DisplayFileChooserCommand { get; private set; }
 
         public Property(PluginProperty pluginProperty)
         {
