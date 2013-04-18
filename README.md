@@ -21,7 +21,7 @@ Kinectitude uses some third-party libraries. While some of these libraries are i
 * [Kinect for Windows SDK 1.6 or newer](http://www.microsoft.com/en-us/kinectforwindows/develop/developer-downloads.aspx)
 * [Microsoft Expression Blend SDK for .NET 4](http://www.microsoft.com/en-ca/download/details.aspx?id=10801)
 
-Once both of these SDKs are installed, you can get started by building the Kinectitude solutions!
+Once these SDKs are installed, you can get started by building the Kinectitude solutions!
 
 Step 2: Build the Solutions
 ---------------------------
