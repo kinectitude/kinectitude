@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    
+    <Product Id="{C3186EC4-DC75-4CC5-801F-8362F459A3B6}"
+             Name="Kinectitude"
+             Language="1033"
+             Version="1.0.0.0"
+             Manufacturer="Team Kinectitude"
+             UpgradeCode="52af7206-d1e8-43fe-80d1-91f98d71f0fa">
+      
+      <Package InstallerVersion="200"
+               Compressed="yes"
+               Manufacturer="Team Kinectitude"
+               Description="Installs Kinectitude"
+               Comments="(c) 2013 Team Kinectitude"
+               InstallScope="perMachine" />
+
+      <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+      
+      <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+
+      <Directory Id="TARGETDIR" Name="SourceDir">
+        <Directory Id="ProgramFilesFolder">
+          <Directory Id="InstallFolder" Name="Kinectitude">
+            <Directory Id="InteractivityResourcesFolder" Name="en" />
+            <Directory Id="PluginsFolder" Name="Plugins" />
+          </Directory>
+        </Directory>
+        <Directory Id="ProgramMenuFolder">
+          <Directory Id="ShortcutsFolder" Name="Kinectitude" />
+        </Directory>
+      </Directory>
+
+      <DirectoryRef Id="InstallFolder">
+        <Component Id="CMP_LicenseMD" Guid="{A78FD491-8B82-4D2F-9E42-3614A47E46AB}">
+          <File Id="FILE_LicenseMD" Source="..\..\..\LICENSE.md" KeyPath="yes" />
+        </Component>
+        <Component Id="CMP_IronyDLL" Guid="{C328DD94-0EFF-4970-8CAC-10020C5E5DC3}">
+          <File Id="FILE_IronyDLL" Source="..\..\..\Build\$(var.Kinectitude.Core.Platform)\$(var.Kinectitude.Core.Configuration)\Irony.dll" KeyPath="yes" />
+        </Component>
+        <Component Id="CMP_IronyInterpreterDLL" Guid="{A215FEF4-6676-429B-9BCC-DB3C8CB916A8}">
+          <File Id="FILE_IronyInterpreterDLL" Source="..\..\..\Build\$(var.Kinectitude.Core.Platform)\$(var.Kinectitude.Core.Configuration)\Irony.Interpreter.dll" KeyPath="yes" />
+        </Component>
+        <Component Id="CMP_KinectitudeCoreDLL" Guid="{47959AC8-75B0-4A9F-AFF0-85F2820F936F}">
+          <File Id="FILE_KinectitudeCoreDLL" Source="..\..\..\Build\$(var.Kinectitude.Core.Platform)\$(var.Kinectitude.Core.Configuration)\Kinectitude.Core.dll" KeyPath="yes" />
+        </Component>
+        <Component Id="CMP_KinectitudeCoreDLL_CONFIG" Guid="{5BB41CD0-34F5-4C7A-AA0C-DAD8E143AEE2}">
+          <File Id="FILE_KinectitudeCoreDLL_CONFIG" Source="..\..\..\Build\$(var.Kinectitude.Core.Platform)\$(var.Kinectitude.Core.Configuration)\Kinectitude.Core.dll.config" KeyPath="yes" />
+        </Component>
+        <Component Id="CMP_KinectitudeEditorEXE" Guid="{D5C25092-EEA5-4714-9EB7-4E7AA465D780}">
+          <File Id="FILE_KinectitudeEditorEXE" Source="..\..\..\Build\$(var.Kinectitude.Core.Platform)\$(var.Kinectitude.Core.Configuration)\Kinectitude.Editor.exe" KeyPath="yes" />
+        </Component>
+        <Component Id="CMP_KinectitudeEditorEXE_CONFIG" Guid="{13D2044C-E585-4467-82A6-91FBA2ABD4AF}">
+          <File Id="FILE_KinectitudeEditorEXE_CONFIG" Source="..\..\..\Build\$(var.Kinectitude.Core.Platform)\$(var.Kinectitude.Core.Configuration)\Kinectitude.Editor.exe.config" KeyPath="yes" />
+        </Component>
+        <Component Id="CMP_KinectitudePlayerEXE" Guid="{CBBF1394-16C4-4FB1-AD12-4351BDEB737F}">
+          <File Id="FILE_KinectitudePlayerEXE" Source="..\..\..\Build\$(var.Kinectitude.Core.Platform)\$(var.Kinectitude.Core.Configuration)\Kinectitude.Player.exe" KeyPath="yes" />
+        </Component>
+        <Component Id="CMP_KinectitudePlayerEXE_CONFIG" Guid="{6D216805-FF7E-4A9B-8313-24C24B50F27B}">
+          <File Id="FILE_KinectitudePlayerEXE_CONFIG" Source="..\..\..\Build\$(var.Kinectitude.Core.Platform)\$(var.Kinectitude.Core.Configuration)\Kinectitude.Player.exe.config" KeyPath="yes" />
+        </Component>
+        <!--SlimDX?-->
+        <Component Id="CMP_SystemWindowsInteractivityDLL" Guid="{D25B3892-900E-4EE6-8A6B-30D2B6B26F17}">
+          <File Id="FILE_SystemWindowsInteractivityDLL" Source="..\..\..\Build\$(var.Kinectitude.Core.Platform)\$(var.Kinectitude.Core.Configuration)\System.Windows.Interactivity.dll" KeyPath="yes" />
+        </Component>
+      </DirectoryRef>
+
+      <DirectoryRef Id="InteractivityResourcesFolder">
+        <Component Id="CMP_SystemWindowsInteractivityResourcesDLL" Guid="{AE0A2B8C-997B-4BF2-964F-42CBDDA90C4B}">
+          <File Id="FILE_SystemWindowsInteractivityResourcesDLL" Source="..\..\..\Build\$(var.Kinectitude.Core.Platform)\$(var.Kinectitude.Core.Configuration)\en\System.Windows.Interactivity.resources.dll" KeyPath="yes" />
+        </Component>
+      </DirectoryRef>
+      
+      <DirectoryRef Id="PluginsFolder">
+        <Component Id="CMP_FarseerPhysicsDLL" Guid="{AF907DBF-403F-4B9C-9EE9-FBF4FEA8BF76}">
+          <File Id="FILE_FarseerPhysicsDLL" Source="..\..\..\Build\$(var.Kinectitude.Core.Platform)\$(var.Kinectitude.Core.Configuration)\Plugins\FarseerPhysics.dll" KeyPath="yes" />
+        </Component>
+        <Component Id="CMP_KinectToolboxDLL" Guid="{AAAC4E3C-6E99-4BF6-94F4-AD1AF8D5FF01}">
+          <File Id="FILE_KinectToolboxDLL" Source="..\..\..\Build\$(var.Kinectitude.Core.Platform)\$(var.Kinectitude.Core.Configuration)\Plugins\Kinect.Toolbox.dll" KeyPath="yes" />
+        </Component>
+        <Component Id="CMP_KinectitudeInputDLL" Guid="{242160F6-FB54-47E7-99B0-EF82D2B3D522}">
+          <File Id="FILE_KinectitudeInputDLL" Source="..\..\..\Build\$(var.Kinectitude.Core.Platform)\$(var.Kinectitude.Core.Configuration)\Plugins\Kinectitude.Input.dll" KeyPath="yes" />
+        </Component>
+        <Component Id="CMP_KinectitudeKinectDLL" Guid="{43C8BBF7-66CA-41B6-9D54-6E9A98A8B785}">
+          <File Id="FILE_KinectitudeKinectDLL" Source="..\..\..\Build\$(var.Kinectitude.Core.Platform)\$(var.Kinectitude.Core.Configuration)\Plugins\Kinectitude.Kinect.dll" KeyPath="yes" />
+        </Component>
+        <Component Id="CMP_KinectitudePhysicsDLL" Guid="{65ECBF9E-F1F7-4944-BE42-4184EF5F286A}">
+          <File Id="FILE_KinectitudePhysicsDLL" Source="..\..\..\Build\$(var.Kinectitude.Core.Platform)\$(var.Kinectitude.Core.Configuration)\Plugins\Kinectitude.Physics.dll" KeyPath="yes" />
+        </Component>
+        <Component Id="CMP_KinectitudeRenderDLL" Guid="{996325B2-88F1-466B-8398-B655F7C7FDB2}">
+          <File Id="FILE_KinectitudeRenderDLL" Source="..\..\..\Build\$(var.Kinectitude.Core.Platform)\$(var.Kinectitude.Core.Configuration)\Plugins\Kinectitude.Render.dll" KeyPath="yes" />
+        </Component>
+        <Component Id="CMP_KinectitudeRenderDLL_CONFIG" Guid="{802664E6-3615-4DCA-BF26-4697216D2448}">
+          <File Id="FILE_KinectitudeRenderDLL_CONFIG" Source="..\..\..\Build\$(var.Kinectitude.Core.Platform)\$(var.Kinectitude.Core.Configuration)\Plugins\Kinectitude.Render.dll.config" KeyPath="yes" />
+        </Component>
+        <Component Id="CMP_KinectitudeSoundDLL" Guid="{33179EC4-C027-4D0D-9120-76EE829E40C0}">
+          <File Id="FILE_KinectitudeSoundDLL" Source="..\..\..\Build\$(var.Kinectitude.Core.Platform)\$(var.Kinectitude.Core.Configuration)\Plugins\Kinectitude.Sound.dll" KeyPath="yes" />
+        </Component>
+        <Component Id="CMP_KinectitudeSoundDLL_CONFIG" Guid="{084127AC-AABA-4DEF-A371-67214AB2F45A}">
+          <File Id="FILE_KinectitudeSoundDLL_CONFIG" Source="..\..\..\Build\$(var.Kinectitude.Core.Platform)\$(var.Kinectitude.Core.Configuration)\Plugins\Kinectitude.Sound.dll.config" KeyPath="yes" />
+        </Component>
+      </DirectoryRef>
+
+      <DirectoryRef Id="ShortcutsFolder">
+        <Component Id="CMP_EditorShortcut" Guid="">
+          <Shortcut Id="EditorStartMenuShortcut"
+                    Name="Kinectitude Editor"
+                    Description="Launch the Kinectitude Editor"
+                    Target="[InstallFolder]Kinectitude.Editor.exe"
+                    WorkingDirectory="InstallFolder" />
+          <Shortcut Id="UninstallShortcut"
+                    Name="Uninstall Kinectitude"
+                    Description="Uninstalls Kinectitude and all of its components"
+                    Target="[System64Folder]msiexec.exe"
+                    Arguments="/x [ProductCode]" />
+          <RemoveFolder Id="RemoveShortcutsFolder" On="uninstall" />
+          <RegistryValue Root="HKCU"
+                         Key="Software\Kinectitude"
+                         Name="installed"
+                         Type="integer"
+                         Value="1"
+                         KeyPath="yes" />
+        </Component>
+      </DirectoryRef>
+      
+      <Feature Id="ProductFeature" Title="Kinectitude" Level="1">
+        <ComponentRef Id="CMP_LicenseMD" />
+        <ComponentRef Id="CMP_IronyDLL" />
+        <ComponentRef Id="CMP_IronyInterpreterDLL" />
+        <ComponentRef Id="CMP_KinectitudeCoreDLL" />
+        <ComponentRef Id="CMP_KinectitudeCoreDLL_CONFIG" />
+        <ComponentRef Id="CMP_KinectitudeEditorEXE" />
+        <ComponentRef Id="CMP_KinectitudeEditorEXE_CONFIG" />
+        <ComponentRef Id="CMP_KinectitudePlayerEXE" />
+        <ComponentRef Id="CMP_KinectitudePlayerEXE_CONFIG" />
+        <ComponentRef Id="CMP_SystemWindowsInteractivityDLL" />
+        <ComponentRef Id="CMP_SystemWindowsInteractivityResourcesDLL" />
+        <ComponentRef Id="CMP_FarseerPhysicsDLL" />
+        <ComponentRef Id="CMP_KinectToolboxDLL" />
+        <ComponentRef Id="CMP_KinectitudeInputDLL" />
+        <ComponentRef Id="CMP_KinectitudeKinectDLL" />
+        <ComponentRef Id="CMP_KinectitudePhysicsDLL" />
+        <ComponentRef Id="CMP_KinectitudeRenderDLL" />
+        <ComponentRef Id="CMP_KinectitudeRenderDLL_CONFIG" />
+        <ComponentRef Id="CMP_KinectitudeSoundDLL" />
+        <ComponentRef Id="CMP_KinectitudeSoundDLL_CONFIG" />
+        <ComponentRef Id="CMP_EditorShortcut" />
+      </Feature>
+
+      <UIRef Id="WixUI_Minimal" />
+      <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+      
+    </Product>
+</Wix>

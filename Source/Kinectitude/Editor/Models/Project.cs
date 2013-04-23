@@ -346,7 +346,7 @@ namespace Kinectitude.Editor.Models
             {
                 "Kinectitude.Player.exe",
                 "Kinectitude.Player.exe.config",
-                "SlimDX.dll",
+                //"SlimDX.dll",
                 "Kinectitude.Core.dll",
                 "Kinectitude.Core.dll.config",
                 "Irony.Interpreter.dll",

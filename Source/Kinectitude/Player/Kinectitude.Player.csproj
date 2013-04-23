@@ -36,6 +36,24 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>signature.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>$(ProjectDir)..\..\..\Build\$(Platform)\$(Configuration)\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>$(ProjectDir)..\..\..\Build\$(Platform)\$(Configuration)\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -90,6 +108,7 @@
     <ProjectReference Include="..\Input\Kinectitude.Input.csproj">
       <Project>{6f23fa79-3a6f-4d54-a099-336f90a719e7}</Project>
       <Name>Kinectitude.Input</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Render\Kinectitude.Render.csproj">
       <Project>{E6DD6F76-999C-4B56-887C-347FAF50DAB3}</Project>
